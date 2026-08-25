@@ -1,0 +1,463 @@
+import { useQuery } from "@tanstack/react-query";
+import { RefreshCw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
+import { buildModelMarket } from "@/infrastructure/compose";
+import { getDeskExtras, getMarket, getPulse, getTick } from "@/infrastructure/server-fns";
+import { cn, formatPct, formatUsd } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ClarityPanel } from "./clarity-panel";
+import { ClientOnly } from "./client-only";
+import { CommunityFeedPanel } from "./community-feed";
+import { FearGreedPanel } from "./fear-greed-panel";
+import { HistoryTimeline } from "./history-timeline";
+import { LiquidityPanel } from "./liquidity-panel";
+import { NewsCycle } from "./news-cycle";
+import { OnchainPanel } from "./onchain-panel";
+import { PriceChart } from "./price-chart";
+import { ContributeQr } from "@/components/contribute-qr";
+import { SiteShell } from "@/components/site-header";
+import { useT } from "@/lib/i18n";
+import { useLocale } from "@/lib/locale";
+import { MaToggles, Segmented, HeatToggle } from "./segmented";
+
+const CHART_RANGES: { value: ChartRange; label: string }[] = [
+  { value: "1d", label: "1D" },
+  { value: "1w", label: "1S" },
+  { value: "1m", label: "1M" },
+  { value: "6m", label: "6M" },
+];
+
+const DEFAULT_MA: Record<MaKey, boolean> = {
+  ema1d: true,
+  ema1w: true,
+  ema1m: true,
+  ema6m: true,
+};
+
+function fgLabel(classification: string) {
+  if (classification === "Extreme Fear") return "Miedo extremo";
+  if (classification === "Extreme Greed") return "Codicia extrema";
+  if (classification === "Fear") return "Miedo";
+  if (classification === "Greed") return "Codicia";
+  return "Neutral";
+}
+
+function asLiq(range: ChartRange): LiqRange {
+  return range === "6m" ? "1m" : range;
+}
+
+function formatClock(ts: number) {
+  return new Date(ts).toLocaleTimeString("es-UY", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
+
+export function Desk() {
+  const [range, setRange] = useState<ChartRange>("1w");
+  const [ma, setMa] = useState(DEFAULT_MA);
+  const [heatOn, setHeatOn] = useState(true);
+  const liq = asLiq(range);
+  const uiLang = useLocale((s) => s.lang);
+  const t = useT();
+  const [allowFetch, setAllowFetch] = useState(false);
+  useEffect(() => {
+    setAllowFetch(true);
+  }, []);
+
+  const fallback = useMemo(() => buildModelMarket(range, liq), [range, liq]);
+
+  const query = useQuery({
+    queryKey: ["market", range, liq],
+    queryFn: () => getMarket({ data: { range, liq } }),
+    enabled: allowFetch,
+    staleTime: 4_000,
+    refetchInterval: (q) => (q.state.status === "error" ? 8_000 : 10_000),
+    refetchOnWindowFocus: true,
+    retry: 2,
+    placeholderData: (prev) => prev,
+  });
+
+  const extras = useQuery({
+    queryKey: ["extras", range],
+    queryFn: () => getDeskExtras({ data: { range } }),
+    enabled: allowFetch,
+    staleTime: 8_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+    retry: 2,
+    placeholderData: (prev) => prev,
+  });
+
+  const pulse = useQuery({
+    queryKey: ["pulse"],
+    queryFn: () => getPulse({ data: { lang: uiLang } }),
+    enabled: allowFetch,
+    staleTime: 90_000,
+    refetchInterval: 120_000,
+    refetchOnWindowFocus: true,
+    retry: 2,
+    placeholderData: (prev) => prev,
+  });
+
+  const tick = useQuery({
+    queryKey: ["tick"],
+    queryFn: () => getTick(),
+    enabled: allowFetch,
+    staleTime: 0,
+    refetchInterval: 2_000,
+    refetchOnWindowFocus: true,
+    retry: 1,
+    placeholderData: (prev) => prev,
+  });
+
+  const market = useMemo(() => {
+    const base = query.data ?? fallback;
+    return tick.data ? applyTick(base, tick.data) : base;
+  }, [query.data, fallback, tick.data]);
+  const fetching = query.isFetching || extras.isFetching;
+  const updatedAt = tick.dataUpdatedAt || query.dataUpdatedAt || market.asOf;
+  const up = (market?.change24h ?? 0) >= 0;
+
+  const dist6m = useMemo(() => {
+    if (!market?.emaNow.ema6m || !market.price) return null;
+    return ((market.price - market.emaNow.ema6m) / market.emaNow.ema6m) * 100;
+  }, [market]);
+
+  const poc = market.poc;
+  const fg = extras.data?.fearGreed ?? null;
+  const fgUp = (fg?.value ?? 50) >= 50;
+  const liqData = extras.data?.liquidity ?? null;
+
+  const priceDelta = useMemo(() => {
+    const c = market.candles;
+    if (c.length < 2) return null;
+    const last = c[c.length - 1]!;
+    const from = last.t - (market.lookbackMs || 7 * 86_400_000);
+    const first = c.find((x) => x.t >= from) ?? c[0]!;
+    if (!first.close) return null;
+    return ((last.close - first.close) / first.close) * 100;
+  }, [market.candles, market.lookbackMs]);
+
+  return (
+    <SiteShell>
+      <section id="mercado" className="scroll-mt-28 space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+              {t("mercadoTitle")}
+            </h1>
+            <p className="mt-1 text-base text-pretty text-muted-foreground">
+              {t("mercadoLead")}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-right">
+              <Badge>
+                {query.isLoading && !query.data
+                  ? t("loading")
+                  : market.source === "hyperliquid"
+                    ? t("srcHl")
+                    : market.source === "binance"
+                      ? t("srcBn")
+                      : market.source === "okx"
+                        ? t("srcOkx")
+                        : t("srcModel")}
+              </Badge>
+              {updatedAt ? (
+                <p className="mt-1 font-mono text-xs tabular-nums text-muted-foreground">
+                  {query.isFetching ? t("updating") : `act. ${formatClock(updatedAt)}`}
+                </p>
+              ) : null}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t("refresh")}
+              onClick={() => {
+                query.refetch();
+                extras.refetch();
+                tick.refetch();
+              }}
+            >
+              <RefreshCw className={cn("size-4", fetching && "animate-spin")} />
+            </Button>
+          </div>
+        </div>
+
+      <section className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        <Stat
+          label={t("statPrice")}
+          value={formatUsd(market.price, 0)}
+          hint={formatPct(market.change24h)}
+          hintClass={up ? "text-long" : "text-short"}
+        />
+        <Stat
+          label={t("statEma")}
+          value={market.emaNow.ema6m ? formatUsd(market.emaNow.ema6m, 0) : "—"}
+          hint={dist6m != null ? `${formatPct(dist6m)} ${t("vsPrice")}` : ""}
+        />
+        <Stat
+          label={t("statLs")}
+          value={`${market.longPct.toFixed(1)}%`}
+          hint={`${t("short")} ${market.shortPct.toFixed(1)}%`}
+        />
+        <Stat
+          label={t("statFg")}
+          value={fg ? String(fg.value) : "—"}
+          hint={fg ? fgLabel(fg.classification) : "Alternative.me"}
+          hintClass={fg ? (fgUp ? "text-long" : "text-short") : undefined}
+        />
+        <Stat
+          label={t("statLiq")}
+          value={liqData ? String(liqData.score) : "—"}
+          hint={liqData ? `${liqData.spreadBps.toFixed(2)} ${t("spread")}` : "OKX libro"}
+        />
+      </section>
+
+      <PocCallout poc={poc} price={market.price} />
+
+      <LongShortBar longPct={market.longPct} shortPct={market.shortPct} />
+
+      <section className="overflow-hidden rounded-lg bg-card shadow-[var(--shadow-border)]">
+        <div className="flex flex-col gap-1.5 border-b border-border px-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-3">
+          <Segmented
+            ariaLabel="Periodo del gráfico"
+            value={range}
+            options={CHART_RANGES}
+            onChange={setRange}
+          />
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-1 sm:justify-end">
+            <MaToggles
+              enabled={ma}
+              onToggle={(key) =>
+                setMa((prev) => ({ ...prev, [key]: !prev[key as MaKey] }))
+              }
+            />
+            <HeatToggle on={heatOn} onToggle={() => setHeatOn((v) => !v)} />
+          </div>
+        </div>
+        <div className="bg-plot">
+          <ClientOnly fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
+            <PriceChart market={market} enabled={ma} heatOn={heatOn} />
+          </ClientOnly>
+        </div>
+      </section>
+      </section>
+
+      <section id="participe" className="scroll-mt-28">
+        <ContributeQr />
+      </section>
+
+      <section id="comunidad" className="scroll-mt-28">
+        <CommunityFeedPanel />
+      </section>
+
+      <section id="pulso" className="scroll-mt-28">
+        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
+      </section>
+
+      <section id="red" className="scroll-mt-28 space-y-3">
+        <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{t("redTitle")}</h2>
+        <LiquidityPanel data={liqData} />
+        <div className="grid gap-3 lg:grid-cols-3">
+          <OnchainPanel data={extras.data?.onchain ?? null} priceDelta={priceDelta} />
+          <FearGreedPanel data={fg} />
+          <ClarityPanel data={extras.data?.clarity ?? null} />
+        </div>
+      </section>
+
+      <HistoryTimeline />
+
+      <section id="datos" className="scroll-mt-28 rounded-lg bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-5">
+        <details>
+          <summary className="cursor-pointer text-sm font-medium text-foreground">
+            {t("datosTitle")}
+          </summary>
+          <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
+            <p>
+              bitacora.btc es el nodo que te une al mundo Bitcoin: un desk de un solo gráfico.
+              Los botones 1D / 1S / 1M / 6M fijan el <span className="text-foreground">intervalo de cada vela</span>
+              (día, semana, mes, semestre) y no cambian al panear o hacer zoom. Velas sólidas estilo
+              Binance; el mapa de calor es el promedio ponderado de los 10 perps más grandes, resampleado
+              a ese mismo intervalo.
+            </p>
+            <p>
+              <span className="text-foreground">Datos.</span> Las velas salen nativas de Binance
+              (<span className="font-mono text-foreground">1d / 1w / 1M</span>; 6M se arma con seis
+              mensuales). Si Binance no responde, OKX. El histórico profundo (Coinbase + blockchain.info)
+              se reagrupa al mismo intervalo para poder ir hasta el origen de la cotización. El mapa
+              de liquidaciones combina Binance, OKX, Bybit, Bitget, Hyperliquid, Gate, KuCoin, HTX,
+              MEXC y Kraken. El badge arriba a la derecha dice la fuente del precio.
+            </p>
+            <p>
+              <span className="text-foreground">Mapa.</span> Motor LiqMap (estilo Coinglass): en cada
+              vela se siembran liquidaciones en entry × (1 ± 1/L) para 5×–125×, ponderadas por nocional,
+              con kernel gaussiano. Cada palanca decae con su vida media. Cuando la mecha recorre un
+              precio, ese calor se borra. Azul = poca acumulación; amarillo = máximo. La franja derecha
+              marca los imanes. El <span className="text-primary">POC semanal</span> se calcula con 52
+              velas de 1S y no cambia al hacer zoom. Arriba del spot son shorts; abajo, longs.
+            </p>
+            <p>
+              <span className="text-foreground">Medias.</span> EMA con decay temporal sobre el cierre:{" "}
+              <span className="text-ma-1d">1D cian</span>,{" "}
+              <span className="text-ma-1w">1S violeta</span>,{" "}
+              <span className="text-ma-1m">1M lima</span>,{" "}
+              <span className="text-ma-6m">6M naranja Bitcoin flúor</span>.
+              La 6M es un trazo fino (#ff7a12) con halo suave #F7931A: al hacer zoom el glow se
+              estrecha para no tapar velas; al alejar, apenas se enciende para no perderse en el mapa.
+              Curva continua, no segmentos. El reencuadre vuelve al tramo reciente de ese intervalo.
+            </p>
+            <p>
+              <span className="text-foreground">Red Bitcoin.</span> Hashrate, dificultad y
+              transacciones diarias de blockchain.info, comparadas con el precio en el mismo
+              periodo. El hashrate mide el trabajo de mineros; las tx, la actividad de la cadena.
+            </p>
+            <p>
+              <span className="text-foreground">CLARITY.</span> Precio del mercado Sí/No en
+              Polymarket: «Clarity Act (H.R.3633) signed into law in 2026?». Ese precio es la
+              probabilidad implícita de que el proyecto se firme en 2026.
+            </p>
+            <p>
+              <span className="text-foreground">Miedo / codicia.</span> Índice diario de
+              Alternative.me (metodología tipo CNN): 0–24 miedo extremo, 25–49 miedo, 50–54
+              neutral, 55–74 codicia, 75–100 codicia extrema.
+            </p>
+            <p>
+              <span className="text-foreground">Liquidez.</span> Libro L2, open interest, funding 8h
+              y base mark–índice del swap BTC-USDT en OKX. El score pondera spread (más estrecho
+              mejor), nocional acumulado a ±1% del mid e imbalance del book.
+            </p>
+            <p>
+              <span className="text-foreground">Pulso.</span> Rastreo económico: RSS públicos
+              (CoinDesk, Bitcoin Magazine, Optech, Cointelegraph, CryptoSlate) sin API key, más
+              CryptoCompare. Filtro por Bitcoin, ETF, SEC, minería y temas afines. Tendencias:
+              CoinGecko. El ciclo avanza cada 8 s.
+            </p>
+            <p>
+              <span className="text-foreground">Zoom.</span> Rueda o pellizco para acercar, arrastrar
+              para mover, doble clic o el botón de maximizar para volver al periodo completo. El eje
+              Y se reajusta solo en log.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {query.isError && (
+        <p className="text-sm text-short">
+          No se pudo leer el mercado. Reintentá actualizar.
+        </p>
+      )}
+    </SiteShell>
+  );
+}
+
+function PocCallout({ poc, price }: { poc: number | null; price: number }) {
+  const ready = poc != null && poc > 0 && price > 0;
+  const above = ready ? poc > price : false;
+  const dist = ready ? (Math.abs(price - poc) / poc) * 100 : null;
+  return (
+    <section className="rounded-2xl bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <span className="rounded bg-primary px-1.5 py-0.5 text-primary-foreground">POC LIQ</span>
+            Punto de control semanal
+          </p>
+          <p className="mt-1 font-mono text-2xl tabular-nums tracking-tight text-primary sm:text-3xl">
+            {ready ? formatUsd(poc, 0) : "—"}
+          </p>
+        </div>
+        {dist != null ? (
+          <p className="font-mono text-sm tabular-nums text-muted-foreground">
+            {dist.toFixed(1)}% {above ? "por encima" : "por debajo"} del precio
+          </p>
+        ) : null}
+      </div>
+      <p className="mt-2 text-sm text-pretty text-muted-foreground">
+        {ready ? (
+          <>
+            Es el precio con{" "}
+            <span className="text-foreground">más capital apalancado a liquidar</span> en las
+            últimas 52 velas semanales. No se mueve al hacer zoom: el mapa local sí cambia, el POC
+            no.{" "}
+            {above
+              ? "Está arriba: si BTC sube hasta ahí, barre shorts."
+              : "Está abajo: si BTC baja hasta ahí, barre longs."}
+          </>
+        ) : (
+          "Cuando el mapa tenga datos, acá se lee el imán más pesado: el precio donde hay más liquidaciones acumuladas."
+        )}
+      </p>
+    </section>
+  );
+}
+
+function LongShortBar({ longPct, shortPct }: { longPct: number; shortPct: number }) {
+  const long = Number.isFinite(longPct) ? Math.max(0, longPct) : 50;
+  const short = Number.isFinite(shortPct) ? Math.max(0, shortPct) : 50;
+  const sum = long + short || 1;
+  const lw = (long / sum) * 100;
+  const sw = (short / sum) * 100;
+  return (
+    <div
+      className="flex h-11 overflow-hidden rounded-xl"
+      role="img"
+      aria-label={`Long ${long.toFixed(1)} por ciento, short ${short.toFixed(1)} por ciento`}
+    >
+      <div
+        className="flex min-w-0 items-center justify-between gap-2 bg-long px-3 text-primary-foreground"
+        style={{ width: `${lw}%` }}
+      >
+        {lw >= 20 ? (
+          <>
+            <span className="text-xs font-medium tracking-wide uppercase">Long</span>
+            <span className="font-mono text-sm font-semibold tabular-nums">{long.toFixed(1)}%</span>
+          </>
+        ) : null}
+      </div>
+      <div
+        className="flex min-w-0 items-center justify-end gap-2 bg-short px-3 text-primary-foreground"
+        style={{ width: `${sw}%` }}
+      >
+        {sw >= 20 ? (
+          <>
+            <span className="font-mono text-sm font-semibold tabular-nums">{short.toFixed(1)}%</span>
+            <span className="text-xs font-medium tracking-wide uppercase">Short</span>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  hint,
+  hintClass,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  hintClass?: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-card px-3 py-2 shadow-[var(--shadow-border)] sm:px-4">
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase whitespace-nowrap">
+        {label}
+      </p>
+      <p className="mt-0.5 truncate font-mono text-lg tabular-nums text-foreground sm:text-xl">
+        {value}
+      </p>
+      {hint ? (
+        <p className={cn("mt-0.5 font-mono text-sm tabular-nums", hintClass ?? "text-muted-foreground")}>
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}

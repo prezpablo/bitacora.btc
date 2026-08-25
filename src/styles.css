@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Ubuntu Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-background: #ffffff;
+  --color-foreground: #1d1d1b;
+  --color-card: #ffffff;
+  --color-elevated: #f6f6f6;
+  --color-subtle: #efece7;
+  --color-muted: #5c6370;
+  --color-muted-foreground: #5c6370;
+  --color-primary: #f7931a;
+  --color-primary-foreground: #ffffff;
+  --color-border: #e6e6e6;
+  --color-border-strong: #c8c8c8;
+  --color-ring: #f7931a;
+  --color-long: #0ecb81;
+  --color-short: #f6465d;
+  --color-doji: #848e9c;
+  --color-ma-1d: #5ec8ff;
+  --color-ma-1w: #c9a0ff;
+  --color-ma-1m: #9dff6a;
+  --color-ma-6m: #ff7a12;
+  --color-heat-0: #1a0a32;
+  --color-heat-1: #3b1480;
+  --color-heat-2: #147d9c;
+  --color-heat-3: #1ed4a0;
+  --color-heat-4: #d4f04a;
+  --color-heat-5: #ffff8a;
+  --color-plot: #140826;
+  --color-plot-rail: #1a0a32;
+  --color-grade-low: #f6465d;
+  --color-grade-mid: #e2b203;
+  --color-grade-high: #0ecb81;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius: 6px;
+
+  --shadow-border: 0 0 0 1px #e6e6e6;
+  --shadow-border-hover: 0 0 0 1px #c8c8c8;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+}
+
+@keyframes velar-neon {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.velar-neon-glow {
+  animation: velar-neon 1.7s var(--ease-out) infinite;
+}
+
+@keyframes velar-news-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.velar-news-in {
+  animation: velar-news-in 280ms var(--ease-out);
+}
+
+@keyframes bitacora-hit-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
+
+.bitacora-hit {
+  position: relative;
+  width: 32px;
+  height: 44px;
+}
+
+.bitacora-hit-pulse {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f7931a;
+  transform: translate(-50%, -50%);
+  animation: bitacora-hit-pulse 1.5s var(--ease-out) infinite;
+}
+
+.bitacora-hit-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f7931a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 10px rgb(29 29 27 / 0.28);
+}
+
+.bitacora-hit-point {
+  width: 0;
+  height: 0;
+  margin: -5px auto 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 14px solid #f7931a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bitacora-hit-pulse {
+    animation: none;
+    opacity: 0.25;
+  }
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    border-top: 4px solid var(--color-primary);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-weight: 500;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--color-primary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
