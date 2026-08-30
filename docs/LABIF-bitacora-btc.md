@@ -232,7 +232,7 @@ El directorio federado no es KPI de Bitácora: es contexto. El KPI es el **overl
 | Informe al fondo | 1 hoja / trimestre | Puntos, ciudades, pines, contactos, estado de infra — sin vanidad de tráfico |
 | Tablero de uso sin cookies | Encendido | Conteos de búsqueda y de CTA de historia, sin user-id |
 | Altas: intentadas vs. verificadas | Publicadas | Ratio visible; no se esconde el rechazo |
-| Tiempo de verificación | Mediana en días | Código BIT-XXXX en canal público → scraper |
+| Tiempo de verificación | Mediana en días | Código CARGA-XXXX en canal público → scraper |
 | Contacto | Canal operativo | Formulario que entrega, sin exponer el correo |
 | Reporte “ya no opera” | Política publicada | Captcha → 14 días a confirmar → 60 días rojo → baja a los 6 meses por nota 1–2 |
 
@@ -252,7 +252,7 @@ Soberanía no es “cuántos nodos meten data al heatmap”. Es **quién custodi
 
 | Amenaza | Control | Éxito |
 |---|---|---|
-| Bots | Captcha + prueba de control en canal público | Alta no se “prende” sin código BIT-XXXX visible |
+| Bots | Captcha + prueba de control en canal público | Alta no se “prende” sin código CARGA-XXXX visible |
 | Fantasmas | Sin DNI; con prueba de que controlan web, X, Nostr o Telegram | Estrella naranja solo si el scraper encuentra el código |
 | Comercio cerrado | Reporte comunitario + regla de 14 / 60 / 180 días | Overlay propio no acumula puntos muertos |
 | Review bombing | Promedio = puntaje / votos en el CSV; 1–2 baja | Baja por regla publicada, no por moderación opaca |

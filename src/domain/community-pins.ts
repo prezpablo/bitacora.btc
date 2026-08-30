@@ -42,7 +42,7 @@ export function makePinToken() {
   const abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let s = "";
   for (let i = 0; i < 6; i++) s += abc[Math.floor(Math.random() * abc.length)];
-  return `BIT-${s}`;
+  return `CARGA-${s}`;
 }
 
 function cell(v: string | number | boolean) {

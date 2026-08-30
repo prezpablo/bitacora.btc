@@ -60,7 +60,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "¿Cómo sumo mi comunidad o comercio al mapa?",
-      a: "En el mapa, proponé un punto, cargá nombre, descripción, redes y un logo. Publicá el código BIT-XXXX en tu web o red; un scraper lo verifica y prende la estrella naranja. También se verifica con dos redes públicas o con nota ≥ 4 y tres votos.",
+      a: "En el mapa, proponé un punto, cargá nombre, descripción, redes y un logo. Publicá el código CARGA-XXXX en tu web o red; un scraper lo verifica y prende la estrella naranja. También se verifica con dos redes públicas o con nota ≥ 4 y tres votos.",
     },
     {
       q: "¿Bitácora.btc es una empresa o un exchange?",
@@ -78,7 +78,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "How do I add my community or shop to the map?",
-      a: "On the map, drop a pin, add name, description, socials and a logo. Publish the BIT-XXXX code on your site or socials; a scraper verifies it and lights the orange star. Two public networks or a rating ≥ 4 with three votes also verify.",
+      a: "On the map, drop a pin, add name, description, socials and a logo. Publish the CARGA-XXXX code on your site or socials; a scraper verifies it and lights the orange star. Two public networks or a rating ≥ 4 with three votes also verify.",
     },
     {
       q: "Is Bitácora.btc a company or an exchange?",
@@ -96,7 +96,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "Como somo a minha comunidade ou comércio ao mapa?",
-      a: "No mapa, propõe um ponto, carrega nome, descrição, redes e um logo. Publica o código BIT-XXXX na tua web ou rede; um scraper verifica e acende a estrela laranja. Também se verifica com duas redes públicas ou nota ≥ 4 com três votos.",
+      a: "No mapa, propõe um ponto, carrega nome, descrição, redes e um logo. Publica o código CARGA-XXXX na tua web ou rede; um scraper verifica e acende a estrela laranja. Também se verifica com duas redes públicas ou nota ≥ 4 com três votos.",
     },
     {
       q: "A Bitácora.btc é uma empresa ou um exchange?",

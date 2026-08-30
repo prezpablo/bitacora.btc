@@ -2,7 +2,7 @@ import type { CommunityPin } from "@/domain/community-pins";
 import { PIN_TTL_MS } from "@/domain/community-pins";
 import { fetchPublic, isPublicHttp } from "./safe-fetch";
 
-const TOKEN_RE = /^BIT-[A-Z0-9]{6}$/;
+const TOKEN_RE = /^(CARGA|BIT)-[A-Z0-9]{6}$/;
 
 function decode(html: string) {
   return html
