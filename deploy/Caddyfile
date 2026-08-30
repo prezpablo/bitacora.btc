@@ -1,5 +1,15 @@
-# HTTP primero (el puente bitácora.btc.us redirige a la IP).
-# Cuando haya un hostname con DNS, Caddy puede pedir certificado solo.
+# HTTPS con nombre (Let's Encrypt). El candado no existe sobre una IP cruda.
+45.158.116.49.sslip.io {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:8080
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options SAMEORIGIN
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+}
+
 :80 {
 	encode gzip zstd
 	reverse_proxy 127.0.0.1:8080
