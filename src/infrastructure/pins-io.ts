@@ -10,30 +10,38 @@ async function pinsFiles() {
 
 async function readLocal(): Promise<string> {
   const { readFile } = await import("node:fs/promises");
+  let best = "";
+  let bestN = -1;
   for (const file of await pinsFiles()) {
     try {
-      return await readFile(file, "utf8");
+      const text = await readFile(file, "utf8");
+      const n = parsePinsCsv(text).length;
+      if (n > bestN || (n === bestN && text.length > best.length)) {
+        best = text;
+        bestN = n;
+      }
     } catch {
       /* next */
     }
   }
-  return "";
+  return best;
 }
 
 async function writeLocal(csv: string) {
   const { mkdir, writeFile } = await import("node:fs/promises");
   const { dirname } = await import("node:path");
+  let ok = 0;
   let last: unknown;
   for (const file of await pinsFiles()) {
     try {
       await mkdir(dirname(file), { recursive: true });
       await writeFile(file, csv, "utf8");
-      return;
+      ok++;
     } catch (e) {
       last = e;
     }
   }
-  throw last ?? new Error("pins write failed");
+  if (!ok) throw last ?? new Error("pins write failed");
 }
 
 export async function loadPins(): Promise<CommunityPin[]> {
@@ -45,17 +53,12 @@ export async function loadPins(): Promise<CommunityPin[]> {
   } catch {
     /* local only */
   }
-  const rows = mergePins(parsePinsCsv(local), parsePinsCsv(remote));
-  return rows;
+  return mergePins(parsePinsCsv(local), parsePinsCsv(remote));
 }
 
-export async function savePins(rows: CommunityPin[]): Promise<boolean> {
-  const current = await loadPins();
-  const merged = mergePins(current, rows);
-  const csv = stringifyPinsCsv(merged);
-  await writeLocal(csv);
+async function pushGithub(csv: string) {
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
-  if (!token) return true;
+  if (!token) return;
   try {
     const owner = process.env.GITHUB_MAP_OWNER || "prezpablo";
     const repo = process.env.GITHUB_MAP_REPO || "bitacora.btc";
@@ -85,5 +88,20 @@ export async function savePins(rows: CommunityPin[]): Promise<boolean> {
   } catch {
     /* token optional */
   }
+}
+
+export async function savePins(rows: CommunityPin[]): Promise<boolean> {
+  const current = await loadPins();
+  const merged = mergePins(current, rows);
+  const csv = stringifyPinsCsv(merged);
+  await writeLocal(csv);
+  await pushGithub(csv);
+  return true;
+}
+
+export async function replacePins(rows: CommunityPin[]): Promise<boolean> {
+  const csv = stringifyPinsCsv(rows);
+  await writeLocal(csv);
+  await pushGithub(csv);
   return true;
 }

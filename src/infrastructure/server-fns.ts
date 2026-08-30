@@ -10,7 +10,7 @@ import { fetchNetworkEvents } from "./events";
 import { nominatimCity, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
 import { loadMapCsvText, saveMapCsvText } from "./map-csv-io";
-import { loadPins, savePins } from "./pins-io";
+import { loadPins, savePins, replacePins } from "./pins-io";
 import { scrapePendingPins, scrapeShowsToken } from "./pin-verify";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, tooMany } from "./rate-limit";
@@ -204,6 +204,17 @@ export const verifyCommunityPin = createServerFn({ method: "POST" })
     pin.verified = true;
     pin.verifiedAt = Date.now();
     await savePins(rows);
+    return { ok: true };
+  });
+
+export const cancelCommunityPin = createServerFn({ method: "POST" })
+  .validator((input: { id: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const rows = await loadPins();
+    const pin = rows.find((p) => p.id === data.id);
+    if (!pin) return { ok: true };
+    if (pin.verified) return { ok: false, error: "live" };
+    await replacePins(rows.filter((p) => p.id !== data.id));
     return { ok: true };
   });
 

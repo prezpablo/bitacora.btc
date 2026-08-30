@@ -1,11 +1,44 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox } from "@/components/map/captcha";
-import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
+import { cancelCommunityPin, getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
 import { pinDaysLeft, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+
+const PENDING_KEY = "bitacora-pin-pending";
+
+type Pending = { id: string; token: string; name: string; proof: string };
+
+function readPending(): Pending | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(PENDING_KEY) || localStorage.getItem(PENDING_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Pending;
+    if (!p.id || !p.token) return null;
+    return p;
+  } catch {
+    return null;
+  }
+}
+
+function writePending(p: Pending | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (!p) {
+      sessionStorage.removeItem(PENDING_KEY);
+      localStorage.removeItem(PENDING_KEY);
+      return;
+    }
+    const raw = JSON.stringify(p);
+    sessionStorage.setItem(PENDING_KEY, raw);
+    localStorage.setItem(PENDING_KEY, raw);
+  } catch {
+    /* quota */
+  }
+}
 
 export function CommunityPinsBoard() {
   const t = useT();
@@ -21,37 +54,17 @@ export function CommunityPinsBoard() {
   const [captchaOk, setCaptchaOk] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [pending, setPending] = useState<{ id: string; token: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [pending, setPending] = useState<Pending | null>(null);
 
   useEffect(() => {
-    if (!pending) return;
-    let stop = false;
-    const tick = async () => {
-      try {
-        const res = await verifyCommunityPin({ data: { id: pending.id } });
-        if (stop) return;
-        if (res.ok) {
-          setPending(null);
-          setName("");
-          setBlurb("");
-          setProof("");
-          setLinks("");
-          setCaptchaOk(false);
-          setErr("");
-          await q.refetch();
-        }
-      } catch {
-        /* next tick */
-      }
-    };
-    const id = window.setInterval(() => void tick(), 8000);
-    const t2 = window.setTimeout(() => void tick(), 2500);
-    return () => {
-      stop = true;
-      window.clearInterval(id);
-      window.clearTimeout(t2);
-    };
-  }, [pending?.id]);
+    setPending(readPending());
+  }, []);
+
+  function keepPending(p: Pending | null) {
+    setPending(p);
+    writePending(p);
+  }
 
   const live = useMemo(() => {
     const rows = q.data || [];
@@ -81,7 +94,7 @@ export function CommunityPinsBoard() {
         setErr(res?.error === "rate" ? t("pinRate") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
       }
-      setPending({ id: res.id, token: res.token });
+      keepPending({ id: res.id, token: res.token, name: name.trim(), proof: proofUrl });
     } catch {
       setErr(t("pinNeed"));
     } finally {
@@ -99,7 +112,7 @@ export function CommunityPinsBoard() {
         setErr(t("pinProofFail"));
         return;
       }
-      setPending(null);
+      keepPending(null);
       setName("");
       setBlurb("");
       setProof("");
@@ -110,6 +123,30 @@ export function CommunityPinsBoard() {
       setErr(t("pinProofFail"));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function cancel() {
+    if (!pending) return;
+    setBusy(true);
+    setErr("");
+    try {
+      await cancelCommunityPin({ data: { id: pending.id } });
+    } catch {
+      /* still drop local hold */
+    }
+    keepPending(null);
+    setBusy(false);
+  }
+
+  async function copyCode() {
+    if (!pending) return;
+    try {
+      await navigator.clipboard.writeText(pending.token);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setErr(pending.token);
     }
   }
 
@@ -137,20 +174,43 @@ export function CommunityPinsBoard() {
         <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
         {pending ? (
           <div className="mt-4 space-y-3">
-            <p className="text-sm text-foreground">
-              {t("pinPostCode")}{" "}
-              <code className="rounded bg-primary px-1.5 py-0.5 font-mono text-sm font-bold text-white">{pending.token}</code>
-            </p>
-            <p className="text-xs text-muted-foreground">{t("pinPostHint")}</p>
-            {err ? <p className="text-sm text-primary">{err}</p> : null}
+            <p className="text-sm text-foreground">{t("pinPostCode")}</p>
             <button
               type="button"
-              className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
-              onClick={() => void check()}
-              disabled={busy}
+              onClick={() => void copyCode()}
+              className="block w-full rounded-md bg-primary px-3 py-3 text-center font-mono text-2xl font-bold tracking-widest text-white sm:text-3xl"
+              title={t("pinCopy")}
             >
-              {t("pinCheck")}
+              {pending.token}
             </button>
+            <p className="text-xs text-muted-foreground">
+              {copied ? t("pinCopied") : t("pinPostHint")}
+            </p>
+            {pending.proof ? (
+              <p className="truncate text-xs text-muted-foreground">
+                {pending.name ? `${pending.name} · ` : ""}
+                {pending.proof}
+              </p>
+            ) : null}
+            {err ? <p className="text-sm text-primary">{err}</p> : null}
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
+                onClick={() => void check()}
+                disabled={busy}
+              >
+                {t("pinCheck")}
+              </button>
+              <button
+                type="button"
+                className="h-9 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-50"
+                onClick={() => void cancel()}
+                disabled={busy}
+              >
+                {t("pinCancel")}
+              </button>
+            </div>
           </div>
         ) : (
           <form
