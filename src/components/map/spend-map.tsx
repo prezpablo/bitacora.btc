@@ -314,12 +314,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         focus ? [focus.lat, focus.lon] : [20, -40],
         focus?.zoom ?? 4,
       );
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/">CARTO</a> · <a href="https://btcmap.org">BTC Map</a>',
-        subdomains: "abcd",
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://btcmap.org">BTC Map</a>',
+        subdomains: "abc",
         maxZoom: 19,
       }).addTo(map);
+      osm.on("tileerror", () => {
+        if (!map || (map as { _bitacoraFb?: boolean })._bitacoraFb) return;
+        (map as { _bitacoraFb?: boolean })._bitacoraFb = true;
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+          attribution: "Esri · OSM · BTC Map",
+          maxZoom: 19,
+        }).addTo(map);
+      });
       L.control.zoom({ position: "topright" }).addTo(map);
       leafletRef.current = L;
       const group = L.layerGroup().addTo(map);
