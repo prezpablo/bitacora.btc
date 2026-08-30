@@ -170,7 +170,7 @@ export function CommunityPinsBoard() {
                 className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2"
                 value={proof}
                 onChange={(e) => setProof(e.target.value)}
-                placeholder={t("logoUrl")}
+                placeholder="URL"
                 required
               />
             </label>
