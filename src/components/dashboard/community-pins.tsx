@@ -64,15 +64,21 @@ export function CommunityPinsBoard() {
       setErr(t("captchaNeed"));
       return;
     }
+    const proofUrl = proof.trim().match(/^https?:\/\//i) ? proof.trim() : `https://${proof.trim()}`;
+    if (!name.trim() || !proof.trim()) {
+      setErr(t("pinNeed"));
+      return;
+    }
     setBusy(true);
     try {
       const extra = links
         .split(/[\s,|]+/)
         .map((u) => u.trim())
-        .filter(Boolean);
-      const res = await submitCommunityPin({ data: { name, blurb, proof, links: extra } });
-      if (!res.ok || !res.token || !res.id) {
-        setErr(t("pinNeed"));
+        .filter(Boolean)
+        .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
+      const res = await submitCommunityPin({ data: { name: name.trim(), blurb, proof: proofUrl, links: extra } });
+      if (!res?.ok || !res.token || !res.id) {
+        setErr(res?.error === "rate" ? t("pinRate") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
       }
       setPending({ id: res.id, token: res.token });
@@ -199,7 +205,7 @@ export function CommunityPinsBoard() {
             <button
               type="submit"
               className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
-              disabled={busy || !captchaOk}
+              disabled={busy}
             >
               {t("pinSubmit")}
             </button>

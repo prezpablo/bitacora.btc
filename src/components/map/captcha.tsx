@@ -127,8 +127,13 @@ export function CaptchaBox({
           className="h-10 min-w-0 flex-1 rounded-md bg-card px-3 font-mono text-sm uppercase tracking-widest shadow-[var(--shadow-border)]"
           value={typed}
           onChange={(e) => {
-            setTyped(e.target.value);
-            if (ok) onOk(false);
+            const v = e.target.value;
+            setTyped(v);
+            const match = v.trim().toUpperCase() === code;
+            if (match && !hp.trim() && Date.now() - born >= 400) {
+              setFail("");
+              onOk(true);
+            } else if (ok) onOk(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {

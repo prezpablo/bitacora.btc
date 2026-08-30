@@ -3,20 +3,37 @@ import { mergePins, parsePinsCsv, stringifyPinsCsv, type CommunityPin } from "@/
 const FILE = "public/data/pins.csv";
 const RAW = "https://raw.githubusercontent.com/prezpablo/bitacora.btc/main/public/data/pins.csv";
 
+async function pinsFiles() {
+  const { join } = await import("node:path");
+  return [join(process.cwd(), FILE), join(process.cwd(), "..", FILE), "/var/www/bitacora/public/data/pins.csv", FILE];
+}
+
 async function readLocal(): Promise<string> {
   const { readFile } = await import("node:fs/promises");
-  try {
-    return await readFile(FILE, "utf8");
-  } catch {
-    return "";
+  for (const file of await pinsFiles()) {
+    try {
+      return await readFile(file, "utf8");
+    } catch {
+      /* next */
+    }
   }
+  return "";
 }
 
 async function writeLocal(csv: string) {
   const { mkdir, writeFile } = await import("node:fs/promises");
   const { dirname } = await import("node:path");
-  await mkdir(dirname(FILE), { recursive: true });
-  await writeFile(FILE, csv, "utf8");
+  let last: unknown;
+  for (const file of await pinsFiles()) {
+    try {
+      await mkdir(dirname(file), { recursive: true });
+      await writeFile(file, csv, "utf8");
+      return;
+    } catch (e) {
+      last = e;
+    }
+  }
+  throw last ?? new Error("pins write failed");
 }
 
 export async function loadPins(): Promise<CommunityPin[]> {

@@ -140,7 +140,8 @@ export const saveMapCsv = createServerFn({ method: "POST" })
   });
 
 function safeHttp(raw: string) {
-  const u = raw.trim();
+  let u = raw.trim();
+  if (u && !/^https?:\/\//i.test(u)) u = `https://${u}`;
   if (!isPublicHttp(u)) return "";
   try {
     return new URL(u).toString();
@@ -184,7 +185,11 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
     };
     const rows = await loadPins();
     const fresh = rows.filter((p) => Date.now() - p.created < 40 * PIN_TTL_MS);
-    await savePins([...fresh, pin]);
+    try {
+      await savePins([...fresh, pin]);
+    } catch {
+      return { ok: false, error: "save" };
+    }
     return { ok: true, token: pin.token, id: pin.id };
   });
 
