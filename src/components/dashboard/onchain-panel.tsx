@@ -1,5 +1,6 @@
 import type { OnchainPayload } from "@/domain";
 import { cn, formatCompact, formatPct } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import { Sparkline } from "./spark";
 
 function ehLabel(eh: number) {
@@ -60,6 +61,7 @@ export function OnchainPanel({
   data: OnchainPayload | null;
   priceDelta: number | null;
 }) {
+  const t = useT();
   const scale = Math.max(
     8,
     Math.abs(priceDelta ?? 0),
@@ -71,10 +73,8 @@ export function OnchainPanel({
     <section className="rounded-2xl bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-medium text-foreground">Red Bitcoin</h2>
-          <p className="text-sm text-muted-foreground">
-            Comparación on-chain vs precio, mismo periodo
-          </p>
+          <h2 className="text-base font-medium text-foreground">{t("ocTitle")}</h2>
+          <p className="text-sm text-muted-foreground">{t("ocLead")}</p>
         </div>
         {data ? (
           <Sparkline
@@ -86,35 +86,51 @@ export function OnchainPanel({
 
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Metric
-          label="Hashrate"
+          label={t("ocHash")}
           value={data ? ehLabel(data.hashrateEh) : "—"}
           hint={data?.hashrateDelta != null ? formatPct(data.hashrateDelta, 1) : ""}
           up={(data?.hashrateDelta ?? 0) >= 0}
         />
         <Metric
-          label="Dificultad"
+          label={t("ocDiff")}
           value={data ? formatCompact(data.difficulty) : "—"}
           hint={data?.difficultyDelta != null ? formatPct(data.difficultyDelta, 1) : ""}
           up={(data?.difficultyDelta ?? 0) >= 0}
         />
         <Metric
-          label="Tx / día"
+          label={t("ocTx")}
           value={data ? formatCompact(data.txPerDay) : "—"}
           hint={data?.txDelta != null ? formatPct(data.txDelta, 1) : ""}
           up={(data?.txDelta ?? 0) >= 0}
         />
         <Metric
-          label="Bloque"
+          label={t("ocBlock")}
           value={data?.height ? formatCompact(data.height) : "—"}
-          hint="altura de cadena"
+          hint={t("ocHeight")}
+        />
+        <Metric
+          label={t("ocFee")}
+          value={data?.feeFast != null ? `${data.feeFast} sat/vB` : "—"}
+          hint={data?.feeHour != null ? `${data.feeHour} sat/vB 1h` : ""}
+        />
+        <Metric
+          label={t("ocMempool")}
+          value={data?.mempoolTx != null ? formatCompact(data.mempoolTx) : "—"}
+          hint={data?.mempoolVsize != null ? `${(data.mempoolVsize / 1e6).toFixed(1)} vMB` : ""}
+        />
+        <Metric
+          label={t("ocAdj")}
+          value={data?.diffAdjPct != null ? `${data.diffAdjPct >= 0 ? "+" : ""}${data.diffAdjPct.toFixed(1)}%` : "—"}
+          hint={data?.blocksToAdj != null ? t("ocBlocks", { n: data.blocksToAdj }) : ""}
+          up={(data?.diffAdjPct ?? 0) >= 0}
         />
       </div>
 
       <div className="mt-4 space-y-2">
-        <CmpRow label="Precio" pct={priceDelta} scale={scale} />
-        <CmpRow label="Hashrate" pct={data?.hashrateDelta ?? null} scale={scale} />
-        <CmpRow label="Tx / día" pct={data?.txDelta ?? null} scale={scale} />
-        <CmpRow label="Dificultad" pct={data?.difficultyDelta ?? null} scale={scale} />
+        <CmpRow label={t("ocPrice")} pct={priceDelta} scale={scale} />
+        <CmpRow label={t("ocHash")} pct={data?.hashrateDelta ?? null} scale={scale} />
+        <CmpRow label={t("ocTx")} pct={data?.txDelta ?? null} scale={scale} />
+        <CmpRow label={t("ocDiff")} pct={data?.difficultyDelta ?? null} scale={scale} />
       </div>
     </section>
   );

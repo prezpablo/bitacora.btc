@@ -1,0 +1,96 @@
+import { useEffect } from "react";
+import { FAQ, GEO, SEO, SITE_NAME, jsonLd, siteOrigin } from "@/lib/seo";
+import { useLocale, type AppLang } from "@/lib/locale";
+
+function upsertMeta(attr: "name" | "property", key: string, content: string) {
+  if (typeof document === "undefined") return;
+  let el = document.head.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.content = content;
+}
+
+function upsertLink(rel: string, href: string, extra?: Record<string, string>) {
+  if (typeof document === "undefined") return;
+  const sel = extra?.hreflang
+    ? `link[rel="${rel}"][hreflang="${extra.hreflang}"]`
+    : `link[rel="${rel}"]:not([hreflang])`;
+  let el = document.head.querySelector(sel) as HTMLLinkElement | null;
+  if (!el) {
+    el = document.createElement("link");
+    el.rel = rel;
+    document.head.appendChild(el);
+  }
+  el.href = href;
+  if (extra) for (const [k, v] of Object.entries(extra)) el.setAttribute(k, v);
+}
+
+export function SeoHead() {
+  const lang = useLocale((s) => s.lang);
+  useEffect(() => {
+    const seo = SEO[lang];
+    const origin = siteOrigin();
+    const url = `${origin}/`;
+    const image = `${origin}/og.jpg`;
+    document.title = seo.title;
+    document.documentElement.lang = lang;
+    upsertMeta("name", "description", seo.description);
+    upsertMeta("name", "keywords", seo.keywords);
+    upsertMeta("name", "robots", "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
+    upsertMeta("name", "author", "Conciencia Bitcoin");
+    upsertMeta("name", "geo.region", GEO.region);
+    upsertMeta("name", "geo.placename", GEO.placename);
+    upsertMeta("name", "geo.position", `${GEO.lat};${GEO.lon}`);
+    upsertMeta("name", "ICBM", `${GEO.lat}, ${GEO.lon}`);
+    upsertMeta("property", "og:type", "website");
+    upsertMeta("property", "og:site_name", SITE_NAME);
+    upsertMeta("property", "og:title", seo.title);
+    upsertMeta("property", "og:description", seo.description);
+    upsertMeta("property", "og:url", url);
+    upsertMeta("property", "og:image", image);
+    upsertMeta("property", "og:image:alt", seo.title);
+    upsertMeta("property", "og:locale", seo.ogLocale);
+    upsertMeta("property", "og:locale:alternate", lang === "es" ? "en_US" : "es_UY");
+    upsertMeta("name", "twitter:card", "summary_large_image");
+    upsertMeta("name", "twitter:title", seo.title);
+    upsertMeta("name", "twitter:description", seo.description);
+    upsertMeta("name", "twitter:image", image);
+    upsertLink("canonical", url);
+    upsertLink("alternate", `${url}?lang=es`, { hreflang: "es" });
+    upsertLink("alternate", `${url}?lang=pt`, { hreflang: "pt" });
+    upsertLink("alternate", `${url}?lang=en`, { hreflang: "en" });
+    upsertLink("alternate", url, { hreflang: "x-default" });
+    upsertLink("sitemap", `${origin}/sitemap.xml`);
+    let ld = document.getElementById("seo-jsonld");
+    if (!ld) {
+      ld = document.createElement("script");
+      ld.id = "seo-jsonld";
+      (ld as HTMLScriptElement).type = "application/ld+json";
+      document.head.appendChild(ld);
+    }
+    ld.textContent = JSON.stringify(jsonLd(lang, origin));
+  }, [lang]);
+  return null;
+}
+
+export function SeoFaq({ lang }: { lang: AppLang }) {
+  const rows = FAQ[lang];
+  return (
+    <section id="faq-seo" className="scroll-mt-[var(--header-offset)] space-y-3" aria-labelledby="faq-seo-title">
+      <h2 id="faq-seo-title" className="font-display text-2xl font-medium tracking-tight text-foreground">
+        FAQ
+      </h2>
+      <dl className="space-y-3">
+        {rows.map((f) => (
+          <div key={f.q} className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
+            <dt className="font-medium text-foreground">{f.q}</dt>
+            <dd className="mt-1 text-sm text-pretty leading-relaxed text-muted-foreground">{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}

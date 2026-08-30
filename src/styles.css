@@ -48,6 +48,35 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --motion-quick: 150ms;
   --motion-fast: 250ms;
+
+  --phi: 1.618;
+  --space-2xs: 0.382rem;
+  --space-xs: 0.618rem;
+  --space-sm: 1rem;
+  --space-md: 1.618rem;
+  --space-lg: 2.618rem;
+  --space-xl: 4.236rem;
+  --leading-body: 1.618;
+  --leading-title: 1.236;
+  --header-offset: 7.236rem;
+}
+
+html {
+  --header-offset: 7.236rem;
+}
+
+body {
+  line-height: var(--leading-body);
+}
+
+.bit-section {
+  scroll-margin-top: var(--header-offset);
+}
+
+main#contenido h2.font-display {
+  font-size: clamp(1.272rem, 0.7rem + 2.2vw, 2.058rem);
+  line-height: var(--leading-title);
+  letter-spacing: -0.02em;
 }
 
 @keyframes velar-neon {
@@ -62,6 +91,19 @@
 
 .velar-neon-glow {
   animation: velar-neon 1.7s var(--ease-out) infinite;
+}
+
+.velar-live-dot {
+  animation: velar-neon 1.1s var(--ease-out) infinite;
+}
+
+@keyframes poc-magnet {
+  0% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes velar-news-in {

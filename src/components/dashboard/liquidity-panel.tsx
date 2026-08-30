@@ -1,12 +1,15 @@
 import type { LiquidityPayload } from "@/domain";
 import { cn, formatCompact, formatPct } from "@/lib/utils";
+import { localeTag } from "@/lib/display";
+import { useLocale } from "@/lib/locale";
+import { useT } from "@/lib/i18n";
 import { Sparkline } from "./spark";
 
-function scoreLabel(n: number) {
-  if (n >= 75) return "Amplia";
-  if (n >= 50) return "Aceptable";
-  if (n >= 30) return "Justa";
-  return "Escasa";
+function scoreKey(n: number) {
+  if (n >= 75) return "liqWide" as const;
+  if (n >= 50) return "liqOk" as const;
+  if (n >= 30) return "liqTight" as const;
+  return "liqThin" as const;
 }
 
 function formatBps(n: number) {
@@ -47,11 +50,13 @@ function Metric({
 }
 
 export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
+  const t = useT();
+  const lang = useLocale((s) => s.lang);
   const tot1 = data ? data.depth1m.bid + data.depth1m.ask : 0;
   const bidPct = tot1 > 0 && data ? (data.depth1m.bid / tot1) * 100 : 50;
   const next =
     data?.nextFundingAt && data.nextFundingAt > Date.now()
-      ? new Date(data.nextFundingAt).toLocaleTimeString("es-UY", {
+      ? new Date(data.nextFundingAt).toLocaleTimeString(localeTag(lang), {
           hour: "2-digit",
           minute: "2-digit",
         })
@@ -61,10 +66,8 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
     <section className="rounded-2xl bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-base font-medium text-foreground">Liquidez BTC</h2>
-          <p className="text-sm text-pretty text-muted-foreground">
-            Libro, interés abierto y funding · OKX perpetual
-          </p>
+          <h2 className="text-base font-medium text-foreground">{t("liqTitle")}</h2>
+          <p className="text-sm text-pretty text-muted-foreground">{t("liqLead")}</p>
         </div>
         {data && data.oiSeries.length >= 2 ? (
           <Sparkline values={data.oiSeries.map((p) => p.v)} color="var(--color-ma-1d)" />
@@ -77,7 +80,7 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
             {data ? data.score : "—"}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {data ? scoreLabel(data.score) : "Sin libro"} · 0 escasa · 100 amplia
+            {data ? t(scoreKey(data.score)) : t("liqNone")} · {t("liqScale")}
           </p>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -94,7 +97,7 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Metric
-          label="Profundidad L2"
+          label={t("liqDepth")}
           value={data ? `${formatCompact(tot1)} USD` : "—"}
           hint={
             data
@@ -103,13 +106,13 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
           }
         />
         <Metric
-          label="Imbalance"
+          label={t("liqImb")}
           value={data ? `${(data.imbalance * 100).toFixed(1)}% bid` : "—"}
-          hint={data && data.imbalance >= 0.5 ? "Más demanda" : "Más oferta"}
+          hint={data && data.imbalance >= 0.5 ? t("liqMoreBid") : t("liqMoreAsk")}
           hintClass={data && data.imbalance >= 0.5 ? "text-long" : "text-short"}
         />
         <Metric
-          label="Funding 8h"
+          label={t("liqFunding")}
           value={data ? formatFunding(data.funding) : "—"}
           hint={next ? `próximo ${next}` : "OKX"}
           hintClass={
@@ -117,7 +120,7 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
           }
         />
         <Metric
-          label="Open interest"
+          label={t("liqOi")}
           value={data ? `${formatCompact(data.openInterestUsd)} USD` : "—"}
           hint={data?.oiDelta != null ? `${formatPct(data.oiDelta, 1)} 24h` : ""}
           hintClass={
@@ -132,26 +135,26 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
 
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Metric
-          label="Base mark–índice"
+          label={t("liqBase")}
           value={data ? formatBps(data.basisBps) : "—"}
-          hint="premio del perp"
+          hint={t("liqHintBasis")}
         />
         <Metric
-          label="Volumen 24h"
+          label={t("liqVol")}
           value={data ? `${formatCompact(data.volume24h)} USD` : "—"}
-          hint="nocional swap"
+          hint={t("liqHintVol")}
         />
         <Metric
-          label="Alcance del libro"
+          label={t("liqBook")}
           value={data ? `${data.coverBps.toFixed(1)} bps` : "—"}
-          hint="top 400 niveles OKX"
+          hint={t("liqHintBook")}
         />
       </div>
 
       <div className="mt-4">
         <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-          <span>Bids L2</span>
-          <span>Asks L2</span>
+          <span>{t("liqBids")}</span>
+          <span>{t("liqAsks")}</span>
         </div>
         <div className="grid h-2 grid-cols-2 overflow-hidden rounded-full bg-elevated">
           <div className="flex justify-end">
@@ -165,7 +168,7 @@ export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
 
       {data && data.fundingSeries.length >= 2 ? (
         <div className="mt-4 flex items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">Funding 14 periodos</p>
+          <p className="text-sm text-muted-foreground">{t("fundPeriods")}</p>
           <Sparkline
             values={data.fundingSeries.map((p) => p.v)}
             color={data.funding >= 0 ? "var(--color-long)" : "var(--color-short)"}

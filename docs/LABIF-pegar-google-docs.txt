@@ -1,0 +1,205 @@
+BITÁCORA.BTC — PROYECTO LABIF 2026
+(Pegar debajo de la nota de presentación. No repetir la carta.)
+
+Ficha
+Iniciativa: Bitácora.btc
+Organización: Conciencia Bitcoin
+Respaldo: LATAM Cripto Mom
+Origen: Colonia del Sacramento, Uruguay
+Territorio: Latinoamérica (foco inicial Río de la Plata)
+Nombre: bitacora.btc
+Código: https://github.com/prezpablo/bitacora.btc
+Página pública HTTP: aún no (repositorio privado, sin GitHub Pages al 29 ago 2026)
+Idiomas: español, portugués, inglés
+Contacto: formulario en el sitio (sin publicar el correo)
+Fecha: 29 de agosto de 2026
+
+2. Resumen ejecutivo
+
+Qué es: bitácora comunitaria, abierta y sin custodia, para visibilizar nodos, comercios, eventos y educación Bitcoin en Latinoamérica.
+Para quién: comunidades activas; familias y personas que dan el primer paso; comercios que quieren aceptar bitcoin; educadores.
+Qué hay hoy: sitio trilingüe con mapa y globo, altas colaborativas, verificación por prueba de control (código en la red propia), eventos, historia, pulso y datos de mercado.
+Qué no es: empresa, exchange, custodio, token, ni producto para vender perfiles.
+Impacto buscado: que cada ciudad con un nodo, un café o un meetup sea encontrable; que la educación no dependa de un algoritmo ajeno.
+Pedido a LABIF: apoyo 2026–2028 para operación, infraestructura soberana, verificación territorial y presencia en comunidades de Latam.
+Indicadores: puntos propios verificables + lectura en vivo de BTC Map; 3 idiomas; 21 hitos; plan hasta abril 2028.
+
+2.1 Cifras reales (corte 29 de agosto de 2026)
+
+No inflamos visitas. Distinguimos lo propio de lo que el mapa lee en directorios abiertos.
+
+Lo propio (Bitácora / Conciencia Bitcoin)
+• Comunidad fundadora: 1 — Conciencia Bitcoin, Colonia del Sacramento, Uruguay
+• Overlay en map.csv: 1 comunidad + 1 ficha de comercio (el comercio no se cuenta como adopción Latam hasta verificarlo)
+• Anuncios comunitarios activos: 0 (tablero de 7 días listo)
+• Idiomas de la interfaz: 3 — ES · PT · EN (400 cadenas por idioma)
+• Secciones: 10 — Mapa, Conciencia, Roadmap, Comunidad, Pulso hoy, Historia, Red, Mercado, Privacidad, Contacto
+• Hitos de historia con relato y llamado a la acción: 21
+• Bloques de origen de datos: 14
+• Fases hasta el halving: 4 (Q1 sep 2026 → Q4 abr 2028)
+• Exchanges en el promedio de liquidaciones: 10 (Binance, OKX, Bybit, Bitget, Hyperliquid, Gate, KuCoin, HTX, MEXC, Kraken)
+• Componentes de interfaz / módulos: 49 / 80 (TypeScript)
+• Repositorio: privado, creado el 25 ago 2026 — https://github.com/prezpablo/bitacora.btc
+
+Lo federado (BTC Map; no es nuestro padrón)
+El mapa no clona el directorio: lo lee en vivo (api.btcmap.org, caché 6 h). Orden de magnitud: unos 25.000 comercios y unas 690 comunidades en el mundo. Bitácora suma el overlay local (Colonia) y las altas que cargue la comunidad.
+
+El impacto que pedimos crecer con LABIF: que el overlay Latam deje de ser una ficha y pase a ser decenas de comunidades verificadas.
+
+3. El problema
+
+En la región hay más Bitcoin de lo que se ve.
+
+Los mapas globales (valiosos) no siempre cuentan la historia local: el meetup de un barrio, la comunidad de una plaza, el comercio que cobra Lightning y no está en un directorio. Quien da el primer paso tropieza con hilos, grupos cerrados o plataformas que exigen cuenta.
+
+Al mismo tiempo, mucha “infraestructura web3” pide billetera para leer un texto, rastrea visitas o habla de la red cuando en realidad muestra el precio de un derivado. Para el arquetipo bitcoiner —privacidad por defecto, dinero entre pares, resistencia a la censura, herramientas para el mundo real— eso no sirve.
+
+Falta un punto de encuentro territorial y humano, en los idiomas de la región, que no custodie nada y que se pueda auditar.
+
+4. La solución: Bitácora.btc
+
+Bitácora.btc es ese punto de encuentro. Nace como espacio abierto para las comunidades bitcoiners de Latinoamérica y para quienes dan el primer paso. Es mapa, agenda, historia y datos públicos. El lema: el nodo que te une al mundo Bitcoin.
+
+Principios (no negociables)
+1. Sin custodia de fondos ni de llaves.
+2. Sin KYC para consultar información.
+3. Idiomas de la región: español, portugués, inglés.
+4. Aporte al proyecto solo en bitcoin (on-chain y Lightning).
+5. El mercado no se presenta como “el estado de la red”.
+6. El mapa se mira sin conectar una billetera.
+
+5. Qué está construido (estado real del producto)
+
+Lo siguiente está desarrollado y en uso, no es una lámina de promesas.
+
+5.1 Territorio
+• Globo de primera visita y paso a mapa de calle.
+• Comercios y comunidades: directorio abierto (BTC Map) más registro propio para excepciones y comunidades de Latam.
+• Alta con nombre, descripción, dirección, horarios, pagos (on-chain, Lightning, sin contacto) y redes.
+• Calificación 1 a 5; baja calificación puede retirar el punto, con reglas claras.
+• Verificación sin documento: código público en la red propia, o reputación por votos. Marca naranja al verificarse.
+• Búsqueda con autocompletar (comercio, comunidad, ciudad).
+• Geolocalización a pedido de la persona, no por IP.
+• Anuncios comunitarios temporales (siete días), con la misma prueba de control.
+
+5.2 Comunidad y tiempo
+• Agenda de encuentros Bitcoin y afines, con filtro por cercanía, país, continente y plataforma.
+• Eventos en línea con horario UTC visible.
+• Historia de Bitcoin con relato, significado para quien usa la red, y llamados a la acción (White Paper, Pizza Day / PizzaDAO, LABITCONF, fundaciones locales).
+• Pulso del día: titulares del ecosistema, traducidos al idioma elegido.
+• Contacto por formulario, sin exponer la casilla. Respuesta en el idioma de quien escribe.
+
+5.3 Datos públicos (con honestidad)
+• Precio y velas, medias, mapa de liquidaciones, miedo y codicia, flujos de ETF, debates regulatorios de fuentes públicas.
+• Se declara el origen de cada dato.
+• Se distingue: esto es mercado; esto otro es red.
+
+5.4 Oficio de la web
+• Tres idiomas en menús, secciones, formularios y legal.
+• Diseño alineado a bitcoin.org: blanco, naranja Bitcoin, lectura primero.
+• Hoja de ruta pública hasta el halving de abril de 2028.
+• Aviso de privacidad y accesibilidad; almacenamiento mínimo en el dispositivo.
+
+6. A quién sirve
+
+Quien da el primer paso: un mapa, una comunidad cerca, un texto de historia y el White Paper.
+Quien ya organiza un nodo: un lugar donde marcar el punto, las redes y los horarios.
+Comercio que acepta bitcoin: ficha, pagos, horarios, reputación.
+Educador / familia: relato claro, sin jerga innecesaria, en ES / PT / EN.
+Bitcoiner exigente: sin custodia, sin KYC de lectura, aporte en sats, datos con fuente.
+
+7. Impacto (educación, innovación, adopción)
+
+Educación. La historia no es una línea de fechas: cada hito explica qué significó para quien usa Bitcoin y ofrece un acto (leer el White Paper, conocer PizzaDAO, acercarse a un encuentro). El pulso acerca noticias al idioma de la persona.
+
+Innovación. Un registro colaborativo verificable sin plataforma de identidad. La prueba es pública (un código en la web o la red de quien se registra). Encaja con economía circular: el comercio se encuentra, se visita, se paga en bitcoin.
+
+Adopción. Visibilidad territorial. El globo dice “ya no estás solo”. El mapa baja a la cuadra. La agenda acerca el próximo encuentro. Eso es adopción de uso, no de cotización.
+
+Geografía. El proyecto nace en Uruguay y está pensado para Latinoamérica. El portugués no es un extra: es el puente con Brasil. El inglés, el puente con el resto de la red.
+
+8. Gobernanza y sostenibilidad
+
+• Iniciativa de Conciencia Bitcoin, con respaldo de LATAM Cripto Mom.
+• No hay accionistas de un producto financiero.
+• El mapa se nutre de directorios abiertos y de altas de la comunidad.
+• Costos actuales: operación del sitio, APIs públicas, tiempo de curaduría y verificación.
+• Ingresos actuales: aportes voluntarios en bitcoin (QR en el sitio). No hay pasarela de tarjetas.
+• Lo que no haremos con un grant: tokenizar la bitácora, vender datos de visitantes, exigir cuenta para leer.
+
+Uso previsto de un apoyo LABIF (orden de prioridad)
+1. Mantener el sitio en el aire con copias que no dependan de un solo proveedor.
+2. Nodo propio (Bitcoin + Lightning) para recibir aportes y verificar sin terceros de más.
+3. Curaduría y verificación humana de puntos y comunidades (Latam).
+4. Mejora de agenda de eventos y de la experiencia en telefonía móvil.
+5. Viajes y presencia en encuentros de comunidades (no stand de venta: taller y alta de puntos).
+6. Traducción y revisión nativa ES / PT / EN del material educativo.
+
+Los montos exactos se ajustan al instrumento de LABIF (Geyser / grant directo). Este documento no inventa una cifra: estamos abiertos a la ronda y a la escala que el fondo considere para un proyecto ya construido, de base territorial.
+
+9. Hoja de ruta (hasta el halving, abril 2028)
+
+Q1 · Consolidación — sep 2026 – ene 2027
+Contacto fiable, menos abusos en el mapa, distinción nítida mercado / red.
+
+Q2 · Claridad y acceso — feb 2027 – jun 2027
+Carga en el celular, gráfico legible, el sitio no se cae si falla una fuente.
+
+Q3 · Identidad sin custodia — jul 2027 – nov 2027
+Altas y votos con perfil público o Lightning como firma, nunca para guardar plata.
+
+Q4 · Cercanía con la red — dic 2027 – abr 2028
+Comisión y próximo bloque; aporte en sats; el mapa nunca pide billetera.
+
+10. Riesgos y cómo se mitigan
+
+Altas falsas o spam → captcha, límites de envío, prueba de control, votos con reglas de baja.
+Dependencia de un mapa global → BTC Map como base; CSV propio para comunidades y excepciones.
+Dependencia de un correo o un host → plan de soberanía: lectura estática, nodo propio.
+Confundir precio con red → copy explícito en Mercado y en este documento.
+Quemar el grant en marketing → prioridad: infraestructura, curaduría, territorio. Cero pauta invasiva.
+
+11. Pedido concreto a LABIF
+
+Solicitamos ser considerados como proyecto de educación, innovación y adopción territorial en la ronda 2026.
+
+Pedimos:
+1. Inclusión en la red LABIF (visibilidad ante donantes alineados, Geyser u el canal que definan).
+2. Acompañamiento de Bitcoin Beach / Fundación Bitcoin Iberoamérica en prácticas de economía circular (el mapa ya está pensado para el comercio que cobra en sats).
+3. Capital de operación para 12–18 meses, según el tramo que el fondo asigne a iniciativas de base comunitaria ya construidas.
+4. Puente con comunidades de la red iberoamericana para cargar y verificar puntos fuera de Uruguay.
+
+A cambio, Bitácora.btc se compromete a:
+• Mantener el código de conducta: sin custodia, sin KYC de lectura, tres idiomas.
+• Publicar de forma simple qué se hizo con el apoyo (puntos nuevos, ciudades, eventos; no vanidad de tráfico).
+• Ofrecer la bitácora como herramienta a otras comunidades de la red LABIF, sin cobrar licencia.
+
+12. Cierre
+
+Bitácora.btc no promete un protocolo nuevo. Promete algo más escaso: que una persona en Colonia, en Recife o en Medellín pueda ver un punto naranja, llegar a un encuentro y pagar un café en bitcoin, sin entregar el pasaporte a una web.
+
+Eso es impacto. Eso es lo que pedimos sostener.
+
+Iniciativa Bitácora.btc
+Conciencia Bitcoin by LATAM Cripto Mom
+Colonia del Sacramento, Uruguay
+Agosto 2026
+
+Anexo A — Ficha corta (formulario / Geyser)
+Nombre: Bitácora.btc
+Tipo: educación + mapa de adopción + comunidad
+País de origen: Uruguay
+Alcance: Latinoamérica
+Estado: producto en producción (no idea, no prototipo de lámina)
+Equipo: Conciencia Bitcoin · LATAM Cripto Mom
+Código: https://github.com/prezpablo/bitacora.btc
+Aporte actual: QR bitcoin / Lightning en el propio sitio
+Categorías LABIF: educación, innovación, adopción
+
+Anexo B — Frase para redes
+Bitácora.btc es el punto de encuentro donde las comunidades y las personas se conectan con la libertad financiera. Mapa, historia y datos públicos de Bitcoin en Latinoamérica. Sin custodia. Sin KYC para leer. Una iniciativa de Conciencia Bitcoin, Colonia del Sacramento.
+
+Anexo C — Lo que este documento no inventa
+No se declaran números de usuarios que no están medidos.
+No se promete token, DAO de recaudación ni retorno financiero al fondo.
+No se presenta el panel de mercado como infraestructura de la red Bitcoin.

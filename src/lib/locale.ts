@@ -10,6 +10,12 @@ export type AppLang = (typeof LANGS)[number]["value"];
 
 function readLang(): AppLang {
   if (typeof window === "undefined") return "es";
+  try {
+    const q = new URLSearchParams(window.location.search).get("lang");
+    if (q === "es" || q === "en" || q === "pt") return q;
+  } catch {
+    /* ignore */
+  }
   const stored = window.localStorage.getItem("bitacora-lang");
   if (stored === "es" || stored === "en" || stored === "pt") return stored;
   const nav = window.navigator.language.slice(0, 2);
@@ -24,6 +30,9 @@ export const useLocale = create<{ lang: AppLang; setLang: (lang: AppLang) => voi
     setLang: (lang) => {
       try {
         window.localStorage.setItem("bitacora-lang", lang);
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", lang);
+        window.history.replaceState(null, "", url.pathname + url.search + url.hash);
       } catch {
         /* ignore */
       }

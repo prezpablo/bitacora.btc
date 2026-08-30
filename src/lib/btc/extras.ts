@@ -3,4 +3,5 @@ export {
   fetchFearGreed,
   fetchLiquidity,
   fetchOnchain,
+  fetchOnchainLive,
 } from "@/infrastructure/extra-feeds";

@@ -33,8 +33,12 @@ export function gradeOf(local: MerchantLocal | undefined, now = Date.now()): {
   count: number;
   ageMs: number;
 } {
-  const votes = local?.votes ?? [];
   const ageMs = now - (local?.listedAt ?? now);
+  if (local && (local.voteCount ?? 0) > 0) {
+    const avg = local.score ?? 0;
+    return { avg, band: bandFromAvg(avg), monthly: false, count: local.voteCount || 0, ageMs };
+  }
+  const votes = local?.votes ?? [];
   const monthly = ageMs >= SIX_MONTHS;
   const pool = monthly ? votesInMonth(votes, monthKey(now)) : votes;
   const used = pool.length ? pool : votes;

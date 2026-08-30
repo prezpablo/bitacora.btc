@@ -1,3 +1,8 @@
+import type { ContinentId } from "./geo-regions";
+import type { WeekHours } from "./hours";
+import type { PayKey } from "./pays";
+import type { SocialLink } from "./socials";
+
 export type ChartRange = "1d" | "1w" | "1m" | "6m";
 export type LiqRange = "1d" | "1w" | "1m";
 export type MaKey = "ema1d" | "ema1w" | "ema1m" | "ema6m";
@@ -79,6 +84,28 @@ export type OnchainPayload = {
   hashSeries: SeriesPoint[];
   txSeries: SeriesPoint[];
   asOf: number;
+  feeFast?: number;
+  feeHour?: number;
+  mempoolTx?: number;
+  mempoolVsize?: number;
+  diffAdjPct?: number;
+  blocksToAdj?: number;
+  adjProgress?: number;
+};
+
+export type EtfFundFlow = { ticker: string; usdM: number };
+
+export type EtfFlowPayload = {
+  asOf: number;
+  source: string;
+  url: string;
+  lastDate: string;
+  lastUsdM: number;
+  lastBtc: number | null;
+  weekUsdM: number;
+  monthUsdM: number;
+  series: SeriesPoint[];
+  funds: EtfFundFlow[];
 };
 
 export type ClarityPayload = {
@@ -158,12 +185,29 @@ export type MerchantVote = { stars: 1 | 2 | 3 | 4 | 5; at: number; by: string };
 
 export type MerchantLocal = {
   description: string;
+  notes?: string;
   votes: MerchantVote[];
   listedAt: number;
   removed?: boolean;
+  hours?: WeekHours;
+  pays?: PayKey[];
+  links?: SocialLink[];
+  address?: string;
+  logo?: string;
+  lat?: number;
+  lon?: number;
+  name?: string;
+  category?: string;
+  updatedAt?: number;
+  /** Running average (CSV `score`). */
+  score?: number;
+  /** Vote count (CSV `votes`). */
+  voteCount?: number;
+  verifyToken?: string;
+  verifiedAt?: number;
 };
 
-export type CommunityLink = { label: string; url: string };
+export type CommunityLink = { key?: string; label: string; url: string };
 
 export type Community = {
   id: string;
@@ -175,6 +219,11 @@ export type Community = {
   description: string;
   links: CommunityLink[];
   createdAt: number;
+  votes?: MerchantVote[];
+  score?: number;
+  voteCount?: number;
+  verifyToken?: string;
+  verifiedAt?: number;
 };
 
 export type PulsePayload = {
@@ -199,6 +248,36 @@ export type CommunityPost = {
 export type CommunityFeed = {
   posts: CommunityPost[];
   asOf: number;
+};
+
+export type EventKind = "meetup" | "conference" | "workshop" | "hackathon" | "online" | "other";
+
+export type NetworkEvent = {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  startAt: number;
+  endAt?: number;
+  timezone?: string;
+  city: string;
+  region: string;
+  country: string;
+  countryCode: string;
+  continent: ContinentId | "";
+  url: string;
+  platform: string;
+  kind: EventKind;
+};
+
+export function eventIsLive(e: { startAt: number; endAt?: number }, now = Date.now()) {
+  return Number.isFinite(e.startAt) && e.startAt >= now;
+}
+
+export type EventsPayload = {
+  events: NetworkEvent[];
+  asOf: number;
+  sources: string[];
 };
 
 export type DeskExtras = {

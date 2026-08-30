@@ -6,7 +6,6 @@ import {
   buildLiquidationMap,
   candleKind,
   isDojiKind,
-  KIND_LABEL,
   liquidationEnvelope,
   niceTimeTicks,
   type Candle,
@@ -78,7 +77,9 @@ function cursorDate(t: number, span: number) {
 }
 
 function axisUsd(v: number) {
-  if (v >= 10_000) return compactUsd(v);
+  if (v >= 1_000_000) {
+    return `${(v / 1_000_000).toLocaleString("es-UY", { maximumFractionDigits: 2 })} M`;
+  }
   if (v >= 100) return Math.round(v).toLocaleString("es-UY");
   if (v >= 1) {
     return v.toLocaleString("es-UY", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
@@ -87,10 +88,7 @@ function axisUsd(v: number) {
 }
 
 function compactUsd(v: number) {
-  return new Intl.NumberFormat("es-UY", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(v);
+  return axisUsd(v);
 }
 
 function kindColor(kind: ReturnType<typeof candleKind>) {
@@ -785,7 +783,7 @@ export function PriceChart({
           size="icon"
           variant="subtle"
           className="size-8"
-          aria-label="Alejar"
+          aria-label={t("zoomOut")}
           onClick={() => zoomBy(2)}
         >
           <ZoomOut />
@@ -795,7 +793,7 @@ export function PriceChart({
           size="icon"
           variant="subtle"
           className="size-8"
-          aria-label="Acercar"
+          aria-label={t("zoomIn")}
           onClick={() => zoomBy(1 / 2)}
         >
           <ZoomIn />
@@ -805,7 +803,7 @@ export function PriceChart({
           size="icon"
           variant="subtle"
           className="size-8"
-          aria-label="Volver al rango"
+          aria-label={t("zoomHome")}
           disabled={layout.atHome}
           onClick={() => {
             setView(null);
@@ -828,7 +826,7 @@ export function PriceChart({
         viewBox={`0 0 ${layout.vbW} ${layout.vbH}`}
         className="absolute inset-0 h-full w-full cursor-grab touch-none bg-transparent active:cursor-grabbing"
         role="img"
-        aria-label="Velas logarítmicas y mapa de liquidaciones estilo Coinglass"
+        aria-label={t("chartAria")}
         onPointerDown={onPointerDown}
         onPointerMove={onMove}
         onPointerUp={onPointerUp}
@@ -1091,7 +1089,11 @@ export function PriceChart({
               isDojiKind(hk) ? "text-doji" : hk === "bull" ? "text-long" : "text-short",
             )}
           >
-            {KIND_LABEL[hk]}
+            {t(
+              ({ bull: "kindBull", bear: "kindBear", doji: "kindDoji", dragonfly: "kindDragon", gravestone: "kindGrave" } as const)[
+                hk
+              ],
+            )}
           </p>
           <p className="font-mono tabular-nums text-foreground">
             O {formatUsd(hc.open, 0)} · C {formatUsd(hc.close, 0)}
@@ -1164,9 +1166,51 @@ function NeonPocPointer({
   if (Math.abs(labelY - liveY) < 16) labelY = liveY < y ? y + 14 : y - 28;
   labelY = Math.min(PAD.t + mainH - 18, Math.max(PAD.t + 6, labelY));
   const tip = heatX - 1;
+  const cx = labelX + w / 2;
+  const cy = labelY + 10;
 
   return (
     <g pointerEvents="none">
+      {[0, 1, 2].map((i) => (
+        <ellipse
+          key={`w-${i}`}
+          cx={cx}
+          cy={cy}
+          fill="none"
+          stroke={neon}
+          strokeWidth={1.2}
+        >
+          <animate attributeName="rx" values="10;52" dur="2.4s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
+          <animate attributeName="ry" values="6;22" dur="2.4s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.7;0" dur="2.4s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
+        </ellipse>
+      ))}
+      {[0, 1, 2].map((i) => (
+        <ellipse
+          key={`t-${i}`}
+          cx={tip - 6}
+          cy={y}
+          fill="none"
+          stroke={neon}
+          strokeWidth={1.1}
+        >
+          <animate attributeName="rx" values="4;28" dur="2.2s" begin={`${i * 0.7}s`} repeatCount="indefinite" />
+          <animate attributeName="ry" values="4;16" dur="2.2s" begin={`${i * 0.7}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.55;0" dur="2.2s" begin={`${i * 0.7}s`} repeatCount="indefinite" />
+        </ellipse>
+      ))}
+      {[0.55, 0.78, 1].map((k, i) => (
+        <path
+          key={`f-${i}`}
+          d={`M ${labelX + w} ${cy} Q ${(labelX + w + tip) / 2} ${cy - 16 - i * 10} ${tip} ${y}
+              M ${labelX + w} ${cy} Q ${(labelX + w + tip) / 2} ${cy + 16 + i * 10} ${tip} ${y}`}
+          fill="none"
+          stroke={neon}
+          strokeWidth={1}
+          opacity={0.35 - i * 0.08}
+          style={{ animation: `poc-magnet 2.6s ${i * 0.35}s ease-out infinite` }}
+        />
+      ))}
       <g className="velar-neon-glow" filter="url(#velar-neon)">
         <line
           x1={PAD.l + (heatX - PAD.l) * 0.58}
@@ -1186,11 +1230,6 @@ function NeonPocPointer({
           strokeWidth={4}
           opacity={0.22}
           vectorEffect="non-scaling-stroke"
-        />
-        <circle cx={tip - 11} cy={y} r={4.4} fill={neon} />
-        <polygon
-          points={`${tip - 20},${y - 8} ${tip + 1},${y} ${tip - 20},${y + 8}`}
-          fill={neon}
         />
       </g>
       <rect x={labelX} y={labelY} width={w} height={20} rx={4} fill={neon} />
@@ -1316,7 +1355,6 @@ function CursorAxes({
 }
 
 function liveUsd(v: number) {
-  if (v >= 1000) return Math.round(v).toLocaleString("es-UY");
   return axisUsd(v);
 }
 
@@ -1356,7 +1394,24 @@ function LivePriceMark({
         stroke="var(--color-background)"
         strokeWidth={1.4}
       />
-      <polygon points={`${x},${y - 13} ${x - 7},${y} ${x},${y + 13}`} fill={color} />
+      <polygon
+        points={`${x},${y} ${x - 18},${y - 12} ${x - 18},${y + 12}`}
+        fill="#F7931A"
+        stroke="#ffffff"
+        strokeWidth={0.8}
+      />
+      <text
+        x={x - 10}
+        y={y + 0.5}
+        fill="#ffffff"
+        fontSize="11"
+        fontWeight="800"
+        fontFamily="var(--font-sans)"
+        textAnchor="middle"
+        dominantBaseline="middle"
+      >
+        ₿
+      </text>
       <rect x={x} y={y - 13} width={w} height={26} rx={3} fill={color} />
       <text
         x={x + w - 5}

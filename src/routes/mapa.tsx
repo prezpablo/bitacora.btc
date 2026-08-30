@@ -1,13 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { SpendMap } from "@/components/map/spend-map";
-import "leaflet/dist/leaflet.css";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/mapa")({ component: MapPage });
-
-function MapPage() {
-  return (
-    <main>
-      <SpendMap />
-    </main>
-  );
-}
+export const Route = createFileRoute("/mapa")({
+  beforeLoad: () => {
+    throw redirect({ to: "/", hash: "mapa" });
+  },
+});

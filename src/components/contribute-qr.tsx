@@ -92,7 +92,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
         <section className="flex flex-wrap items-center gap-4 rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:gap-6 sm:p-5">
           {trigger}
           <div className="min-w-0 flex-1">
-            <p className="text-xs tracking-wide text-primary uppercase">Lightning / on-chain</p>
+            <p className="text-xs tracking-wide text-primary uppercase">{t("payRail")}</p>
             <h2 className="mt-1 font-display text-xl font-medium text-foreground sm:text-2xl">
               {t("contributeTitle")}
             </h2>

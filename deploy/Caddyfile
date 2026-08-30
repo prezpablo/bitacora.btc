@@ -1,0 +1,11 @@
+# HTTP primero (el puente bitácora.btc.us redirige a la IP).
+# Cuando haya un hostname con DNS, Caddy puede pedir certificado solo.
+:80 {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:8080
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options SAMEORIGIN
+	}
+}

@@ -1,8 +1,10 @@
 import type { ClarityPayload } from "@/domain";
 import { formatCompact, formatPct } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 import { Sparkline } from "./spark";
 
 export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
+  const t = useT();
   const yes = data ? data.yes * 100 : null;
   const no = data ? data.no * 100 : null;
   const hist = data?.history.map((p) => p.v) ?? [];
@@ -15,10 +17,8 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
     <section className="rounded-2xl bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-base font-medium text-foreground">Ley CLARITY</h2>
-          <p className="text-sm text-pretty text-muted-foreground">
-            Probabilidad de que H.R.3633 se firme en 2026 · Polymarket
-          </p>
+          <h2 className="text-base font-medium text-foreground">{t("clTitle")}</h2>
+          <p className="text-sm text-pretty text-muted-foreground">{t("clLead")}</p>
         </div>
         {hist.length >= 2 ? (
           <Sparkline values={hist} color="var(--color-ma-1w)" />
@@ -31,7 +31,7 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
             {yes == null ? "—" : `${yes.toFixed(1)}%`}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sí · se aprueba y se firma
+            {t("clYes")}
             {delta != null ? (
               <span className="ml-2 font-mono tabular-nums">
                 {formatPct(delta, 1)} 7d
@@ -40,7 +40,7 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
           </p>
         </div>
         <p className="font-mono text-lg tabular-nums text-muted-foreground">
-          {no == null ? "—" : `${no.toFixed(1)}%`} No
+          {no == null ? "—" : `${no.toFixed(1)}%`} {t("clNo")}
         </p>
       </div>
 
@@ -53,12 +53,12 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
 
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
         <span>
-          Vol. {data ? formatCompact(data.volume) : "—"} USD
+          {t("vol")} {data ? formatCompact(data.volume) : "—"} USD
         </span>
         <span>
           24h {data ? formatCompact(data.volume24h) : "—"}
         </span>
-        <span>Cierra 31 dic 2026</span>
+        <span>{t("clClose")}</span>
         {data ? (
           <a
             href={data.url}
@@ -66,10 +66,10 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
             rel="noreferrer"
             className="text-foreground underline-offset-2 hover:underline"
           >
-            Ver en Polymarket
+            {t("clView")}
           </a>
         ) : (
-          <span>Sin datos de Polymarket</span>
+          <span>{t("clEmpty")}</span>
         )}
       </div>
     </section>

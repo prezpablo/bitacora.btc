@@ -1,5 +1,6 @@
 import type { MarketPayload } from "@/domain";
 import { formatUsd } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 function r(n: number, d = 3) {
   const f = 10 ** d;
@@ -7,12 +8,13 @@ function r(n: number, d = 3) {
 }
 
 export function LiqHeatmap({ market }: { market: MarketPayload }) {
+  const t = useT();
   const cols = market.heatmap;
   const clusters = market.clusters;
   if (!cols.length || !clusters.length) {
     return (
       <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        Sin datos de liquidación
+        {t("liqEmpty")}
       </div>
     );
   }
@@ -43,7 +45,7 @@ export function LiqHeatmap({ market }: { market: MarketPayload }) {
       viewBox="0 0 920 400"
       className="h-full w-full"
       role="img"
-      aria-label="Mapa de liquidaciones de Bitcoin"
+      aria-label={t("heatAria")}
       preserveAspectRatio="none"
     >
       {cols.map((col, i) =>

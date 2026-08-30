@@ -3,7 +3,7 @@ import { ExternalLink, Radio } from "lucide-react";
 import type { NewsItem, PulsePayload } from "@/domain";
 import { translateNews } from "@/infrastructure/translate";
 import { formatAgo, useT } from "@/lib/i18n";
-import { useLocale, type AppLang } from "@/lib/locale";
+import { LANGS, useLocale, type AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 function headline(item: { title: string; sourceLang?: string }) {
@@ -15,6 +15,7 @@ export type PulseLang = AppLang;
 
 export function NewsCycle({ data }: { data: PulsePayload | null }) {
   const lang = useLocale((s) => s.lang) as AppLang;
+  const setLang = useLocale((s) => s.setLang);
   const t = useT();
   const source = data?.news ?? [];
   const trends = data?.trends ?? [];
@@ -74,6 +75,22 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
           <p className="text-sm text-pretty text-muted-foreground">
             {t("pulseLead")}
           </p>
+          <div role="group" aria-label={t("langAria")} className="mt-2 inline-flex rounded-md bg-elevated p-0.5 shadow-[var(--shadow-border)]">
+            {LANGS.map((l) => (
+              <button
+                key={l.value}
+                type="button"
+                onClick={() => setLang(l.value)}
+                className={cn(
+                  "h-8 min-w-10 rounded px-2 font-mono text-xs font-medium",
+                  lang === l.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-pressed={lang === l.value}
+              >
+                {l.short}
+              </button>
+            ))}
+          </div>
         </div>
         {n ? (
           <p className="font-mono text-xs tabular-nums text-muted-foreground">
@@ -152,7 +169,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
             <button
               key={row.id}
               type="button"
-              aria-label={`Noticia ${idx + 1}`}
+              aria-label={t("newsDot", { n: idx + 1 })}
               className={cn(
                 "h-1.5 min-w-4 flex-1 rounded-full",
                 idx === i % n ? "bg-long" : "bg-border",
@@ -165,7 +182,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
 
       {trends.length ? (
         <div className="mt-4 flex flex-wrap items-center gap-1.5">
-          <span className="text-xs tracking-wide text-muted-foreground uppercase">Tendencias</span>
+          <span className="text-xs tracking-wide text-muted-foreground uppercase">{t("trends")}</span>
           {trends.map((t) => {
             const up = (t.change24h ?? 0) >= 0;
             return (

@@ -11,6 +11,7 @@ attachments/
 .env
 .env.*
 !.env.example
+data/contact-inbox.jsonl
 .node_modules.lock
 .DS_Store
 coverage/

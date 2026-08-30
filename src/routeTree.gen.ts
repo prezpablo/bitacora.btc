@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LabifRouteImport } from './routes/labif'
 import { Route as MapaRouteImport } from './routes/mapa'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabifRoute = LabifRouteImport.update({
+  id: '/labif',
+  path: '/labif',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapaRoute = MapaRouteImport.update({
@@ -25,27 +31,31 @@ const MapaRoute = MapaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/labif': typeof LabifRoute
   '/mapa': typeof MapaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/labif': typeof LabifRoute
   '/mapa': typeof MapaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/labif': typeof LabifRoute
   '/mapa': typeof MapaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mapa'
+  fullPaths: '/' | '/labif' | '/mapa'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mapa'
-  id: '__root__' | '/' | '/mapa'
+  to: '/' | '/labif' | '/mapa'
+  id: '__root__' | '/' | '/labif' | '/mapa'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LabifRoute: typeof LabifRoute
   MapaRoute: typeof MapaRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/labif': {
+      id: '/labif'
+      path: '/labif'
+      fullPath: '/labif'
+      preLoaderRoute: typeof LabifRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mapa': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LabifRoute: LabifRoute,
   MapaRoute: MapaRoute,
 }
 export const routeTree = rootRouteImport

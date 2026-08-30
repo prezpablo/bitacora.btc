@@ -1,13 +1,14 @@
 import type { FearGreedPayload } from "@/domain";
 import { cn } from "@/lib/utils";
+import { useT, type CopyKey } from "@/lib/i18n";
 import { Sparkline } from "./spark";
 
-const LABELS: Record<string, string> = {
-  "Extreme Fear": "Miedo extremo",
-  Fear: "Miedo",
-  Neutral: "Neutral",
-  Greed: "Codicia",
-  "Extreme Greed": "Codicia extrema",
+const LABELS: Record<string, CopyKey> = {
+  "Extreme Fear": "fgExtFear",
+  Fear: "fgFear",
+  Neutral: "fgNeutral",
+  Greed: "fgGreed",
+  "Extreme Greed": "fgExtGreed",
 };
 
 function tone(value: number) {
@@ -24,8 +25,9 @@ function fill(value: number) {
 }
 
 export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
+  const t = useT();
   const value = data?.value ?? null;
-  const label = data ? (LABELS[data.classification] ?? data.classification) : "—";
+  const label = data ? t(LABELS[data.classification] ?? "fgNeutral") : "—";
   const hist = data?.history.map((p) => p.v) ?? [];
   const prev = hist.length >= 2 ? hist[hist.length - 2] : null;
   const delta = value != null && prev != null ? value - prev : null;
@@ -34,10 +36,8 @@ export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
     <section className="rounded-2xl bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-base font-medium text-foreground">Miedo / codicia</h2>
-          <p className="text-sm text-pretty text-muted-foreground">
-            Índice cripto de Alternative.me (CNN Fear & Greed)
-          </p>
+          <h2 className="text-base font-medium text-foreground">{t("fgTitle")}</h2>
+          <p className="text-sm text-pretty text-muted-foreground">{t("fgLead")}</p>
         </div>
         {hist.length >= 2 ? (
           <Sparkline values={hist} color="var(--color-ma-1m)" />
@@ -54,12 +54,12 @@ export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
             {delta != null ? (
               <span className="ml-2 font-mono tabular-nums">
                 {delta > 0 ? "+" : ""}
-                {`${delta} vs ayer`}
+                {`${delta} ${t("fgVsYday")}`}
               </span>
             ) : null}
           </p>
         </div>
-        <p className="text-sm text-muted-foreground">0 miedo · 100 codicia</p>
+        <p className="text-sm text-muted-foreground">{t("fgScale")}</p>
       </div>
 
       <div className="relative mt-3 h-2 overflow-hidden rounded-full bg-elevated">
@@ -70,7 +70,7 @@ export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-        <span>30 días</span>
+        <span>{t("fg30d")}</span>
         {data ? (
           <a
             href={data.url}
@@ -81,7 +81,7 @@ export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
             Alternative.me
           </a>
         ) : (
-          <span>Sin dato de miedo/codicia</span>
+          <span>{t("fgNone")}</span>
         )}
       </div>
     </section>

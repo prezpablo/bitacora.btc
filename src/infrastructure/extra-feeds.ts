@@ -2,6 +2,7 @@ import { homeLookback, liquidityScore } from "@/domain";
 import type {
   ChartRange,
   ClarityPayload,
+  EtfFlowPayload,
   FearGreedPayload,
   LiquidityPayload,
   OnchainPayload,
@@ -57,17 +58,99 @@ async function fetchChart(name: string, signal: AbortSignal): Promise<SeriesPoin
   return (j.values ?? []).map((p) => ({ t: p.x * 1000, v: p.y }));
 }
 
+const MEMPOOL_APIS = ["https://mempool.space/api", "https://mempool.emzy.de/api"] as const;
+
+async function fetchMempoolJson<T>(path: string, parent: AbortSignal): Promise<T> {
+  let last: unknown;
+  for (const base of MEMPOOL_APIS) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4_500);
+    const onAbort = () => ctrl.abort();
+    if (parent.aborted) ctrl.abort();
+    else parent.addEventListener("abort", onAbort, { once: true });
+    try {
+      return await fetchJson<T>(`${base}${path}`, ctrl.signal);
+    } catch (e) {
+      last = e;
+    } finally {
+      clearTimeout(timer);
+      parent.removeEventListener("abort", onAbort);
+    }
+  }
+  throw last instanceof Error ? last : new Error("mempool down");
+}
+
+async function fetchOnchainFallback(signal: AbortSignal): Promise<Partial<OnchainPayload>> {
+  const [heightRaw, hashRaw, diffRaw, unconf, fees] = await Promise.all([
+    fetchJson<number>("https://blockstream.info/api/blocks/tip/height", signal).catch(() =>
+      fetchJson<number>("https://api.blockchain.info/q/getblockcount", signal).catch(() => 0),
+    ),
+    fetchJson<number>("https://api.blockchain.info/q/hashrate", signal).catch(() => 0),
+    fetchJson<number>("https://blockchain.info/q/getdifficulty", signal).catch(() => 0),
+    fetchJson<number>("https://blockchain.info/q/unconfirmedcount", signal).catch(() => undefined),
+    fetchJson<Record<string, number>>("https://blockstream.info/api/fee-estimates", signal).catch(
+      () => ({}) as Record<string, number>,
+    ),
+  ]);
+  const feeFast = fees["1"] ?? fees["2"];
+  const feeHour = fees["6"] ?? fees["10"];
+  return {
+    height: Number(heightRaw) || 0,
+    hashrateEh: Number(hashRaw) > 0 ? Number(hashRaw) / 1e9 : undefined,
+    difficulty: Number(diffRaw) || undefined,
+    feeFast: feeFast != null ? Math.round(feeFast) : undefined,
+    feeHour: feeHour != null ? Math.round(feeHour) : undefined,
+    mempoolTx: unconf,
+    asOf: Date.now(),
+  };
+}
+
+export async function fetchOnchainLive(signal?: AbortSignal): Promise<Partial<OnchainPayload>> {
+  const ctrl = signal ?? new AbortController().signal;
+  try {
+    const [fees, pool, heightRaw, mining, adj] = await Promise.all([
+      fetchMempoolJson<{ fastestFee?: number; hourFee?: number }>("/v1/fees/recommended", ctrl),
+      fetchMempoolJson<{ count?: number; vsize?: number }>("/mempool", ctrl),
+      fetchMempoolJson<number>("/blocks/tip/height", ctrl),
+      fetchMempoolJson<{ currentHashrate?: number; currentDifficulty?: number }>(
+        "/v1/mining/hashrate/3d",
+        ctrl,
+      ),
+      fetchMempoolJson<{
+        difficultyChange?: number;
+        remainingBlocks?: number;
+        progressPercent?: number;
+      }>("/v1/difficulty-adjustment", ctrl),
+    ]);
+    const hashEh = mining.currentHashrate ? mining.currentHashrate / 1e18 : undefined;
+    return {
+      height: Number(heightRaw) || 0,
+      hashrateEh: hashEh,
+      difficulty: mining.currentDifficulty,
+      feeFast: fees.fastestFee,
+      feeHour: fees.hourFee,
+      mempoolTx: pool.count,
+      mempoolVsize: pool.vsize,
+      diffAdjPct: adj.difficultyChange,
+      blocksToAdj: adj.remainingBlocks,
+      adjProgress: adj.progressPercent,
+      asOf: Date.now(),
+    };
+  } catch {
+    return await fetchOnchainFallback(ctrl);
+  }
+}
+
+
 export async function fetchOnchain(range: ChartRange): Promise<OnchainPayload> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 12_000);
   try {
-    const [hash, diff, tx, heightRaw] = await Promise.all([
+    const [hash, diff, tx, live] = await Promise.all([
       fetchChart("hash-rate", ctrl.signal),
       fetchChart("difficulty", ctrl.signal),
       fetchChart("n-transactions", ctrl.signal),
-      fetchJson<string | number>("https://blockchain.info/q/getblockcount", ctrl.signal).catch(
-        () => 0,
-      ),
+      fetchOnchainLive(ctrl.signal).catch(() => ({}) as Partial<OnchainPayload>),
     ]);
     const from = Date.now() - LOOKBACK[range];
     const hashW = sliceSeries(hash, from);
@@ -76,18 +159,24 @@ export async function fetchOnchain(range: ChartRange): Promise<OnchainPayload> {
     const lastHash = hashW[hashW.length - 1]?.v ?? hash[hash.length - 1]?.v ?? 0;
     const lastDiff = diffW[diffW.length - 1]?.v ?? diff[diff.length - 1]?.v ?? 0;
     const lastTx = txW[txW.length - 1]?.v ?? tx[tx.length - 1]?.v ?? 0;
-    const height = Number(heightRaw) || 0;
     return {
-      height,
-      hashrateEh: lastHash / 1e6,
+      height: live.height || 0,
+      hashrateEh: live.hashrateEh ?? lastHash / 1e6,
       hashrateDelta: deltaPct(hashW),
-      difficulty: lastDiff,
+      difficulty: live.difficulty ?? lastDiff,
       difficultyDelta: deltaPct(diffW),
       txPerDay: lastTx,
       txDelta: deltaPct(txW),
       hashSeries: hashW,
       txSeries: txW,
       asOf: Date.now(),
+      feeFast: live.feeFast,
+      feeHour: live.feeHour,
+      mempoolTx: live.mempoolTx,
+      mempoolVsize: live.mempoolVsize,
+      diffAdjPct: live.diffAdjPct,
+      blocksToAdj: live.blocksToAdj,
+      adjProgress: live.adjProgress,
     };
   } finally {
     clearTimeout(timer);
@@ -653,4 +742,108 @@ async function fetchRawPulse(): Promise<PulsePayload> {
 
 export async function fetchPulse(_lang?: string): Promise<PulsePayload> {
   return fetchRawPulse();
+}
+
+const ETF_URL = "https://bitbo.io/treasuries/etf-flows/";
+let etfCache: { at: number; data: EtfFlowPayload } | null = null;
+
+function numCell(raw: string) {
+  const n = Number(String(raw).replace(/,/g, "").replace(/[()]/g, (c) => (c === "(" ? "-" : "")));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function parseEtfTable(html: string): { date: string; t: number; usdM: number; funds: { ticker: string; usdM: number }[] }[] {
+  const tables = html.match(/<table[\s\S]*?<\/table>/i);
+  if (!tables) return [];
+  const table = tables[0]!;
+  const rows: string[][] = [];
+  for (const tr of table.matchAll(/<tr[\s\S]*?<\/tr>/gi)) {
+    const cells = [...tr[0].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((m) =>
+      m[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(),
+    );
+    if (cells.length) rows.push(cells);
+  }
+  if (rows.length < 2) return [];
+  const head = rows[0]!.map((h) => h.toUpperCase());
+  const totalIdx = head.findIndex((h) => h === "TOTALS" || h === "TOTAL");
+  const skip = new Set(["DATE", "TOTALS", "TOTAL"]);
+  const out: { date: string; t: number; usdM: number; funds: { ticker: string; usdM: number }[] }[] = [];
+  for (const cells of rows.slice(1)) {
+    const date = cells[0] || "";
+    if (!/^[A-Za-z]{3} /.test(date)) continue;
+    const t = Date.parse(date + " UTC");
+    if (!Number.isFinite(t)) continue;
+    const usdM = totalIdx >= 0 ? numCell(cells[totalIdx] || "0") : numCell(cells[cells.length - 1] || "0");
+    const funds = head
+      .map((ticker, i) => ({ ticker, usdM: numCell(cells[i] || "0") }))
+      .filter((f) => !skip.has(f.ticker) && f.ticker.length <= 5);
+    out.push({ date, t, usdM, funds });
+  }
+  return out;
+}
+
+function parseEtfJsHistory(html: string, kind: "Btc" | "Usd"): SeriesPoint[] {
+  const start = html.indexOf(`const history${kind} = [`);
+  if (start < 0) return [];
+  const end = html.indexOf(`mergedHistory${kind}`, start);
+  const chunk = html.slice(start, end > start ? end : start + 120_000);
+  const pairs = [...chunk.matchAll(/getPreviousBusinessDay\((\d+)\),\s*truncate\(([-\d.]+)/g)];
+  return pairs.map((m) => ({ t: Number(m[1]), v: Number(m[2]) })).filter((p) => Number.isFinite(p.t) && Number.isFinite(p.v));
+}
+
+export async function fetchEtfFlows(): Promise<EtfFlowPayload> {
+  const now = Date.now();
+  if (etfCache && now - etfCache.at < 15 * 60_000) return etfCache.data;
+  const res = await fetch(ETF_URL, {
+    cache: "no-store",
+    headers: {
+      Accept: "text/html",
+      "User-Agent": "Mozilla/5.0 (compatible; bitacora.btc/1.0)",
+    },
+  });
+  if (!res.ok) throw new Error(`etf ${res.status}`);
+  const html = await res.text();
+  const days = parseEtfTable(html);
+  const usdHist = parseEtfJsHistory(html, "Usd");
+  const btcHist = parseEtfJsHistory(html, "Btc");
+  if (!days.length && !usdHist.length && !btcHist.length) throw new Error("etf empty");
+  const last = days[0];
+  const lastUsdFromTable = last?.usdM ?? 0;
+  const lastBtcRaw = btcHist.length ? btcHist[btcHist.length - 1]!.v : null;
+  let series: SeriesPoint[] = usdHist.length ? usdHist : [];
+  if (series.length) {
+    const lastH = series[series.length - 1]!.v;
+    if (last && Math.abs(lastH) > 1 && Math.abs(lastUsdFromTable) > 1) {
+      const ratio = Math.abs(lastH / lastUsdFromTable);
+      if (ratio > 8 || ratio < 0.12) {
+        series = series.map((p) => ({ t: p.t, v: p.v / (lastH / lastUsdFromTable) }));
+      }
+    }
+  } else if (days.length) {
+    series = days.slice().reverse().map((d) => ({ t: d.t, v: d.usdM }));
+  } else if (btcHist.length && lastBtcRaw && lastUsdFromTable) {
+    const px = lastUsdFromTable / lastBtcRaw;
+    series = btcHist.map((p) => ({ t: p.t, v: p.v * px }));
+  }
+  const lastUsdM = last?.usdM ?? series[series.length - 1]?.v ?? 0;
+  const lastDate =
+    last?.date ||
+    (series.length ? new Date(series[series.length - 1]!.t).toISOString().slice(0, 10) : "—");
+  const lastT = series[series.length - 1]?.t ?? Date.now();
+  const weekUsdM = series.filter((p) => p.t >= lastT - 7 * 86_400_000).reduce((s, p) => s + p.v, 0);
+  const monthUsdM = series.filter((p) => p.t >= lastT - 30 * 86_400_000).reduce((s, p) => s + p.v, 0);
+  const data: EtfFlowPayload = {
+    asOf: Date.now(),
+    source: "Bitbo",
+    url: ETF_URL,
+    lastDate,
+    lastUsdM,
+    lastBtc: lastBtcRaw,
+    weekUsdM,
+    monthUsdM,
+    series,
+    funds: last ? last.funds.filter((f) => f.usdM !== 0).sort((a, b) => Math.abs(b.usdM) - Math.abs(a.usdM)) : [],
+  };
+  etfCache = { at: Date.now(), data };
+  return data;
 }

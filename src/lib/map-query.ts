@@ -1,0 +1,101 @@
+import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import type { GlobeStats } from "@/domain/globe";
+import {
+  getBtcCommunities,
+  getGlobeStats,
+  getMapCsv,
+  getMerchants,
+  getNetworkEvents,
+} from "@/infrastructure/server-fns";
+
+export type MapBbox = { west: number; south: number; east: number; north: number };
+
+export const mapKeys = {
+  root: ["map"] as const,
+  globe: ["map", "globe"] as const,
+  geo: ["map", "geo"] as const,
+  merchantsRoot: ["map", "merchants"] as const,
+  merchants: (b: MapBbox) =>
+    ["map", "merchants", b.west.toFixed(3), b.south.toFixed(3), b.east.toFixed(3), b.north.toFixed(3)] as const,
+  communities: ["map", "communities"] as const,
+  csv: ["map", "csv"] as const,
+  events: ["map", "events"] as const,
+};
+
+const STALE = {
+  globe: 15 * 60_000,
+  geo: 24 * 60 * 60_000,
+  merchants: 60_000,
+  communities: 6 * 60 * 60_000,
+  csv: 60_000,
+  events: 10 * 60_000,
+};
+
+export function useGlobeStats() {
+  return useQuery({
+    queryKey: mapKeys.globe,
+    queryFn: () => getGlobeStats(),
+    staleTime: STALE.globe,
+  });
+}
+
+export function useMapCommunities() {
+  return useQuery({
+    queryKey: mapKeys.communities,
+    queryFn: () => getBtcCommunities(),
+    staleTime: STALE.communities,
+  });
+}
+
+export function useMapMerchants(bbox: MapBbox) {
+  return useQuery({
+    queryKey: mapKeys.merchants(bbox),
+    queryFn: () => getMerchants({ data: bbox }),
+    staleTime: STALE.merchants,
+  });
+}
+
+export function useMapCsv() {
+  return useQuery({
+    queryKey: mapKeys.csv,
+    queryFn: () => getMapCsv(),
+    staleTime: STALE.csv,
+  });
+}
+
+export function useMapEvents() {
+  return useQuery({
+    queryKey: mapKeys.events,
+    queryFn: () => getNetworkEvents(),
+    staleTime: STALE.events,
+    refetchInterval: 5 * 60_000,
+  });
+}
+
+export function prefetchMapStore(qc: QueryClient) {
+  return Promise.all([
+    qc.prefetchQuery({ queryKey: mapKeys.globe, queryFn: () => getGlobeStats(), staleTime: STALE.globe }),
+    qc.prefetchQuery({ queryKey: mapKeys.communities, queryFn: () => getBtcCommunities(), staleTime: STALE.communities }),
+    qc.prefetchQuery({ queryKey: mapKeys.csv, queryFn: () => getMapCsv(), staleTime: STALE.csv }),
+    qc.prefetchQuery({ queryKey: mapKeys.events, queryFn: () => getNetworkEvents(), staleTime: STALE.events }),
+  ]);
+}
+
+export function invalidateMapWrite(qc: QueryClient, csv?: string) {
+  if (csv) qc.setQueryData(mapKeys.csv, csv);
+  return Promise.all([
+    qc.invalidateQueries({ queryKey: mapKeys.globe }),
+    qc.invalidateQueries({ queryKey: mapKeys.merchantsRoot }),
+    qc.invalidateQueries({ queryKey: mapKeys.communities }),
+  ]);
+}
+
+export function countryFromGlobe(data: GlobeStats | undefined, iso?: string) {
+  if (!data || !iso) return null;
+  return data.countries.find((c) => c.iso === iso.toUpperCase()) ?? null;
+}
+
+export function useMapStore() {
+  const qc = useQueryClient();
+  return { qc, prefetch: () => prefetchMapStore(qc), invalidate: (csv?: string) => invalidateMapWrite(qc, csv) };
+}

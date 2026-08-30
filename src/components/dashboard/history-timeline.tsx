@@ -9,7 +9,7 @@ export function HistoryTimeline() {
   const localPaper = WHITEPAPER[lang];
 
   return (
-    <section id="historia" className="scroll-mt-28 space-y-5">
+    <section id="historia" className="scroll-mt-[var(--header-offset)] space-y-5">
       <div>
         <h2 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
           {t("historyTitle")}
@@ -23,6 +23,17 @@ export function HistoryTimeline() {
             <p className="font-mono text-xs tracking-wide text-primary">{m.date}</p>
             <h3 className="mt-0.5 text-base font-medium text-foreground">{m.title}</h3>
             <p className="mt-1 text-sm text-pretty text-muted-foreground">{m.body}</p>
+            <p className="mt-2 text-sm text-pretty text-foreground">
+              <span className="font-medium text-primary">{t("historyMeaning")}.</span> {m.meaning}
+            </p>
+            <a
+              href={m.url}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex h-9 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline hover:opacity-90"
+            >
+              {m.cta}
+            </a>
           </li>
         ))}
       </ol>

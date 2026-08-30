@@ -1,24 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
 import { buildModelMarket } from "@/infrastructure/compose";
-import { getDeskExtras, getMarket, getPulse, getTick } from "@/infrastructure/server-fns";
+import { getDeskExtras, getEtfFlows, getMarket, getOnchainLive, getPulse, getTick } from "@/infrastructure/server-fns";
 import { cn, formatPct, formatUsd } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ClarityPanel } from "./clarity-panel";
 import { ClientOnly } from "./client-only";
 import { CommunityFeedPanel } from "./community-feed";
+import { NetworkEvents } from "./network-events";
 import { FearGreedPanel } from "./fear-greed-panel";
 import { HistoryTimeline } from "./history-timeline";
+import { CommunityPinsBoard } from "./community-pins";
 import { LiquidityPanel } from "./liquidity-panel";
 import { NewsCycle } from "./news-cycle";
 import { OnchainPanel } from "./onchain-panel";
+import { OnchainLiveBar } from "./onchain-live";
+import { EtfFlowPanel } from "./etf-flow";
 import { PriceChart } from "./price-chart";
 import { ContributeQr } from "@/components/contribute-qr";
+import { ConcienciaBlock } from "./conciencia";
+import { ContactBlock } from "./contact";
+import { RoadmapWeb3 } from "./roadmap-web3";
+import { SoberaniaBlock } from "./soberania";
+import { LegalEu } from "./legal-eu";
+import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
-import { useT } from "@/lib/i18n";
+import { DATOS, useT } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
@@ -36,12 +47,12 @@ const DEFAULT_MA: Record<MaKey, boolean> = {
   ema6m: true,
 };
 
-function fgLabel(classification: string) {
-  if (classification === "Extreme Fear") return "Miedo extremo";
-  if (classification === "Extreme Greed") return "Codicia extrema";
-  if (classification === "Fear") return "Miedo";
-  if (classification === "Greed") return "Codicia";
-  return "Neutral";
+function fgLabel(classification: string, t: (k: "fgExtFear" | "fgExtGreed" | "fgFear" | "fgGreed" | "fgNeutral") => string) {
+  if (classification === "Extreme Fear") return t("fgExtFear");
+  if (classification === "Extreme Greed") return t("fgExtGreed");
+  if (classification === "Fear") return t("fgFear");
+  if (classification === "Greed") return t("fgGreed");
+  return t("fgNeutral");
 }
 
 function asLiq(range: ChartRange): LiqRange {
@@ -64,6 +75,7 @@ export function Desk() {
   const uiLang = useLocale((s) => s.lang);
   const t = useT();
   const [allowFetch, setAllowFetch] = useState(false);
+  const hash = useRouterState({ select: (s) => s.location.hash });
   useEffect(() => {
     setAllowFetch(true);
   }, []);
@@ -74,7 +86,8 @@ export function Desk() {
     queryKey: ["market", range, liq],
     queryFn: () => getMarket({ data: { range, liq } }),
     enabled: allowFetch,
-    staleTime: 4_000,
+    staleTime: 0,
+    refetchOnMount: "always",
     refetchInterval: (q) => (q.state.status === "error" ? 8_000 : 10_000),
     refetchOnWindowFocus: true,
     retry: 2,
@@ -85,7 +98,8 @@ export function Desk() {
     queryKey: ["extras", range],
     queryFn: () => getDeskExtras({ data: { range } }),
     enabled: allowFetch,
-    staleTime: 8_000,
+    staleTime: 0,
+    refetchOnMount: "always",
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
     retry: 2,
@@ -113,6 +127,38 @@ export function Desk() {
     retry: 1,
     placeholderData: (prev) => prev,
   });
+
+  const onchainLive = useQuery({
+    queryKey: ["onchain-live"],
+    queryFn: () => getOnchainLive(),
+    enabled: allowFetch,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchInterval: 6_000,
+    refetchOnWindowFocus: true,
+    retry: 2,
+    placeholderData: (prev) => prev,
+  });
+  const etfFlows = useQuery({
+    queryKey: ["etf-flows"],
+    queryFn: () => getEtfFlows(),
+    enabled: allowFetch,
+    staleTime: 10 * 60_000,
+    refetchOnMount: "always",
+    refetchInterval: 10 * 60_000,
+    retry: 2,
+    placeholderData: (prev) => prev,
+  });
+
+  useEffect(() => {
+    if (!allowFetch) return;
+    if (hash && hash !== "mercado") return;
+    void query.refetch();
+    void extras.refetch();
+    void tick.refetch();
+    void onchainLive.refetch();
+    void etfFlows.refetch();
+  }, [allowFetch, hash, range, liq]);
 
   const market = useMemo(() => {
     const base = query.data ?? fallback;
@@ -144,12 +190,54 @@ export function Desk() {
 
   return (
     <SiteShell>
-      <section id="mercado" className="scroll-mt-28 space-y-3">
+      <section id="mapa" className="scroll-mt-[var(--header-offset)] min-h-[min(70dvh,640px)]">
+        <ClientOnly fallback={<div className="h-[min(70dvh,640px)] rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
+          <MapGate embedded />
+        </ClientOnly>
+      </section>
+
+      <section id="conciencia" className="scroll-mt-[var(--header-offset)] space-y-4">
+        <ConcienciaBlock />
+        <ContributeQr />
+      </section>
+
+      <RoadmapWeb3 />
+
+      <section id="comunidad" className="scroll-mt-[var(--header-offset)] space-y-6">
+        <CommunityPinsBoard />
+        <NetworkEvents />
+        <CommunityFeedPanel />
+      </section>
+
+      <section id="pulso" className="scroll-mt-[var(--header-offset)]">
+        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
+      </section>
+
+      <HistoryTimeline />
+
+      <section id="red" className="scroll-mt-[var(--header-offset)] space-y-3">
+        <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{t("redTitle")}</h2>
+        <LiquidityPanel data={liqData} />
+        <div className="grid gap-3 lg:grid-cols-3">
+          <OnchainPanel
+            data={
+              extras.data?.onchain
+                ? { ...extras.data.onchain, ...onchainLive.data }
+                : extras.data?.onchain ?? null
+            }
+            priceDelta={priceDelta}
+          />
+          <FearGreedPanel data={fg} />
+          <ClarityPanel data={extras.data?.clarity ?? null} />
+        </div>
+      </section>
+
+      <section id="mercado" className="scroll-mt-[var(--header-offset)] space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+            <h2 className="font-display font-medium tracking-tight text-foreground">
               {t("mercadoTitle")}
-            </h1>
+            </h2>
             <p className="mt-1 text-base text-pretty text-muted-foreground">
               {t("mercadoLead")}
             </p>
@@ -208,24 +296,26 @@ export function Desk() {
         <Stat
           label={t("statFg")}
           value={fg ? String(fg.value) : "—"}
-          hint={fg ? fgLabel(fg.classification) : "Alternative.me"}
+          hint={fg ? fgLabel(fg.classification, t) : "Alternative.me"}
           hintClass={fg ? (fgUp ? "text-long" : "text-short") : undefined}
         />
         <Stat
           label={t("statLiq")}
           value={liqData ? String(liqData.score) : "—"}
-          hint={liqData ? `${liqData.spreadBps.toFixed(2)} ${t("spread")}` : "OKX libro"}
+          hint={liqData ? `${liqData.spreadBps.toFixed(2)} ${t("spread")}` : t("okxBook")}
         />
       </section>
 
       <PocCallout poc={poc} price={market.price} />
+
+      <OnchainLiveBar data={onchainLive.data ?? extras.data?.onchain ?? null} />
 
       <LongShortBar longPct={market.longPct} shortPct={market.shortPct} />
 
       <section className="overflow-hidden rounded-lg bg-card shadow-[var(--shadow-border)]">
         <div className="flex flex-col gap-1.5 border-b border-border px-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-3">
           <Segmented
-            ariaLabel="Periodo del gráfico"
+            ariaLabel={t("chartPeriod")}
             value={range}
             options={CHART_RANGES}
             onChange={setRange}
@@ -246,109 +336,34 @@ export function Desk() {
           </ClientOnly>
         </div>
       </section>
+      <EtfFlowPanel data={etfFlows.data ?? null} />
       </section>
 
-      <section id="participe" className="scroll-mt-28">
-        <ContributeQr />
-      </section>
-
-      <section id="comunidad" className="scroll-mt-28">
-        <CommunityFeedPanel />
-      </section>
-
-      <section id="pulso" className="scroll-mt-28">
-        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
-      </section>
-
-      <section id="red" className="scroll-mt-28 space-y-3">
-        <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{t("redTitle")}</h2>
-        <LiquidityPanel data={liqData} />
-        <div className="grid gap-3 lg:grid-cols-3">
-          <OnchainPanel data={extras.data?.onchain ?? null} priceDelta={priceDelta} />
-          <FearGreedPanel data={fg} />
-          <ClarityPanel data={extras.data?.clarity ?? null} />
-        </div>
-      </section>
-
-      <HistoryTimeline />
-
-      <section id="datos" className="scroll-mt-28 rounded-lg bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-5">
+      <section id="datos" className="scroll-mt-[var(--header-offset)] rounded-lg bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-5">
         <details>
           <summary className="cursor-pointer text-sm font-medium text-foreground">
             {t("datosTitle")}
           </summary>
           <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            <p>
-              bitacora.btc es el nodo que te une al mundo Bitcoin: un desk de un solo gráfico.
-              Los botones 1D / 1S / 1M / 6M fijan el <span className="text-foreground">intervalo de cada vela</span>
-              (día, semana, mes, semestre) y no cambian al panear o hacer zoom. Velas sólidas estilo
-              Binance; el mapa de calor es el promedio ponderado de los 10 perps más grandes, resampleado
-              a ese mismo intervalo.
-            </p>
-            <p>
-              <span className="text-foreground">Datos.</span> Las velas salen nativas de Binance
-              (<span className="font-mono text-foreground">1d / 1w / 1M</span>; 6M se arma con seis
-              mensuales). Si Binance no responde, OKX. El histórico profundo (Coinbase + blockchain.info)
-              se reagrupa al mismo intervalo para poder ir hasta el origen de la cotización. El mapa
-              de liquidaciones combina Binance, OKX, Bybit, Bitget, Hyperliquid, Gate, KuCoin, HTX,
-              MEXC y Kraken. El badge arriba a la derecha dice la fuente del precio.
-            </p>
-            <p>
-              <span className="text-foreground">Mapa.</span> Motor LiqMap (estilo Coinglass): en cada
-              vela se siembran liquidaciones en entry × (1 ± 1/L) para 5×–125×, ponderadas por nocional,
-              con kernel gaussiano. Cada palanca decae con su vida media. Cuando la mecha recorre un
-              precio, ese calor se borra. Azul = poca acumulación; amarillo = máximo. La franja derecha
-              marca los imanes. El <span className="text-primary">POC semanal</span> se calcula con 52
-              velas de 1S y no cambia al hacer zoom. Arriba del spot son shorts; abajo, longs.
-            </p>
-            <p>
-              <span className="text-foreground">Medias.</span> EMA con decay temporal sobre el cierre:{" "}
-              <span className="text-ma-1d">1D cian</span>,{" "}
-              <span className="text-ma-1w">1S violeta</span>,{" "}
-              <span className="text-ma-1m">1M lima</span>,{" "}
-              <span className="text-ma-6m">6M naranja Bitcoin flúor</span>.
-              La 6M es un trazo fino (#ff7a12) con halo suave #F7931A: al hacer zoom el glow se
-              estrecha para no tapar velas; al alejar, apenas se enciende para no perderse en el mapa.
-              Curva continua, no segmentos. El reencuadre vuelve al tramo reciente de ese intervalo.
-            </p>
-            <p>
-              <span className="text-foreground">Red Bitcoin.</span> Hashrate, dificultad y
-              transacciones diarias de blockchain.info, comparadas con el precio en el mismo
-              periodo. El hashrate mide el trabajo de mineros; las tx, la actividad de la cadena.
-            </p>
-            <p>
-              <span className="text-foreground">CLARITY.</span> Precio del mercado Sí/No en
-              Polymarket: «Clarity Act (H.R.3633) signed into law in 2026?». Ese precio es la
-              probabilidad implícita de que el proyecto se firme en 2026.
-            </p>
-            <p>
-              <span className="text-foreground">Miedo / codicia.</span> Índice diario de
-              Alternative.me (metodología tipo CNN): 0–24 miedo extremo, 25–49 miedo, 50–54
-              neutral, 55–74 codicia, 75–100 codicia extrema.
-            </p>
-            <p>
-              <span className="text-foreground">Liquidez.</span> Libro L2, open interest, funding 8h
-              y base mark–índice del swap BTC-USDT en OKX. El score pondera spread (más estrecho
-              mejor), nocional acumulado a ±1% del mid e imbalance del book.
-            </p>
-            <p>
-              <span className="text-foreground">Pulso.</span> Rastreo económico: RSS públicos
-              (CoinDesk, Bitcoin Magazine, Optech, Cointelegraph, CryptoSlate) sin API key, más
-              CryptoCompare. Filtro por Bitcoin, ETF, SEC, minería y temas afines. Tendencias:
-              CoinGecko. El ciclo avanza cada 8 s.
-            </p>
-            <p>
-              <span className="text-foreground">Zoom.</span> Rueda o pellizco para acercar, arrastrar
-              para mover, doble clic o el botón de maximizar para volver al periodo completo. El eje
-              Y se reajusta solo en log.
-            </p>
+            {DATOS[uiLang].map((block) => (
+              <p key={block.title}>
+                <span className="text-foreground">{block.title}.</span> {block.body}
+              </p>
+            ))}
           </div>
         </details>
       </section>
 
+      <SoberaniaBlock />
+      <LegalEu />
+
+      <section id="contacto" className="scroll-mt-[var(--header-offset)]">
+        <ContactBlock />
+      </section>
+
       {query.isError && (
         <p className="text-sm text-short">
-          No se pudo leer el mercado. Reintentá actualizar.
+          {t("marketFail")}
         </p>
       )}
     </SiteShell>
@@ -356,6 +371,7 @@ export function Desk() {
 }
 
 function PocCallout({ poc, price }: { poc: number | null; price: number }) {
+  const t = useT();
   const ready = poc != null && poc > 0 && price > 0;
   const above = ready ? poc > price : false;
   const dist = ready ? (Math.abs(price - poc) / poc) * 100 : null;
@@ -365,7 +381,7 @@ function PocCallout({ poc, price }: { poc: number | null; price: number }) {
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
             <span className="rounded bg-primary px-1.5 py-0.5 text-primary-foreground">POC LIQ</span>
-            Punto de control semanal
+            {t("pocWeekly")}
           </p>
           <p className="mt-1 font-mono text-2xl tabular-nums tracking-tight text-primary sm:text-3xl">
             {ready ? formatUsd(poc, 0) : "—"}
@@ -373,23 +389,17 @@ function PocCallout({ poc, price }: { poc: number | null; price: number }) {
         </div>
         {dist != null ? (
           <p className="font-mono text-sm tabular-nums text-muted-foreground">
-            {dist.toFixed(1)}% {above ? "por encima" : "por debajo"} del precio
+            {dist.toFixed(1)}% {above ? t("pocAbove") : t("pocBelow")} {t("pocOfPrice")}
           </p>
         ) : null}
       </div>
       <p className="mt-2 text-sm text-pretty text-muted-foreground">
         {ready ? (
           <>
-            Es el precio con{" "}
-            <span className="text-foreground">más capital apalancado a liquidar</span> en las
-            últimas 52 velas semanales. No se mueve al hacer zoom: el mapa local sí cambia, el POC
-            no.{" "}
-            {above
-              ? "Está arriba: si BTC sube hasta ahí, barre shorts."
-              : "Está abajo: si BTC baja hasta ahí, barre longs."}
+            {t("pocBody")} {above ? t("pocUp") : t("pocDown")}
           </>
         ) : (
-          "Cuando el mapa tenga datos, acá se lee el imán más pesado: el precio donde hay más liquidaciones acumuladas."
+          t("pocWait")
         )}
       </p>
     </section>

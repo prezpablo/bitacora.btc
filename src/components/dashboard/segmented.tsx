@@ -49,6 +49,7 @@ export function MaToggles({
   enabled: Record<string, boolean>;
   onToggle: (key: string) => void;
 }) {
+  const t = useT();
   const items = [
     { key: "ema1d", label: "1D", swatch: "bg-ma-1d" },
     { key: "ema1w", label: "1S", swatch: "bg-ma-1w" },
@@ -56,7 +57,7 @@ export function MaToggles({
     { key: "ema6m", label: "6M", swatch: "bg-ma-6m" },
   ];
   return (
-    <div className="flex min-w-0 items-center gap-0.5" role="group" aria-label="EMAs">
+    <div className="flex min-w-0 items-center gap-0.5" role="group" aria-label={t("emaAria")}>
       {items.map((item) => {
         const on = enabled[item.key];
         return (

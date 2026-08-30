@@ -1,4 +1,5 @@
-import type { MerchantPlace } from "@/domain";
+import type { Community, MerchantPlace } from "@/domain";
+import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 
 type RawEl = {
   id: string;
@@ -13,9 +14,11 @@ type RawEl = {
   tags?: { category?: string };
 };
 
-const TTL = 6 * 60 * 60_000;
+const TTL = 6 * 60_000 * 60;
 let cache: { at: number; places: MerchantPlace[] } | null = null;
 let inflight: Promise<MerchantPlace[]> | null = null;
+let commCache: { at: number; rows: Community[] } | null = null;
+let commInflight: Promise<Community[]> | null = null;
 
 function asPlace(el: RawEl): MerchantPlace | null {
   if (el.deleted_at) return null;
@@ -66,6 +69,14 @@ const FALLBACK: MerchantPlace[] = [
   { id: "node:5122775107", lat: -34.90137, lon: -56.14643, name: "MBC Montevideo Boulder Club", category: "sport", createdAt: Date.now() - 200 * 86_400_000 },
   { id: "node:13424595224", lat: -34.89667, lon: -56.16615, name: "Roderichs Crypto House", category: "shop", createdAt: Date.now() - 120 * 86_400_000 },
 ];
+
+export async function fetchAllMerchants(): Promise<MerchantPlace[]> {
+  try {
+    return await loadAll();
+  } catch {
+    return FALLBACK;
+  }
+}
 
 export async function fetchMerchants(bbox: {
   west: number;
@@ -118,4 +129,107 @@ export async function searchCities(q: string): Promise<{ label: string; lat: num
       lon: Number(r.lon),
     }))
     .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lon));
+}
+
+type RawArea = {
+  id: string;
+  created_at?: string;
+  deleted_at?: string | null;
+  tags?: Record<string, unknown>;
+};
+
+function ringCentroid(ring: number[][]): { lat: number; lon: number } | null {
+  if (!ring?.length) return null;
+  let x = 0;
+  let y = 0;
+  let n = 0;
+  for (const p of ring) {
+    if (!Array.isArray(p) || p.length < 2) continue;
+    x += Number(p[0]);
+    y += Number(p[1]);
+    n++;
+  }
+  if (!n) return null;
+  return { lon: x / n, lat: y / n };
+}
+
+function geoCentroid(geo: unknown): { lat: number; lon: number } | null {
+  if (!geo || typeof geo !== "object") return null;
+  const g = geo as { type?: string; coordinates?: unknown };
+  if (g.type === "Polygon") {
+    const ring = (g.coordinates as number[][][] | undefined)?.[0];
+    return ring ? ringCentroid(ring) : null;
+  }
+  if (g.type === "MultiPolygon") {
+    const ring = (g.coordinates as number[][][][] | undefined)?.[0]?.[0];
+    return ring ? ringCentroid(ring) : null;
+  }
+  if (g.type === "Point") {
+    const p = g.coordinates as number[] | undefined;
+    if (p && p.length >= 2) return { lon: Number(p[0]), lat: Number(p[1]) };
+  }
+  return null;
+}
+
+function areaLinks(tags: Record<string, unknown>): SocialLink[] {
+  const rows: SocialLink[] = [];
+  const seen = new Set<string>();
+  for (const [k, raw] of Object.entries(tags)) {
+    if (!k.startsWith("contact:") || typeof raw !== "string" || !raw.trim()) continue;
+    const url = raw.trim();
+    if (!/^https?:\/\//i.test(url) && !url.includes(".")) continue;
+    const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    const key: SocialKey = k === "contact:twitter" ? "x" : k === "contact:website" ? "web" : keyFromUrl(href);
+    const id = `${key}:${href}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    rows.push({ key, label: key, url: href });
+  }
+  return rows;
+}
+
+function asCommunity(el: RawArea): Community | null {
+  if (el.deleted_at) return null;
+  const tags = (el.tags || {}) as Record<string, unknown>;
+  if (tags.type !== "community") return null;
+  const center = geoCentroid(tags.geo_json);
+  if (!center || !Number.isFinite(center.lat) || !Number.isFinite(center.lon)) return null;
+  const name = String(tags.name || el.id);
+  const icon = typeof tags["icon:square"] === "string" ? tags["icon:square"] : "";
+  const continent = typeof tags.continent === "string" ? tags.continent : "";
+  return {
+    id: `btcmap:${el.id}`,
+    slug: String(tags.url_alias || el.id),
+    name,
+    lat: center.lat,
+    lon: center.lon,
+    logo: icon,
+    description: continent ? `BTC Map · ${continent}` : "BTC Map",
+    links: areaLinks(tags),
+    createdAt: el.created_at ? Date.parse(el.created_at) : Date.now(),
+  };
+}
+
+/** Live BTC Map communities — federated, not copied into the CSV overlay. */
+export async function fetchBtcCommunities(): Promise<Community[]> {
+  const now = Date.now();
+  if (commCache && now - commCache.at < TTL) return commCache.rows;
+  if (commInflight) return commInflight;
+  commInflight = (async () => {
+    const res = await fetch("https://api.btcmap.org/v2/areas", {
+      headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+    });
+    if (!res.ok) throw new Error(`btcmap areas ${res.status}`);
+    const raw = (await res.json()) as RawArea[];
+    const rows: Community[] = [];
+    for (const el of raw) {
+      const c = asCommunity(el);
+      if (c) rows.push(c);
+    }
+    commCache = { at: Date.now(), rows };
+    return rows;
+  })().finally(() => {
+    commInflight = null;
+  });
+  return commInflight;
 }
