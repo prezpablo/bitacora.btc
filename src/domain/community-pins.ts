@@ -17,6 +17,15 @@ export function pinAlive(p: CommunityPin, now = Date.now()) {
   return p.verified && p.verifiedAt > 0 && now - p.verifiedAt < PIN_TTL_MS;
 }
 
+/** Pedido aún no verificado: visible en el tablero hasta 7 días o cancelar. */
+export function pinPending(p: CommunityPin, now = Date.now()) {
+  return !p.verified && now - p.created < PIN_TTL_MS;
+}
+
+export function pinOnBoard(p: CommunityPin, now = Date.now()) {
+  return pinAlive(p, now) || pinPending(p, now);
+}
+
 export function pinDaysLeft(p: CommunityPin, now = Date.now()) {
   if (!pinAlive(p, now)) return 0;
   return Math.max(0, Math.ceil((PIN_TTL_MS - (now - p.verifiedAt)) / 86_400_000));

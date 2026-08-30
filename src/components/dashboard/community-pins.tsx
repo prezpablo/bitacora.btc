@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox } from "@/components/map/captcha";
 import { cancelCommunityPin, getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
-import { pinDaysLeft, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
+import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -67,9 +67,22 @@ export function CommunityPinsBoard() {
   }
 
   const live = useMemo(() => {
-    const rows = q.data || [];
-    return [...rows].sort((a, b) => pinWeekPose(a.id).order - pinWeekPose(b.id).order);
-  }, [q.data]);
+    const rows = [...(q.data || [])];
+    if (pending && !rows.some((p) => p.id === pending.id)) {
+      rows.push({
+        id: pending.id,
+        name: pending.name || "…",
+        blurb: "",
+        proof: pending.proof,
+        links: [],
+        token: pending.token,
+        verified: false,
+        verifiedAt: 0,
+        created: Date.now(),
+      });
+    }
+    return rows.sort((a, b) => pinWeekPose(a.id).order - pinWeekPose(b.id).order);
+  }, [q.data, pending]);
 
   async function submit() {
     setErr("");
@@ -95,6 +108,7 @@ export function CommunityPinsBoard() {
         return;
       }
       keepPending({ id: res.id, token: res.token, name: name.trim(), proof: proofUrl });
+      await q.refetch();
     } catch {
       setErr(t("pinNeed"));
     } finally {
@@ -280,6 +294,7 @@ function PinCard({ pin }: { pin: CommunityPin }) {
   const t = useT();
   const pose = pinWeekPose(pin.id);
   const days = pinDaysLeft(pin);
+  const waiting = pinPending(pin);
   const href = pin.proof;
   return (
     <li
@@ -302,7 +317,9 @@ function PinCard({ pin }: { pin: CommunityPin }) {
           ))}
         </p>
       ) : null}
-      <p className={cn("mt-2 font-mono text-[11px] text-muted-foreground")}>{t("pinDays", { n: days })}</p>
+      <p className={cn("mt-2 font-mono text-[11px]", waiting ? "text-primary" : "text-muted-foreground")}>
+        {waiting ? t("pinWait") : t("pinDays", { n: days })}
+      </p>
     </li>
   );
 }

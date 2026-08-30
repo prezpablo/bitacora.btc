@@ -11,11 +11,11 @@ import { nominatimCity, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
 import { loadMapCsvText, saveMapCsvText } from "./map-csv-io";
 import { loadPins, savePins, replacePins } from "./pins-io";
-import { scrapePendingPins, scrapeShowsToken } from "./pin-verify";
+import { scrapeShowsToken } from "./pin-verify";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, tooMany } from "./rate-limit";
 import { isPublicHttp } from "./safe-fetch";
-import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
+import { makePinToken, pinOnBoard, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
 import { parseMapCsv, socialsFromCsv, stringifyMapCsv } from "@/domain/map-csv";
 
 export const getMarket = createServerFn({ method: "POST" })
@@ -151,16 +151,12 @@ function safeHttp(raw: string) {
 }
 
 export const getCommunityPins = createServerFn({ method: "POST" }).handler(async (): Promise<CommunityPin[]> => {
-  const rows = await loadPins();
-  const swept = await scrapePendingPins(rows, 4);
-  if (swept.changed) {
-    try {
-      await savePins(swept.rows);
-    } catch {
-      /* still return live */
-    }
+  try {
+    const rows = await loadPins();
+    return rows.filter((p) => pinOnBoard(p)).slice(0, 48);
+  } catch {
+    return [];
   }
-  return swept.rows.filter((p) => pinAlive(p)).slice(0, 48);
 });
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
