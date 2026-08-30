@@ -123,7 +123,7 @@ export function CommunityPinsBoard() {
     try {
       const res = await verifyCommunityPin({ data: { id: pending.id } });
       if (!res.ok) {
-        setErr(t("pinProofFail"));
+        setErr(res.error === "instagram" ? t("pinIgBlock") : t("pinProofFail"));
         return;
       }
       keepPending(null);

@@ -52,8 +52,15 @@ export function scrapeMirrors(url: string): string[] {
     return out;
   }
   if (host === "instagram.com") {
+    const user = path.split("/").filter(Boolean)[0] || "";
     push(`https://r.jina.ai/${href}`);
-    return out;
+    push(`https://www.instagram.com/${user}/embed/`);
+    if (user) {
+      push(`https://api.fxtwitter.com/${user}`);
+      push(`https://r.jina.ai/https://x.com/${user}`);
+      push(`https://r.jina.ai/https://ink.bio/${user}`);
+    }
+    return out.slice(0, 6);
   }
   if (host === "njump.me" || host.endsWith(".njump.me")) {
     push(href);

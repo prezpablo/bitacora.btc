@@ -196,7 +196,10 @@ export const verifyCommunityPin = createServerFn({ method: "POST" })
     const pin = rows.find((p) => p.id === data.id);
     if (!pin) return { ok: false, error: "missing" };
     const hit = await scrapeShowsToken(pin.proof, pin.token, pin.links);
-    if (!hit) return { ok: false, error: "proof" };
+    if (!hit) {
+      const ig = /instagram\.com/i.test(pin.proof);
+      return { ok: false, error: ig ? "instagram" : "proof" };
+    }
     pin.verified = true;
     pin.verifiedAt = Date.now();
     await savePins(rows);
