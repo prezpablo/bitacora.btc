@@ -4,7 +4,7 @@ import type { Community, CommunityLink } from "./entities";
 
 const ID_KEYS = new Set(["web", "x", "nostr", "telegram", "github"]);
 
-const FOUNDING = new Set(["cc-btc", "c:cc-btc", "conciencia-bitcoin"]);
+const FOUNDING = new Set(["cc-btc", "c:cc-btc", "conciencia-bitcoin", "consciencia-bitcoin"]);
 
 function isFounding(c: { id?: string; slug?: string }) {
   return FOUNDING.has((c.slug || "").toLowerCase()) || FOUNDING.has((c.id || "").toLowerCase());

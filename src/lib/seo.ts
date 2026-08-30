@@ -25,25 +25,25 @@ export const SEO: Record<
   es: {
     title: "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica",
     description:
-      "Mapa interactivo de comunidades, nodos y comercios que aceptan Bitcoin en Latinoamérica. Eventos, pulso on-chain y educación. Una iniciativa de Conciencia Bitcoin desde Colonia del Sacramento, Uruguay.",
+      "Mapa interactivo de comunidades, nodos y comercios que aceptan Bitcoin en Latinoamérica. Eventos, pulso on-chain y educación. Una iniciativa de Consciencia Bitcoin desde Colonia del Sacramento, Uruguay.",
     keywords:
-      "Bitcoin, mapa Bitcoin, comunidades Bitcoin, Latinoamérica, comercios Bitcoin, Lightning, autocustodia, Conciencia Bitcoin, LATAM Cripto Mom, Colonia del Sacramento, Uruguay, LABITCONF, nodos Bitcoin",
+      "Bitcoin, mapa Bitcoin, comunidades Bitcoin, Latinoamérica, comercios Bitcoin, Lightning, autocustodia, Consciencia Bitcoin, LATAM Cripto Mom, Colonia del Sacramento, Uruguay, LABITCONF, nodos Bitcoin",
     ogLocale: "es_UY",
   },
   en: {
     title: "Bitácora.btc | Bitcoin community and merchant map for Latin America",
     description:
-      "Interactive map of Bitcoin communities, nodes and merchants across Latin America. Events, on-chain pulse and education. A Conciencia Bitcoin initiative from Colonia del Sacramento, Uruguay.",
+      "Interactive map of Bitcoin communities, nodes and merchants across Latin America. Events, on-chain pulse and education. A Consciencia Bitcoin initiative from Colonia del Sacramento, Uruguay.",
     keywords:
-      "Bitcoin, Bitcoin map, Bitcoin communities, Latin America, Bitcoin merchants, Lightning, self-custody, Conciencia Bitcoin, LATAM Cripto Mom, Colonia del Sacramento, Uruguay",
+      "Bitcoin, Bitcoin map, Bitcoin communities, Latin America, Bitcoin merchants, Lightning, self-custody, Consciencia Bitcoin, LATAM Cripto Mom, Colonia del Sacramento, Uruguay",
     ogLocale: "en_US",
   },
   pt: {
     title: "Bitácora.btc | Mapa de comunidades e comércios Bitcoin na América Latina",
     description:
-      "Mapa interativo de comunidades, nós e comércios que aceitam Bitcoin na América Latina. Eventos, pulso on-chain e educação. Iniciativa da Conciencia Bitcoin em Colonia del Sacramento, Uruguai.",
+      "Mapa interativo de comunidades, nós e comércios que aceitam Bitcoin na América Latina. Eventos, pulso on-chain e educação. Iniciativa da Consciencia Bitcoin em Colonia del Sacramento, Uruguai.",
     keywords:
-      "Bitcoin, mapa Bitcoin, comunidades Bitcoin, América Latina, comércios Bitcoin, Lightning, autocustódia, Conciencia Bitcoin, LATAM Cripto Mom, Colonia del Sacramento, Uruguai",
+      "Bitcoin, mapa Bitcoin, comunidades Bitcoin, América Latina, comércios Bitcoin, Lightning, autocustódia, Consciencia Bitcoin, LATAM Cripto Mom, Colonia del Sacramento, Uruguai",
     ogLocale: "pt_BR",
   },
 };
@@ -52,7 +52,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
   es: [
     {
       q: "¿Qué es Bitácora.btc?",
-      a: "Bitácora.btc es un espacio abierto y colaborativo para comunidades bitcoiner de Latinoamérica: un mapa interactivo de nodos, comercios que aceptan Bitcoin, eventos y educación. Lo impulsa Conciencia Bitcoin desde Colonia del Sacramento, Uruguay, con LATAM Cripto Mom.",
+      a: "Bitácora.btc es un espacio abierto y colaborativo para comunidades bitcoiner de Latinoamérica: un mapa interactivo de nodos, comercios que aceptan Bitcoin, eventos y educación. Lo impulsa Consciencia Bitcoin desde Colonia del Sacramento, Uruguay, con LATAM Cripto Mom.",
     },
     {
       q: "¿Dónde encuentro comunidades Bitcoin cerca de mí?",
@@ -70,7 +70,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
   en: [
     {
       q: "What is Bitácora.btc?",
-      a: "Bitácora.btc is an open collaborative space for bitcoiner communities in Latin America: an interactive map of nodes, Bitcoin-accepting merchants, events and education. It is run by Conciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom.",
+      a: "Bitácora.btc is an open collaborative space for bitcoiner communities in Latin America: an interactive map of nodes, Bitcoin-accepting merchants, events and education. It is run by Consciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom.",
     },
     {
       q: "Where do I find Bitcoin communities near me?",
@@ -88,7 +88,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
   pt: [
     {
       q: "O que é a Bitácora.btc?",
-      a: "A Bitácora.btc é um espaço aberto e colaborativo para comunidades bitcoiner da América Latina: um mapa interativo de nós, comércios que aceitam Bitcoin, eventos e educação. É impulsionada pela Conciencia Bitcoin em Colonia del Sacramento, Uruguai, com a LATAM Cripto Mom.",
+      a: "A Bitácora.btc é um espaço aberto e colaborativo para comunidades bitcoiner da América Latina: um mapa interativo de nós, comércios que aceitam Bitcoin, eventos e educação. É impulsionada pela Consciencia Bitcoin em Colonia del Sacramento, Uruguai, com a LATAM Cripto Mom.",
     },
     {
       q: "Onde encontro comunidades Bitcoin perto de mim?",
@@ -116,7 +116,7 @@ export function jsonLd(lang: AppLang, origin: string) {
         "@type": "Organization",
         "@id": `${origin}/#org`,
         name: SITE_NAME,
-        alternateName: ["bitacora.btc", "Bitácora BTC", "Conciencia Bitcoin"],
+        alternateName: ["bitacora.btc", "Bitácora BTC", "Consciencia Bitcoin"],
         url: origin,
         logo: `${origin}/logos/conciencia-bitcoin.png`,
         image: `${origin}/og.jpg`,
@@ -134,7 +134,7 @@ export function jsonLd(lang: AppLang, origin: string) {
         },
         areaServed: { "@type": "Place", name: "Latin America" },
         knowsAbout: ["Bitcoin", "Lightning Network", "self-custody", "Bitcoin circular economies"],
-        parentOrganization: { "@type": "Organization", name: "Conciencia Bitcoin" },
+        parentOrganization: { "@type": "Organization", name: "Consciencia Bitcoin" },
         sponsor: { "@type": "Organization", name: "LATAM Cripto Mom" },
       },
       {
@@ -179,7 +179,7 @@ export function jsonLd(lang: AppLang, origin: string) {
       {
         "@type": "Place",
         "@id": `${origin}/#place`,
-        name: "Conciencia Bitcoin — Colonia del Sacramento",
+        name: "Consciencia Bitcoin — Colonia del Sacramento",
         address: {
           "@type": "PostalAddress",
           addressLocality: GEO.city,

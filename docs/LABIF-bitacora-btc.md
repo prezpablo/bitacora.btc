@@ -5,7 +5,7 @@
 ---
 
 **Iniciativa:** Bitácora.btc  
-**Organización impulsora:** Conciencia Bitcoin  
+**Organización impulsora:** Consciencia Bitcoin  
 **Respaldo:** LATAM Cripto Mom  
 **Origen:** Colonia del Sacramento, Uruguay  
 **Territorio de impacto:** Latinoamérica (con foco inicial en el Río de la Plata y nodos de la región)  
@@ -30,7 +30,7 @@ Estimadas y estimados:
 
 Bitcoin no crece solo con tecnología. Crece cuando hay personas, comunidades y proyectos que construyen soluciones reales. Esa es la premisa de LABIF y es, también, el origen de Bitácora.btc.
 
-Somos una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, en el marco de Conciencia Bitcoin y con el respaldo de LATAM Cripto Mom. No somos un exchange. No custodiamos fondos. No vendemos cuentas. No pedimos documento de identidad para leer el mapa. Bitácora.btc es una hoja de ruta viva: un mapa de comercios y comunidades que aceptan bitcoin, una agenda de encuentros, una línea de historia verificable y datos públicos de la red, en español, portugués e inglés.
+Somos una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, en el marco de Consciencia Bitcoin y con el respaldo de LATAM Cripto Mom. No somos un exchange. No custodiamos fondos. No vendemos cuentas. No pedimos documento de identidad para leer el mapa. Bitácora.btc es una hoja de ruta viva: un mapa de comercios y comunidades que aceptan bitcoin, una agenda de encuentros, una línea de historia verificable y datos públicos de la red, en español, portugués e inglés.
 
 El problema que atendemos es concreto. En Latinoamérica hay nodos, meetups, plazas bitcoin y comercios que ya cobran en sats. Están dispersos. Quien da el primer paso no sabe a quién preguntar. Quien organiza un encuentro no tiene un tablero común. Quien enseña soberanía termina dependiendo de redes que no controla. Bitácora reúne eso en un solo lugar, abierto y colaborativo, con el tono de bitcoin.org: claro, naranja Bitcoin, sin ruido.
 
@@ -40,10 +40,10 @@ Solicitamos el acompañamiento de LABIF —capital, red y visibilidad— para co
 
 Con respeto y en bitcoin,
 
-**Conciencia Bitcoin**  
+**Consciencia Bitcoin**  
 Iniciativa Bitácora.btc  
 Colonia del Sacramento, Uruguay  
-*Conciencia Bitcoin by LATAM Cripto Mom*
+*Consciencia Bitcoin by LATAM Cripto Mom*
 
 ---
 
@@ -65,15 +65,15 @@ Colonia del Sacramento, Uruguay
 
 No inflamos visitas. Distinguimos **lo propio** de **lo que el mapa lee** de directorios abiertos.
 
-### Lo propio (Bitácora / Conciencia Bitcoin)
+### Lo propio (Bitácora / Consciencia Bitcoin)
 
 | Dato | Cifra | Nota |
 |---|---|---|
-| Comunidad fundadora | 1 | Conciencia Bitcoin, Colonia del Sacramento, Uruguay |
+| Comunidad fundadora | 1 | Consciencia Bitcoin, Colonia del Sacramento, Uruguay |
 | Overlay en `map.csv` | 1 comunidad + 1 ficha de comercio | El comercio no se cuenta como adopción Latam hasta verificarlo |
 | Anuncios comunitarios activos | 0 | Tablero de 7 días listo; aún sin pines vigentes |
 | Idiomas de la interfaz | 3 | ES · PT · EN (400 cadenas por idioma) |
-| Secciones de la bitácora | 10 | Mapa, Conciencia, Roadmap, Comunidad, Pulso hoy, Historia, Red, Mercado, Privacidad, Contacto |
+| Secciones de la bitácora | 10 | Mapa, Consciencia, Roadmap, Comunidad, Pulso hoy, Historia, Red, Mercado, Privacidad, Contacto |
 | Hitos de historia con relato y CTA | 21 | White Paper, Pizza Day, LABITCONF, fundaciones de la región, etc. |
 | Bloques de origen de datos (sección Datos) | 14 | Cada fuente se declara |
 | Fases hasta el halving | 4 | Q1 sep 2026 → Q4 abr 2028 |
@@ -200,7 +200,7 @@ El comité necesita ver una herramienta en uso, no una lámina. Distinguimos **l
 
 | Indicador | Valor | Lectura |
 |---|---|---|
-| Comunidad propia verificada | 1 | Conciencia Bitcoin, Colonia del Sacramento |
+| Comunidad propia verificada | 1 | Consciencia Bitcoin, Colonia del Sacramento |
 | Comercio propio contado como adopción Latam | 0 | Hay 1 ficha en cola, aún no verificada |
 | Ciudades con overlay propio | 1 | Colonia |
 | Anuncios comunitarios activos | 0 | Tablero de 7 días listo |
@@ -275,7 +275,7 @@ Identidades, correos de quien usa el mapa, conversiones de exchange, impresiones
 
 # 8. Gobernanza y sostenibilidad
 
-- Iniciativa de **Conciencia Bitcoin**, con respaldo de **LATAM Cripto Mom**.  
+- Iniciativa de **Consciencia Bitcoin**, con respaldo de **LATAM Cripto Mom**.  
 - No hay accionistas de un producto financiero.  
 - El mapa se nutre de directorios abiertos y de altas de la comunidad.  
 - Costos actuales: operación del sitio, APIs públicas, tiempo de curaduría y verificación.  
@@ -344,7 +344,7 @@ Bitácora.btc no promete un protocolo nuevo. Promete algo más escaso: que una p
 Eso es impacto. Eso es lo que pedimos sostener.
 
 **Iniciativa Bitácora.btc**  
-Conciencia Bitcoin by LATAM Cripto Mom  
+Consciencia Bitcoin by LATAM Cripto Mom  
 Colonia del Sacramento, Uruguay  
 Agosto 2026
 
@@ -357,14 +357,14 @@ Agosto 2026
 - **País de origen:** Uruguay  
 - **Alcance:** Latinoamérica  
 - **Estado:** producto en producción (no idea, no prototipo de lámina)  
-- **Equipo:** Conciencia Bitcoin · LATAM Cripto Mom  
+- **Equipo:** Consciencia Bitcoin · LATAM Cripto Mom  
 - **Sitio:** vista previa en esta sesión · código https://github.com/prezpablo/bitacora.btc (privado; sin Pages al 29 ago 2026) 
 - **Aporte actual:** QR bitcoin / Lightning en el propio sitio  
 - **Categorías LABIF:** educación, innovación, adopción  
 
 # Anexo B — Frase para redes (si LABIF la pide)
 
-Bitácora.btc es el punto de encuentro donde las comunidades y las personas se conectan con la libertad financiera. Mapa, historia y datos públicos de Bitcoin en Latinoamérica. Sin custodia. Sin KYC para leer. Una iniciativa de Conciencia Bitcoin, Colonia del Sacramento.
+Bitácora.btc es el punto de encuentro donde las comunidades y las personas se conectan con la libertad financiera. Mapa, historia y datos públicos de Bitcoin en Latinoamérica. Sin custodia. Sin KYC para leer. Una iniciativa de Consciencia Bitcoin, Colonia del Sacramento.
 
 # Anexo C — Lo que este documento no inventa
 

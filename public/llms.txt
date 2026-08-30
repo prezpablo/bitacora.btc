@@ -2,13 +2,13 @@
 
 > Open collaborative map of Bitcoin communities, nodes and merchants in Latin America. Education, events and on-chain pulse. No custody, no exchange.
 
-Bitácora.btc is a community logbook (bitácora) run by Conciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom. It helps people find Bitcoin circular economies nearby and learn self-custody.
+Bitácora.btc is a community logbook (bitácora) run by Consciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom. It helps people find Bitcoin circular economies nearby and learn self-custody.
 
 ## Site
 
 - Home (single page): /
 - Map / globe: /#mapa
-- About / Conciencia Bitcoin: /#conciencia
+- About / Consciencia Bitcoin: /#conciencia
 - Community & events: /#comunidad
 - News pulse: /#pulso
 - History of Bitcoin: /#historia
@@ -24,7 +24,7 @@ Not an exchange, wallet, broker or custodian. It does not hold keys or user fund
 
 ## Publisher
 
-- Organization: Conciencia Bitcoin
+- Organization: Consciencia Bitcoin
 - Backing: LATAM Cripto Mom
 - Place: Colonia del Sacramento, Colonia, Uruguay (−34.47, −57.84)
 - Area served: Latin America

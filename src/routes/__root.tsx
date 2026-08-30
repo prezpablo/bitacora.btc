@@ -7,7 +7,7 @@ import appCss from "../styles.css?url";
 const APP_NAME = "Bitácora.btc";
 const TITLE = "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica";
 const DESC =
-  "Mapa interactivo de comunidades, nodos y comercios que aceptan Bitcoin en Latinoamérica. Eventos, pulso on-chain y educación. Una iniciativa de Conciencia Bitcoin desde Colonia del Sacramento, Uruguay.";
+  "Mapa interactivo de comunidades, nodos y comercios que aceptan Bitcoin en Latinoamérica. Eventos, pulso on-chain y educación. Una iniciativa de Consciencia Bitcoin desde Colonia del Sacramento, Uruguay.";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -19,9 +19,9 @@ export const Route = createRootRoute({
       {
         name: "keywords",
         content:
-          "Bitcoin, mapa Bitcoin, comunidades Bitcoin, Latinoamérica, comercios Bitcoin, Lightning, autocustodia, Conciencia Bitcoin, Colonia del Sacramento, Uruguay",
+          "Bitcoin, mapa Bitcoin, comunidades Bitcoin, Latinoamérica, comercios Bitcoin, Lightning, autocustodia, Consciencia Bitcoin, Colonia del Sacramento, Uruguay",
       },
-      { name: "author", content: "Conciencia Bitcoin" },
+      { name: "author", content: "Consciencia Bitcoin" },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1" },
       { name: "theme-color", content: "#f7931a" },
       { name: "geo.region", content: "UY-CO" },

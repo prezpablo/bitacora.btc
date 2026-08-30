@@ -82,7 +82,7 @@ export function forwardFormSubmit(p: ContactPayload) {
 
 /** Acuse al emisor: FormSubmit no dispara _autoresponse si _captcha=false. */
 export function forwardAck(p: ContactPayload) {
-  const body = (p.auto || "").trim() || `Hola ${p.name}:\n\nRecibimos tu mensaje en Bitácora.btc.\n\nIniciativa Bitacora.btc\nConciencia Bitcoin by Latam Cripto Mom`;
+  const body = (p.auto || "").trim() || `Hola ${p.name}:\n\nRecibimos tu mensaje en Bitácora.btc.\n\nIniciativa Bitacora.btc\nConsciencia Bitcoin by Latam Cripto Mom`;
   return postSubmit(p.email, {
     name: FROM_NAME,
     email: p.email,

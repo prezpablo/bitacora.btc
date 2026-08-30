@@ -44,7 +44,7 @@ export function LabifDossier() {
         <p className="kicker">Proyecto escrito · Latin America Bitcoin Impact Fund</p>
         <h1 className="mt-2">Bitácora.btc</h1>
         <p className="mt-3 text-lg text-[#5c6370]">
-          El nodo que te une al mundo Bitcoin. Iniciativa de Conciencia Bitcoin, Colonia del Sacramento, Uruguay.
+          El nodo que te une al mundo Bitcoin. Iniciativa de Consciencia Bitcoin, Colonia del Sacramento, Uruguay.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-6 border border-[#e6e6e6] bg-[#f6f6f6] px-5 py-4">
@@ -53,8 +53,8 @@ export function LabifDossier() {
             <figcaption className="text-xs tracking-wide text-[#5c6370] uppercase">Bitácora.btc</figcaption>
           </figure>
           <figure className="m-0 flex flex-col items-center gap-2">
-            <img src="/logos/conciencia-bitcoin.png" alt="Conciencia Bitcoin" className="h-14 w-14 rounded-full object-cover" />
-            <figcaption className="text-xs tracking-wide text-[#5c6370] uppercase">Conciencia Bitcoin</figcaption>
+            <img src="/logos/conciencia-bitcoin.png" alt="Consciencia Bitcoin" className="h-14 w-14 rounded-full object-cover" />
+            <figcaption className="text-xs tracking-wide text-[#5c6370] uppercase">Consciencia Bitcoin</figcaption>
           </figure>
           <figure className="m-0 flex flex-col items-center gap-2">
             <img src="/latam-cripto-mom.png" alt="LATAM Cripto Mom" className="h-14 w-14 rounded-full object-cover" />
@@ -75,7 +75,7 @@ export function LabifDossier() {
           soluciones reales. Esa es la premisa de LABIF y es, también, el origen de Bitácora.btc.
         </p>
         <p>
-          Somos una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, en el marco de Conciencia Bitcoin
+          Somos una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, en el marco de Consciencia Bitcoin
           y con el respaldo de LATAM Cripto Mom. No somos un exchange. No custodiamos fondos. No vendemos cuentas. No
           pedimos documento de identidad para leer el mapa. Bitácora.btc es una hoja de ruta viva: un mapa de comercios
           y comunidades que aceptan bitcoin, una agenda de encuentros, una línea de historia verificable y datos
@@ -94,11 +94,11 @@ export function LabifDossier() {
         <p>
           Con respeto y en bitcoin,
           <br />
-          <strong>Conciencia Bitcoin</strong>
+          <strong>Consciencia Bitcoin</strong>
           <br />
           Iniciativa Bitácora.btc · Colonia del Sacramento, Uruguay
           <br />
-          <em>Conciencia Bitcoin by LATAM Cripto Mom</em>
+          <em>Consciencia Bitcoin by LATAM Cripto Mom</em>
         </p>
 
         <h2>2. Resumen ejecutivo</h2>
@@ -146,7 +146,7 @@ export function LabifDossier() {
             <tr>
               <td>Comunidad fundadora</td>
               <td>1</td>
-              <td>Conciencia Bitcoin, Colonia del Sacramento</td>
+              <td>Consciencia Bitcoin, Colonia del Sacramento</td>
             </tr>
             <tr>
               <td>Overlay map.csv</td>
@@ -166,7 +166,7 @@ export function LabifDossier() {
             <tr>
               <td>Secciones</td>
               <td>10</td>
-              <td>Mapa, Conciencia, Roadmap, Comunidad, Pulso hoy, Historia, Red, Mercado, Privacidad, Contacto</td>
+              <td>Mapa, Consciencia, Roadmap, Comunidad, Pulso hoy, Historia, Red, Mercado, Privacidad, Contacto</td>
             </tr>
             <tr>
               <td>Hitos de historia</td>
@@ -287,7 +287,7 @@ export function LabifDossier() {
 
         <h2>8. Gobernanza y uso del apoyo</h2>
         <p>
-          Iniciativa de Conciencia Bitcoin, respaldo de LATAM Cripto Mom. Sin accionistas de un producto financiero.
+          Iniciativa de Consciencia Bitcoin, respaldo de LATAM Cripto Mom. Sin accionistas de un producto financiero.
           Aportes actuales: QR bitcoin. No hay pasarela de tarjetas. No tokenizamos, no vendemos datos, no exigimos
           cuenta para leer.
         </p>
@@ -397,11 +397,11 @@ export function LabifDossier() {
                 itacora<span className="text-[#F7931A]">.btc</span>
               </span>
             </div>
-            <img src="/logos/conciencia-bitcoin.png" alt="Conciencia Bitcoin" className="size-16 rounded-full object-cover" />
+            <img src="/logos/conciencia-bitcoin.png" alt="Consciencia Bitcoin" className="size-16 rounded-full object-cover" />
             <img src="/latam-cripto-mom.png" alt="LATAM Cripto Mom" className="size-16 rounded-full object-cover" />
           </div>
           <p className="text-center text-sm text-[#5c6370]">
-            Una iniciativa de Conciencia Bitcoin by LATAM Cripto Mom
+            Una iniciativa de Consciencia Bitcoin by LATAM Cripto Mom
             <br />
             Colonia del Sacramento, Uruguay · Agosto 2026
           </p>

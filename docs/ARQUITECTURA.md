@@ -2,7 +2,7 @@
 
 Informe al 26 ago 2026. Describe lo que el código hace hoy, no un plan.
 
-**Producto.** Desk público de Bitcoin: un gráfico (velas + EMAs + mapa de liquidaciones), pulso on-chain, flujos de ETF, mapa de gasto/comunidades, eventos y la historia de la red. Frase: *el nodo que te une al mundo Bitcoin*. Iniciativa Conciencia Bitcoin By LCM.
+**Producto.** Desk público de Bitcoin: un gráfico (velas + EMAs + mapa de liquidaciones), pulso on-chain, flujos de ETF, mapa de gasto/comunidades, eventos y la historia de la red. Frase: *el nodo que te une al mundo Bitcoin*. Iniciativa Consciencia Bitcoin By LCM.
 
 **Auth.** Apagada (`VITE_AUTH_ENABLED=false`). No hay cuentas. Postgres/Better Auth están en el scaffold y no se usan.
 

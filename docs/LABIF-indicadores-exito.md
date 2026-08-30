@@ -16,7 +16,7 @@ El comité necesita ver una herramienta en uso, no una lámina. Distinguimos **l
 
 | Indicador | Valor | Lectura |
 |---|---|---|
-| Comunidad propia verificada | 1 | Conciencia Bitcoin, Colonia del Sacramento |
+| Comunidad propia verificada | 1 | Consciencia Bitcoin, Colonia del Sacramento |
 | Comercio propio contado como adopción Latam | 0 | Hay 1 ficha en cola, aún no verificada |
 | Ciudades con overlay propio | 1 | Colonia |
 | Anuncios comunitarios activos | 0 | Tablero de 7 días listo |

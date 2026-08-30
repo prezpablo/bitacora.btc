@@ -8,7 +8,7 @@ const es: { lead: string; gmail: string; blocks: SovBlock[] } = {
   blocks: [
     {
       title: "Qué no se toca (estética y relato)",
-      body: "Tipografía, naranja Bitcoin, globo de primera visita, mapa Leaflet, fichas, historia, i18n ES/PT/EN, QR de contribución, Conciencia Bitcoin. El visitante sigue viendo la misma bitácora. El globo y Mercado pasan a ser opt-in (modo ligero por defecto en redes lentas), no se eliminan.",
+      body: "Tipografía, naranja Bitcoin, globo de primera visita, mapa Leaflet, fichas, historia, i18n ES/PT/EN, QR de contribución, Consciencia Bitcoin. El visitante sigue viendo la misma bitácora. El globo y Mercado pasan a ser opt-in (modo ligero por defecto en redes lentas), no se eliminan.",
     },
     {
       title: "Dónde hospedar",
@@ -39,7 +39,7 @@ const en: { lead: string; gmail: string; blocks: SovBlock[] } = {
   blocks: [
     {
       title: "What we do not touch (look and story)",
-      body: "Type, Bitcoin orange, first-visit globe, Leaflet map, listings, history, ES/PT/EN, contribution QR, Conciencia Bitcoin. Visitors still see the same logbook. Globe and Market become opt-in (lite mode by default on slow links); they are not deleted.",
+      body: "Type, Bitcoin orange, first-visit globe, Leaflet map, listings, history, ES/PT/EN, contribution QR, Consciencia Bitcoin. Visitors still see the same logbook. Globe and Market become opt-in (lite mode by default on slow links); they are not deleted.",
     },
     {
       title: "Where to host",
@@ -70,7 +70,7 @@ const pt: { lead: string; gmail: string; blocks: SovBlock[] } = {
   blocks: [
     {
       title: "O que não se toca (estética e relato)",
-      body: "Tipografia, laranja Bitcoin, globo na primeira visita, mapa Leaflet, fichas, história, i18n ES/PT/EN, QR de contribuição, Conciencia Bitcoin. O visitante continua a ver a mesma bitácora. Globo e Mercado passam a opt-in (modo leve por defeito em redes lentas); não se apagam.",
+      body: "Tipografia, laranja Bitcoin, globo na primeira visita, mapa Leaflet, fichas, história, i18n ES/PT/EN, QR de contribuição, Consciencia Bitcoin. O visitante continua a ver a mesma bitácora. Globo e Mercado passam a opt-in (modo leve por defeito em redes lentas); não se apagam.",
     },
     {
       title: "Onde hospedar",

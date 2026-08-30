@@ -4,7 +4,7 @@ El nodo que te une al mundo Bitcoin.
 
 Desk de un gráfico: velas estilo Binance, EMAs (1D / 1S / 1M / 6M), mapa de liquidaciones (promedio de 10 exchanges), mapa de comercios y comunidades, pulso de noticias y la historia de Bitcoin.
 
-Una iniciativa de Conciencia Bitcoin By LCM.
+Una iniciativa de Consciencia Bitcoin By LCM.
 
 ## Stack
 

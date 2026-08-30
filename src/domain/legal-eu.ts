@@ -7,7 +7,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
   blocks: [
     {
       title: "Responsable",
-      body: "Iniciativa Bitacora.btc · Conciencia Bitcoin by Latam Cripto Mom, Colonia del Sacramento, Uruguay. No hay Delegado de Protección de Datos nombrado. El canal es el formulario de Contacto. No hay representante en la UE (art. 27 RGPD): si el servicio se dirige de forma efectiva a personas en la Unión, hay que designarlo.",
+      body: "Iniciativa Bitacora.btc · Consciencia Bitcoin by Latam Cripto Mom, Colonia del Sacramento, Uruguay. No hay Delegado de Protección de Datos nombrado. El canal es el formulario de Contacto. No hay representante en la UE (art. 27 RGPD): si el servicio se dirige de forma efectiva a personas en la Unión, hay que designarlo.",
     },
     {
       title: "Datos que tratamos",
@@ -49,7 +49,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
   blocks: [
     {
       title: "Controller",
-      body: "Iniciativa Bitacora.btc · Conciencia Bitcoin by Latam Cripto Mom, Colonia del Sacramento, Uruguay. No Data Protection Officer is appointed. The channel is the Contact form. No EU representative (GDPR art. 27): if the service is aimed at people in the Union, one must be designated.",
+      body: "Iniciativa Bitacora.btc · Consciencia Bitcoin by Latam Cripto Mom, Colonia del Sacramento, Uruguay. No Data Protection Officer is appointed. The channel is the Contact form. No EU representative (GDPR art. 27): if the service is aimed at people in the Union, one must be designated.",
     },
     {
       title: "Data we process",
@@ -91,7 +91,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
   blocks: [
     {
       title: "Responsável",
-      body: "Iniciativa Bitacora.btc · Conciencia Bitcoin by Latam Cripto Mom, Colonia del Sacramento, Uruguai. Não há Encarregado de Proteção de Dados nomeado. O canal é o formulário de Contacto. Não há representante na UE (art. 27.º RGPD): se o serviço se dirigir a pessoas na União, é preciso designá-lo.",
+      body: "Iniciativa Bitacora.btc · Consciencia Bitcoin by Latam Cripto Mom, Colonia del Sacramento, Uruguai. Não há Encarregado de Proteção de Dados nomeado. O canal é o formulário de Contacto. Não há representante na UE (art. 27.º RGPD): se o serviço se dirigir a pessoas na União, é preciso designá-lo.",
     },
     {
       title: "Dados que tratamos",
