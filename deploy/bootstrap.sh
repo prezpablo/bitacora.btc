@@ -21,12 +21,12 @@ done
 
 export DEBIAN_FRONTEND=noninteractive
 
-if ! swapon --show | grep -q .; then
-  fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
-  chmod 600 /swapfile
-  mkswap /swapfile
-  swapon /swapfile
-  grep -q swapfile /etc/fstab || echo "/swapfile none swap sw 0 0" >> /etc/fstab
+if ! swapon --show 2>/dev/null | grep -q .; then
+  fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none || true
+  chmod 600 /swapfile 2>/dev/null || true
+  mkswap /swapfile 2>/dev/null || true
+  swapon /swapfile 2>/dev/null || echo "swap omitido (este VPS no lo permite)"
+  grep -q swapfile /etc/fstab 2>/dev/null || echo "/swapfile none swap sw 0 0" >> /etc/fstab || true
 fi
 
 apt-get update -y
