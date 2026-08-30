@@ -3,7 +3,7 @@ import { useT, type CopyKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 function Glyph({ k }: { k: SocialKey }) {
-  const p = { fill: "currentColor", viewBox: "0 0 24 24", className: "size-4", "aria-hidden": true as const };
+  const p = { fill: "currentColor", viewBox: "0 0 24 24", className: "size-3.5", "aria-hidden": true as const };
   switch (k) {
     case "x":
       return (
@@ -95,7 +95,7 @@ function Glyph({ k }: { k: SocialKey }) {
 export function SocialRow({ links }: { links: { label: string; url: string; key?: string }[] }) {
   if (!links.length) return null;
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+    <div className="mt-2 flex flex-wrap items-center gap-1.5">
       {links.map((l) => {
         const k = (l.key as SocialKey) || keyFromUrl(l.url);
         return (
@@ -107,8 +107,8 @@ export function SocialRow({ links }: { links: { label: string; url: string; key?
             title={l.label}
             aria-label={l.label}
             className={cn(
-              "inline-flex size-10 items-center justify-center rounded-full bg-primary text-white no-underline",
-              "transition-opacity hover:opacity-90",
+              "inline-flex size-7 items-center justify-center rounded-md text-primary no-underline",
+              "transition-opacity hover:opacity-80",
             )}
           >
             <Glyph k={k} />
