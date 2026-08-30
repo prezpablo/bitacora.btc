@@ -13,12 +13,11 @@ if [ "$(id -u)" -ne 0 ]; then
   echo "Corré este script como root (ssh root@IP)."
   exit 1
 fi
-if [ -z "${GITHUB_TOKEN:-}" ]; then
-  echo "Falta GITHUB_TOKEN. En GitHub: Settings → Developer settings → Fine-grained token,"
-  echo "repo prezpablo/bitacora.btc, permiso Contents: Read. Después:"
-  echo "  export GITHUB_TOKEN=github_pat_..."
-  exit 1
-fi
+
+ZIP_SRC=""
+for d in /tmp/bitacora.btc-main /tmp/bitacora-src; do
+  if [ -f "$d/deploy/bootstrap.sh" ]; then ZIP_SRC="$d"; break; fi
+done
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -46,13 +45,22 @@ if ! command -v caddy >/dev/null 2>&1; then
 fi
 
 mkdir -p /var/www
-if [ ! -d "$APP_DIR/.git" ]; then
-  git clone "https://${GITHUB_TOKEN}@github.com/prezpablo/bitacora.btc.git" "$APP_DIR"
+if [ -n "$ZIP_SRC" ]; then
+  rm -rf "$APP_DIR"
+  mkdir -p "$APP_DIR"
+  cp -a "$ZIP_SRC"/. "$APP_DIR"/
+elif [ -n "${GITHUB_TOKEN:-}" ]; then
+  if [ ! -d "$APP_DIR/.git" ]; then
+    git clone "https://${GITHUB_TOKEN}@github.com/prezpablo/bitacora.btc.git" "$APP_DIR"
+  else
+    git -C "$APP_DIR" remote set-url origin "https://${GITHUB_TOKEN}@github.com/prezpablo/bitacora.btc.git"
+    git -C "$APP_DIR" pull --ff-only
+  fi
+  git -C "$APP_DIR" remote set-url origin "$REPO_URL"
 else
-  git -C "$APP_DIR" remote set-url origin "https://${GITHUB_TOKEN}@github.com/prezpablo/bitacora.btc.git"
-  git -C "$APP_DIR" pull --ff-only
+  echo "Poné el ZIP en /tmp (bitacora.btc-main) o exportá GITHUB_TOKEN."
+  exit 1
 fi
-git -C "$APP_DIR" remote set-url origin "$REPO_URL"
 
 cd "$APP_DIR"
 npm ci
