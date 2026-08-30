@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox } from "@/components/map/captcha";
+import { SocialRow } from "@/components/map/social-row";
 import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
 import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
@@ -343,15 +344,7 @@ function PinCard({ pin, onCopy }: { pin: CommunityPin; onCopy?: () => void }) {
         )}
       </p>
       {pin.blurb ? <p className="mt-1 text-xs text-pretty text-muted-foreground">{pin.blurb}</p> : null}
-      {pin.links.length ? (
-        <p className="mt-2 flex flex-wrap gap-x-2 gap-y-0.5 text-xs">
-          {pin.links.map((u) => (
-            <a key={u} href={u} target="_blank" rel="noreferrer" className="truncate text-primary">
-              {hostOf(u)}
-            </a>
-          ))}
-        </p>
-      ) : null}
+      {pin.links.length ? <SocialRow links={pin.links.map((url) => ({ url, label: hostOf(url) }))} /> : null}
       <p className={cn("mt-2 font-mono text-[11px]", waiting ? "text-primary" : "text-muted-foreground")}>
         {waiting ? t("pinWait") : t("pinDays", { n: days })}
       </p>
