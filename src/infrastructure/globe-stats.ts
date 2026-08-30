@@ -4,6 +4,7 @@ import { fetchNetworkEvents } from "./events";
 import { parseMapCsv } from "@/domain/map-csv";
 import { loadMapCsvText } from "./map-csv-io";
 
+const GEO_FILE = "public/data/ne-110m-countries.json";
 const GEO_URL =
   "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/geojson/ne_110m_admin_0_countries.geojson";
 const UY_PATCH = "public/data/ne-uy-10m.json";
@@ -128,9 +129,15 @@ function inCountry(lon: number, lat: number, c: CountryIdx) {
 
 async function countryIndex(): Promise<CountryIdx[]> {
   if (geoCache && geoCache.ver === STATS_VER && Date.now() - geoCache.at < 24 * 60 * 60_000) return geoCache.idx;
-  const res = await fetch(GEO_URL, { headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" } });
-  if (!res.ok) throw new Error(`geo ${res.status}`);
-  const raw = (await res.json()) as { features?: { properties?: Record<string, unknown>; geometry?: { type?: string; coordinates?: unknown } }[] };
+  let raw: { features?: { properties?: Record<string, unknown>; geometry?: { type?: string; coordinates?: unknown } }[] } = { features: [] };
+  try {
+    const { readFile } = await import("node:fs/promises");
+    raw = JSON.parse(await readFile(GEO_FILE, "utf8")) as typeof raw;
+  } catch {
+    const res = await fetch(GEO_URL, { headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" } });
+    if (!res.ok) throw new Error(`geo ${res.status}`);
+    raw = (await res.json()) as typeof raw;
+  }
   const idx: CountryIdx[] = [];
   for (const f of raw.features || []) {
     const iso = isoOf(f.properties || {});

@@ -9,8 +9,7 @@ import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { ClientOnly } from "@/components/dashboard/client-only";
 
-const GEO_URL =
-  "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/geojson/ne_110m_admin_0_countries.geojson";
+const GEO_URL = "/data/ne-110m-countries.json";
 
 const WHITE =
   "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
@@ -110,9 +109,23 @@ function GlobeCanvas({
   }, [geo.data, stats.data]);
 
   useEffect(() => {
+    let stop = false;
+    const timer = window.setTimeout(() => {
+      if (!stop) setLoadErr((e) => e || "timeout");
+    }, 12000);
     void import("react-globe.gl")
-      .then((m) => setGlobe(() => m.default as ComponentType<Record<string, unknown>>))
-      .catch((err: Error) => setLoadErr(err.message || "globe"));
+      .then((m) => {
+        const g = (m as { default?: unknown }).default ?? m;
+        const Cmp = (g as { default?: unknown }).default ?? g;
+        if (!stop) setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
+      })
+      .catch((err: Error) => {
+        if (!stop) setLoadErr(err.message || "globe");
+      });
+    return () => {
+      stop = true;
+      window.clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -239,9 +252,14 @@ function GlobeCanvas({
           }}
         />
       ) : (
-        <p className="flex h-full items-center justify-center text-sm text-neutral-500">
-          {loadErr ? loadErr : t("loading")}
-        </p>
+        <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center">
+          <p className="text-sm text-neutral-500">{loadErr ? t("globeFail") : t("loading")}</p>
+          {loadErr ? (
+            <button type="button" className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white" onClick={onSkip}>
+              {t("globeSkip")}
+            </button>
+          ) : null}
+        </div>
       )}
 
       {hover ? (

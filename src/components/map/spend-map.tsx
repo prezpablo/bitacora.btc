@@ -314,9 +314,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         focus ? [focus.lat, focus.lon] : [20, -40],
         focus?.zoom ?? 4,
       );
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://btcmap.org">BTC Map</a>',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/">CARTO</a> · <a href="https://btcmap.org">BTC Map</a>',
+        subdomains: "abcd",
         maxZoom: 19,
       }).addTo(map);
       L.control.zoom({ position: "topright" }).addTo(map);
