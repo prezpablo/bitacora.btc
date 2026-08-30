@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox } from "@/components/map/captcha";
-import { cancelCommunityPin, getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
+import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
 import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
@@ -56,10 +56,26 @@ export function CommunityPinsBoard() {
   const [err, setErr] = useState("");
   const [copied, setCopied] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     setPending(readPending());
   }, []);
+
+  useEffect(() => {
+    if (!pending?.token) return;
+    let stop = false;
+    void navigator.clipboard.writeText(pending.token).then(() => {
+      if (stop) return;
+      setCopied(true);
+      window.setTimeout(() => {
+        if (!stop) setCopied(false);
+      }, 4000);
+    }).catch(() => {});
+    return () => {
+      stop = true;
+    };
+  }, [pending?.token]);
 
   function keepPending(p: Pending | null) {
     setPending(p);
@@ -95,7 +111,13 @@ export function CommunityPinsBoard() {
       setErr(t("pinNeed"));
       return;
     }
+    if (/instagram\.com/i.test(proofUrl)) {
+      setErr(t("pinNoIg"));
+      return;
+    }
     setBusy(true);
+    setGenerating(true);
+    const started = Date.now();
     try {
       const extra = links
         .split(/[\s,|]+/)
@@ -103,6 +125,8 @@ export function CommunityPinsBoard() {
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
       const res = await submitCommunityPin({ data: { name: name.trim(), blurb, proof: proofUrl, links: extra } });
+      const wait = Math.max(0, 700 - (Date.now() - started));
+      if (wait) await new Promise((r) => window.setTimeout(r, wait));
       if (!res?.ok || !res.token || !res.id) {
         setErr(res?.error === "rate" ? t("pinRate") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
@@ -113,6 +137,7 @@ export function CommunityPinsBoard() {
       setErr(t("pinNeed"));
     } finally {
       setBusy(false);
+      setGenerating(false);
     }
   }
 
@@ -140,25 +165,12 @@ export function CommunityPinsBoard() {
     }
   }
 
-  async function cancel() {
-    if (!pending) return;
-    setBusy(true);
-    setErr("");
-    try {
-      await cancelCommunityPin({ data: { id: pending.id } });
-    } catch {
-      /* still drop local hold */
-    }
-    keepPending(null);
-    setBusy(false);
-  }
-
   async function copyCode() {
     if (!pending) return;
     try {
       await navigator.clipboard.writeText(pending.token);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
+      window.setTimeout(() => setCopied(false), 4000);
     } catch {
       setErr(pending.token);
     }
@@ -175,7 +187,20 @@ export function CommunityPinsBoard() {
         {live.length ? (
           <ul className="flex flex-wrap justify-center gap-3 sm:gap-4">
             {live.map((p) => (
-              <PinCard key={p.id} pin={p} />
+              <PinCard
+                key={p.id}
+                pin={p}
+                onCopy={
+                  p.token
+                    ? () => {
+                        void navigator.clipboard.writeText(p.token).then(() => {
+                          setCopied(true);
+                          window.setTimeout(() => setCopied(false), 4000);
+                        });
+                      }
+                    : undefined
+                }
+              />
             ))}
           </ul>
         ) : (
@@ -186,7 +211,17 @@ export function CommunityPinsBoard() {
       <div className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
         <p className="text-sm font-medium text-foreground">{t("pinFormTitle")}</p>
         <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
-        {pending ? (
+        {generating && !pending ? (
+          <div
+            className="mt-6 flex min-h-32 flex-col items-center justify-center gap-2"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <span className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden />
+            <p className="font-display text-lg font-medium text-foreground">{t("pinGenerating")}</p>
+          </div>
+        ) : pending ? (
           <div className="mt-4 space-y-3">
             <p className="text-sm text-foreground">{t("pinPostCode")}</p>
             <button
@@ -194,10 +229,11 @@ export function CommunityPinsBoard() {
               onClick={() => void copyCode()}
               className="block w-full rounded-md bg-primary px-3 py-3 text-center font-mono text-2xl font-bold tracking-widest text-white sm:text-3xl"
               title={t("pinCopy")}
+              aria-label={`${t("pinCopy")}: ${pending.token}`}
             >
               {pending.token}
             </button>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm font-medium text-primary" role="status" aria-live="polite">
               {copied ? t("pinCopied") : t("pinPostHint")}
             </p>
             {pending.proof ? (
@@ -206,25 +242,15 @@ export function CommunityPinsBoard() {
                 {pending.proof}
               </p>
             ) : null}
-            {err ? <p className="text-sm text-primary">{err}</p> : null}
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
-                onClick={() => void check()}
-                disabled={busy}
-              >
-                {t("pinCheck")}
-              </button>
-              <button
-                type="button"
-                className="h-9 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-50"
-                onClick={() => void cancel()}
-                disabled={busy}
-              >
-                {t("pinCancel")}
-              </button>
-            </div>
+            {err ? <p className="text-sm text-primary" role="alert">{err}</p> : null}
+            <button
+              type="button"
+              className="h-10 w-full rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
+              onClick={() => void check()}
+              disabled={busy}
+            >
+              {t("pinCheck")}
+            </button>
           </div>
         ) : (
           <form
@@ -251,7 +277,10 @@ export function CommunityPinsBoard() {
                 value={proof}
                 onChange={(e) => setProof(e.target.value)}
                 placeholder="URL"
+                inputMode="url"
+                autoComplete="url"
                 required
+                aria-invalid={/instagram\.com/i.test(proof) || undefined}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -290,7 +319,7 @@ export function CommunityPinsBoard() {
   );
 }
 
-function PinCard({ pin }: { pin: CommunityPin }) {
+function PinCard({ pin, onCopy }: { pin: CommunityPin; onCopy?: () => void }) {
   const t = useT();
   const pose = pinWeekPose(pin.id);
   const days = pinDaysLeft(pin);
@@ -303,9 +332,15 @@ function PinCard({ pin }: { pin: CommunityPin }) {
     >
       <p className="flex items-center gap-1.5 font-medium text-foreground">
         <Pin className="size-4 shrink-0 text-primary" aria-hidden />
-        <a href={href} target="_blank" rel="noreferrer" className="truncate no-underline hover:underline">
-          {pin.name}
-        </a>
+        {waiting && onCopy ? (
+          <button type="button" className="truncate text-left hover:underline" onClick={onCopy}>
+            {pin.name}
+          </button>
+        ) : (
+          <a href={href} target="_blank" rel="noreferrer" className="truncate no-underline hover:underline">
+            {pin.name}
+          </a>
+        )}
       </p>
       {pin.blurb ? <p className="mt-1 text-xs text-pretty text-muted-foreground">{pin.blurb}</p> : null}
       {pin.links.length ? (
