@@ -8,6 +8,8 @@ import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { ClientOnly } from "@/components/dashboard/client-only";
+import { getCityFrame } from "@/infrastructure/server-fns";
+import { boxAround, locateBest } from "@/infrastructure/geo";
 
 const GEO_URL = "/data/ne-110m-countries.json";
 
@@ -61,6 +63,7 @@ function GlobeCanvas({
   const entered = useRef(false);
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
   const [loadErr, setLoadErr] = useState("");
+  const [joining, setJoining] = useState(false);
   const [size, setSize] = useState({ w: 800, h: 600 });
   const [hover, setHover] = useState<Feat | null>(null);
 
@@ -150,6 +153,26 @@ function GlobeCanvas({
     if (entered.current) return;
     entered.current = true;
     onEnter({ lat, lon, zoom, iso });
+  }
+
+  async function joinHere() {
+    if (joining || entered.current) return;
+    setJoining(true);
+    try {
+      const cityOf = (lat: number, lon: number, zoom: number) =>
+        getCityFrame({ data: { lat, lon, zoom } }).catch(() => boxAround(lat, lon));
+      let city;
+      try {
+        city = (await locateBest(true, cityOf)).city;
+      } catch {
+        city = (await locateBest(false, cityOf)).city;
+      }
+      enter(city.lat, city.lon, 13, city.countryCode);
+    } catch {
+      onSkip();
+    } finally {
+      setJoining(false);
+    }
   }
 
   const world = stats.data?.world;
@@ -263,7 +286,7 @@ function GlobeCanvas({
       )}
 
       {hover ? (
-        <div className="pointer-events-none absolute top-2 right-14 left-2 z-20 rounded-md bg-white/95 px-3 py-2 shadow-[var(--shadow-border)] sm:top-auto sm:right-auto sm:bottom-16 sm:left-1/2 sm:w-[min(92%,320px)] sm:-translate-x-1/2">
+        <div className="pointer-events-none absolute top-12 right-2 left-2 z-20 rounded-md bg-white/95 px-3 py-2 shadow-[var(--shadow-border)] sm:top-auto sm:right-auto sm:bottom-16 sm:left-1/2 sm:w-[min(92%,320px)] sm:-translate-x-1/2">
           <p className="font-medium text-neutral-900">{names?.of(hover.iso) || hover.iso}</p>
           <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 font-mono text-xs text-neutral-700 sm:grid-cols-1 sm:text-sm">
             <li>
@@ -286,6 +309,14 @@ function GlobeCanvas({
         </p>
       )}
 
+      <button
+        type="button"
+        className="absolute top-2 left-2 z-20 h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-60 sm:top-auto sm:bottom-3 sm:left-3"
+        onClick={() => void joinHere()}
+        disabled={joining}
+      >
+        {joining ? t("geoWait") : t("globeJoin")}
+      </button>
       <button
         type="button"
         className="absolute top-2 right-2 z-20 h-9 rounded-md bg-primary px-3 text-sm font-medium text-white sm:top-auto sm:right-3 sm:bottom-3"
