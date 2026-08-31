@@ -12,11 +12,11 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 
 | Pieza | Hecho |
 |---|---|
-| Host | VPS Ubuntu 24.04, Caddy → `127.0.0.1:8080`. **Público HTTPS:** `https://45.158.116.49.sslip.io`. BNS `bitácora.btc` (activo hasta 28-08-2031) redirige `bitacora.btc.us` → sslip.io |
+| Host | VPS Ubuntu 24.04, Caddy → `127.0.0.1:8080`. **Público HTTPS:** `https://45.158.116.49.sslip.io`. SSH: `bitacora@45.158.116.49` (root SSH **cerrado**). BNS `bitácora.btc` redirige `bitacora.btc.us` → sslip.io |
 | Runtime | Nitro `node-server`, **un** proceso Node |
 | RAM | VPS chico; swap 2 GB a veces **no se puede** (`swapon: Operation not permitted`) |
-| systemd | `Restart=on-failure` — **no hay** `MemoryMax` ni healthcheck |
-| Datos | `public/data/map.csv`, `public/data/pins.csv` (+ merge a GitHub raw) |
+| systemd | `Restart=always`, `MemoryMax=700M` (unit `bitacora.service`) |
+| Datos | SQLite `data/bitacora.sqlite`; CSV de respaldo en `public/data/` |
 | Front pesado | `react-globe.gl` / Three (~4,3 MB en el output SSR) |
 
 ---
@@ -27,11 +27,26 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 
 | Deuda | Efecto | Cómo se ve |
 |---|---|---|
-| Producción ≠ `main` | El VPS sirve un build anterior | `/data/ne-110m-countries.json` **404**; `pins.csv` público **vacío**; copy vieja (Conciencia, BIT-) |
-| Sin tope de RAM | Un globo + dump de BTC Map → OOM | Node muere; systemd lo levanta; se pierde el rate-limit en memoria |
-| SSH root + HTTP :80 | Clave root = dueño del VPS; IP sin candado | **En curso (31 ago 2026):** Caddy redirige `:80` → sslip HTTPS. Usuario `bitacora` + `PermitRootLogin no` (scripts `deploy/p0-*.sh`). PAT de GitHub a revocar a mano. |
+| Producción ≠ `main` | El VPS sirve un build anterior | `git fetch` pide token; HEAD local quedó atrás. Caddy P0 se aplicó a mano (python), no por pull. |
+| Sin tope de RAM | Un globo + dump de BTC Map → OOM | Mitigado en unit (`MemoryMax=700M`) si el bootstrap corrió. |
 
-**Cierre P0:** `git pull` + `bootstrap.sh` en el VPS; `MemoryMax=700M` (o el 70 % de la RAM) en `bitacora.service`.
+**Cierre P0 restante:** actualizar código sin PAT en el chat (ZIP o token de solo lectura, nunca pegarlo acá).
+
+### 2.0 Seguridad del VPS — P0 cerrado (31 ago 2026)
+
+Hecho en el server Njalla, no solo en el repo:
+
+| Ítem | Estado | Cómo |
+|---|---|---|
+| HTTP en la IP (`:80` servía la app) | **Cerrado** | Caddy: `http://` → `https://45.158.116.49.sslip.io{uri}` permanent. Validate + `systemctl reload caddy`. |
+| SSH como `root` | **Cerrado** | Usuario `bitacora` (uid 1000, sudo NOPASSWD, misma clave ed25519). `/etc/ssh/sshd_config.d/50-bitacora.conf`: `PermitRootLogin no`. Comprobado: `ssh root@…` → `Permission denied (publickey)`. |
+| Entrada de admin | `ssh bitacora@45.158.116.49` | Adentro: `sudo …`. No reactivar root. |
+| Scripts en repo | `deploy/p0-ssh-user.sh`, `deploy/p0-lock-root.sh`, `deploy/Caddyfile` | El VPS no los tenía (git sin auth); se aplicó el equivalente a mano. |
+| PAT de GitHub pegado en el chat | **Pendiente (humano)** | Revocar en github.com/settings/tokens. No volver a pegar secretos. Deploy: ZIP o PAT nuevo de **solo lectura**, solo en SSH. |
+
+**No hacer:** `Transfer Domain` en btc.us; `PermitRootLogin yes`; servir Node en `0.0.0.0`.
+
+P1 de seguridad que **sigue abierta:** fail2ban, `unattended-upgrades`, CSP, hash de IP en rate-limit, `saveMapCsv` público, backup de SQLite fuera del VPS.
 
 ### P1 — arquitectura que no escala ni a un meetup grande
 
@@ -53,8 +68,9 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 | Panel btc.us | **Website Redirect** → `https://45.158.116.49.sslip.io` (no hay registro A) |
 | Puente ASCII | `https://bitacora.btc.us` → 302 al sslip |
 | Puente con tilde | `bitácora.btc.us` — NXDOMAIN (el puente no IDN-iza la á) |
-| Caddy / Let's Encrypt | solo `45.158.116.49.sslip.io` + `:80` |
-| IP cruda | `https://45.158.116.49` — “No seguro”; no hay cert en IP |
+| Caddy / Let's Encrypt | `45.158.116.49.sslip.io` (HTTPS). Catch-all HTTP redirige a ese host. |
+| IP cruda HTTP | `http://45.158.116.49` → 301/308 a sslip HTTPS (P0, 31 ago 2026) |
+| SSH | Solo `bitacora`; root denegado |
 
 **Efecto:** la URL de compartir memorable es `bitacora.btc.us`; tras el salto la barra muestra sslip.io. SEO/AEO no consolidan una canónica. Sitemap y `robots.txt` no deben promover la á.
 
@@ -77,7 +93,7 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 - `i18n.ts` monolito (415 claves × 3): funciona, es difícil de revisar.
 - Cancelar pin sigue en el server y ya no está en la UI.
 
-**No es deuda:** paridad ES/EN/PT (415 claves), Caddy+HTTPS, captcha, POC semanal fijo al zoom, OSM con fallback Esri (en `main`).
+**No es deuda:** paridad ES/EN/PT, captcha, POC semanal fijo al zoom, OSM con fallback Esri, **P0 SSH/HTTP** (31 ago 2026), Caddy+HTTPS en sslip.io.
 
 ---
 
