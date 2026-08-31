@@ -114,3 +114,14 @@ export function slotShift(slot: number, slots: number) {
   if (slots <= 1) return 0;
   return (slot - (slots - 1) / 2) * 100;
 }
+
+/** Offset longitude so logos sit in a row. Keeps lat0/lon0 for clicks. */
+export function fanLon<T extends { lat: number; lon: number; slot: number; slots: number }>(
+  rows: T[],
+  gapDeg: number,
+): (T & { lat0: number; lon0: number })[] {
+  return rows.map((r) => {
+    const dx = r.slots <= 1 ? 0 : (r.slot - (r.slots - 1) / 2) * gapDeg;
+    return { ...r, lat0: r.lat, lon0: r.lon, lon: r.lon + dx };
+  });
+}

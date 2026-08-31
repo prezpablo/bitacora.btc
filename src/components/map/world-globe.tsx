@@ -8,7 +8,7 @@ import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { logoUrl } from "@/domain/map-csv";
-import { dedupeCommunities, slotShift, spreadSameCity } from "@/domain/community-dedupe";
+import { dedupeCommunities, fanLon, spreadSameCity } from "@/domain/community-dedupe";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { boxAround, locateBest } from "@/infrastructure/geo";
@@ -200,8 +200,9 @@ function GlobeCanvas({
     for (const p of overlayPins) {
       if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
-    return spreadSameCity(dedupeCommunities([...byId.values()]));
-  }, [mapPins, overlayPins]);
+    const gap = alt > 2.05 ? 0.32 : alt > 1.35 ? 0.16 : alt > 0.8 ? 0.07 : 0.028;
+    return fanLon(spreadSameCity(dedupeCommunities([...byId.values()])), gap);
+  }, [mapPins, overlayPins, alt]);
 
   return (
     <div className="space-y-3">
@@ -263,15 +264,14 @@ function GlobeCanvas({
           htmlLng="lon"
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
-          htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string; slot?: number; slots?: number }) => {
+          htmlElement={(d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {
             const el = document.createElement("button");
             const founding = d.id === "c:cc-btc";
             const logo = logoUrl(d.logo || "");
             const sizePx = founding ? 14 : alt > 2 ? 9 : alt > 1.2 ? 11 : 13;
-            const dx = slotShift(d.slot ?? 0, d.slots ?? 1);
             el.type = "button";
             el.title = d.name || "";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:visible;cursor:pointer;pointer-events:auto;transform:translateX(${dx}%)`;
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
             if (logo) {
               const img = document.createElement("img");
               img.src = logo;
@@ -288,7 +288,7 @@ function GlobeCanvas({
             }
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
-              enter(d.lat, d.lon, 13, undefined, d);
+              enter(d.lat0 ?? d.lat, d.lon0 ?? d.lon, 13, undefined, d);
             });
             return el;
           }}
