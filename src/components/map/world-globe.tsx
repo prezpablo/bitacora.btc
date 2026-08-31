@@ -208,26 +208,29 @@ function GlobeCanvas({
   }, [mapPins, overlayPins]);
 
   const far = alt > 1.48;
-  const htmlPins = useMemo(
-    () => (far ? coinPins.filter((p) => p.id === FOUNDING_UY.id) : coinPins),
-    [coinPins, far],
-  );
-  const gpuPins = useMemo(
-    () => (far ? coinPins.filter((p) => p.id !== FOUNDING_UY.id) : []),
-    [coinPins, far],
-  );
+  const htmlPins = useMemo(() => {
+    if (!far) return coinPins.map((p) => ({ ...p, face: "logo" as const }));
+    const cell = 0.85;
+    const m = new Map<string, (typeof coinPins)[number] & { face: "btc" }>();
+    for (const p of coinPins) {
+      const k = `${Math.round(p.lat / cell)}_${Math.round(p.lon / cell)}`;
+      const prev = m.get(k);
+      if (!prev || p.id === FOUNDING_UY.id) m.set(k, { ...p, face: "btc" });
+    }
+    return [...m.values()];
+  }, [coinPins, far]);
 
   const enterRef = useRef(enter);
   enterRef.current = enter;
   const htmlElement = useCallback(
-    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community" }) => {
+    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo" }) => {
       const el = document.createElement("button");
       const founding = d.id === FOUNDING_UY.id;
-      const logo = logoUrl(d.logo || "");
-      const sizePx = founding ? 14 : 12;
+      const sizePx = founding ? 14 : d.face === "btc" ? 11 : 12;
       el.type = "button";
       el.title = d.name || "";
       el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+      const logo = d.face === "logo" ? logoUrl(d.logo || "") : "";
       if (logo) {
         const img = document.createElement("img");
         img.src = logo;
@@ -314,17 +317,7 @@ function GlobeCanvas({
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
           htmlElement={htmlElement}
-          pointsData={gpuPins}
-          pointLat="lat"
-          pointLng="lng"
-          pointColor={() => "#ffb020"}
-          pointAltitude={0.03}
-          pointRadius={0.55}
-          pointResolution={10}
-          pointsMerge={false}
-          onPointClick={(d: { lat?: number; lon?: number; lat0?: number; lon0?: number; id?: string; kind?: "shop" | "community" }) => {
-            enter(d.lat0 ?? d.lat ?? 0, d.lon0 ?? d.lon ?? 0, 13, undefined, d);
-          }}
+          pointsData={[]}
           onZoom={(pov: { altitude?: number }) => {
             const a = Number(pov?.altitude);
             if (!Number.isFinite(a)) return;
