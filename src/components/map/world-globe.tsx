@@ -180,7 +180,7 @@ function GlobeCanvas({
     const over = stats.data?.overlay || [];
     const rest = stats.data?.points || [];
     const seen = new Set(over.map((p) => `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`));
-    const cap = size.w < 640 ? 90 : 360;
+    const cap = size.w < 640 ? 220 : 520;
     return [...over, ...rest.filter((p) => !seen.has(`${p.lat.toFixed(3)},${p.lon.toFixed(3)}`))].slice(0, cap);
   }, [stats.data?.overlay, stats.data?.points, size.w]);
 
@@ -242,7 +242,7 @@ function GlobeCanvas({
           htmlElementsData={pins}
           htmlLat="lat"
           htmlLng="lon"
-          htmlAltitude={0.018}
+          htmlAltitude={0.028}
           htmlElement={(d: { lat: number; lon: number; n: number }) => {
             const el = document.createElement("button");
             const sizePx = size.w < 640 ? 12 + Math.min(8, Math.sqrt(d.n) * 0.9) : 14 + Math.min(16, Math.sqrt(d.n) * 1.4);

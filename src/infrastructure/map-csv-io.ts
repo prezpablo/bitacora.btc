@@ -10,8 +10,8 @@ const FOUNDING: MapCsvRow = {
   id: "c:cc-btc",
   tipo: "community",
   name: "Consciencia Bitcoin",
-  lat: -34.47051920882338,
-  lon: -57.84668721120329,
+  lat: -34.462,
+  lon: -57.84,
   address: "Colonia del Sacramento, Uruguay",
   description:
     "Consciencia Bitcoin es una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, impulsada por LATAM Cripto Mom —un espacio dedicado a la educación financiera familiar, la divulgación de Web3 y la soberanía digital de forma simple y humana—.",

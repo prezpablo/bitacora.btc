@@ -1,4 +1,5 @@
 import type { GlobeCountryStat, GlobeDot, GlobeStats } from "@/domain/globe";
+import { capitalOf } from "@/domain/capitals";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { parseMapCsv } from "@/domain/map-csv";
@@ -66,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 7;
+const STATS_VER = 8;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -300,11 +301,34 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
-      overlay.push({ lat: r.lat, lon: r.lon, n: 10 });
+      overlay.push({ lat: r.lat, lon: r.lon, n: 24 });
       rawPts.push({ lat: r.lat, lon: r.lon });
     }
   } catch {
     /* overlay optional */
+  }
+  if (!overlay.some((p) => Math.abs(p.lat + 34.47) < 0.08 && Math.abs(p.lon + 57.84) < 0.08)) {
+    overlay.unshift({ lat: -34.462, lon: -57.84, n: 24 });
+    bump("UY", "comms");
+    markCity("UY", -34.462, -57.84);
+    rawPts.push({ lat: -34.462, lon: -57.84 });
+  }
+  for (const e of ev.events) {
+    if (e.countryCode) bump(e.countryCode, "events");
+  }
+  const countries = [...byIso.values()];
+  for (const row of countries) {
+    row.cities = cityKeys.get(row.iso)?.size ?? 0;
+  }
+  for (const c of countries) {
+    if (c.shops + c.comms + c.events <= 0) continue;
+    if (!Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
+    const cap = capitalOf(c.iso);
+    overlay.push({
+      lat: cap?.lat ?? c.lat,
+      lon: cap?.lon ?? c.lon,
+      n: Math.max(8, Math.min(64, c.shops + c.comms * 3)),
+    });
   }
   for (const e of ev.events) {
     if (e.countryCode) bump(e.countryCode, "events");
