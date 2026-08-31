@@ -197,7 +197,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [shopLogo, setShopLogo] = useState("");
   const [stars, setStars] = useState<1 | 2 | 3 | 4 | 5>(5);
   const [nick, setNick] = useState("colaborador");
-  const [filter, setFilter] = useState<GradeBand | "todas" | "comunidades">("todas");
+  const [filter, setFilter] = useState<"todas" | "comercios" | "comunidades">("todas");
   const [drop, setDrop] = useState<{ lat: number; lon: number } | null>(null);
   const [mode, setMode] = useState<"comercio" | "comunidad">("comercio");
   const [form, setForm] = useState<CommForm>(EMPTY_FORM);
@@ -287,9 +287,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       }));
     const seen = new Set(extra.map((p) => p.id));
     const api = (query.data ?? []).filter((p) => !store[p.id]?.removed && !seen.has(p.id));
-    const rows = [...extra, ...api];
-    if (filter === "todas") return rows;
-    return rows.filter((p) => gradeOf(store[p.id], Date.now()).band === filter);
+    return [...extra, ...api];
   }, [query.data, store, filter]);
 
   const overlayComms = comms;
@@ -317,7 +315,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }, [btcComms.data, overlayComms]);
 
   const visibleComms = useMemo(() => {
-    if (filter !== "todas" && filter !== "comunidades") return [];
+    if (filter === "comercios") return [];
     const isoBox: Record<string, { s: number; n: number; w: number; e: number }> = {
       UY: { s: -35.15, n: -30.05, w: -58.6, e: -53.0 },
       AR: { s: -55.1, n: -21.7, w: -73.6, e: -53.5 },
@@ -390,6 +388,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       };
       map.on("moveend", pushBbox);
       map.on("zoomend", () => {
+        pushBbox();
         if (!map) return;
         if (map.getZoom() <= 2) onWorldRef.current?.();
       });
@@ -473,7 +472,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.addTo(group);
       }
       for (const p of places) {
-        const k = `${p.lat.toFixed(4)},${p.lon.toFixed(4)}`;
+        const k = `${p.lat.toFixed(5)},${p.lon.toFixed(5)}`;
         if (occupied.has(k)) continue;
         occupied.add(k);
         const selected = hit && hit.kind === "place" && hit.id === p.id;
@@ -782,7 +781,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     ? listingTrust(local?.links, g?.avg ?? 0, g?.count ?? 0, (local?.verifiedAt ?? 0) > 0)
     : null;
   const removable = sel ? canRemove(local) : false;
-  const chips: (GradeBand | "todas" | "comunidades")[] = ["todas", "comunidades", "alta", "media", "baja", "nueva"];
+  const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
 
   const body = (
     <>
@@ -827,17 +826,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 filter === k ? "bg-primary text-primary-foreground" : "bg-elevated text-muted-foreground",
               )}
             >
-              {k === "todas"
-                ? t("all")
-                : k === "comunidades"
-                  ? t("communities")
-                  : k === "alta"
-                    ? t("gradeHigh")
-                    : k === "media"
-                      ? t("gradeMid")
-                      : k === "baja"
-                        ? t("gradeLow")
-                        : t("gradeNew")}
+              {k === "todas" ? t("all") : k === "comercios" ? t("filterShops") : t("communities")}
             </button>
           ))}
         </div>

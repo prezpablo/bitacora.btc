@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, keepPreviousData, type QueryClient } from "@tanstack/react-query";
 import type { GlobeStats } from "@/domain/globe";
 import {
   getBtcCommunities,
@@ -52,6 +52,7 @@ export function useMapMerchants(bbox: MapBbox) {
     queryKey: mapKeys.merchants(bbox),
     queryFn: () => getMerchants({ data: bbox }),
     staleTime: STALE.merchants,
+    placeholderData: keepPreviousData,
   });
 }
 
