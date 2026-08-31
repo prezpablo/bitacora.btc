@@ -239,20 +239,44 @@ function ringCentroid(ring: number[][]): { lat: number; lon: number } | null {
 }
 
 function geoCentroid(geo: unknown): { lat: number; lon: number } | null {
-  if (!geo || typeof geo !== "object") return null;
-  const g = geo as { type?: string; coordinates?: unknown };
-  if (g.type === "Polygon") {
-    const ring = (g.coordinates as number[][][] | undefined)?.[0];
+  let g: unknown = geo;
+  if (typeof g === "string") {
+    try {
+      g = JSON.parse(g);
+    } catch {
+      return null;
+    }
+  }
+  if (!g || typeof g !== "object") return null;
+  const obj = g as { type?: string; coordinates?: unknown; geometry?: unknown; features?: unknown[] };
+  if (obj.geometry) return geoCentroid(obj.geometry);
+  if (obj.type === "FeatureCollection" && Array.isArray(obj.features) && obj.features[0]) return geoCentroid(obj.features[0]);
+  if (obj.type === "Polygon") {
+    const ring = (obj.coordinates as number[][][] | undefined)?.[0];
     return ring ? ringCentroid(ring) : null;
   }
-  if (g.type === "MultiPolygon") {
-    const ring = (g.coordinates as number[][][][] | undefined)?.[0]?.[0];
+  if (obj.type === "MultiPolygon") {
+    const ring = (obj.coordinates as number[][][][] | undefined)?.[0]?.[0];
     return ring ? ringCentroid(ring) : null;
   }
-  if (g.type === "Point") {
-    const p = g.coordinates as number[] | undefined;
+  if (obj.type === "Point") {
+    const p = obj.coordinates as number[] | undefined;
     if (p && p.length >= 2) return { lon: Number(p[0]), lat: Number(p[1]) };
   }
+  return null;
+}
+
+function areaCenter(tags: Record<string, unknown>): { lat: number; lon: number } | null {
+  const fromGeo = geoCentroid(tags.geo_json);
+  if (fromGeo) return fromGeo;
+  const lat = Number(tags.lat ?? tags["geo:lat"]);
+  const lon = Number(tags.lon ?? tags.lng ?? tags["geo:lon"]);
+  if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon };
+  const n = Number(tags["box:north"]);
+  const s = Number(tags["box:south"]);
+  const e = Number(tags["box:east"]);
+  const w = Number(tags["box:west"]);
+  if ([n, s, e, w].every(Number.isFinite)) return { lat: (n + s) / 2, lon: (e + w) / 2 };
   return null;
 }
 
@@ -276,11 +300,13 @@ function areaLinks(tags: Record<string, unknown>): SocialLink[] {
 function asCommunity(el: RawArea): Community | null {
   if (el.deleted_at) return null;
   const tags = (el.tags || {}) as Record<string, unknown>;
-  if (tags.type !== "community") return null;
-  const center = geoCentroid(tags.geo_json);
+  const type = String(tags.type || "").toLowerCase();
+  if (type === "country" || type === "continent" || type === "world") return null;
+  if (type && type !== "community" && type !== "meetup" && type !== "region") return null;
+  const center = areaCenter(tags);
   if (!center || !Number.isFinite(center.lat) || !Number.isFinite(center.lon)) return null;
-  const name = String(tags.name || el.id);
-  const icon = typeof tags["icon:square"] === "string" ? tags["icon:square"] : "";
+  const name = String(tags.name || tags["name:es"] || tags["name:en"] || el.id);
+  const icon = typeof tags["icon:square"] === "string" ? tags["icon:square"] : typeof tags.icon === "string" ? tags.icon : "";
   const continent = typeof tags.continent === "string" ? tags.continent : "";
   return {
     id: `btcmap:${el.id}`,
@@ -295,24 +321,56 @@ function asCommunity(el: RawArea): Community | null {
   };
 }
 
+const COMM_SNAP = join(process.cwd(), "data", "btcmap-comms.json");
+
+function readCommSnap(): Community[] {
+  try {
+    const rows = JSON.parse(readFileSync(COMM_SNAP, "utf8")) as Community[];
+    return Array.isArray(rows) ? rows.filter((c) => c && Number.isFinite(c.lat) && Number.isFinite(c.lon) && c.id) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeCommSnap(rows: Community[]) {
+  try {
+    mkdirSync(dirname(COMM_SNAP), { recursive: true });
+    writeFileSync(COMM_SNAP, JSON.stringify(rows));
+  } catch {
+    /* disk optional */
+  }
+}
+
 /** Live BTC Map communities — federated, not copied into the CSV overlay. */
 export async function fetchBtcCommunities(): Promise<Community[]> {
   const now = Date.now();
-  if (commCache && now - commCache.at < TTL) return commCache.rows;
+  if (commCache && now - commCache.at < TTL && commCache.rows.length) return commCache.rows;
   if (commInflight) return commInflight;
   commInflight = (async () => {
-    const res = await fetch("https://api.btcmap.org/v2/areas", {
-      headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
-    });
-    if (!res.ok) throw new Error(`btcmap areas ${res.status}`);
-    const raw = (await res.json()) as RawArea[];
-    const rows: Community[] = [];
-    for (const el of raw) {
-      const c = asCommunity(el);
-      if (c) rows.push(c);
+    const snap = readCommSnap();
+    try {
+      const res = await fetch("https://api.btcmap.org/v2/areas", {
+        headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+        signal: AbortSignal.timeout(40_000),
+      });
+      if (!res.ok) throw new Error(`btcmap areas ${res.status}`);
+      const raw = (await res.json()) as RawArea[];
+      const rows: Community[] = [];
+      const seen = new Set<string>();
+      for (const el of raw) {
+        const c = asCommunity(el);
+        if (!c || seen.has(c.id)) continue;
+        seen.add(c.id);
+        rows.push(c);
+      }
+      const out = rows.length ? rows : snap;
+      if (rows.length) writeCommSnap(rows);
+      commCache = { at: Date.now(), rows: out };
+      return out;
+    } catch {
+      commCache = { at: Date.now(), rows: snap };
+      return snap;
     }
-    commCache = { at: Date.now(), rows };
-    return rows;
   })().finally(() => {
     commInflight = null;
   });

@@ -294,10 +294,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const overlayComms = comms;
   const allComms = useMemo(() => {
     const map = new Map<string, Community>();
-    for (const c of btcComms.data ?? []) map.set(c.slug, c);
-    for (const c of overlayComms) map.set(c.slug, c);
-    if (!map.has(FOUNDING_UY.slug) && !map.has(FOUNDING_UY.id)) {
-      map.set(FOUNDING_UY.slug, {
+    for (const c of btcComms.data ?? []) map.set(c.id || c.slug, c);
+    for (const c of overlayComms) map.set(c.id || c.slug, c);
+    if (![...map.values()].some((c) => c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug)) {
+      map.set(FOUNDING_UY.id, {
         id: FOUNDING_UY.id,
         slug: FOUNDING_UY.slug,
         name: FOUNDING_UY.name,
@@ -319,7 +319,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (filter !== "todas" && filter !== "comunidades") return [];
     return allComms.filter((c) => {
       const founding = c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug;
-      const pad = founding ? 2.6 : 0;
+      const pad = founding ? 2.6 : 0.45;
       return c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad;
     });
   }, [allComms, bbox, filter]);

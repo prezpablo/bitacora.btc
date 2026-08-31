@@ -206,16 +206,19 @@ function GlobeCanvas({
         if (!comms.has(k)) comms.set(k, p);
       } else if (!shops.has(k)) shops.set(k, p);
     }
-    const cap = lod >= 3 ? 280 : lod >= 2 ? 340 : lod >= 1 ? 400 : 460;
+    const cap = lod >= 3 ? 320 : lod >= 2 ? 380 : lod >= 1 ? 440 : 520;
+    const overlayComm = overlayPins.filter((p) => p.kind === "community");
     const shopRows = [...shops.values()];
-    const commRows = [...comms.values()].map((p) => {
-      const k = key(p.lat, p.lon);
-      if (!shops.has(k)) return p;
-      return { ...p, lat: p.lat + lod * 0.12, lon: p.lon + lod * 0.16 };
-    });
-    const shopN = Math.min(shopRows.length, Math.max(160, Math.floor(cap * 0.7)));
-    const commN = Math.min(commRows.length, cap - shopN);
-    return [...shopRows.slice(0, shopN), ...commRows.slice(0, commN)];
+    const commRows = [...comms.values()]
+      .filter((p) => !overlayComm.some((o) => o.id === p.id))
+      .map((p) => {
+        const k = key(p.lat, p.lon);
+        if (!shops.has(k)) return p;
+        return { ...p, lat: p.lat + lod * 0.12, lon: p.lon + lod * 0.16 };
+      });
+    const shopN = Math.min(shopRows.length, Math.max(140, Math.floor(cap * 0.58)));
+    const commN = Math.min(commRows.length, Math.max(80, cap - shopN - overlayComm.length));
+    return [...overlayComm, ...shopRows.slice(0, shopN), ...commRows.slice(0, commN)];
   }, [mapPins, overlayPins, lod]);
 
   return (

@@ -16,6 +16,7 @@ data/*.sqlite
 data/*.sqlite-wal
 data/*.sqlite-shm
 data/btcmap-shops.json
+data/btcmap-comms.json
 .node_modules.lock
 .DS_Store
 coverage/
