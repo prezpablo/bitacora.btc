@@ -90,14 +90,14 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 
 | Deuda | Dónde | Efecto |
 |---|---|---|
-| Desk con `staleTime: 0` en precio | `desk.tsx` | Cada foco de pestaña vuelve a Binance/OKX/mempool. |
+| Desk con `staleTime: 0` en precio | `desk.tsx` | **Cerrado en `main`:** market 8s, extras 20s, tick 1.5s, onchain 5s; sin refetch al foco. |
 | Rate-limit en un `Map` | `rate-limit.ts` | Reinicio = cero. IPs distintas = el Map crece sin techo. |
 | Scraper de pines en el request | `pin-verify.ts` + Jina | Verificar varios pines juntos bloquea el event loop. |
 | Pins: 8/hora/IP + **30/h global** | `submitCommunityPin` | **Cerrado en `main` (31 ago).** Tablero sigue en 48. |
 
 ### P3 — higiene
 
-- Sin healthcheck HTTP (`/healthz`).
+- Healthcheck HTTP `GET /healthz` (`server/routes/healthz.get.ts`).
 - Sin cola de scrapes ni de mails.
 - Casi sin tests de pines, CSV ni fallback de feeds.
 - `i18n.ts` monolito (415 claves × 3): funciona, es difícil de revisar.
