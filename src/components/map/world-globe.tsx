@@ -317,10 +317,10 @@ function GlobeCanvas({
           pointsData={gpuPins}
           pointLat="lat"
           pointLng="lng"
-          pointColor={() => "#f7931a"}
-          pointAltitude={0.004}
-          pointRadius={0.14}
-          pointResolution={6}
+          pointColor={() => "#ff9f12"}
+          pointAltitude={0.018}
+          pointRadius={0.38}
+          pointResolution={8}
           pointsMerge={false}
           onPointClick={(d: { lat?: number; lon?: number; lat0?: number; lon0?: number; id?: string; kind?: "shop" | "community" }) => {
             enter(d.lat0 ?? d.lat ?? 0, d.lon0 ?? d.lon ?? 0, 13, undefined, d);
