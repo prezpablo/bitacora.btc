@@ -25,6 +25,16 @@ export function RoadmapWeb3() {
                 <li key={item}>{item}</li>
               ))}
             </ul>
+            {p.checks.length ? (
+              <div className="mt-4 border-t border-border pt-3">
+                <p className="text-xs font-medium tracking-wide text-primary uppercase">{t("rmChecks")}</p>
+                <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-foreground">
+                  {p.checks.map((c) => (
+                    <li key={c}>{c}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </li>
         ))}
       </ol>
