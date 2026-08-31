@@ -29,6 +29,7 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 |---|---|---|
 | Producción ≠ `main` | El VPS sirve un build anterior | `/data/ne-110m-countries.json` **404**; `pins.csv` público **vacío**; copy vieja (Conciencia, BIT-) |
 | Sin tope de RAM | Un globo + dump de BTC Map → OOM | Node muere; systemd lo levanta; se pierde el rate-limit en memoria |
+| SSH root + HTTP :80 | Clave root = dueño del VPS; IP sin candado | **En curso (31 ago 2026):** Caddy redirige `:80` → sslip HTTPS. Usuario `bitacora` + `PermitRootLogin no` (scripts `deploy/p0-*.sh`). PAT de GitHub a revocar a mano. |
 
 **Cierre P0:** `git pull` + `bootstrap.sh` en el VPS; `MemoryMax=700M` (o el 70 % de la RAM) en `bitacora.service`.
 

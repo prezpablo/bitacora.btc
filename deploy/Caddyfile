@@ -1,4 +1,6 @@
 # HTTPS con nombre (Let's Encrypt). El candado no existe sobre una IP cruda.
+# HTTP de la IP o de cualquier Host no-sslip → sslip HTTPS. El site sslip.io
+# sigue atendiendo ACME en :80 (más específico que este catch-all).
 45.158.116.49.sslip.io {
 	encode gzip zstd
 	reverse_proxy 127.0.0.1:8080
@@ -10,12 +12,6 @@
 	}
 }
 
-:80 {
-	encode gzip zstd
-	reverse_proxy 127.0.0.1:8080
-	header {
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-		X-Frame-Options SAMEORIGIN
-	}
+http:// {
+	redir https://45.158.116.49.sslip.io{uri} permanent
 }
