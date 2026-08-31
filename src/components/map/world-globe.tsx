@@ -8,7 +8,7 @@ import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { logoUrl } from "@/domain/map-csv";
-import { dedupeCommunities, fanLon, spreadSameCity } from "@/domain/community-dedupe";
+import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { boxAround, locateBest } from "@/infrastructure/geo";
@@ -200,8 +200,8 @@ function GlobeCanvas({
     for (const p of overlayPins) {
       if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
-    const gap = alt > 2.05 ? 0.32 : alt > 1.35 ? 0.16 : alt > 0.8 ? 0.07 : 0.028;
-    return fanLon(spreadSameCity(dedupeCommunities([...byId.values()])), gap);
+    const gap = alt > 2.05 ? 0.42 : alt > 1.35 ? 0.2 : alt > 0.8 ? 0.09 : 0.035;
+    return layoutCityLogos(dedupeCommunities([...byId.values()]), gap);
   }, [mapPins, overlayPins, alt]);
 
   return (

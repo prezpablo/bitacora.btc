@@ -4,7 +4,7 @@ import type { Community, GradeBand, MerchantLocal, MerchantPlace } from "@/domai
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
-import { dedupeCommunities, spreadSameCity } from "@/domain/community-dedupe";
+import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
@@ -333,7 +333,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       if (box && c.lat >= box.s && c.lat <= box.n && c.lon >= box.w && c.lon <= box.e) return true;
       return false;
     });
-    return spreadSameCity(rows);
+    return rows;
   }, [allComms, bbox, filter, focus?.iso]);
 
   useEffect(() => {
@@ -435,13 +435,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     void import("leaflet").then((L) => {
       group.clearLayers();
       const occupied = new Set<string>();
-      for (const c of visibleComms) {
-        const k = `${c.lat.toFixed(4)},${c.lon.toFixed(4)}`;
-        occupied.add(k);
+      const z = map.getZoom();
+      const clat = map.getCenter().lat;
+      const mpp = (40075016.686 * Math.cos((clat * Math.PI) / 180)) / (256 * 2 ** z);
+      const gapDeg = Math.max(0.0009, (36 * mpp) / (111320 * Math.max(0.2, Math.cos((clat * Math.PI) / 180))));
+      const laid = layoutCityLogos(visibleComms, gapDeg);
+      for (const c of laid) {
+        occupied.add(`${c.lat.toFixed(5)},${c.lon.toFixed(5)}`);
+        occupied.add(`${c.lat.toFixed(4)},${c.lon.toFixed(4)}`);
+        occupied.add(`${c.lat0.toFixed(4)},${c.lon0.toFixed(4)}`);
         const trust = communityTrust(c);
         const logo = logoUrl(c.logo || "");
-        const step = 36;
-        const dx = (c.slots ?? 1) <= 1 ? 0 : (c.slot - (c.slots - 1) / 2) * step;
         const face = logo
           ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" />`
           : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
@@ -452,7 +456,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           className: "",
           html: `<div style="position:relative;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
           iconSize: [32, 32],
-          iconAnchor: [16 - dx, 16],
+          iconAnchor: [16, 16],
         });
         const m = L.marker([c.lat, c.lon], { icon, zIndexOffset: 400 });
         m.on("click", (ev) => {

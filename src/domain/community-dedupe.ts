@@ -33,7 +33,7 @@ function logoKey(raw?: string) {
   }
 }
 
-function km(a: NamedPin, b: NamedPin) {
+function km(a: { lat: number; lon: number }, b: { lat: number; lon: number }) {
   const R = 6371;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
   const dLon = ((b.lon - a.lon) * Math.PI) / 180;
@@ -94,20 +94,91 @@ export function dedupeCommunities<T extends NamedPin>(rows: T[]): T[] {
   return kept;
 }
 
-export function spreadSameCity<T extends NamedPin>(rows: T[], cellDeg = 0.14): (T & { slot: number; slots: number })[] {
-  const groups = new Map<string, T[]>();
-  for (const r of rows) {
-    const k = `${Math.round(r.lat / cellDeg)}_${Math.round(r.lon / cellDeg)}`;
-    const g = groups.get(k) || [];
+function clusters<T extends NamedPin>(rows: T[], maxKm: number): T[][] {
+  const n = rows.length;
+  const parent = rows.map((_, i) => i);
+  const find = (i: number) => {
+    while (parent[i] !== i) {
+      parent[i] = parent[parent[i]];
+      i = parent[i];
+    }
+    return i;
+  };
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (km(rows[i], rows[j]) < maxKm) {
+        const a = find(i);
+        const b = find(j);
+        if (a !== b) parent[b] = a;
+      }
+    }
+  }
+  const map = new Map<number, T[]>();
+  rows.forEach((r, i) => {
+    const p = find(i);
+    const g = map.get(p) || [];
     g.push(r);
-    groups.set(k, g);
-  }
-  const out: (T & { slot: number; slots: number })[] = [];
-  for (const g of groups.values()) {
+    map.set(p, g);
+  });
+  return [...map.values()];
+}
+
+function offsets(n: number, gap: number) {
+  const cols = Math.min(n, 4);
+  const rows = Math.ceil(n / cols);
+  return Array.from({ length: n }, (_, i) => {
+    const r = Math.floor(i / cols);
+    const c = i % cols;
+    const colsThis = r === rows - 1 ? n - r * cols : cols;
+    return {
+      dlat: (r - (rows - 1) / 2) * gap * 0.9,
+      dlon: (c - (colsThis - 1) / 2) * gap,
+    };
+  });
+}
+
+export type LaidPin<T> = T & { lat0: number; lon0: number; slot: number; slots: number };
+
+/** Same city → logos in a row with distinct lat/lon. Then nudge leftovers that still collide. */
+export function layoutCityLogos<T extends NamedPin>(rows: T[], gapDeg: number): LaidPin<T>[] {
+  const gap = Math.max(0.0004, gapDeg);
+  const cityKm = Math.max(12, Math.min(36, gap * 111 * 1.2));
+  const laid: LaidPin<T>[] = [];
+  for (const g of clusters(rows, cityKm)) {
     g.sort((a, b) => (a.name || "").localeCompare(b.name || "", "es"));
-    g.forEach((r, i) => out.push({ ...r, slot: i, slots: g.length }));
+    const lat0 = g.reduce((s, r) => s + r.lat, 0) / g.length;
+    const lon0 = g.reduce((s, r) => s + r.lon, 0) / g.length;
+    const pack = offsets(g.length, gap);
+    g.forEach((r, i) => {
+      laid.push({
+        ...r,
+        lat0: r.lat,
+        lon0: r.lon,
+        lat: lat0 + pack[i].dlat,
+        lon: lon0 + pack[i].dlon,
+        slot: i,
+        slots: g.length,
+      });
+    });
   }
-  return out;
+  const min = gap * 0.92;
+  const key = (lat: number, lon: number) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
+  const placed: LaidPin<T>[] = [];
+  for (const r of laid) {
+    let lat = r.lat;
+    let lon = r.lon;
+    let guard = 0;
+    const hits = () =>
+      placed.some((p) => Math.hypot(p.lat - lat, p.lon - lon) < min || key(p.lat, p.lon) === key(lat, lon));
+    while (guard++ < 32 && hits()) lon += gap;
+    placed.push({ ...r, lat, lon });
+  }
+  return placed;
+}
+
+/** @deprecated use layoutCityLogos */
+export function spreadSameCity<T extends NamedPin>(rows: T[], cellDeg = 0.14): (T & { slot: number; slots: number })[] {
+  return layoutCityLogos(rows, Math.max(0.02, cellDeg * 0.35));
 }
 
 export function slotShift(slot: number, slots: number) {
@@ -115,13 +186,9 @@ export function slotShift(slot: number, slots: number) {
   return (slot - (slots - 1) / 2) * 100;
 }
 
-/** Offset longitude so logos sit in a row. Keeps lat0/lon0 for clicks. */
 export function fanLon<T extends { lat: number; lon: number; slot: number; slots: number }>(
   rows: T[],
   gapDeg: number,
 ): (T & { lat0: number; lon0: number })[] {
-  return rows.map((r) => {
-    const dx = r.slots <= 1 ? 0 : (r.slot - (r.slots - 1) / 2) * gapDeg;
-    return { ...r, lat0: r.lat, lon0: r.lon, lon: r.lon + dx };
-  });
+  return layoutCityLogos(rows as T & NamedPin, gapDeg) as (T & { lat0: number; lon0: number })[];
 }
