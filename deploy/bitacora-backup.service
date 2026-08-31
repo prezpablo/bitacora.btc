@@ -1,0 +1,8 @@
+[Unit]
+Description=Bitacora SQLite backup
+After=network.target
+
+[Service]
+Type=oneshot
+Environment=BITACORA_SQLITE=/var/www/bitacora/data/bitacora.sqlite
+ExecStart=/usr/local/bin/bitacora-backup.sh

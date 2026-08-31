@@ -46,7 +46,7 @@ Hecho en el server Njalla, no solo en el repo:
 
 **No hacer:** `Transfer Domain` en btc.us; `PermitRootLogin yes`; servir Node en `0.0.0.0`.
 
-P1 de seguridad: **fail2ban sshd + unattended-upgrades cerrados (31 ago 2026)** — jail `sshd` activo (`maxretry 4` / `bantime 1h`). Sigue: CSP, hash de IP en rate-limit, `saveMapCsv` público, backup de SQLite fuera del VPS.
+P1 de seguridad: fail2ban + unattended-upgrades **cerrados**. Backup SQLite **en el VPS** (`deploy/backup-sqlite.sh`, timer 03:17). Sigue: copia **fuera** del VPS, CSP, hash de IP, `saveMapCsv` público.
 
 ### P1 — arquitectura que no escala ni a un meetup grande
 
