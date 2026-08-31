@@ -7,6 +7,7 @@ import { localeTag } from "@/lib/display";
 import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
+import { logoUrl } from "@/domain/map-csv";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { boxAround, locateBest } from "@/infrastructure/geo";
@@ -205,7 +206,9 @@ function GlobeCanvas({
     const cap = lod >= 3 ? 220 : lod >= 2 ? 280 : lod >= 1 ? 340 : 400;
     const overlayIds = new Set(overlayPins.map((p) => p.id));
     const overlay = [...buckets.values()].filter((p) => overlayIds.has(p.id));
-    const rest = [...buckets.values()].filter((p) => !overlayIds.has(p.id));
+    const rest = [...buckets.values()]
+      .filter((p) => !overlayIds.has(p.id))
+      .sort((a, b) => rank(b) - rank(a));
     return [...overlay, ...rest].slice(0, cap);
   }, [mapPins, overlayPins, lod]);
 
@@ -272,19 +275,21 @@ function GlobeCanvas({
           htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {
             const el = document.createElement("button");
             const founding = d.id === "c:cc-btc";
-            const logo = d.kind === "community" && d.logo && (/^\/logos\//.test(d.logo) || /^https:\/\//i.test(d.logo)) ? d.logo : "";
-            const sizePx = founding ? 12 : logo ? 11 : 8;
+            const isComm = d.kind === "community" || founding;
+            const logo = isComm ? logoUrl(d.logo || "") : "";
+            const sizePx = founding ? 16 : isComm ? 14 : 8;
             el.type = "button";
             el.title = d.name || "";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto`;
+            el.style.cssText = isComm
+              ? `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`
+              : `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto`;
             if (logo) {
               const img = document.createElement("img");
               img.src = logo;
               img.alt = d.name || "";
               img.width = sizePx;
               img.height = sizePx;
-              img.style.cssText =
-                "width:100%;height:100%;object-fit:cover;border-radius:50%;background:#f7931a;display:block;box-shadow:0 0 0 1px #fff";
+              img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;background:#f7931a";
               img.onerror = () => {
                 el.innerHTML = BITCOIN_MARK_SVG;
               };
@@ -294,7 +299,7 @@ function GlobeCanvas({
             }
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
-              enter(d.lat, d.lon, founding || d.kind === "community" ? 13 : 14, undefined, d);
+              enter(d.lat, d.lon, isComm ? 13 : 14, undefined, d);
             });
             return el;
           }}

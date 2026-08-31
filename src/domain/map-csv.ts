@@ -154,8 +154,9 @@ export function logoUrl(raw: string) {
   if (!t || t.startsWith("data:")) return "";
   if (t.startsWith("/") && !t.startsWith("//") && /\.(png|jpe?g|webp|gif|svg)(\?|$)/i.test(t)) return t;
   try {
-    const u = new URL(/^https?:\/\//i.test(t) ? t : `https://${t}`);
-    if (u.protocol !== "http:" && u.protocol !== "https:") return "";
+    const u = new URL(t.startsWith("//") ? `https:${t}` : /^https?:\/\//i.test(t) ? t : `https://${t}`);
+    if (u.protocol === "http:") u.protocol = "https:";
+    if (u.protocol !== "https:") return "";
     return u.toString();
   } catch {
     return "";

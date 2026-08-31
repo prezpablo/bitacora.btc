@@ -427,18 +427,18 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         const k = `${c.lat.toFixed(4)},${c.lon.toFixed(4)}`;
         occupied.add(k);
         const trust = communityTrust(c);
-        const logo = c.logo && (/^\/logos\//.test(c.logo) || /^https:\/\//i.test(c.logo)) ? c.logo.replace(/"/g, "") : "";
+        const logo = logoUrl(c.logo || "");
         const face = logo
-          ? `<img src="${logo}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" />`
+          ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" />`
           : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
         const check = trust.verified
-          ? `<span style="position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
+          ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : "";
         const icon = L.divIcon({
           className: "",
-          html: `<div style="position:relative;width:28px;height:28px">${face}${check}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
+          html: `<div style="position:relative;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         });
         const m = L.marker([c.lat, c.lon], { icon, zIndexOffset: 400 });
         m.on("click", (ev) => {
