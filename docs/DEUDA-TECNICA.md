@@ -36,7 +36,7 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 
 | Deuda | Dónde | Efecto |
 |---|---|---|
-| CSV como base de datos | `pins-io.ts`, `map-csv` | Cada lectura **mergea GitHub raw**. Cada alta **reescribe el archivo sin lock**. Dos clics a la vez pueden perder un pin. |
+| CSV como base de datos | `pins-io.ts`, `map-csv-io.ts` + `sqlite.ts` | **En curso (30 ago 2026):** SQLite WAL en `data/bitacora.sqlite` (node:sqlite). El CSV queda como copia de respaldo. Tope 80 pines pendientes. |
 | BTC Map entero en RAM | `btc-map.ts`, TTL 6 h | `GET /v2/elements` (decenas de miles de puntos). El primer hit es el más caro. |
 | Globo 3D en la primera visita | `world-globe.tsx` | Varios móviles a la vez pegan más que todo Mercado. |
 | Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | Peso, superficie, no aportan (`VITE_AUTH_ENABLED=false`). |

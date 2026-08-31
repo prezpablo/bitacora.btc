@@ -161,7 +161,7 @@ export default defineConfig(({ command, isPreview }) => ({
     include: ["three", "react-globe.gl", "three-globe"],
   },
   ssr: {
-    external: ["react-globe.gl", "three", "three-globe"],
+    external: ["react-globe.gl", "three", "three-globe", "node:sqlite"],
   },
   plugins: [
     pgliteBootstrapPlugin(),

@@ -12,6 +12,9 @@ attachments/
 .env.*
 !.env.example
 data/contact-inbox.jsonl
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
 .node_modules.lock
 .DS_Store
 coverage/

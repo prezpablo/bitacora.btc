@@ -10,7 +10,7 @@ import { fetchNetworkEvents } from "./events";
 import { nominatimCity, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
 import { loadMapCsvText, saveMapCsvText } from "./map-csv-io";
-import { loadPins, savePins, replacePins } from "./pins-io";
+import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, tooMany } from "./rate-limit";
@@ -167,6 +167,7 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
     const proof = safeHttp(data.proof);
     if (!name || !proof) return { ok: false, error: "need" };
     if (tooMany(clientKey("pin"), 8, 60 * 60_000)) return { ok: false, error: "rate" };
+    if ((await countPendingPins()) >= 80) return { ok: false, error: "rate" };
     const links = (data.links || []).map(safeHttp).filter(Boolean).slice(0, 6);
     const pin: CommunityPin = {
       id: `pin:${Date.now().toString(36)}`,

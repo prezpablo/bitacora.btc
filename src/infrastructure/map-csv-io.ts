@@ -1,87 +1,123 @@
-import { mergeMapRows, parseMapCsv, stringifyMapCsv } from "@/domain/map-csv";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { mergeMapRows, parseMapCsv, stringifyMapCsv, type MapCsvRow } from "@/domain/map-csv";
+import { metaGet, metaSet, openSqlite, sqlTx } from "./sqlite";
 
-const FILE = "public/data/map.csv";
-const RAW =
-  "https://raw.githubusercontent.com/prezpablo/bitacora.btc/main/public/data/map.csv";
+const SNAP = "public/data/map.csv";
 
-async function readLocal(): Promise<string> {
-  const { readFile } = await import("node:fs/promises");
+function rowFromSql(r: Record<string, unknown>): MapCsvRow {
+  return {
+    id: String(r.id || ""),
+    tipo: r.tipo === "community" ? "community" : "shop",
+    name: String(r.name || ""),
+    lat: Number(r.lat) || 0,
+    lon: Number(r.lon) || 0,
+    address: String(r.address || ""),
+    description: String(r.description || ""),
+    notes: String(r.notes || ""),
+    score: Number(r.score) || 0,
+    votes: Math.max(0, Math.floor(Number(r.votes) || 0)),
+    logo: String(r.logo || ""),
+    socials: String(r.socials || ""),
+    hours: String(r.hours || ""),
+    pays: String(r.pays || ""),
+    created: Number(r.created) || Date.now(),
+    token: String(r.token || ""),
+    verifiedAt: Number(r.verified_at) || 0,
+  };
+}
+
+function upsertMap(row: MapCsvRow) {
+  openSqlite()
+    .prepare(
+      `INSERT INTO map_rows(id, tipo, name, lat, lon, address, description, notes, score, votes, logo, socials, hours, pays, created, token, verified_at)
+       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+       ON CONFLICT(id) DO UPDATE SET
+         tipo=excluded.tipo, name=excluded.name, lat=excluded.lat, lon=excluded.lon,
+         address=excluded.address, description=excluded.description, notes=excluded.notes,
+         score=excluded.score, votes=excluded.votes, logo=excluded.logo, socials=excluded.socials,
+         hours=excluded.hours, pays=excluded.pays, created=excluded.created, token=excluded.token,
+         verified_at=excluded.verified_at`,
+    )
+    .run(
+      row.id,
+      row.tipo,
+      row.name,
+      row.lat,
+      row.lon,
+      row.address,
+      row.description,
+      row.notes,
+      row.score,
+      row.votes,
+      row.logo,
+      row.socials,
+      row.hours,
+      row.pays,
+      row.created,
+      row.token,
+      row.verifiedAt,
+    );
+}
+
+async function seedFromCsv() {
+  if (metaGet("map_seeded") === "1") return;
+  let text = "";
+  for (const file of [join(process.cwd(), SNAP), SNAP, "/var/www/bitacora/public/data/map.csv"]) {
+    try {
+      text = await readFile(file, "utf8");
+      if (text.includes("id,tipo,name")) break;
+    } catch {
+      /* next */
+    }
+  }
+  const rows = parseMapCsv(text);
+  if (rows.length) {
+    sqlTx(() => {
+      for (const r of rows) upsertMap(r);
+    });
+  }
+  metaSet("map_seeded", "1");
+}
+
+let seed: Promise<void> | null = null;
+function ensureSeed() {
+  if (!seed) seed = seedFromCsv().catch(() => metaSet("map_seeded", "1"));
+  return seed;
+}
+
+async function snapCsv(rows: MapCsvRow[]) {
   try {
-    return await readFile(FILE, "utf8");
+    const csv = stringifyMapCsv(rows);
+    await mkdir(dirname(join(process.cwd(), SNAP)), { recursive: true });
+    await writeFile(join(process.cwd(), SNAP), csv, "utf8");
   } catch {
-    return "";
+    /* snapshot optional */
   }
 }
 
-async function writeLocal(csv: string) {
-  const { mkdir, writeFile } = await import("node:fs/promises");
-  const { dirname } = await import("node:path");
-  await mkdir(dirname(FILE), { recursive: true });
-  await writeFile(FILE, csv, "utf8");
-}
-
-async function pushGithub(csv: string) {
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
-  if (!token) return false;
-  const owner = process.env.GITHUB_MAP_OWNER || "prezpablo";
-  const repo = process.env.GITHUB_MAP_REPO || "bitacora.btc";
-  const path = "public/data/map.csv";
-  const meta = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
-  });
-  let sha: string | undefined;
-  if (meta.ok) {
-    const body = (await meta.json()) as { sha?: string };
-    sha = body.sha;
-  }
-  const put = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: "map: sync CSV",
-      content: Buffer.from(csv, "utf8").toString("base64"),
-      sha,
-      branch: "main",
-    }),
-  });
-  return put.ok;
+function allRows(): MapCsvRow[] {
+  return openSqlite().prepare("SELECT * FROM map_rows").all().map(rowFromSql).filter((r) => r.id);
 }
 
 export async function loadMapCsvText(): Promise<string> {
-  const local = await readLocal();
-  try {
-    const res = await fetch(RAW, { cache: "no-store" });
-    if (res.ok) {
-      const remote = await res.text();
-      if (remote.includes("id,tipo,name")) {
-        const merged = stringifyMapCsv(mergeMapRows(parseMapCsv(local), parseMapCsv(remote)));
-        return merged;
-      }
-    }
-  } catch {
-    /* keep local */
-  }
-  return local;
+  await ensureSeed();
+  return stringifyMapCsv(allRows());
 }
 
 export async function saveMapCsvText(csv: string): Promise<boolean> {
   if (!csv || csv.length > 350_000) return false;
   const incoming = parseMapCsv(csv);
   if (incoming.length > 400) return false;
-  const current = parseMapCsv(await readLocal());
+  await ensureSeed();
+  const current = allRows();
   const have = new Set(current.map((r) => r.id));
   const added = incoming.filter((r) => !have.has(r.id)).length;
   if (added > 8) return false;
-  const merged = stringifyMapCsv(mergeMapRows(current, incoming));
-  await writeLocal(merged);
-  try {
-    await pushGithub(merged);
-  } catch {
-    /* token optional */
-  }
+  const merged = mergeMapRows(current, incoming);
+  sqlTx(() => {
+    for (const r of merged) upsertMap(r);
+  });
+  await snapCsv(merged);
   return true;
 }
