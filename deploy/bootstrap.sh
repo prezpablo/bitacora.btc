@@ -95,7 +95,9 @@ if [ "$git_ok" != 1 ]; then
     exit 1
   fi
   mkdir -p "$APP_DIR"
+  rm -rf "$APP_DIR/.git"
   cp -a "$ZIP_SRC"/. "$APP_DIR"/
+  echo "Instalado desde ZIP (sin .git). No te fíes de git log."
 fi
 
 mkdir -p "$APP_DIR/data"
@@ -145,7 +147,7 @@ ufw allow 80/tcp
 ufw allow 443/tcp
 
 echo
-echo "Commit: $(git -C "$APP_DIR" log -1 --oneline 2>/dev/null || echo zip)"
+echo "Commit: $(git -C "$APP_DIR" log -1 --oneline 2>/dev/null || echo 'ZIP sin git')"
 echo "Probá:  curl -sI http://127.0.0.1:80 | head"
 echo "SQLite: $APP_DIR/data/"
 echo "https://bitacora.btc.us"
