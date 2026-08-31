@@ -206,19 +206,19 @@ function GlobeCanvas({
         if (!comms.has(k)) comms.set(k, p);
       } else if (!shops.has(k)) shops.set(k, p);
     }
-    const cap = lod >= 3 ? 320 : lod >= 2 ? 380 : lod >= 1 ? 440 : 520;
     const overlayComm = overlayPins.filter((p) => p.kind === "community");
     const shopRows = [...shops.values()];
+    const latam = (p: (typeof mapPins)[number]) => p.lat < 15 && p.lat > -56 && p.lon < -30 && p.lon > -95;
     const commRows = [...comms.values()]
       .filter((p) => !overlayComm.some((o) => o.id === p.id))
       .map((p) => {
         const k = key(p.lat, p.lon);
         if (!shops.has(k)) return p;
         return { ...p, lat: p.lat + lod * 0.12, lon: p.lon + lod * 0.16 };
-      });
-    const shopN = Math.min(shopRows.length, Math.max(140, Math.floor(cap * 0.58)));
-    const commN = Math.min(commRows.length, Math.max(80, cap - shopN - overlayComm.length));
-    return [...overlayComm, ...shopRows.slice(0, shopN), ...commRows.slice(0, commN)];
+      })
+      .sort((a, b) => Number(latam(b)) - Number(latam(a)));
+    const shopN = Math.min(shopRows.length, lod >= 3 ? 160 : 200);
+    return [...overlayComm, ...commRows, ...shopRows.slice(0, shopN)];
   }, [mapPins, overlayPins, lod]);
 
   return (

@@ -317,12 +317,22 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   const visibleComms = useMemo(() => {
     if (filter !== "todas" && filter !== "comunidades") return [];
+    const isoBox: Record<string, { s: number; n: number; w: number; e: number }> = {
+      UY: { s: -35.15, n: -30.05, w: -58.6, e: -53.0 },
+      AR: { s: -55.1, n: -21.7, w: -73.6, e: -53.5 },
+      BR: { s: -34.0, n: 5.3, w: -74.1, e: -32.3 },
+      CL: { s: -56.1, n: -17.4, w: -75.8, e: -66.3 },
+      PY: { s: -27.7, n: -19.2, w: -62.7, e: -54.2 },
+    };
+    const box = focus?.iso ? isoBox[focus.iso.toUpperCase()] : null;
     return allComms.filter((c) => {
       const founding = c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug;
-      const pad = founding ? 2.6 : 0.45;
-      return c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad;
+      const pad = founding ? 2.6 : 0.6;
+      if (c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad) return true;
+      if (box && c.lat >= box.s && c.lat <= box.n && c.lon >= box.w && c.lon <= box.e) return true;
+      return false;
     });
-  }, [allComms, bbox, filter]);
+  }, [allComms, bbox, filter, focus?.iso]);
 
   useEffect(() => {
     if (!focus?.id) return;

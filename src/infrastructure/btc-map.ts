@@ -263,10 +263,20 @@ function geoCentroid(geo: unknown): { lat: number; lon: number } | null {
     const p = obj.coordinates as number[] | undefined;
     if (p && p.length >= 2) return { lon: Number(p[0]), lat: Number(p[1]) };
   }
+  if (obj.type === "GeometryCollection" && Array.isArray((obj as { geometries?: unknown[] }).geometries)) {
+    for (const part of (obj as { geometries: unknown[] }).geometries) {
+      const c = geoCentroid(part);
+      if (c) return c;
+    }
+  }
   return null;
 }
 
 function areaCenter(tags: Record<string, unknown>): { lat: number; lon: number } | null {
+  const g = tags.geo_json as { lat?: number; lon?: number } | unknown;
+  if (g && typeof g === "object" && Number.isFinite((g as { lat?: number }).lat) && Number.isFinite((g as { lon?: number }).lon)) {
+    return { lat: Number((g as { lat: number }).lat), lon: Number((g as { lon: number }).lon) };
+  }
   const fromGeo = geoCentroid(tags.geo_json);
   if (fromGeo) return fromGeo;
   const lat = Number(tags.lat ?? tags["geo:lat"]);
@@ -298,11 +308,14 @@ function areaLinks(tags: Record<string, unknown>): SocialLink[] {
 }
 
 function asCommunity(el: RawArea): Community | null {
-  if (el.deleted_at) return null;
+  const deleted = String(el.deleted_at || "");
+  if (/^\d{4}-\d{2}/.test(deleted)) return null;
   const tags = (el.tags || {}) as Record<string, unknown>;
   const type = String(tags.type || "").toLowerCase();
-  if (type === "country" || type === "continent" || type === "world") return null;
-  if (type && type !== "community" && type !== "meetup" && type !== "region") return null;
+  const rootType = String((el as { type?: string }).type || "").toLowerCase();
+  const kind = type || rootType;
+  if (kind === "country" || kind === "continent" || kind === "world" || kind === "planet" || kind === "trash") return null;
+  if (kind && kind !== "community" && kind !== "meetup" && kind !== "region") return null;
   const center = areaCenter(tags);
   if (!center || !Number.isFinite(center.lat) || !Number.isFinite(center.lon)) return null;
   const name = String(tags.name || tags["name:es"] || tags["name:en"] || el.id);
@@ -351,10 +364,17 @@ export async function fetchBtcCommunities(): Promise<Community[]> {
     try {
       const res = await fetch("https://api.btcmap.org/v2/areas", {
         headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
-        signal: AbortSignal.timeout(40_000),
+        signal: AbortSignal.timeout(90_000),
       });
       if (!res.ok) throw new Error(`btcmap areas ${res.status}`);
-      const raw = (await res.json()) as RawArea[];
+      const text = await res.text();
+      const raw = JSON.parse(text, (k, v) => {
+        if (k === "geo_json") {
+          const c = geoCentroid(v);
+          return c || v;
+        }
+        return v;
+      }) as RawArea[];
       const rows: Community[] = [];
       const seen = new Set<string>();
       for (const el of raw) {
@@ -362,6 +382,25 @@ export async function fetchBtcCommunities(): Promise<Community[]> {
         if (!c || seen.has(c.id)) continue;
         seen.add(c.id);
         rows.push(c);
+      }
+      for (const slug of ["punta-bitcoin", "bitcoin-school-argentina"]) {
+        if ([...seen].some((id) => id.endsWith(`:${slug}`) || id === `btcmap:${slug}`)) continue;
+        if (rows.some((c) => c.slug === slug)) continue;
+        try {
+          const one = await fetch(`https://api.btcmap.org/v2/areas/${slug}`, {
+            headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+            signal: AbortSignal.timeout(15_000),
+          });
+          if (!one.ok) continue;
+          const el = (await one.json()) as RawArea;
+          const c = asCommunity(el);
+          if (c && !seen.has(c.id)) {
+            seen.add(c.id);
+            rows.push(c);
+          }
+        } catch {
+          /* one area optional */
+        }
       }
       const out = rows.length ? rows : snap;
       if (rows.length) writeCommSnap(rows);
