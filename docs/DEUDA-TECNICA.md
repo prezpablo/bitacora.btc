@@ -46,7 +46,7 @@ Hecho en el server Njalla, no solo en el repo:
 
 **No hacer:** `Transfer Domain` en btc.us; `PermitRootLogin yes`; servir Node en `0.0.0.0`.
 
-P1 de seguridad que **sigue abierta:** fail2ban, `unattended-upgrades`, CSP, hash de IP en rate-limit, `saveMapCsv` público, backup de SQLite fuera del VPS.
+P1 de seguridad: **en curso (31 ago 2026)** fail2ban + unattended-upgrades (`deploy/p1-harden.sh`). Sigue: CSP, hash de IP en rate-limit, `saveMapCsv` público, backup de SQLite fuera del VPS.
 
 ### P1 — arquitectura que no escala ni a un meetup grande
 
