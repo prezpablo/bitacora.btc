@@ -193,23 +193,29 @@ function GlobeCanvas({
   const overlayPins = stats.data?.overlay || [];
   const lod = alt > 2.05 ? 3.4 : alt > 1.35 ? 2.1 : alt > 0.8 ? 1 : 0.45;
   const coinPins = useMemo(() => {
-    const buckets = new Map<string, (typeof mapPins)[number]>();
     const key = (lat: number, lon: number) => `${Math.round(lat / lod)}_${Math.round(lon / lod)}`;
-    for (const p of overlayPins) buckets.set(key(p.lat, p.lon), p);
-    const rank = (p: (typeof mapPins)[number]) =>
-      p.kind === "community" && p.logo ? 3 : p.kind === "community" ? 2 : 1;
+    const shops = new Map<string, (typeof mapPins)[number]>();
+    const comms = new Map<string, (typeof mapPins)[number]>();
+    for (const p of overlayPins) {
+      if (p.kind === "community") comms.set(key(p.lat, p.lon), p);
+      else shops.set(key(p.lat, p.lon), p);
+    }
     for (const p of mapPins) {
       const k = key(p.lat, p.lon);
-      const prev = buckets.get(k);
-      if (!prev || rank(p) > rank(prev)) buckets.set(k, p);
+      if (p.kind === "community") {
+        if (!comms.has(k)) comms.set(k, p);
+      } else if (!shops.has(k)) shops.set(k, p);
     }
-    const cap = lod >= 3 ? 220 : lod >= 2 ? 280 : lod >= 1 ? 340 : 400;
-    const overlayIds = new Set(overlayPins.map((p) => p.id));
-    const overlay = [...buckets.values()].filter((p) => overlayIds.has(p.id));
-    const rest = [...buckets.values()]
-      .filter((p) => !overlayIds.has(p.id))
-      .sort((a, b) => rank(b) - rank(a));
-    return [...overlay, ...rest].slice(0, cap);
+    const cap = lod >= 3 ? 280 : lod >= 2 ? 340 : lod >= 1 ? 400 : 460;
+    const shopRows = [...shops.values()];
+    const commRows = [...comms.values()].map((p) => {
+      const k = key(p.lat, p.lon);
+      if (!shops.has(k)) return p;
+      return { ...p, lat: p.lat + lod * 0.12, lon: p.lon + lod * 0.16 };
+    });
+    const shopN = Math.min(shopRows.length, Math.max(160, Math.floor(cap * 0.7)));
+    const commN = Math.min(commRows.length, cap - shopN);
+    return [...shopRows.slice(0, shopN), ...commRows.slice(0, commN)];
   }, [mapPins, overlayPins, lod]);
 
   return (

@@ -1,3 +1,5 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import type { Community, MerchantPlace } from "@/domain";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 
@@ -15,6 +17,7 @@ type RawEl = {
 };
 
 const TTL = 6 * 60_000 * 60;
+const SHOP_SNAP = join(process.cwd(), "data", "btcmap-shops.json");
 let cache: { at: number; places: MerchantPlace[] } | null = null;
 let inflight: Promise<MerchantPlace[]> | null = null;
 let commCache: { at: number; rows: Community[] } | null = null;
@@ -38,23 +41,51 @@ function asPlace(el: RawEl): MerchantPlace | null {
   };
 }
 
+function readSnap(): MerchantPlace[] {
+  try {
+    const rows = JSON.parse(readFileSync(SHOP_SNAP, "utf8")) as MerchantPlace[];
+    return Array.isArray(rows) ? rows.filter((p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lon) && p.id) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSnap(places: MerchantPlace[]) {
+  try {
+    mkdirSync(dirname(SHOP_SNAP), { recursive: true });
+    writeFileSync(SHOP_SNAP, JSON.stringify(places));
+  } catch {
+    /* disk optional */
+  }
+}
+
 async function loadAll(): Promise<MerchantPlace[]> {
   const now = Date.now();
-  if (cache && now - cache.at < TTL) return cache.places;
+  if (cache && now - cache.at < TTL && cache.places.length) return cache.places;
   if (inflight) return inflight;
   inflight = (async () => {
-    const res = await fetch("https://api.btcmap.org/v2/elements", {
-      headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
-    });
-    if (!res.ok) throw new Error(`btcmap ${res.status}`);
-    const raw = (await res.json()) as RawEl[];
-    const places: MerchantPlace[] = [];
-    for (const el of raw) {
-      const p = asPlace(el);
-      if (p) places.push(p);
+    const snap = readSnap();
+    try {
+      const res = await fetch("https://api.btcmap.org/v2/elements", {
+        headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+        signal: AbortSignal.timeout(55_000),
+      });
+      if (!res.ok) throw new Error(`btcmap ${res.status}`);
+      const raw = (await res.json()) as RawEl[];
+      const places: MerchantPlace[] = [];
+      for (const el of raw) {
+        const p = asPlace(el);
+        if (p) places.push(p);
+      }
+      const out = places.length >= 50 ? places : snap.length ? snap : FALLBACK;
+      if (out.length >= 50) writeSnap(out);
+      cache = { at: Date.now(), places: out };
+      return out;
+    } catch {
+      const out = snap.length ? snap : FALLBACK;
+      cache = { at: Date.now(), places: out };
+      return out;
     }
-    cache = { at: Date.now(), places };
-    return places;
   })().finally(() => {
     inflight = null;
   });
@@ -72,10 +103,55 @@ const FALLBACK: MerchantPlace[] = [
 
 export async function fetchAllMerchants(): Promise<MerchantPlace[]> {
   try {
-    return await loadAll();
+    const rows = await loadAll();
+    return rows.length ? rows : FALLBACK;
   } catch {
-    return FALLBACK;
+    const snap = readSnap();
+    return snap.length ? snap : FALLBACK;
   }
+}
+
+function inBox(
+  p: { lat: number; lon: number },
+  b: { west: number; south: number; east: number; north: number },
+) {
+  return p.lon >= b.west && p.lon <= b.east && p.lat >= b.south && p.lat <= b.north;
+}
+
+async function overpassBbox(b: { west: number; south: number; east: number; north: number }): Promise<MerchantPlace[]> {
+  const span = Math.abs(b.east - b.west) * Math.abs(b.north - b.south);
+  if (span > 80) return [];
+  const q = `[out:json][timeout:20];(nwr["payment:bitcoin"="yes"](${b.south},${b.west},${b.north},${b.east});nwr["currency:XBT"="yes"](${b.south},${b.west},${b.north},${b.east}););out center tags;`;
+  const res = await fetch("https://overpass-api.de/api/interpreter", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "bitacora.btc/1.0",
+    },
+    body: new URLSearchParams({ data: q }),
+    signal: AbortSignal.timeout(25_000),
+  });
+  if (!res.ok) return [];
+  const json = (await res.json()) as {
+    elements?: { type: string; id: number; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> }[];
+  };
+  const out: MerchantPlace[] = [];
+  for (const el of json.elements || []) {
+    const lat = el.lat ?? el.center?.lat;
+    const lon = el.lon ?? el.center?.lon;
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const tags = el.tags || {};
+    out.push({
+      id: `osm:${el.type}:${el.id}`,
+      lat: lat as number,
+      lon: lon as number,
+      name: tags.name || tags.brand || "Comercio Bitcoin",
+      category: tags.amenity || tags.shop || tags.tourism || "lugar",
+      createdAt: Date.now(),
+    });
+  }
+  return out;
 }
 
 export async function fetchMerchants(bbox: {
@@ -84,15 +160,24 @@ export async function fetchMerchants(bbox: {
   east: number;
   north: number;
 }): Promise<MerchantPlace[]> {
+  const map = new Map<string, MerchantPlace>();
   try {
     const all = await loadAll();
-    const { west, south, east, north } = bbox;
-    const hits = all.filter((p) => p.lon >= west && p.lon <= east && p.lat >= south && p.lat <= north);
-    if (hits.length > 450) return hits.slice(0, 450);
-    return hits.length ? hits : FALLBACK.filter((p) => p.lon >= west && p.lon <= east && p.lat >= south && p.lat <= north);
+    for (const p of all) if (inBox(p, bbox)) map.set(p.id, p);
   } catch {
-    return FALLBACK.filter((p) => p.lon >= bbox.west && p.lon <= bbox.east && p.lat >= bbox.south && p.lat <= bbox.north);
+    /* dump optional */
   }
+  if (map.size < 12) {
+    try {
+      for (const p of await overpassBbox(bbox)) map.set(p.id, p);
+    } catch {
+      /* overpass optional */
+    }
+  }
+  if (!map.size) {
+    for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, p);
+  }
+  return [...map.values()].slice(0, 500);
 }
 
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {
