@@ -128,12 +128,19 @@ function allRows(): MapCsvRow[] {
 }
 
 export async function loadMapCsvText(): Promise<string> {
-  await ensureSeed();
-  const rows = allRows();
-  if (!rows.some((r) => r.id === FOUNDING.id)) {
-    sqlTx(() => upsertMap(FOUNDING));
+  try {
+    await ensureSeed();
+    const rows = allRows();
+    if (!rows.some((r) => r.id === FOUNDING.id)) {
+      sqlTx(() => upsertMap(FOUNDING));
+    }
+    const out = allRows();
+    if (out.length) return stringifyMapCsv(out);
+  } catch (err) {
+    console.error("[map-csv] sqlite", err);
   }
-  return stringifyMapCsv(allRows());
+  const file = await readFirstFile(SNAP);
+  return file.includes("id,tipo") ? file : stringifyMapCsv([FOUNDING]);
 }
 
 export async function saveMapCsvText(csv: string): Promise<boolean> {

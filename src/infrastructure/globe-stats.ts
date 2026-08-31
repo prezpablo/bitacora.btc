@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 8;
+const STATS_VER = 9;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -241,13 +241,26 @@ function locateOrNearest(lon: number, lat: number, idx: CountryIdx[]) {
 
 export async function fetchGlobeStats(): Promise<GlobeStats> {
   if (statsCache && statsCache.ver === STATS_VER && Date.now() - statsCache.at < 30 * 60_000) return statsCache.data;
+  const empty = { events: [] as { countryCode: string }[] };
   const [idx, shops, comms, ev, csv, places] = await Promise.all([
     countryIndex().catch(() => [] as CountryIdx[]),
     fetchAllMerchants().catch(() => []),
     fetchBtcCommunities().catch(() => []),
-    fetchNetworkEvents().catch(() => ({ events: [] as { countryCode: string }[] })),
-    loadMapCsvText().catch(() => ""),
-    loadNeCities(),
+    fetchNetworkEvents().catch(() => empty),
+    (async () => {
+      try {
+        const t = await loadMapCsvText();
+        if (t.includes("id,tipo")) return t;
+      } catch {
+        /* sqlite optional */
+      }
+      try {
+        return await readFirstFile("public/data/map.csv");
+      } catch {
+        return "";
+      }
+    })(),
+    loadNeCities().catch(() => [] as NeCity[]),
   ]);
   const grid = cityGrid(places);
   const byIso = new Map<string, GlobeCountryStat>();
@@ -277,59 +290,45 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     set.add(name);
   };
   for (const p of shops) {
+    if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
     const iso = locate(p.lon, p.lat, idx);
     bump(iso, "shops");
     markCity(iso, p.lat, p.lon);
     rawPts.push({ lat: p.lat, lon: p.lon });
   }
   for (const c of comms) {
+    if (!Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
     const iso = locate(c.lon, c.lat, idx);
     bump(iso, "comms");
     markCity(iso, c.lat, c.lon);
     rawPts.push({ lat: c.lat, lon: c.lon });
   }
-  const shopIds = new Set(shops.map((p) => p.id));
-  const commIds = new Set(comms.flatMap((c) => [c.id, c.slug, `c:${c.slug}`]));
   const overlay: GlobeDot[] = [];
+  const seenOver = new Set<string>();
+  const addOver = (lat: number, lon: number, n: number) => {
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+    const k = `${lat.toFixed(4)},${lon.toFixed(4)}`;
+    if (seenOver.has(k)) return;
+    seenOver.add(k);
+    overlay.push({ lat, lon, n });
+  };
   try {
-    const rows = parseMapCsv(csv);
-    for (const r of rows) {
+    for (const r of parseMapCsv(csv)) {
       if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
       const isComm = r.tipo === "community";
-      const known = isComm ? commIds.has(r.id) || commIds.has(r.id.replace(/^c:/, "")) : shopIds.has(r.id);
-      if (known) continue;
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
-      overlay.push({ lat: r.lat, lon: r.lon, n: 24 });
+      addOver(r.lat, r.lon, 28);
       rawPts.push({ lat: r.lat, lon: r.lon });
     }
   } catch {
-    /* overlay optional */
+    /* csv optional */
   }
-  if (!overlay.some((p) => Math.abs(p.lat + 34.47) < 0.08 && Math.abs(p.lon + 57.84) < 0.08)) {
-    overlay.unshift({ lat: -34.462, lon: -57.84, n: 24 });
-    bump("UY", "comms");
-    markCity("UY", -34.462, -57.84);
-    rawPts.push({ lat: -34.462, lon: -57.84 });
-  }
-  for (const e of ev.events) {
-    if (e.countryCode) bump(e.countryCode, "events");
-  }
-  const countries = [...byIso.values()];
-  for (const row of countries) {
-    row.cities = cityKeys.get(row.iso)?.size ?? 0;
-  }
-  for (const c of countries) {
-    if (c.shops + c.comms + c.events <= 0) continue;
-    if (!Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
-    const cap = capitalOf(c.iso);
-    overlay.push({
-      lat: cap?.lat ?? c.lat,
-      lon: cap?.lon ?? c.lon,
-      n: Math.max(8, Math.min(64, c.shops + c.comms * 3)),
-    });
-  }
+  addOver(-34.462, -57.84, 28);
+  bump("UY", "comms");
+  markCity("UY", -34.462, -57.84);
+  rawPts.push({ lat: -34.462, lon: -57.84 });
   for (const e of ev.events) {
     if (e.countryCode) bump(e.countryCode, "events");
   }
@@ -340,24 +339,24 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   const buckets = new Map<string, GlobeDot>();
   for (const p of rawPts) {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
-    const lat = Math.round(p.lat * 4) / 4;
-    const lon = Math.round(p.lon * 4) / 4;
+    const lat = Math.round(p.lat * 5) / 5;
+    const lon = Math.round(p.lon * 5) / 5;
     const k = `${lat},${lon}`;
     const row = buckets.get(k) || { lat, lon, n: 0 };
     row.n++;
     buckets.set(k, row);
   }
   for (const c of countries) {
-    if (c.events > 0 && Number.isFinite(c.lat) && Number.isFinite(c.lon)) {
-      const lat = Math.round(c.lat * 4) / 4;
-      const lon = Math.round(c.lon * 4) / 4;
-      const k = `${lat},${lon}`;
-      const row = buckets.get(k) || { lat, lon, n: 0 };
-      row.n += c.events;
-      buckets.set(k, row);
-    }
+    const cap = capitalOf(c.iso);
+    const lat = cap?.lat ?? c.lat;
+    const lon = cap?.lon ?? c.lon;
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const k = `${Math.round(lat * 5) / 5},${Math.round(lon * 5) / 5}`;
+    const row = buckets.get(k) || { lat, lon, n: 0 };
+    row.n += Math.max(1, c.shops + c.comms);
+    buckets.set(k, row);
   }
-  const points = [...buckets.values()].sort((a, b) => b.n - a.n).slice(0, 1800);
+  const points = [...buckets.values()].sort((a, b) => b.n - a.n);
   const data: GlobeStats = {
     world: {
       shops: countries.reduce((s, c) => s + c.shops, 0),

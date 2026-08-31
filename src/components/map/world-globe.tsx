@@ -176,13 +176,8 @@ function GlobeCanvas({
   }
 
   const world = stats.data?.world;
-  const pins = useMemo(() => {
-    const over = stats.data?.overlay || [];
-    const rest = stats.data?.points || [];
-    const seen = new Set(over.map((p) => `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`));
-    const cap = size.w < 640 ? 220 : 520;
-    return [...over, ...rest.filter((p) => !seen.has(`${p.lat.toFixed(3)},${p.lon.toFixed(3)}`))].slice(0, cap);
-  }, [stats.data?.overlay, stats.data?.points, size.w]);
+  const overlayPins = useMemo(() => stats.data?.overlay || [], [stats.data?.overlay]);
+  const gpuPoints = useMemo(() => stats.data?.points || [], [stats.data?.points]);
 
   return (
     <div className="space-y-3">
@@ -239,13 +234,13 @@ function GlobeCanvas({
             return d.shops + d.comms + d.events + d.cities > 0 ? 0.005 : 0.003;
           }}
           polygonsTransitionDuration={180}
-          htmlElementsData={pins}
+          htmlElementsData={overlayPins}
           htmlLat="lat"
           htmlLng="lon"
           htmlAltitude={0.028}
           htmlElement={(d: { lat: number; lon: number; n: number }) => {
             const el = document.createElement("button");
-            const sizePx = size.w < 640 ? 12 + Math.min(8, Math.sqrt(d.n) * 0.9) : 14 + Math.min(16, Math.sqrt(d.n) * 1.4);
+            const sizePx = size.w < 640 ? 14 : 18;
             el.type = "button";
             el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))`;
             el.innerHTML = BITCOIN_MARK_SVG;
@@ -255,6 +250,14 @@ function GlobeCanvas({
             });
             return el;
           }}
+          pointsData={gpuPoints}
+          pointLat="lat"
+          pointLng="lon"
+          pointAltitude={0.012}
+          pointRadius={(d: { n: number }) => Math.min(0.45, 0.12 + Math.sqrt(d.n) * 0.04)}
+          pointColor={() => "#f7931a"}
+          pointResolution={6}
+          pointsMerge
           onPolygonHover={(d: Feat | null) => setHover(d)}
           onPolygonClick={(d: Feat) => {
             const cap = capitalOf(d.iso);
