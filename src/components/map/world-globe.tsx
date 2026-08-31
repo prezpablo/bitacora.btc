@@ -66,6 +66,7 @@ function GlobeCanvas({
   const [joining, setJoining] = useState(false);
   const [size, setSize] = useState({ w: 800, h: 600 });
   const [hover, setHover] = useState<Feat | null>(null);
+  const [alt, setAlt] = useState(2.35);
 
   const stats = useGlobeStats();
   const geo = useQuery({
@@ -187,7 +188,20 @@ function GlobeCanvas({
   }
 
   const world = stats.data?.world;
-  const coinPins = stats.data?.points || [];
+  const mapPins = stats.data?.points || [];
+  const overlayPins = stats.data?.overlay || [];
+  const coinPins = useMemo(() => {
+    const cell = alt > 2.1 ? 3.2 : alt > 1.3 ? 1.6 : alt > 0.75 ? 0.7 : 0.28;
+    const seen = new Set(overlayPins.map((p) => p.id || `${p.lat.toFixed(4)},${p.lon.toFixed(4)}`));
+    const buckets = new Map<string, (typeof mapPins)[number]>();
+    for (const p of mapPins) {
+      const id = p.id || `${p.lat},${p.lon}`;
+      if (seen.has(id)) continue;
+      const k = `${Math.round(p.lat / cell)}_${Math.round(p.lon / cell)}`;
+      if (!buckets.has(k)) buckets.set(k, p);
+    }
+    return [...overlayPins, ...[...buckets.values()].slice(0, 480)];
+  }, [mapPins, overlayPins, alt]);
 
   return (
     <div className="space-y-3">
@@ -247,20 +261,36 @@ function GlobeCanvas({
           htmlElementsData={coinPins}
           htmlLat="lat"
           htmlLng="lon"
-          htmlAltitude={0.006}
+          htmlAltitude={0.012}
           htmlElement={(d: { lat: number; lon: number; n: number; id?: string; kind?: "shop" | "community"; name?: string }) => {
             const el = document.createElement("button");
-            const founding = d.id === "c:cc-btc" || (Math.abs(d.lat + 34.451) < 0.08 && Math.abs(d.lon + 57.812) < 0.08);
-            const sizePx = founding ? 10 : 8;
+            const founding = d.id === "c:cc-btc";
+            const sizePx = founding ? 11 : 8;
             el.type = "button";
             el.title = d.name || "";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.9`;
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.92`;
             el.innerHTML = BITCOIN_MARK_SVG;
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
               enter(d.lat, d.lon, founding || d.kind === "community" ? 13 : 14, undefined, d);
             });
             return el;
+          }}
+          pointsData={mapPins}
+          pointLat="lat"
+          pointLng="lon"
+          pointAltitude={0.006}
+          pointRadius={0.09}
+          pointColor={() => "#f7931a"}
+          pointResolution={4}
+          pointsMerge
+          onPointClick={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community" }) => {
+            enter(d.lat, d.lon, 14, undefined, d);
+          }}
+          onZoom={(pov: { altitude?: number }) => {
+            const a = Number(pov?.altitude);
+            if (!Number.isFinite(a)) return;
+            setAlt((prev) => (Math.abs(prev - a) < 0.06 ? prev : a));
           }}
           onPolygonHover={(d: Feat | null) => setHover(d)}
           onPolygonClick={(d: Feat) => {

@@ -23,7 +23,7 @@ export const mapKeys = {
 };
 
 const STALE = {
-  globe: 15 * 60_000,
+  globe: 60_000,
   geo: 24 * 60 * 60_000,
   merchants: 60_000,
   communities: 6 * 60 * 60_000,

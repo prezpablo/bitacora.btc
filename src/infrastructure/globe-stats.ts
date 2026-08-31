@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 13;
+const STATS_VER = 14;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -266,14 +266,10 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   const byIso = new Map<string, GlobeCountryStat>();
   const cityKeys = new Map<string, Set<string>>();
   const listings = new Map<string, GlobeDot>();
-  const seenGeo = new Set<string>();
   const addListing = (pin: GlobeDot) => {
     if (!pin.id || !Number.isFinite(pin.lat) || !Number.isFinite(pin.lon)) return false;
     if (listings.has(pin.id)) return false;
-    const g = `${pin.lat.toFixed(3)},${pin.lon.toFixed(3)}`;
-    if (seenGeo.has(g)) return false;
-    seenGeo.add(g);
-    listings.set(pin.id, pin);
+    listings.set(pin.id, { id: pin.id, lat: pin.lat, lon: pin.lon, n: pin.n || 1, kind: pin.kind, name: pin.name, logo: pin.logo });
     return true;
   };
   const bump = (iso: string, key: "shops" | "comms" | "events") => {
@@ -303,14 +299,14 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
     bump(locate(p.lon, p.lat, idx), "shops");
     markCity(locate(p.lon, p.lat, idx), p.lat, p.lon);
-    addListing({ id: p.id, lat: p.lat, lon: p.lon, n: 1, name: p.name, kind: "shop" });
+    addListing({ id: p.id, lat: p.lat, lon: p.lon, n: 1, kind: "shop" });
   }
   for (const c of comms) {
     if (!Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
     const iso = locate(c.lon, c.lat, idx);
     bump(iso, "comms");
     markCity(iso, c.lat, c.lon);
-    addListing({ id: c.id || c.slug, lat: c.lat, lon: c.lon, n: 1, name: c.name, kind: "community" });
+    addListing({ id: c.id || c.slug, lat: c.lat, lon: c.lon, n: 1, kind: "community" });
   }
   const overlay: GlobeDot[] = [];
   try {
@@ -359,19 +355,7 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   for (const row of countries) {
     row.cities = cityKeys.get(row.iso)?.size ?? 0;
   }
-  const CELL = 4.5;
-  const buckets = new Map<string, GlobeDot>();
-  for (const pin of listings.values()) {
-    const k = `${Math.round(pin.lat / CELL)},${Math.round(pin.lon / CELL)}`;
-    const prev = buckets.get(k);
-    if (!prev) buckets.set(k, { ...pin, n: 1 });
-    else prev.n += 1;
-  }
-  const sampled = [...buckets.values()].sort((a, b) => b.n - a.n);
-  const points = [
-    ...overlay,
-    ...sampled.filter((p) => overlay.every((o) => p.id !== o.id && (o.lat - p.lat) ** 2 + (o.lon - p.lon) ** 2 >= 9)).slice(0, 220),
-  ];
+  const points = [...listings.values()];
   const data: GlobeStats = {
     world: {
       shops: countries.reduce((s, c) => s + c.shops, 0),
