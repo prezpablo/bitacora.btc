@@ -190,18 +190,21 @@ function GlobeCanvas({
   const world = stats.data?.world;
   const mapPins = stats.data?.points || [];
   const overlayPins = stats.data?.overlay || [];
+  const lod = alt > 2.05 ? 3.4 : alt > 1.35 ? 2.1 : alt > 0.8 ? 1 : 0.45;
   const coinPins = useMemo(() => {
-    const cell = alt > 2.1 ? 3.2 : alt > 1.3 ? 1.6 : alt > 0.75 ? 0.7 : 0.28;
-    const seen = new Set(overlayPins.map((p) => p.id || `${p.lat.toFixed(4)},${p.lon.toFixed(4)}`));
     const buckets = new Map<string, (typeof mapPins)[number]>();
+    const key = (lat: number, lon: number) => `${Math.round(lat / lod)}_${Math.round(lon / lod)}`;
+    for (const p of overlayPins) buckets.set(key(p.lat, p.lon), p);
     for (const p of mapPins) {
-      const id = p.id || `${p.lat},${p.lon}`;
-      if (seen.has(id)) continue;
-      const k = `${Math.round(p.lat / cell)}_${Math.round(p.lon / cell)}`;
+      const k = key(p.lat, p.lon);
       if (!buckets.has(k)) buckets.set(k, p);
     }
-    return [...overlayPins, ...[...buckets.values()].slice(0, 480)];
-  }, [mapPins, overlayPins, alt]);
+    const cap = lod >= 3 ? 220 : lod >= 2 ? 280 : lod >= 1 ? 340 : 400;
+    const overlayIds = new Set(overlayPins.map((p) => p.id));
+    const overlay = [...buckets.values()].filter((p) => overlayIds.has(p.id));
+    const rest = [...buckets.values()].filter((p) => !overlayIds.has(p.id));
+    return [...overlay, ...rest].slice(0, cap);
+  }, [mapPins, overlayPins, lod]);
 
   return (
     <div className="space-y-3">
@@ -261,14 +264,15 @@ function GlobeCanvas({
           htmlElementsData={coinPins}
           htmlLat="lat"
           htmlLng="lon"
-          htmlAltitude={0.012}
-          htmlElement={(d: { lat: number; lon: number; n: number; id?: string; kind?: "shop" | "community"; name?: string }) => {
+          htmlAltitude={0.008}
+          htmlTransitionDuration={0}
+          htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string }) => {
             const el = document.createElement("button");
             const founding = d.id === "c:cc-btc";
-            const sizePx = founding ? 11 : 8;
+            const sizePx = founding ? 10 : 8;
             el.type = "button";
             el.title = d.name || "";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.92`;
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto`;
             el.innerHTML = BITCOIN_MARK_SVG;
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
@@ -276,21 +280,11 @@ function GlobeCanvas({
             });
             return el;
           }}
-          pointsData={mapPins}
-          pointLat="lat"
-          pointLng="lon"
-          pointAltitude={0.006}
-          pointRadius={0.09}
-          pointColor={() => "#f7931a"}
-          pointResolution={4}
-          pointsMerge
-          onPointClick={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community" }) => {
-            enter(d.lat, d.lon, 14, undefined, d);
-          }}
+          pointsData={[]}
           onZoom={(pov: { altitude?: number }) => {
             const a = Number(pov?.altitude);
             if (!Number.isFinite(a)) return;
-            setAlt((prev) => (Math.abs(prev - a) < 0.06 ? prev : a));
+            setAlt((prev) => (Math.abs(prev - a) < 0.12 ? prev : a));
           }}
           onPolygonHover={(d: Feat | null) => setHover(d)}
           onPolygonClick={(d: Feat) => {

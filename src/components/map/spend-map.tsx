@@ -422,20 +422,15 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (!map || !group) return;
     void import("leaflet").then((L) => {
       group.clearLayers();
+      const occupied = new Set<string>();
       for (const p of places) {
-        const g = gradeOf(store[p.id], Date.now());
-        const color = GRADE_HEX[g.band];
-        const logo = store[p.id]?.logo;
         const selected = hit && hit.kind === "place" && hit.id === p.id;
-        const size = selected ? 40 : 28;
+        const size = selected ? 36 : 26;
+        occupied.add(`${p.lat.toFixed(4)},${p.lon.toFixed(4)}`);
         const m = L.marker([p.lat, p.lon], {
           icon: L.divIcon({
             className: "",
-            html: logo
-              ? `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px ${color};overflow:hidden">
-                  <img src="${logo.replace(/"/g, "")}" alt="" style="width:100%;height:100%;object-fit:cover;display:block" />
-                </div>`
-              : `<div style="width:${size}px;height:${size}px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">${BITCOIN_MARK_SVG}</div>`,
+            html: `<div style="width:${size}px;height:${size}px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">${BITCOIN_MARK_SVG}</div>`,
             iconSize: [size, size],
             iconAnchor: [size / 2, size / 2],
           }),
@@ -451,18 +446,18 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.addTo(group);
       }
       for (const c of visibleComms) {
+        const k = `${c.lat.toFixed(4)},${c.lon.toFixed(4)}`;
+        if (occupied.has(k)) continue;
+        occupied.add(k);
         const trust = communityTrust(c);
-        const img = c.logo
-          ? `<img src="${c.logo.replace(/"/g, "")}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block" />`
-          : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
         const check = trust.verified
-          ? `<span style="position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
+          ? `<span style="position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : "";
         const icon = L.divIcon({
           className: "",
-          html: `<div style="position:relative;width:36px;height:36px;border-radius:50%;background:#f7931a;border:2px solid #fff;box-shadow:0 0 0 1px #e6e6e6;overflow:visible;display:flex;align-items:center;justify-content:center">${img}${check}</div>`,
-          iconSize: [36, 36],
-          iconAnchor: [18, 18],
+          html: `<div style="position:relative;width:28px;height:28px">${BITCOIN_MARK_SVG}${check}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
         });
         const m = L.marker([c.lat, c.lon], { icon });
         m.on("click", (ev) => {
