@@ -325,6 +325,21 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }, [allComms, bbox, filter]);
 
   useEffect(() => {
+    if (!focus?.id) return;
+    const comm = allComms.find((c) => c.id === focus.id || c.slug === focus.id);
+    if (comm) {
+      setSelComm(comm);
+      setSel(null);
+      return;
+    }
+    const place = places.find((p) => p.id === focus.id);
+    if (place) {
+      setSel(place);
+      setSelComm(null);
+    }
+  }, [focus?.id, allComms, places]);
+
+  useEffect(() => {
     if (!mapEl.current || mapRef.current) return;
     let dead = false;
     let map: import("leaflet").Map | null = null;

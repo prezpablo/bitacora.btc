@@ -122,6 +122,7 @@ export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Pr
         for (const r of rows) if (yes.has(r.id)) r.verifiedAt = now;
         text = stringifyMapCsv(rows);
         await saveMapCsvText(text);
+        clearGlobeStatsCache();
       }
     }
   } catch {

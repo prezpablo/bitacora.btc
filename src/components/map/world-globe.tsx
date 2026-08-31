@@ -160,10 +160,10 @@ function GlobeCanvas({
     }
   }, [lang]);
 
-  function enter(lat: number, lon: number, zoom: number, iso?: string) {
+  function enter(lat: number, lon: number, zoom: number, iso?: string, pin?: { id?: string; kind?: "shop" | "community" }) {
     if (entered.current) return;
     entered.current = true;
-    onEnter({ lat, lon, zoom, iso });
+    onEnter({ lat, lon, zoom, iso, id: pin?.id, kind: pin?.kind });
   }
 
   async function joinHere() {
@@ -248,16 +248,17 @@ function GlobeCanvas({
           htmlLat="lat"
           htmlLng="lon"
           htmlAltitude={0.006}
-          htmlElement={(d: { lat: number; lon: number; n: number }) => {
+          htmlElement={(d: { lat: number; lon: number; n: number; id?: string; kind?: "shop" | "community"; name?: string }) => {
             const el = document.createElement("button");
-            const founding = Math.abs(d.lat + 34.451) < 0.08 && Math.abs(d.lon + 57.812) < 0.08;
+            const founding = d.id === "c:cc-btc" || (Math.abs(d.lat + 34.451) < 0.08 && Math.abs(d.lon + 57.812) < 0.08);
             const sizePx = founding ? 10 : 8;
             el.type = "button";
+            el.title = d.name || "";
             el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.9`;
             el.innerHTML = BITCOIN_MARK_SVG;
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
-              enter(d.lat, d.lon, founding ? 12 : 8);
+              enter(d.lat, d.lon, founding || d.kind === "community" ? 13 : 14, undefined, d);
             });
             return el;
           }}
