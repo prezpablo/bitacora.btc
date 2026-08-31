@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { GlobeFocus } from "@/domain/globe";
+import { FOUNDING_UY } from "@/domain/globe";
 import { capitalOf } from "@/domain/capitals";
 import { mapKeys, useGlobeStats } from "@/lib/map-query";
 import { localeTag } from "@/lib/display";
@@ -123,7 +124,10 @@ function GlobeCanvas({
       .then((m) => {
         const g = (m as { default?: unknown }).default ?? m;
         const Cmp = (g as { default?: unknown }).default ?? g;
-        if (!stop) setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
+        if (!stop) {
+          window.clearTimeout(timer);
+          setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
+        }
       })
       .catch((err: Error) => {
         if (!stop) setLoadErr(err.message || "globe");
@@ -200,9 +204,52 @@ function GlobeCanvas({
     for (const p of overlayPins) {
       if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
-    const gap = alt > 2.05 ? 1.2 : alt > 1.35 ? 0.55 : alt > 0.8 ? 0.22 : 0.07;
-    return layoutCityLogos(dedupeCommunities([...byId.values()]), gap);
-  }, [mapPins, overlayPins, alt]);
+    return layoutCityLogos(dedupeCommunities([...byId.values()]), 0.035);
+  }, [mapPins, overlayPins]);
+
+  const far = alt > 1.48;
+  const htmlPins = useMemo(
+    () => (far ? coinPins.filter((p) => p.id === FOUNDING_UY.id) : coinPins),
+    [coinPins, far],
+  );
+  const gpuPins = useMemo(
+    () => (far ? coinPins.filter((p) => p.id !== FOUNDING_UY.id) : []),
+    [coinPins, far],
+  );
+
+  const enterRef = useRef(enter);
+  enterRef.current = enter;
+  const htmlElement = useCallback(
+    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community" }) => {
+      const el = document.createElement("button");
+      const founding = d.id === FOUNDING_UY.id;
+      const logo = logoUrl(d.logo || "");
+      const sizePx = founding ? 14 : 12;
+      el.type = "button";
+      el.title = d.name || "";
+      el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+      if (logo) {
+        const img = document.createElement("img");
+        img.src = logo;
+        img.alt = d.name || "";
+        img.width = sizePx;
+        img.height = sizePx;
+        img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;background:#f7931a";
+        img.onerror = () => {
+          el.innerHTML = BITCOIN_MARK_SVG;
+        };
+        el.appendChild(img);
+      } else {
+        el.innerHTML = BITCOIN_MARK_SVG;
+      }
+      el.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        enterRef.current(d.lat0 ?? d.lat, d.lon0 ?? d.lon, 13, undefined, d);
+      });
+      return el;
+    },
+    [],
+  );
 
   return (
     <div className="space-y-3">
@@ -244,9 +291,11 @@ function GlobeCanvas({
           globeImageUrl={WHITE}
           showAtmosphere={false}
           animateIn={false}
+          rendererConfig={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           pointOfView={{ lat: -15, lng: -58, altitude: 2.35 }}
           polygonsData={features}
           polygonGeoJsonGeometry="geometry"
+          polygonCapCurvatureResolution={4}
           polygonCapColor={(d: Feat) => {
             const on = d.shops + d.comms + d.events + d.cities > 0;
             if (hover?.iso === d.iso) return "rgba(247,147,26,0.32)";
@@ -258,41 +307,24 @@ function GlobeCanvas({
             if (hover?.iso === d.iso) return 0.012;
             return d.shops + d.comms + d.events + d.cities > 0 ? 0.005 : 0.003;
           }}
-          polygonsTransitionDuration={180}
-          htmlElementsData={coinPins}
+          polygonsTransitionDuration={0}
+          htmlElementsData={htmlPins}
           htmlLat="lat"
           htmlLng="lng"
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
-          htmlElement={(d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {
-            const el = document.createElement("button");
-            const founding = d.id === "c:cc-btc";
-            const logo = logoUrl(d.logo || "");
-            const sizePx = founding ? 14 : alt > 2 ? 9 : alt > 1.2 ? 11 : 13;
-            el.type = "button";
-            el.title = d.name || "";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
-            if (logo) {
-              const img = document.createElement("img");
-              img.src = logo;
-              img.alt = d.name || "";
-              img.width = sizePx;
-              img.height = sizePx;
-              img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;background:#f7931a";
-              img.onerror = () => {
-                el.innerHTML = BITCOIN_MARK_SVG;
-              };
-              el.appendChild(img);
-            } else {
-              el.innerHTML = BITCOIN_MARK_SVG;
-            }
-            el.addEventListener("click", (ev) => {
-              ev.stopPropagation();
-              enter(d.lat0 ?? d.lat, d.lon0 ?? d.lon, 13, undefined, d);
-            });
-            return el;
+          htmlElement={htmlElement}
+          pointsData={gpuPins}
+          pointLat="lat"
+          pointLng="lng"
+          pointColor={() => "#f7931a"}
+          pointAltitude={0.004}
+          pointRadius={0.14}
+          pointResolution={6}
+          pointsMerge={false}
+          onPointClick={(d: { lat?: number; lon?: number; lat0?: number; lon0?: number; id?: string; kind?: "shop" | "community" }) => {
+            enter(d.lat0 ?? d.lat ?? 0, d.lon0 ?? d.lon ?? 0, 13, undefined, d);
           }}
-          pointsData={[]}
           onZoom={(pov: { altitude?: number }) => {
             const a = Number(pov?.altitude);
             if (!Number.isFinite(a)) return;
