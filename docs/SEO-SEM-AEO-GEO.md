@@ -2,7 +2,7 @@
 
 **Fecha:** 30 ago 2026  
 **Objetivo:** figurar en búsquedas de la comunidad bitcoiner (Latam, ES/PT/EN), no en “comprar crypto”.  
-**Estado de indexación:** el sitio **vive** en `https://45.158.116.49.sslip.io`. `bitácora.btc.us` (con á) da NXDOMAIN. `http://bitacora.btc.us` redirige. Sin URL canónica estable, Google y los motores de respuesta no consolidan autoridad.
+**Estado de indexación (31 ago 2026):** canónica de facto `https://45.158.116.49.sslip.io` (Caddy + LE). `bitacora.btc.us` es alias BNS con Website Redirect al sslip. `bitácora.btc.us` (á) NXDOMAIN. Dominio clásico ASCII **aplazado** (deuda §2.1).
 
 ---
 

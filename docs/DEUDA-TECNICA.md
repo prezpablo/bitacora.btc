@@ -1,10 +1,10 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 30 de agosto de 2026  
+**Fecha:** 31 de agosto de 2026  
 **Alcance:** código en `main` + VPS Njalla (`45.158.116.49`, Caddy + Node un proceso).  
 **No es** un load test de laboratorio: es el techo **antes de que se note**, leído del código y del servidor.
 
-Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado). Persistencia: CSV. Sin cuentas.
+Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado). Persistencia: SQLite (`data/bitacora.sqlite`) + CSV de respaldo. Sin cuentas.
 
 ---
 
@@ -12,7 +12,7 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 
 | Pieza | Hecho |
 |---|---|
-| Host | VPS Ubuntu 24.04, Caddy → `127.0.0.1:8080` |
+| Host | VPS Ubuntu 24.04, Caddy → `127.0.0.1:8080`. **Público HTTPS:** `https://45.158.116.49.sslip.io`. BNS `bitácora.btc` (activo hasta 28-08-2031) redirige `bitacora.btc.us` → sslip.io |
 | Runtime | Nitro `node-server`, **un** proceso Node |
 | RAM | VPS chico; swap 2 GB a veces **no se puede** (`swapon: Operation not permitted`) |
 | systemd | `Restart=on-failure` — **no hay** `MemoryMax` ni healthcheck |
@@ -39,7 +39,25 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 | CSV como base de datos | `pins-io.ts`, `map-csv-io.ts` + `sqlite.ts` | **En curso (30 ago 2026):** SQLite WAL en `data/bitacora.sqlite` (node:sqlite). El CSV queda como copia de respaldo. Tope 80 pines pendientes. |
 | BTC Map entero en RAM | `btc-map.ts`, TTL 6 h | `GET /v2/elements` (decenas de miles de puntos). El primer hit es el más caro. |
 | Globo 3D en la primera visita | `world-globe.tsx` | Varios móviles a la vez pegan más que todo Mercado. |
+| **Dominio canónico** | BNS + btc.us + Caddy | Ver §2.1. Hoy el candado vive en sslip.io; la barra no queda en `bitacora.btc.us`. |
 | Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | Peso, superficie, no aportan (`VITE_AUTH_ENABLED=false`). |
+
+### 2.1 Dominio — aplazado a propósito (31 ago 2026)
+
+**Decisión:** no comprar dominio clásico ahora. El sitio público con candado es **sslip.io**. El puente BNS queda como alias.
+
+| Pieza | Estado |
+|---|---|
+| Nombre BNS | `bitácora.btc` — Active until 28-08-2031 (cuenta `SP2A10KV…`) |
+| Panel btc.us | **Website Redirect** → `https://45.158.116.49.sslip.io` (no hay registro A) |
+| Puente ASCII | `https://bitacora.btc.us` → 302 al sslip |
+| Puente con tilde | `bitácora.btc.us` — NXDOMAIN (el puente no IDN-iza la á) |
+| Caddy / Let's Encrypt | solo `45.158.116.49.sslip.io` + `:80` |
+| IP cruda | `https://45.158.116.49` — “No seguro”; no hay cert en IP |
+
+**Efecto:** la URL de compartir memorable es `bitacora.btc.us`; tras el salto la barra muestra sslip.io. SEO/AEO no consolidan una canónica. Sitemap y `robots.txt` no deben promover la á.
+
+**Cierre (cuando se retome):** dominio ASCII en Njalla (`.org` / `.nl`) → registro A a `45.158.116.49` → site extra en Caddyfile → canónica única. No usar Transfer Domain del BNS para esto.
 
 ### P2 — se nota bajo carga, no en el día a día
 
