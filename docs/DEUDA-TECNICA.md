@@ -46,7 +46,17 @@ Hecho en el server Njalla, no solo en el repo:
 
 **No hacer:** `Transfer Domain` en btc.us; `PermitRootLogin yes`; servir Node en `0.0.0.0`.
 
-P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite VPS, CSP Caddy, hash IP **cerrados**. Caddyfile completo en `deploy/Caddyfile` (admin off, logs, X-Forwarded-For = peer). `saveMapCsv` público **en `main`**. Sigue: copia SQLite fuera del VPS. El VPS necesita **ZIP o pegar Caddyfile** para el último Caddy.
+P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite **en VPS**, CSP, hash IP, Caddy, `saveMapCsv` **cerrados**.
+
+| Ítem | Estado |
+|---|---|
+| `cancelCommunityPin` sin token | **Cerrado en `main` (31 ago):** exige `token` CARGA |
+| Tope global de pines | **Cerrado en `main`:** 30 altas/hora en todo el server + 8/IP + 80 pendientes |
+| Copia SQLite **fuera** del VPS | **En curso:** `deploy/pull-backup.ps1` (scp a `Documentos\bitacora-backups`). Correr **en el PC**, semanal. |
+| PAT GitHub pegado en el chat | **Pendiente (humano)** — revocar |
+| Firebase / better-auth en el bundle | P1 arquitectura: peso y superficie, auth apagada |
+
+El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 
 ### P1 — arquitectura que no escala ni a un meetup grande
 
@@ -83,7 +93,7 @@ P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite VPS, CSP Caddy, ha
 | Desk con `staleTime: 0` en precio | `desk.tsx` | Cada foco de pestaña vuelve a Binance/OKX/mempool. |
 | Rate-limit en un `Map` | `rate-limit.ts` | Reinicio = cero. IPs distintas = el Map crece sin techo. |
 | Scraper de pines en el request | `pin-verify.ts` + Jina | Verificar varios pines juntos bloquea el event loop. |
-| Pins: 8/hora/IP, **sin tope global** | `submitCommunityPin` | 50 IPs = 400 altas/h al CSV. El tablero igual muestra 48. |
+| Pins: 8/hora/IP + **30/h global** | `submitCommunityPin` | **Cerrado en `main` (31 ago).** Tablero sigue en 48. |
 
 ### P3 — higiene
 
@@ -91,7 +101,7 @@ P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite VPS, CSP Caddy, ha
 - Sin cola de scrapes ni de mails.
 - Casi sin tests de pines, CSV ni fallback de feeds.
 - `i18n.ts` monolito (415 claves × 3): funciona, es difícil de revisar.
-- Cancelar pin sigue en el server y ya no está en la UI.
+- Cancelar pin: ahora exige el código CARGA (ya no está en la UI).
 
 **No es deuda:** paridad ES/EN/PT, captcha, POC semanal fijo al zoom, OSM con fallback Esri, **P0 SSH/HTTP** (31 ago 2026), Caddy+HTTPS en sslip.io.
 

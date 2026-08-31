@@ -168,6 +168,7 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
     const proof = safeHttp(data.proof);
     if (!name || !proof) return { ok: false, error: "need" };
     if (tooMany(clientKey("pin"), 8, 60 * 60_000)) return { ok: false, error: "rate" };
+    if (tooMany("pin:global", 30, 60 * 60_000)) return { ok: false, error: "rate" };
     if ((await countPendingPins()) >= 80) return { ok: false, error: "rate" };
     const links = (data.links || []).map(safeHttp).filter(Boolean).slice(0, 6);
     const pin: CommunityPin = {
@@ -209,12 +210,15 @@ export const verifyCommunityPin = createServerFn({ method: "POST" })
   });
 
 export const cancelCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { id: string }) => input)
+  .validator((input: { id: string; token: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const token = (data.token || "").trim();
+    if (!token) return { ok: false, error: "token" };
     const rows = await loadPins();
     const pin = rows.find((p) => p.id === data.id);
     if (!pin) return { ok: true };
     if (pin.verified) return { ok: false, error: "live" };
+    if (pin.token !== token) return { ok: false, error: "token" };
     await replacePins(rows.filter((p) => p.id !== data.id));
     return { ok: true };
   });
