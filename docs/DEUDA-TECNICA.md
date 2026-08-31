@@ -30,7 +30,7 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 | Producción ≠ `main` | El VPS sirve un build anterior | **Cerrado (31 ago 2026 21:54 UTC):** ZIP + bootstrap. Verificado: `hashClientIp` ×2, CSP en Caddy (534), `p1-harden.sh` + `backup-sqlite.sh`. El `git log` decía `b0381a9` porque el ZIP no trae `.git` (bootstrap ahora lo borra). |
 | Sin tope de RAM | Un globo + dump de BTC Map → OOM | Mitigado en unit (`MemoryMax=700M`) si el bootstrap corrió. |
 
-**Cierre P0 restante:** PAT de GitHub a revocar a mano. Deploy de acá en más: ZIP (Code → Download ZIP → scp `/tmp/bitacora.btc-main.zip`) o token de solo lectura, nunca en el chat.
+**Cierre P0 restante:** Deploy de acá en más: ZIP (Code → Download ZIP → scp `/tmp/bitacora.btc-main.zip`) o token de solo lectura, nunca en el chat.
 
 ### 2.0 Seguridad del VPS — P0 cerrado (31 ago 2026)
 
@@ -42,7 +42,7 @@ Hecho en el server Njalla, no solo en el repo:
 | SSH como `root` | **Cerrado** | Usuario `bitacora` (uid 1000, sudo NOPASSWD, misma clave ed25519). `/etc/ssh/sshd_config.d/50-bitacora.conf`: `PermitRootLogin no`. Comprobado: `ssh root@…` → `Permission denied (publickey)`. |
 | Entrada de admin | `ssh bitacora@45.158.116.49` | Adentro: `sudo …`. No reactivar root. |
 | Scripts en repo | `deploy/p0-ssh-user.sh`, `deploy/p0-lock-root.sh`, `deploy/Caddyfile` | El VPS no los tenía (git sin auth); se aplicó el equivalente a mano. |
-| PAT de GitHub pegado en el chat | **Pendiente (humano)** | Revocar en github.com/settings/tokens. No volver a pegar secretos. Deploy: ZIP o PAT nuevo de **solo lectura**, solo en SSH. |
+| PAT de GitHub pegado en el chat | **Cerrado (31 ago 2026):** revocado. |
 
 **No hacer:** `Transfer Domain` en btc.us; `PermitRootLogin yes`; servir Node en `0.0.0.0`.
 
@@ -53,7 +53,7 @@ P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite **en VPS**, CSP, h
 | `cancelCommunityPin` sin token | **Cerrado en `main` (31 ago):** exige `token` CARGA |
 | Tope global de pines | **Cerrado en `main`:** 30 altas/hora en todo el server + 8/IP + 80 pendientes |
 | Copia SQLite **fuera** del VPS | **Primera copia (31 ago 2026 20:44):** `Documentos\bitacora-backups\bitacora-20260831-2140.sqlite.gz` (~1,5 KB). Repetir **semanal** con el mismo `scp`. El tamaño chico = el SQLite del VPS aún tiene poco; el backup está bien. |
-| PAT GitHub pegado en el chat | **Pendiente (humano)** — revocar |
+| PAT GitHub pegado en el chat | **Cerrado (31 ago 2026):** revocado. Deploy: ZIP, nunca un token en el chat. |
 | Firebase / better-auth en el bundle | P1 arquitectura: peso y superficie, auth apagada |
 
 El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
