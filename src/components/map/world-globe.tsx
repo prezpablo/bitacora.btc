@@ -8,6 +8,7 @@ import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { logoUrl } from "@/domain/map-csv";
+import { dedupeCommunities, slotShift, spreadSameCity } from "@/domain/community-dedupe";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { boxAround, locateBest } from "@/infrastructure/geo";
@@ -192,14 +193,14 @@ function GlobeCanvas({
   const mapPins = stats.data?.points || [];
   const overlayPins = stats.data?.overlay || [];
   const coinPins = useMemo(() => {
-    const byId = new Map<string, (typeof mapPins)[number]>();
+    const byId = new Map<string, (typeof mapPins)[number] & { name: string; id: string }>();
     for (const p of mapPins) {
-      if (p.kind === "community" && p.id) byId.set(p.id, p);
+      if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
     for (const p of overlayPins) {
-      if (p.kind === "community" && p.id) byId.set(p.id, p);
+      if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
-    return [...byId.values()];
+    return spreadSameCity(dedupeCommunities([...byId.values()]));
   }, [mapPins, overlayPins]);
 
   return (
@@ -262,14 +263,15 @@ function GlobeCanvas({
           htmlLng="lon"
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
-          htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {
+          htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string; slot?: number; slots?: number }) => {
             const el = document.createElement("button");
             const founding = d.id === "c:cc-btc";
             const logo = logoUrl(d.logo || "");
             const sizePx = founding ? 14 : alt > 2 ? 9 : alt > 1.2 ? 11 : 13;
+            const dx = slotShift(d.slot ?? 0, d.slots ?? 1);
             el.type = "button";
             el.title = d.name || "";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:visible;cursor:pointer;pointer-events:auto;transform:translateX(${dx}%)`;
             if (logo) {
               const img = document.createElement("img");
               img.src = logo;

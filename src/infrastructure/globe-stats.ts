@@ -3,6 +3,7 @@ import { FOUNDING_UY } from "@/domain/globe";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { parseMapCsv } from "@/domain/map-csv";
+import { dedupeCommunities, spreadSameCity } from "@/domain/community-dedupe";
 import { loadMapCsvText } from "./map-csv-io";
 import { readFirstFile } from "./data-files";
 
@@ -67,7 +68,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 19;
+const STATS_VER = 20;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -363,7 +364,13 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   for (const row of countries) {
     row.cities = cityKeys.get(row.iso)?.size ?? 0;
   }
-  const points = [...listings.values()];
+  const points = spreadSameCity(
+    dedupeCommunities(
+      [...listings.values()]
+        .filter((p) => p.kind === "community" && p.id)
+        .map((p) => ({ ...p, id: p.id as string, name: p.name || (p.id as string) })),
+    ),
+  );
   const data: GlobeStats = {
     world: {
       shops: countries.reduce((s, c) => s + c.shops, 0),

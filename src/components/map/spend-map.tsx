@@ -4,6 +4,7 @@ import type { Community, GradeBand, MerchantLocal, MerchantPlace } from "@/domai
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
+import { dedupeCommunities, slotShift, spreadSameCity } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
@@ -312,7 +313,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         verifiedAt: 1,
       });
     }
-    return [...map.values()];
+    return dedupeCommunities([...map.values()]);
   }, [btcComms.data, overlayComms]);
 
   const visibleComms = useMemo(() => {
@@ -325,13 +326,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       PY: { s: -27.7, n: -19.2, w: -62.7, e: -54.2 },
     };
     const box = focus?.iso ? isoBox[focus.iso.toUpperCase()] : null;
-    return allComms.filter((c) => {
+    const rows = allComms.filter((c) => {
       const founding = c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug;
       const pad = founding ? 2.6 : 0.6;
       if (c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad) return true;
       if (box && c.lat >= box.s && c.lat <= box.n && c.lon >= box.w && c.lon <= box.e) return true;
       return false;
     });
+    return spreadSameCity(rows);
   }, [allComms, bbox, filter, focus?.iso]);
 
   useEffect(() => {
@@ -438,6 +440,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         occupied.add(k);
         const trust = communityTrust(c);
         const logo = logoUrl(c.logo || "");
+        const dx = slotShift(c.slot ?? 0, c.slots ?? 1);
         const face = logo
           ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" />`
           : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
@@ -446,7 +449,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           : "";
         const icon = L.divIcon({
           className: "",
-          html: `<div style="position:relative;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
+          html: `<div style="position:relative;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible;transform:translateX(${dx}%)">${face}${check}</div>`,
           iconSize: [32, 32],
           iconAnchor: [16, 16],
         });
