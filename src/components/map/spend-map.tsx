@@ -569,12 +569,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     saveCommunities(nextComms);
     const csv = dumpMapCsv(nextStore, nextComms, query.data ?? []);
     writeExtra(CSV_CACHE, csv);
-    void saveMapCsv({ data: { csv } }).then(
+    return saveMapCsv({ data: { csv } }).then(
       (r) => {
         if (r.ok) setSync("on");
+        else setSync("fail");
         void invalidate(csv);
+        return r.ok;
       },
-      () => setSync("fail"),
+      () => {
+        setSync("fail");
+        return false;
+      },
     );
   }
 
@@ -599,7 +604,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     const by = nick.trim() || "colaborador";
     writeExtra("bitacora-nick", by);
     const tally = addScore(prev.score ?? 0, prev.voteCount ?? prev.votes.length, stars);
-    commit(place.id, {
+    const next = {
       ...prev,
       description: draft.trim() || prev.description,
       votes: [...prev.votes, { stars, at: Date.now(), by }],
@@ -611,9 +616,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       lon: prev.lon ?? place.lon,
       name: prev.name || place.name,
       category: prev.category || place.category,
+    };
+    const data = { ...store, [place.id]: next };
+    setStore(data);
+    void persist(data, comms).then((ok) => {
+      if (!ok) setFormErr(t("voteSaveFail"));
+      else {
+        setFormErr("");
+        setCaptchaOk(false);
+        setDraft("");
+      }
     });
-    setCaptchaOk(false);
-    setFormErr("");
   }
 
   function propose() {
@@ -689,16 +702,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     };
     const next = comms.some((x) => x.id === c.id) ? comms.map((x) => (x.id === c.id ? row : x)) : [...comms, row];
     setComms(next);
-    persist(store, next);
     setSelComm(row);
+    void persist(store, next).then((ok) => {
+      if (!ok) setFormErr(t("voteSaveFail"));
+      else {
+        setFormErr("");
+        setCaptchaOk(false);
+      }
+    });
     void upsertCommunity(row).then(
       (ok) => {
         if (ok) setSync("on");
       },
       () => setSync("fail"),
     );
-    setCaptchaOk(false);
-    setFormErr("");
   }
 
   function pinFromAddress(hit: StreetHit) {
@@ -899,7 +916,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               </div>
               <CaptchaBox key={selComm.id} ok={captchaOk} onOk={setCaptchaOk} />
               {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-              <Button className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk}>
+              <Button type="button" className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk}>
                 {t("publishVote")}
               </Button>
             </div>
@@ -921,9 +938,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                     <VerifiedStar title={t("verified")} className="size-7" />
                   ) : null}
                 </h3>
-                {!shopTrust?.verified ? (
-                  <p className="text-xs text-muted-foreground">{t("verifyPending")}</p>
-                ) : null}
                 </div>
               </div>
               {g ? (
@@ -953,17 +967,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               {local?.hours ? <HoursView hours={local.hours} /> : null}
               {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
               {local?.links?.length ? <SocialRow links={local.links} /> : null}
-              {sel && shopTrust && !shopTrust.verified ? (
-                <ScrapeVerifyBox
-                  id={sel.id}
-                  token={local?.verifyToken}
-                  hasLinks={Boolean(local?.links?.length)}
-                  onToken={(token) => commit(sel.id, { ...(local as MerchantLocal), verifyToken: token })}
-                  onVerified={() =>
-                    commit(sel.id, { ...(local as MerchantLocal), verifiedAt: Date.now(), verifyToken: local?.verifyToken })
-                  }
-                />
-              ) : null}
               <label className="block text-sm">
                 {t("fldNick")}
                 <input
@@ -999,7 +1002,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               </div>
               <CaptchaBox key={sel.id} ok={captchaOk} onOk={setCaptchaOk} />
               {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-              <Button className="w-full" onClick={() => vote(sel)} disabled={!captchaOk}>
+              <Button type="button" className="w-full" onClick={() => vote(sel)} disabled={!captchaOk}>
                 {t("publishVote")}
               </Button>
               {removable ? (

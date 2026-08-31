@@ -387,7 +387,8 @@ export function mergeMapRows(base: MapCsvRow[], incoming: MapCsvRow[]) {
   return [...map.values()];
 }
 
-const NEW_ID = /^(c:[a-z0-9][a-z0-9-]{1,62}|local:-?\d{1,3}\.\d{1,8},-?\d{1,3}\.\d{1,8})$/i;
+const NEW_ID =
+  /^(c:[a-z0-9][a-z0-9-]{1,62}|local:-?\d{1,3}\.\d{1,8},-?\d{1,3}\.\d{1,8}|btcmap:\d+|node:\d+|osm:[a-z]+:\d+)$/i;
 
 function finiteCoord(lat: number, lon: number) {
   return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -85 && lat <= 85 && lon >= -180 && lon <= 180 && !(lat === 0 && lon === 0);
@@ -433,19 +434,19 @@ export function applyPublicMapPatch(current: MapCsvRow[], incoming: MapCsvRow[])
   for (const r of incoming) {
     const prev = byId.get(r.id);
     if (!prev) {
-      added += 1;
-      if (added > 2) return null;
+      if (added >= 2) continue;
       const row = sanitizeNewRow(r);
-      if (!row) return null;
+      if (!row) continue;
+      added += 1;
       out.push(row);
       byId.set(row.id, row);
       continue;
     }
     const nextVotes = Math.max(0, Math.floor(Number(r.votes) || 0));
-    if (nextVotes > (prev.votes || 0) + 1) return null;
+    if (nextVotes > (prev.votes || 0) + 1) continue;
     if (nextVotes === (prev.votes || 0) + 1) {
+      if (voteBumps >= 3) continue;
       voteBumps += 1;
-      if (voteBumps > 3) return null;
       prev.votes = nextVotes;
       prev.score = Math.min(5, Math.max(1, Number(r.score) || prev.score || 1));
     }
