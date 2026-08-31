@@ -52,7 +52,7 @@ P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite **en VPS**, CSP, h
 |---|---|
 | `cancelCommunityPin` sin token | **Cerrado en `main` (31 ago):** exige `token` CARGA |
 | Tope global de pines | **Cerrado en `main`:** 30 altas/hora en todo el server + 8/IP + 80 pendientes |
-| Copia SQLite **fuera** del VPS | **En curso:** `deploy/pull-backup.ps1` (scp a `Documentos\bitacora-backups`). Correr **en el PC**, semanal. |
+| Copia SQLite **fuera** del VPS | **Primera copia (31 ago 2026 20:44):** `Documentos\bitacora-backups\bitacora-20260831-2140.sqlite.gz` (~1,5 KB). Repetir **semanal** con el mismo `scp`. El tamaño chico = el SQLite del VPS aún tiene poco; el backup está bien. |
 | PAT GitHub pegado en el chat | **Pendiente (humano)** — revocar |
 | Firebase / better-auth en el bundle | P1 arquitectura: peso y superficie, auth apagada |
 
