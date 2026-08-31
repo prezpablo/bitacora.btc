@@ -134,11 +134,22 @@ function GlobeCanvas({
   useEffect(() => {
     const el = wrap.current;
     if (!el) return;
-    const apply = () => setSize({ w: el.clientWidth, h: el.clientHeight });
+    let t = 0;
+    const apply = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      setSize((s) => (Math.abs(s.w - w) < 8 && Math.abs(s.h - h) < 8 ? s : { w, h }));
+    };
     apply();
-    const ro = new ResizeObserver(apply);
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(t);
+      t = window.setTimeout(apply, 160);
+    });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      window.clearTimeout(t);
+      ro.disconnect();
+    };
   }, []);
 
   const names = useMemo(() => {
@@ -176,16 +187,7 @@ function GlobeCanvas({
   }
 
   const world = stats.data?.world;
-  const coinPins = useMemo(() => {
-    const over = stats.data?.overlay || [];
-    const seen = new Set(over.map((p) => `${p.lat.toFixed(1)},${p.lon.toFixed(1)}`));
-    const rest = (stats.data?.points || []).filter((p) => {
-      const k = `${p.lat.toFixed(1)},${p.lon.toFixed(1)}`;
-      if (seen.has(k)) return false;
-      return !over.some((o) => (o.lat - p.lat) ** 2 + (o.lon - p.lon) ** 2 < 2.2 * 2.2);
-    });
-    return [...rest, ...over];
-  }, [stats.data?.overlay, stats.data?.points]);
+  const coinPins = stats.data?.points || [];
 
   return (
     <div className="space-y-3">
@@ -245,13 +247,13 @@ function GlobeCanvas({
           htmlElementsData={coinPins}
           htmlLat="lat"
           htmlLng="lon"
-          htmlAltitude={0.007}
-          htmlElement={(d: { lat: number; lon: number; n: number; logo?: string }) => {
+          htmlAltitude={0.006}
+          htmlElement={(d: { lat: number; lon: number; n: number }) => {
             const el = document.createElement("button");
-            const founding = Math.abs(d.lat + 34.451) < 0.05 && Math.abs(d.lon + 57.812) < 0.05;
-            const sizePx = founding ? 11 : Math.max(7, Math.min(11, 6.5 + Math.log2(1 + (d.n || 1)) * 0.9));
+            const founding = Math.abs(d.lat + 34.451) < 0.08 && Math.abs(d.lon + 57.812) < 0.08;
+            const sizePx = founding ? 10 : 8;
             el.type = "button";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.92;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))`;
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.9`;
             el.innerHTML = BITCOIN_MARK_SVG;
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();

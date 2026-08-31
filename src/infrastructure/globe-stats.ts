@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 11;
+const STATS_VER = 12;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -266,6 +266,14 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   const byIso = new Map<string, GlobeCountryStat>();
   const cityKeys = new Map<string, Set<string>>();
   const rawPts: { lat: number; lon: number }[] = [];
+  const seenPt = new Set<string>();
+  const addPt = (lat: number, lon: number) => {
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+    const k = `${lat.toFixed(2)},${lon.toFixed(2)}`;
+    if (seenPt.has(k)) return;
+    seenPt.add(k);
+    rawPts.push({ lat, lon });
+  };
   const bump = (iso: string, key: "shops" | "comms" | "events") => {
     if (!iso || iso.length !== 2) return;
     const code = iso.toUpperCase();
@@ -294,23 +302,20 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     const iso = locate(p.lon, p.lat, idx);
     bump(iso, "shops");
     markCity(iso, p.lat, p.lon);
-    rawPts.push({ lat: p.lat, lon: p.lon });
+    addPt(p.lat, p.lon);
   }
   for (const c of comms) {
     if (!Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
     const iso = locate(c.lon, c.lat, idx);
     bump(iso, "comms");
     markCity(iso, c.lat, c.lon);
-    rawPts.push({ lat: c.lat, lon: c.lon });
+    addPt(c.lat, c.lon);
   }
   const overlay: GlobeDot[] = [];
-  const seenOver = new Set<string>();
-  const addOver = (lat: number, lon: number, n: number, logo?: string) => {
+  const addOver = (lat: number, lon: number) => {
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
-    const k = `${lat.toFixed(4)},${lon.toFixed(4)}`;
-    if (seenOver.has(k)) return;
-    seenOver.add(k);
-    overlay.push({ lat, lon, n, logo });
+    if (overlay.some((o) => (o.lat - lat) ** 2 + (o.lon - lon) ** 2 < 0.04)) return;
+    overlay.push({ lat, lon, n: 8 });
   };
   try {
     for (const r of parseMapCsv(csv)) {
@@ -319,16 +324,15 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
-      addOver(r.lat, r.lon, 36, r.logo);
-      rawPts.push({ lat: r.lat, lon: r.lon });
+      const k = `${r.lat.toFixed(2)},${r.lon.toFixed(2)}`;
+      if (!seenPt.has(k)) addOver(r.lat, r.lon);
     }
   } catch {
     /* csv optional */
   }
-  addOver(FOUNDING_UY.lat, FOUNDING_UY.lon, 40, FOUNDING_UY.logo);
+  addOver(FOUNDING_UY.lat, FOUNDING_UY.lon);
   bump("UY", "comms");
   markCity("UY", FOUNDING_UY.lat, FOUNDING_UY.lon);
-  rawPts.push({ lat: FOUNDING_UY.lat, lon: FOUNDING_UY.lon });
   for (const e of ev.events) {
     if (e.countryCode) bump(e.countryCode, "events");
   }
@@ -336,11 +340,10 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   for (const row of countries) {
     row.cities = cityKeys.get(row.iso)?.size ?? 0;
   }
-  const CELL = 3.8;
+  const CELL = 6;
   type Acc = { slat: number; slon: number; n: number };
   const buckets = new Map<string, Acc>();
   for (const p of rawPts) {
-    if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
     const i = Math.round(p.lat / CELL);
     const j = Math.round(p.lon / CELL);
     const k = `${i},${j}`;
@@ -350,14 +353,13 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     row.n++;
     buckets.set(k, row);
   }
-  const clustered: GlobeDot[] = [];
-  for (const row of buckets.values()) {
-    clustered.push({ lat: row.slat / row.n, lon: row.slon / row.n, n: row.n });
-  }
-  clustered.sort((a, b) => b.n - a.n);
-  const points = clustered.filter((p) => {
-    return !overlay.some((o) => (o.lat - p.lat) ** 2 + (o.lon - p.lon) ** 2 < 3.2 * 3.2);
-  }).slice(0, 280);
+  const clustered: GlobeDot[] = [...buckets.values()]
+    .map((row) => ({ lat: row.slat / row.n, lon: row.slon / row.n, n: row.n }))
+    .sort((a, b) => b.n - a.n);
+  const points = [
+    ...overlay,
+    ...clustered.filter((p) => overlay.every((o) => (o.lat - p.lat) ** 2 + (o.lon - p.lon) ** 2 >= 16)).slice(0, 140),
+  ];
   const data: GlobeStats = {
     world: {
       shops: countries.reduce((s, c) => s + c.shops, 0),
