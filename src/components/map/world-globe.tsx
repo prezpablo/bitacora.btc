@@ -195,9 +195,12 @@ function GlobeCanvas({
     const buckets = new Map<string, (typeof mapPins)[number]>();
     const key = (lat: number, lon: number) => `${Math.round(lat / lod)}_${Math.round(lon / lod)}`;
     for (const p of overlayPins) buckets.set(key(p.lat, p.lon), p);
+    const rank = (p: (typeof mapPins)[number]) =>
+      p.kind === "community" && p.logo ? 3 : p.kind === "community" ? 2 : 1;
     for (const p of mapPins) {
       const k = key(p.lat, p.lon);
-      if (!buckets.has(k)) buckets.set(k, p);
+      const prev = buckets.get(k);
+      if (!prev || rank(p) > rank(prev)) buckets.set(k, p);
     }
     const cap = lod >= 3 ? 220 : lod >= 2 ? 280 : lod >= 1 ? 340 : 400;
     const overlayIds = new Set(overlayPins.map((p) => p.id));
@@ -266,14 +269,29 @@ function GlobeCanvas({
           htmlLng="lon"
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
-          htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string }) => {
+          htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {
             const el = document.createElement("button");
             const founding = d.id === "c:cc-btc";
-            const sizePx = founding ? 10 : 8;
+            const logo = d.kind === "community" && d.logo && (/^\/logos\//.test(d.logo) || /^https:\/\//i.test(d.logo)) ? d.logo : "";
+            const sizePx = founding ? 12 : logo ? 11 : 8;
             el.type = "button";
             el.title = d.name || "";
             el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto`;
-            el.innerHTML = BITCOIN_MARK_SVG;
+            if (logo) {
+              const img = document.createElement("img");
+              img.src = logo;
+              img.alt = d.name || "";
+              img.width = sizePx;
+              img.height = sizePx;
+              img.style.cssText =
+                "width:100%;height:100%;object-fit:cover;border-radius:50%;background:#f7931a;display:block;box-shadow:0 0 0 1px #fff";
+              img.onerror = () => {
+                el.innerHTML = BITCOIN_MARK_SVG;
+              };
+              el.appendChild(img);
+            } else {
+              el.innerHTML = BITCOIN_MARK_SVG;
+            }
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
               enter(d.lat, d.lon, founding || d.kind === "community" ? 13 : 14, undefined, d);

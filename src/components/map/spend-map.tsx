@@ -423,10 +423,43 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     void import("leaflet").then((L) => {
       group.clearLayers();
       const occupied = new Set<string>();
+      for (const c of visibleComms) {
+        const k = `${c.lat.toFixed(4)},${c.lon.toFixed(4)}`;
+        occupied.add(k);
+        const trust = communityTrust(c);
+        const logo = c.logo && (/^\/logos\//.test(c.logo) || /^https:\/\//i.test(c.logo)) ? c.logo.replace(/"/g, "") : "";
+        const face = logo
+          ? `<img src="${logo}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" />`
+          : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
+        const check = trust.verified
+          ? `<span style="position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
+          : "";
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="position:relative;width:28px;height:28px">${face}${check}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        });
+        const m = L.marker([c.lat, c.lon], { icon, zIndexOffset: 400 });
+        m.on("click", (ev) => {
+          L.DomEvent.stopPropagation(ev);
+          setSelComm(c);
+          setSel(null);
+          setDrop(null);
+        });
+        const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
+          ${logo ? `<img src="${logo}" alt="" width="32" height="32" style="border-radius:50%;object-fit:cover" />` : ""}
+          <div><strong>${c.name.replace(/</g, "")}</strong><br/><span style="opacity:.7">@${c.slug.replace(/</g, "")}</span></div>
+        </div>`;
+        m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
+        m.addTo(group);
+      }
       for (const p of places) {
+        const k = `${p.lat.toFixed(4)},${p.lon.toFixed(4)}`;
+        if (occupied.has(k)) continue;
+        occupied.add(k);
         const selected = hit && hit.kind === "place" && hit.id === p.id;
         const size = selected ? 36 : 26;
-        occupied.add(`${p.lat.toFixed(4)},${p.lon.toFixed(4)}`);
         const m = L.marker([p.lat, p.lon], {
           icon: L.divIcon({
             className: "",
@@ -443,34 +476,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           setDraft(store[p.id]?.description || "");
         });
         m.bindTooltip(p.name, { direction: "top", sticky: true });
-        m.addTo(group);
-      }
-      for (const c of visibleComms) {
-        const k = `${c.lat.toFixed(4)},${c.lon.toFixed(4)}`;
-        if (occupied.has(k)) continue;
-        occupied.add(k);
-        const trust = communityTrust(c);
-        const check = trust.verified
-          ? `<span style="position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
-          : "";
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="position:relative;width:28px;height:28px">${BITCOIN_MARK_SVG}${check}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-        });
-        const m = L.marker([c.lat, c.lon], { icon });
-        m.on("click", (ev) => {
-          L.DomEvent.stopPropagation(ev);
-          setSelComm(c);
-          setSel(null);
-          setDrop(null);
-        });
-        const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
-          ${c.logo ? `<img src="${c.logo.replace(/"/g, "")}" alt="" width="32" height="32" style="border-radius:50%;object-fit:cover" />` : ""}
-          <div><strong>${c.name.replace(/</g, "")}</strong><br/><span style="opacity:.7">@${c.slug.replace(/</g, "")}</span></div>
-        </div>`;
-        m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);
       }
     });

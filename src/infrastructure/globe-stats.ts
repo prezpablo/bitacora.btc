@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 14;
+const STATS_VER = 15;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -306,7 +306,15 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     const iso = locate(c.lon, c.lat, idx);
     bump(iso, "comms");
     markCity(iso, c.lat, c.lon);
-    addListing({ id: c.id || c.slug, lat: c.lat, lon: c.lon, n: 1, kind: "community" });
+    addListing({
+      id: c.id || c.slug,
+      lat: c.lat,
+      lon: c.lon,
+      n: 1,
+      name: c.name,
+      kind: "community",
+      logo: c.logo || undefined,
+    });
   }
   const overlay: GlobeDot[] = [];
   try {
