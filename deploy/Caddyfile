@@ -1,6 +1,5 @@
 # HTTPS con nombre (Let's Encrypt). El candado no existe sobre una IP cruda.
-# HTTP de la IP o de cualquier Host no-sslip → sslip HTTPS. El site sslip.io
-# sigue atendiendo ACME en :80 (más específico que este catch-all).
+# HTTP de la IP o de cualquier Host no-sslip → sslip HTTPS.
 45.158.116.49.sslip.io {
 	encode gzip zstd
 	reverse_proxy 127.0.0.1:8080
@@ -9,6 +8,8 @@
 		Referrer-Policy no-referrer
 		X-Frame-Options SAMEORIGIN
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		Permissions-Policy "camera=(), microphone=(), payment=(), usb=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://get.geojs.io https://ipwho.is https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com; worker-src 'self' blob:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co"
 	}
 }
 
