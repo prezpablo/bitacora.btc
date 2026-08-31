@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 9;
+const STATS_VER = 10;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -305,12 +305,13 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   }
   const overlay: GlobeDot[] = [];
   const seenOver = new Set<string>();
-  const addOver = (lat: number, lon: number, n: number) => {
+  const addOver = (lat: number, lon: number, n: number, logo?: string) => {
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
     const k = `${lat.toFixed(4)},${lon.toFixed(4)}`;
     if (seenOver.has(k)) return;
     seenOver.add(k);
-    overlay.push({ lat, lon, n });
+    const mark = logo && (/^\/logos\//.test(logo) || /^https:\/\//i.test(logo)) ? logo : undefined;
+    overlay.push({ lat, lon, n, logo: mark });
   };
   try {
     for (const r of parseMapCsv(csv)) {
@@ -319,13 +320,13 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
-      addOver(r.lat, r.lon, 28);
+      addOver(r.lat, r.lon, 32, r.logo);
       rawPts.push({ lat: r.lat, lon: r.lon });
     }
   } catch {
     /* csv optional */
   }
-  addOver(-34.462, -57.84, 28);
+  addOver(-34.462, -57.84, 32, "/logos/conciencia-bitcoin.png");
   bump("UY", "comms");
   markCity("UY", -34.462, -57.84);
   rawPts.push({ lat: -34.462, lon: -57.84 });
@@ -336,11 +337,12 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   for (const row of countries) {
     row.cities = cityKeys.get(row.iso)?.size ?? 0;
   }
+  const CELL = 2.2;
   const buckets = new Map<string, GlobeDot>();
   for (const p of rawPts) {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
-    const lat = Math.round(p.lat * 5) / 5;
-    const lon = Math.round(p.lon * 5) / 5;
+    const lat = Math.round(p.lat / CELL) * CELL;
+    const lon = Math.round(p.lon / CELL) * CELL;
     const k = `${lat},${lon}`;
     const row = buckets.get(k) || { lat, lon, n: 0 };
     row.n++;
@@ -351,12 +353,12 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     const lat = cap?.lat ?? c.lat;
     const lon = cap?.lon ?? c.lon;
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-    const k = `${Math.round(lat * 5) / 5},${Math.round(lon * 5) / 5}`;
+    const k = `${Math.round(lat / CELL) * CELL},${Math.round(lon / CELL) * CELL}`;
     const row = buckets.get(k) || { lat, lon, n: 0 };
     row.n += Math.max(1, c.shops + c.comms);
     buckets.set(k, row);
   }
-  const points = [...buckets.values()].sort((a, b) => b.n - a.n);
+  const points = [...buckets.values()].sort((a, b) => b.n - a.n).slice(0, 520);
   const data: GlobeStats = {
     world: {
       shops: countries.reduce((s, c) => s + c.shops, 0),

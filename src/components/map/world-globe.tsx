@@ -176,8 +176,12 @@ function GlobeCanvas({
   }
 
   const world = stats.data?.world;
-  const overlayPins = useMemo(() => stats.data?.overlay || [], [stats.data?.overlay]);
-  const gpuPoints = useMemo(() => stats.data?.points || [], [stats.data?.points]);
+  const coinPins = useMemo(() => {
+    const over = stats.data?.overlay || [];
+    const seen = new Set(over.map((p) => `${p.lat.toFixed(1)},${p.lon.toFixed(1)}`));
+    const rest = (stats.data?.points || []).filter((p) => !seen.has(`${p.lat.toFixed(1)},${p.lon.toFixed(1)}`));
+    return [...over, ...rest];
+  }, [stats.data?.overlay, stats.data?.points]);
 
   return (
     <div className="space-y-3">
@@ -234,30 +238,37 @@ function GlobeCanvas({
             return d.shops + d.comms + d.events + d.cities > 0 ? 0.005 : 0.003;
           }}
           polygonsTransitionDuration={180}
-          htmlElementsData={overlayPins}
+          htmlElementsData={coinPins}
           htmlLat="lat"
           htmlLng="lon"
-          htmlAltitude={0.028}
-          htmlElement={(d: { lat: number; lon: number; n: number }) => {
+          htmlAltitude={0.026}
+          htmlElement={(d: { lat: number; lon: number; n: number; logo?: string }) => {
             const el = document.createElement("button");
-            const sizePx = size.w < 640 ? 14 : 18;
+            const sizePx = Math.max(16, Math.min(size.w < 640 ? 22 : 26, 14 + Math.sqrt(d.n || 1)));
             el.type = "button";
             el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))`;
-            el.innerHTML = BITCOIN_MARK_SVG;
+            const logo = d.logo && (/^\/logos\//.test(d.logo) || /^https:\/\//i.test(d.logo)) ? d.logo : "";
+            if (logo) {
+              const img = document.createElement("img");
+              img.src = logo;
+              img.alt = "";
+              img.width = sizePx;
+              img.height = sizePx;
+              img.style.cssText =
+                "width:100%;height:100%;object-fit:cover;border-radius:50%;background:#f7931a;display:block";
+              img.onerror = () => {
+                el.innerHTML = BITCOIN_MARK_SVG;
+              };
+              el.appendChild(img);
+            } else {
+              el.innerHTML = BITCOIN_MARK_SVG;
+            }
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
               enter(d.lat, d.lon, 8);
             });
             return el;
           }}
-          pointsData={gpuPoints}
-          pointLat="lat"
-          pointLng="lon"
-          pointAltitude={0.012}
-          pointRadius={(d: { n: number }) => Math.min(0.45, 0.12 + Math.sqrt(d.n) * 0.04)}
-          pointColor={() => "#f7931a"}
-          pointResolution={6}
-          pointsMerge
           onPolygonHover={(d: Feat | null) => setHover(d)}
           onPolygonClick={(d: Feat) => {
             const cap = capitalOf(d.iso);

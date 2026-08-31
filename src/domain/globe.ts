@@ -1,4 +1,4 @@
-export type GlobeDot = { lat: number; lon: number; n: number };
+export type GlobeDot = { lat: number; lon: number; n: number; logo?: string };
 
 export type GlobeCountryStat = {
   iso: string;
