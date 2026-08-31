@@ -1,5 +1,5 @@
 import type { GlobeCountryStat, GlobeDot, GlobeStats } from "@/domain/globe";
-import { capitalOf } from "@/domain/capitals";
+import { FOUNDING_UY } from "@/domain/globe";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { parseMapCsv } from "@/domain/map-csv";
@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 10;
+const STATS_VER = 11;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -310,8 +310,7 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     const k = `${lat.toFixed(4)},${lon.toFixed(4)}`;
     if (seenOver.has(k)) return;
     seenOver.add(k);
-    const mark = logo && (/^\/logos\//.test(logo) || /^https:\/\//i.test(logo)) ? logo : undefined;
-    overlay.push({ lat, lon, n, logo: mark });
+    overlay.push({ lat, lon, n, logo });
   };
   try {
     for (const r of parseMapCsv(csv)) {
@@ -320,16 +319,16 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
-      addOver(r.lat, r.lon, 32, r.logo);
+      addOver(r.lat, r.lon, 36, r.logo);
       rawPts.push({ lat: r.lat, lon: r.lon });
     }
   } catch {
     /* csv optional */
   }
-  addOver(-34.462, -57.84, 32, "/logos/conciencia-bitcoin.png");
+  addOver(FOUNDING_UY.lat, FOUNDING_UY.lon, 40, FOUNDING_UY.logo);
   bump("UY", "comms");
-  markCity("UY", -34.462, -57.84);
-  rawPts.push({ lat: -34.462, lon: -57.84 });
+  markCity("UY", FOUNDING_UY.lat, FOUNDING_UY.lon);
+  rawPts.push({ lat: FOUNDING_UY.lat, lon: FOUNDING_UY.lon });
   for (const e of ev.events) {
     if (e.countryCode) bump(e.countryCode, "events");
   }
@@ -337,28 +336,28 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   for (const row of countries) {
     row.cities = cityKeys.get(row.iso)?.size ?? 0;
   }
-  const CELL = 2.2;
-  const buckets = new Map<string, GlobeDot>();
+  const CELL = 3.8;
+  type Acc = { slat: number; slon: number; n: number };
+  const buckets = new Map<string, Acc>();
   for (const p of rawPts) {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
-    const lat = Math.round(p.lat / CELL) * CELL;
-    const lon = Math.round(p.lon / CELL) * CELL;
-    const k = `${lat},${lon}`;
-    const row = buckets.get(k) || { lat, lon, n: 0 };
+    const i = Math.round(p.lat / CELL);
+    const j = Math.round(p.lon / CELL);
+    const k = `${i},${j}`;
+    const row = buckets.get(k) || { slat: 0, slon: 0, n: 0 };
+    row.slat += p.lat;
+    row.slon += p.lon;
     row.n++;
     buckets.set(k, row);
   }
-  for (const c of countries) {
-    const cap = capitalOf(c.iso);
-    const lat = cap?.lat ?? c.lat;
-    const lon = cap?.lon ?? c.lon;
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-    const k = `${Math.round(lat / CELL) * CELL},${Math.round(lon / CELL) * CELL}`;
-    const row = buckets.get(k) || { lat, lon, n: 0 };
-    row.n += Math.max(1, c.shops + c.comms);
-    buckets.set(k, row);
+  const clustered: GlobeDot[] = [];
+  for (const row of buckets.values()) {
+    clustered.push({ lat: row.slat / row.n, lon: row.slon / row.n, n: row.n });
   }
-  const points = [...buckets.values()].sort((a, b) => b.n - a.n).slice(0, 520);
+  clustered.sort((a, b) => b.n - a.n);
+  const points = clustered.filter((p) => {
+    return !overlay.some((o) => (o.lat - p.lat) ** 2 + (o.lon - p.lon) ** 2 < 3.2 * 3.2);
+  }).slice(0, 280);
   const data: GlobeStats = {
     world: {
       shops: countries.reduce((s, c) => s + c.shops, 0),

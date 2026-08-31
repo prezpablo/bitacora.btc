@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Locate, Star, Users } from "lucide-react";
 import type { Community, GradeBand, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
+import { FOUNDING_UY } from "@/domain/globe";
 import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
@@ -295,12 +296,32 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     const map = new Map<string, Community>();
     for (const c of btcComms.data ?? []) map.set(c.slug, c);
     for (const c of overlayComms) map.set(c.slug, c);
+    if (!map.has(FOUNDING_UY.slug) && !map.has(FOUNDING_UY.id)) {
+      map.set(FOUNDING_UY.slug, {
+        id: FOUNDING_UY.id,
+        slug: FOUNDING_UY.slug,
+        name: FOUNDING_UY.name,
+        lat: FOUNDING_UY.lat,
+        lon: FOUNDING_UY.lon,
+        logo: FOUNDING_UY.logo,
+        description: "",
+        links: [],
+        createdAt: 0,
+        score: 0,
+        voteCount: 0,
+        verifiedAt: 1,
+      });
+    }
     return [...map.values()];
   }, [btcComms.data, overlayComms]);
 
   const visibleComms = useMemo(() => {
     if (filter !== "todas" && filter !== "comunidades") return [];
-    return allComms.filter((c) => c.lon >= bbox.west && c.lon <= bbox.east && c.lat >= bbox.south && c.lat <= bbox.north);
+    return allComms.filter((c) => {
+      const founding = c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug;
+      const pad = founding ? 2.6 : 0;
+      return c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad;
+    });
   }, [allComms, bbox, filter]);
 
   useEffect(() => {

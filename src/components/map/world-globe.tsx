@@ -179,8 +179,12 @@ function GlobeCanvas({
   const coinPins = useMemo(() => {
     const over = stats.data?.overlay || [];
     const seen = new Set(over.map((p) => `${p.lat.toFixed(1)},${p.lon.toFixed(1)}`));
-    const rest = (stats.data?.points || []).filter((p) => !seen.has(`${p.lat.toFixed(1)},${p.lon.toFixed(1)}`));
-    return [...over, ...rest];
+    const rest = (stats.data?.points || []).filter((p) => {
+      const k = `${p.lat.toFixed(1)},${p.lon.toFixed(1)}`;
+      if (seen.has(k)) return false;
+      return !over.some((o) => (o.lat - p.lat) ** 2 + (o.lon - p.lon) ** 2 < 2.2 * 2.2);
+    });
+    return [...rest, ...over];
   }, [stats.data?.overlay, stats.data?.points]);
 
   return (
@@ -241,31 +245,17 @@ function GlobeCanvas({
           htmlElementsData={coinPins}
           htmlLat="lat"
           htmlLng="lon"
-          htmlAltitude={0.026}
+          htmlAltitude={0.007}
           htmlElement={(d: { lat: number; lon: number; n: number; logo?: string }) => {
             const el = document.createElement("button");
-            const sizePx = Math.max(16, Math.min(size.w < 640 ? 22 : 26, 14 + Math.sqrt(d.n || 1)));
+            const founding = Math.abs(d.lat + 34.451) < 0.05 && Math.abs(d.lon + 57.812) < 0.05;
+            const sizePx = founding ? 11 : Math.max(7, Math.min(11, 6.5 + Math.log2(1 + (d.n || 1)) * 0.9));
             el.type = "button";
-            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))`;
-            const logo = d.logo && (/^\/logos\//.test(d.logo) || /^https:\/\//i.test(d.logo)) ? d.logo : "";
-            if (logo) {
-              const img = document.createElement("img");
-              img.src = logo;
-              img.alt = "";
-              img.width = sizePx;
-              img.height = sizePx;
-              img.style.cssText =
-                "width:100%;height:100%;object-fit:cover;border-radius:50%;background:#f7931a;display:block";
-              img.onerror = () => {
-                el.innerHTML = BITCOIN_MARK_SVG;
-              };
-              el.appendChild(img);
-            } else {
-              el.innerHTML = BITCOIN_MARK_SVG;
-            }
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;opacity:.92;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))`;
+            el.innerHTML = BITCOIN_MARK_SVG;
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
-              enter(d.lat, d.lon, 8);
+              enter(d.lat, d.lon, founding ? 12 : 8);
             });
             return el;
           }}

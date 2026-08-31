@@ -1,5 +1,15 @@
 export type GlobeDot = { lat: number; lon: number; n: number; logo?: string };
 
+/** Consciencia Bitcoin — inland of Colonia so the ₿ sits on UY, not the river. */
+export const FOUNDING_UY = {
+  id: "c:cc-btc",
+  slug: "cc-btc",
+  name: "Consciencia Bitcoin",
+  lat: -34.451,
+  lon: -57.812,
+  logo: "/logos/conciencia-bitcoin.png",
+};
+
 export type GlobeCountryStat = {
   iso: string;
   lat: number;

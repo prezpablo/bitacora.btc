@@ -1,24 +1,25 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { mergeMapRows, parseMapCsv, stringifyMapCsv, type MapCsvRow } from "@/domain/map-csv";
+import { FOUNDING_UY } from "@/domain/globe";
 import { openSqlite, sqlTx } from "./sqlite";
 import { readFirstFile } from "./data-files";
 
 const SNAP = "public/data/map.csv";
 
 const FOUNDING: MapCsvRow = {
-  id: "c:cc-btc",
+  id: FOUNDING_UY.id,
   tipo: "community",
-  name: "Consciencia Bitcoin",
-  lat: -34.462,
-  lon: -57.84,
+  name: FOUNDING_UY.name,
+  lat: FOUNDING_UY.lat,
+  lon: FOUNDING_UY.lon,
   address: "Colonia del Sacramento, Uruguay",
   description:
     "Consciencia Bitcoin es una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, impulsada por LATAM Cripto Mom —un espacio dedicado a la educación financiera familiar, la divulgación de Web3 y la soberanía digital de forma simple y humana—.",
   notes: "",
   score: 0,
   votes: 0,
-  logo: "/logos/conciencia-bitcoin.png",
+  logo: FOUNDING_UY.logo,
   socials: "",
   hours: "",
   pays: "",
