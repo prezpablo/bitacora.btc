@@ -438,7 +438,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       const z = map.getZoom();
       const clat = map.getCenter().lat;
       const mpp = (40075016.686 * Math.cos((clat * Math.PI) / 180)) / (256 * 2 ** z);
-      const gapDeg = Math.max(0.0009, (36 * mpp) / (111320 * Math.max(0.2, Math.cos((clat * Math.PI) / 180))));
+      const gapDeg = Math.max(0.0012, (44 * mpp) / (111320 * Math.max(0.2, Math.cos((clat * Math.PI) / 180))));
       const laid = layoutCityLogos(visibleComms, gapDeg);
       for (const c of laid) {
         occupied.add(`${c.lat.toFixed(5)},${c.lon.toFixed(5)}`);

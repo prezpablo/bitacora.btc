@@ -3,7 +3,7 @@ import { FOUNDING_UY } from "@/domain/globe";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { parseMapCsv } from "@/domain/map-csv";
-import { dedupeCommunities, spreadSameCity } from "@/domain/community-dedupe";
+import { dedupeCommunities } from "@/domain/community-dedupe";
 import { loadMapCsvText } from "./map-csv-io";
 import { readFirstFile } from "./data-files";
 
@@ -364,12 +364,10 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   for (const row of countries) {
     row.cities = cityKeys.get(row.iso)?.size ?? 0;
   }
-  const points = spreadSameCity(
-    dedupeCommunities(
-      [...listings.values()]
-        .filter((p) => p.kind === "community" && p.id)
-        .map((p) => ({ ...p, id: p.id as string, name: p.name || (p.id as string) })),
-    ),
+  const points = dedupeCommunities(
+    [...listings.values()]
+      .filter((p) => p.kind === "community" && p.id)
+      .map((p) => ({ ...p, id: p.id as string, name: p.name || (p.id as string) })),
   );
   const data: GlobeStats = {
     world: {

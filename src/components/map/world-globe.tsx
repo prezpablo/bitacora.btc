@@ -200,7 +200,7 @@ function GlobeCanvas({
     for (const p of overlayPins) {
       if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
-    const gap = alt > 2.05 ? 0.42 : alt > 1.35 ? 0.2 : alt > 0.8 ? 0.09 : 0.035;
+    const gap = alt > 2.05 ? 1.2 : alt > 1.35 ? 0.55 : alt > 0.8 ? 0.22 : 0.07;
     return layoutCityLogos(dedupeCommunities([...byId.values()]), gap);
   }, [mapPins, overlayPins, alt]);
 
@@ -261,7 +261,7 @@ function GlobeCanvas({
           polygonsTransitionDuration={180}
           htmlElementsData={coinPins}
           htmlLat="lat"
-          htmlLng="lon"
+          htmlLng="lng"
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
           htmlElement={(d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {

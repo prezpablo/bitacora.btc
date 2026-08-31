@@ -124,25 +124,25 @@ function clusters<T extends NamedPin>(rows: T[], maxKm: number): T[][] {
 }
 
 function offsets(n: number, gap: number) {
-  const cols = Math.min(n, 4);
+  const cols = Math.min(n, 5);
   const rows = Math.ceil(n / cols);
   return Array.from({ length: n }, (_, i) => {
     const r = Math.floor(i / cols);
     const c = i % cols;
     const colsThis = r === rows - 1 ? n - r * cols : cols;
     return {
-      dlat: (r - (rows - 1) / 2) * gap * 0.9,
+      dlat: (r - (rows - 1) / 2) * gap,
       dlon: (c - (colsThis - 1) / 2) * gap,
     };
   });
 }
 
-export type LaidPin<T> = T & { lat0: number; lon0: number; slot: number; slots: number };
+export type LaidPin<T> = T & { lat0: number; lon0: number; lng: number; slot: number; slots: number };
 
-/** Same city → logos in a row with distinct lat/lon. Then nudge leftovers that still collide. */
+/** Same city → logos in a row, each with its own lat/lon. No two share coordinates. */
 export function layoutCityLogos<T extends NamedPin>(rows: T[], gapDeg: number): LaidPin<T>[] {
-  const gap = Math.max(0.0004, gapDeg);
-  const cityKm = Math.max(12, Math.min(36, gap * 111 * 1.2));
+  const gap = Math.max(0.0006, gapDeg);
+  const cityKm = Math.max(10, Math.min(48, gap * 111 * 2.4));
   const laid: LaidPin<T>[] = [];
   for (const g of clusters(rows, cityKm)) {
     g.sort((a, b) => (a.name || "").localeCompare(b.name || "", "es"));
@@ -150,28 +150,29 @@ export function layoutCityLogos<T extends NamedPin>(rows: T[], gapDeg: number): 
     const lon0 = g.reduce((s, r) => s + r.lon, 0) / g.length;
     const pack = offsets(g.length, gap);
     g.forEach((r, i) => {
+      const lat = lat0 + pack[i].dlat;
+      const lon = lon0 + pack[i].dlon;
       laid.push({
         ...r,
         lat0: r.lat,
         lon0: r.lon,
-        lat: lat0 + pack[i].dlat,
-        lon: lon0 + pack[i].dlon,
+        lat,
+        lon,
+        lng: lon,
         slot: i,
         slots: g.length,
       });
     });
   }
-  const min = gap * 0.92;
-  const key = (lat: number, lon: number) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
+  const min = gap * 0.98;
   const placed: LaidPin<T>[] = [];
   for (const r of laid) {
     let lat = r.lat;
     let lon = r.lon;
     let guard = 0;
-    const hits = () =>
-      placed.some((p) => Math.hypot(p.lat - lat, p.lon - lon) < min || key(p.lat, p.lon) === key(lat, lon));
-    while (guard++ < 32 && hits()) lon += gap;
-    placed.push({ ...r, lat, lon });
+    const hits = () => placed.some((p) => Math.hypot((p.lat - lat) / 0.9, p.lon - lon) < min);
+    while (guard++ < 48 && hits()) lon += gap;
+    placed.push({ ...r, lat, lon, lng: lon });
   }
   return placed;
 }
