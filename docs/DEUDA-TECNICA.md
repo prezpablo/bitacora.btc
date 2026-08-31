@@ -27,10 +27,10 @@ Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado
 
 | Deuda | Efecto | Cómo se ve |
 |---|---|---|
-| Producción ≠ `main` | El VPS sirve un build anterior | `git fetch` pide token; HEAD local quedó atrás. Caddy P0 se aplicó a mano (python), no por pull. |
+| Producción ≠ `main` | El VPS sirve un build anterior | **Cerrado (31 ago 2026 21:54 UTC):** ZIP + bootstrap. Verificado: `hashClientIp` ×2, CSP en Caddy (534), `p1-harden.sh` + `backup-sqlite.sh`. El `git log` decía `b0381a9` porque el ZIP no trae `.git` (bootstrap ahora lo borra). |
 | Sin tope de RAM | Un globo + dump de BTC Map → OOM | Mitigado en unit (`MemoryMax=700M`) si el bootstrap corrió. |
 
-**Cierre P0 restante:** actualizar código sin PAT en el chat (ZIP o token de solo lectura, nunca pegarlo acá).
+**Cierre P0 restante:** PAT de GitHub a revocar a mano. Deploy de acá en más: ZIP (Code → Download ZIP → scp `/tmp/bitacora.btc-main.zip`) o token de solo lectura, nunca en el chat.
 
 ### 2.0 Seguridad del VPS — P0 cerrado (31 ago 2026)
 
