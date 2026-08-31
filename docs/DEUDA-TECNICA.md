@@ -46,7 +46,7 @@ Hecho en el server Njalla, no solo en el repo:
 
 **No hacer:** `Transfer Domain` en btc.us; `PermitRootLogin yes`; servir Node en `0.0.0.0`.
 
-P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite VPS, CSP Caddy **cerrados**. Hash de IP en rate-limit **en `main` (31 ago 2026)** — no aplica en el VPS hasta el próximo deploy. Sigue: copia fuera del VPS, `saveMapCsv` público (merge + tope 8 altas; aún POST abierto).
+P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite VPS, CSP Caddy, hash IP **cerrados**. `saveMapCsv` público **en `main` (31 ago 2026):** solo altas nuevas (`c:` / `local:`, máx. 2), votos +1 (máx. 3 por POST), no mueve coords ni verifica. Rate 6/h. Sigue: copia SQLite fuera del VPS. El VPS necesita **otro ZIP** para este parche.
 
 ### P1 — arquitectura que no escala ni a un meetup grande
 

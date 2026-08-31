@@ -386,3 +386,76 @@ export function mergeMapRows(base: MapCsvRow[], incoming: MapCsvRow[]) {
   }
   return [...map.values()];
 }
+
+const NEW_ID = /^(c:[a-z0-9][a-z0-9-]{1,62}|local:-?\d{1,3}\.\d{1,8},-?\d{1,3}\.\d{1,8})$/i;
+
+function finiteCoord(lat: number, lon: number) {
+  return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -85 && lat <= 85 && lon >= -180 && lon <= 180 && !(lat === 0 && lon === 0);
+}
+
+function sanitizeNewRow(r: MapCsvRow): MapCsvRow | null {
+  const id = String(r.id || "").trim();
+  if (!NEW_ID.test(id)) return null;
+  const name = String(r.name || "").trim().slice(0, 80);
+  if (name.length < 2) return null;
+  if (!finiteCoord(r.lat, r.lon)) return null;
+  const tipo: MapTipo = id.startsWith("c:") ? "community" : "shop";
+  const votes = r.votes === 1 ? 1 : 0;
+  const score = votes ? Math.min(5, Math.max(1, Number(r.score) || 1)) : 0;
+  return {
+    ...r,
+    id,
+    tipo,
+    name,
+    lat: r.lat,
+    lon: r.lon,
+    address: String(r.address || "").slice(0, 200),
+    description: String(r.description || "").slice(0, 400),
+    notes: String(r.notes || "").slice(0, 240),
+    score,
+    votes,
+    logo: String(r.logo || "").slice(0, 500),
+    socials: String(r.socials || "").slice(0, 800),
+    hours: String(r.hours || "").replace(/\s+/g, "").slice(0, 200),
+    pays: String(r.pays || "").slice(0, 80),
+    created: Date.now(),
+    token: String(r.token || "").slice(0, 24),
+    verifiedAt: 0,
+  };
+}
+
+/** POST público: altas nuevas (máx. 2) + un voto por fila; no mueve coords ni borra. */
+export function applyPublicMapPatch(current: MapCsvRow[], incoming: MapCsvRow[]): MapCsvRow[] | null {
+  const out = current.map((r) => ({ ...r }));
+  const byId = new Map(out.map((r) => [r.id, r]));
+  let added = 0;
+  let voteBumps = 0;
+  for (const r of incoming) {
+    const prev = byId.get(r.id);
+    if (!prev) {
+      added += 1;
+      if (added > 2) return null;
+      const row = sanitizeNewRow(r);
+      if (!row) return null;
+      out.push(row);
+      byId.set(row.id, row);
+      continue;
+    }
+    const nextVotes = Math.max(0, Math.floor(Number(r.votes) || 0));
+    if (nextVotes > (prev.votes || 0) + 1) return null;
+    if (nextVotes === (prev.votes || 0) + 1) {
+      voteBumps += 1;
+      if (voteBumps > 3) return null;
+      prev.votes = nextVotes;
+      prev.score = Math.min(5, Math.max(1, Number(r.score) || prev.score || 1));
+    }
+    if (!prev.description && r.description) prev.description = String(r.description).slice(0, 400);
+    if (!prev.logo && r.logo) prev.logo = String(r.logo).slice(0, 500);
+    if (!prev.socials && r.socials) prev.socials = String(r.socials).slice(0, 800);
+    if (!prev.hours && r.hours) prev.hours = String(r.hours).replace(/\s+/g, "").slice(0, 200);
+    if (!prev.pays && r.pays) prev.pays = String(r.pays).slice(0, 80);
+    if (!prev.address && r.address) prev.address = String(r.address).slice(0, 200);
+  }
+  return out;
+}
+

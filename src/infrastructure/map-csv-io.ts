@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { mergeMapRows, parseMapCsv, stringifyMapCsv, type MapCsvRow } from "@/domain/map-csv";
+import { applyPublicMapPatch, mergeMapRows, parseMapCsv, stringifyMapCsv, type MapCsvRow } from "@/domain/map-csv";
 import { FOUNDING_UY } from "@/domain/globe";
 import { openSqlite, sqlTx } from "./sqlite";
 import { readFirstFile } from "./data-files";
@@ -159,5 +159,21 @@ export async function saveMapCsvText(csv: string): Promise<boolean> {
     for (const r of merged) upsertMap(r);
   });
   await snapCsv(merged);
+  return true;
+}
+
+export async function savePublicMapCsv(csv: string): Promise<boolean> {
+  if (!csv || csv.length > 350_000) return false;
+  const incoming = parseMapCsv(csv);
+  if (incoming.length > 400) return false;
+  await ensureSeed();
+  const current = allRows();
+  const next = applyPublicMapPatch(current, incoming);
+  if (!next) return false;
+  if (!next.some((r) => r.id === FOUNDING.id)) next.push(FOUNDING);
+  sqlTx(() => {
+    for (const r of next) upsertMap(r);
+  });
+  await snapCsv(next);
   return true;
 }

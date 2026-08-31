@@ -9,7 +9,7 @@ import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
 import { nominatimCity, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
-import { loadMapCsvText, saveMapCsvText } from "./map-csv-io";
+import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
@@ -134,8 +134,8 @@ export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Pr
 export const saveMapCsv = createServerFn({ method: "POST" })
   .validator((input: { csv: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
-    if (tooMany(clientKey("csv"), 12, 60 * 60_000)) return { ok: false };
-    const ok = await saveMapCsvText(data.csv);
+    if (tooMany(clientKey("csv"), 6, 60 * 60_000)) return { ok: false };
+    const ok = await savePublicMapCsv(data.csv);
     if (ok) clearGlobeStatsCache();
     return { ok };
   });
