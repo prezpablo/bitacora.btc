@@ -54,7 +54,7 @@ P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite **en VPS**, CSP, h
 | Tope global de pines | **Cerrado en `main`:** 30 altas/hora en todo el server + 8/IP + 80 pendientes |
 | Copia SQLite **fuera** del VPS | **Primera copia (31 ago 2026 20:44):** `Documentos\bitacora-backups\bitacora-20260831-2140.sqlite.gz` (~1,5 KB). Repetir **semanal** con el mismo `scp`. El tamaño chico = el SQLite del VPS aún tiene poco; el backup está bien. |
 | PAT GitHub pegado en el chat | **Cerrado (31 ago 2026):** revocado. Deploy: ZIP, nunca un token en el chat. |
-| Firebase / better-auth en el bundle | P1 arquitectura: peso y superficie, auth apagada |
+| Firebase / better-auth en el bundle | **Firebase cerrado en `main`:** stub si no hay claves. Better-auth/PGLite siguen en el server del scaffold. |
 
 El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 
@@ -66,7 +66,7 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 | BTC Map entero en RAM | `btc-map.ts`, TTL 6 h | `GET /v2/elements` (decenas de miles de puntos). El primer hit es el más caro. |
 | Globo 3D en la primera visita | `world-globe.tsx` | Varios móviles a la vez pegan más que todo Mercado. |
 | **Dominio canónico** | BNS + btc.us + Caddy | Ver §2.1. Hoy el candado vive en sslip.io; la barra no queda en `bitacora.btc.us`. |
-| Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | Peso, superficie, no aportan (`VITE_AUTH_ENABLED=false`). |
+| Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | **Firebase (31 ago):** sin `VITE_FIREBASE_*` Vite aliasa a `firebase-stub.ts` — no entra al bundle. Auth Grok sigue apagada (`VITE_AUTH_ENABLED=false`). |
 
 ### 2.1 Dominio — aplazado a propósito (31 ago 2026)
 

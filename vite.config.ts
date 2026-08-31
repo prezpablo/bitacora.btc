@@ -142,6 +142,17 @@ function authPopupPlugin(): Plugin {
   };
 }
 
+function firebaseAliases() {
+  const on = Boolean(process.env.VITE_FIREBASE_API_KEY && process.env.VITE_FIREBASE_PROJECT_ID);
+  if (on) return {};
+  const stub = join(process.cwd(), "src/infrastructure/firebase-stub.ts");
+  return {
+    "firebase/app": stub,
+    "firebase/auth": stub,
+    "firebase/firestore": stub,
+  };
+}
+
 // `0.0.0.0:8080` is the live-preview contract — don't change host/port.
 // The dev server starts once `src/router.tsx` and `src/routes/` exist — see
 // AGENTS.md § "First scaffold".
@@ -156,7 +167,7 @@ export default defineConfig(({ command, isPreview }) => ({
     port: 8081,
     strictPort: true,
   },
-  resolve: { tsconfigPaths: true },
+  resolve: { tsconfigPaths: true, alias: firebaseAliases() },
   optimizeDeps: {
     include: ["three", "react-globe.gl", "three-globe"],
   },
