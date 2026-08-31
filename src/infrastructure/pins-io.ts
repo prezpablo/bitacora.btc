@@ -1,7 +1,8 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { mergePins, parsePinsCsv, stringifyPinsCsv, type CommunityPin } from "@/domain/community-pins";
-import { metaGet, metaSet, openSqlite, sqlTx } from "./sqlite";
+import { parsePinsCsv, stringifyPinsCsv, mergePins, type CommunityPin } from "@/domain/community-pins";
+import { openSqlite, sqlTx } from "./sqlite";
+import { readFirstFile } from "./data-files";
 
 const SNAP = "public/data/pins.csv";
 
@@ -29,7 +30,9 @@ function upsertPin(pin: CommunityPin) {
        VALUES(?,?,?,?,?,?,?,?,?)
        ON CONFLICT(id) DO UPDATE SET
          name=excluded.name, blurb=excluded.blurb, proof=excluded.proof, links=excluded.links,
-         token=excluded.token, verified=excluded.verified, verified_at=excluded.verified_at, created=excluded.created`,
+         token=excluded.token,
+         verified=MAX(pins.verified, excluded.verified),
+         verified_at=MAX(pins.verified_at, excluded.verified_at), created=excluded.created`,
     )
     .run(
       pin.id,
@@ -45,29 +48,23 @@ function upsertPin(pin: CommunityPin) {
 }
 
 async function seedFromCsv() {
-  if (metaGet("pins_seeded") === "1") return;
-  const files = [join(process.cwd(), SNAP), SNAP, "/var/www/bitacora/public/data/pins.csv"];
-  let text = "";
-  for (const file of files) {
-    try {
-      text = await readFile(file, "utf8");
-      if (text.includes("id,name")) break;
-    } catch {
-      /* next */
-    }
-  }
+  const text = await readFirstFile(SNAP);
   const rows = parsePinsCsv(text);
-  if (rows.length) {
-    sqlTx(() => {
-      for (const p of rows) upsertPin(p);
-    });
-  }
-  metaSet("pins_seeded", "1");
+  if (!rows.length) return;
+  sqlTx(() => {
+    const have = new Set(
+      openSqlite()
+        .prepare("SELECT id FROM pins")
+        .all()
+        .map((r) => String(r.id || "")),
+    );
+    for (const p of rows) if (!have.has(p.id)) upsertPin(p);
+  });
 }
 
 let seed: Promise<void> | null = null;
 function ensureSeed() {
-  if (!seed) seed = seedFromCsv().catch(() => metaSet("pins_seeded", "1"));
+  if (!seed) seed = seedFromCsv().catch((err) => console.error("[pins] seed", err));
   return seed;
 }
 

@@ -3,6 +3,7 @@ import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { parseMapCsv } from "@/domain/map-csv";
 import { loadMapCsvText } from "./map-csv-io";
+import { readFirstFile } from "./data-files";
 
 const GEO_FILE = "public/data/ne-110m-countries.json";
 const GEO_URL =
@@ -17,8 +18,8 @@ let cityList: NeCity[] | null = null;
 async function loadNeCities(): Promise<NeCity[]> {
   if (cityList) return cityList;
   try {
-    const { readFile } = await import("node:fs/promises");
-    cityList = JSON.parse(await readFile(CITIES_FILE, "utf8")) as NeCity[];
+    const text = await readFirstFile(CITIES_FILE);
+    cityList = text ? (JSON.parse(text) as NeCity[]) : [];
   } catch {
     cityList = [];
   }
@@ -65,7 +66,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 6;
+const STATS_VER = 7;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -131,8 +132,9 @@ async function countryIndex(): Promise<CountryIdx[]> {
   if (geoCache && geoCache.ver === STATS_VER && Date.now() - geoCache.at < 24 * 60 * 60_000) return geoCache.idx;
   let raw: { features?: { properties?: Record<string, unknown>; geometry?: { type?: string; coordinates?: unknown } }[] } = { features: [] };
   try {
-    const { readFile } = await import("node:fs/promises");
-    raw = JSON.parse(await readFile(GEO_FILE, "utf8")) as typeof raw;
+    const text = await readFirstFile(GEO_FILE);
+    if (text) raw = JSON.parse(text) as typeof raw;
+    else throw new Error("no local geo");
   } catch {
     const res = await fetch(GEO_URL, { headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" } });
     if (!res.ok) throw new Error(`geo ${res.status}`);
@@ -160,8 +162,8 @@ async function countryIndex(): Promise<CountryIdx[]> {
     idx.push({ iso, lat: c.lat, lon: c.lon, minX, minY, maxX, maxY, polys });
   }
   try {
-    const { readFile } = await import("node:fs/promises");
-    const patch = JSON.parse(await readFile(UY_PATCH, "utf8")) as {
+    const patchText = await readFirstFile(UY_PATCH);
+    const patch = JSON.parse(patchText) as {
       iso?: string;
       geometry?: { type?: string; coordinates?: unknown };
     };
@@ -221,11 +223,26 @@ function locate(lon: number, lat: number, idx: CountryIdx[]) {
   return "";
 }
 
+function locateOrNearest(lon: number, lat: number, idx: CountryIdx[]) {
+  const hit = locate(lon, lat, idx);
+  if (hit) return hit;
+  let best = "";
+  let bestD = 36;
+  for (const c of idx) {
+    const d = (c.lat - lat) ** 2 + (c.lon - lon) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = c.iso;
+    }
+  }
+  return best;
+}
+
 export async function fetchGlobeStats(): Promise<GlobeStats> {
   if (statsCache && statsCache.ver === STATS_VER && Date.now() - statsCache.at < 30 * 60_000) return statsCache.data;
   const [idx, shops, comms, ev, csv, places] = await Promise.all([
-    countryIndex(),
-    fetchAllMerchants(),
+    countryIndex().catch(() => [] as CountryIdx[]),
+    fetchAllMerchants().catch(() => []),
     fetchBtcCommunities().catch(() => []),
     fetchNetworkEvents().catch(() => ({ events: [] as { countryCode: string }[] })),
     loadMapCsvText().catch(() => ""),
@@ -280,7 +297,7 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const isComm = r.tipo === "community";
       const known = isComm ? commIds.has(r.id) || commIds.has(r.id.replace(/^c:/, "")) : shopIds.has(r.id);
       if (known) continue;
-      const iso = locate(r.lon, r.lat, idx);
+      const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
       overlay.push({ lat: r.lat, lon: r.lon, n: 10 });

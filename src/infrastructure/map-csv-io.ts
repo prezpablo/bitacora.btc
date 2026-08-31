@@ -1,9 +1,31 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { mergeMapRows, parseMapCsv, stringifyMapCsv, type MapCsvRow } from "@/domain/map-csv";
-import { metaGet, metaSet, openSqlite, sqlTx } from "./sqlite";
+import { openSqlite, sqlTx } from "./sqlite";
+import { readFirstFile } from "./data-files";
 
 const SNAP = "public/data/map.csv";
+
+const FOUNDING: MapCsvRow = {
+  id: "c:cc-btc",
+  tipo: "community",
+  name: "Consciencia Bitcoin",
+  lat: -34.47051920882338,
+  lon: -57.84668721120329,
+  address: "Colonia del Sacramento, Uruguay",
+  description:
+    "Consciencia Bitcoin es una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, impulsada por LATAM Cripto Mom —un espacio dedicado a la educación financiera familiar, la divulgación de Web3 y la soberanía digital de forma simple y humana—.",
+  notes: "",
+  score: 0,
+  votes: 0,
+  logo: "/logos/conciencia-bitcoin.png",
+  socials: "",
+  hours: "",
+  pays: "",
+  created: 1787790155172,
+  token: "",
+  verifiedAt: 1,
+};
 
 function rowFromSql(r: Record<string, unknown>): MapCsvRow {
   return {
@@ -34,10 +56,16 @@ function upsertMap(row: MapCsvRow) {
        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
        ON CONFLICT(id) DO UPDATE SET
          tipo=excluded.tipo, name=excluded.name, lat=excluded.lat, lon=excluded.lon,
-         address=excluded.address, description=excluded.description, notes=excluded.notes,
-         score=excluded.score, votes=excluded.votes, logo=excluded.logo, socials=excluded.socials,
-         hours=excluded.hours, pays=excluded.pays, created=excluded.created, token=excluded.token,
-         verified_at=excluded.verified_at`,
+         address=CASE WHEN excluded.address != '' THEN excluded.address ELSE map_rows.address END,
+         description=CASE WHEN excluded.description != '' THEN excluded.description ELSE map_rows.description END,
+         notes=excluded.notes,
+         score=map_rows.score, votes=map_rows.votes,
+         logo=CASE WHEN excluded.logo != '' THEN excluded.logo ELSE map_rows.logo END,
+         socials=CASE WHEN excluded.socials != '' THEN excluded.socials ELSE map_rows.socials END,
+         hours=CASE WHEN excluded.hours != '' THEN excluded.hours ELSE map_rows.hours END,
+         pays=CASE WHEN excluded.pays != '' THEN excluded.pays ELSE map_rows.pays END,
+         token=CASE WHEN excluded.token != '' THEN excluded.token ELSE map_rows.token END,
+         verified_at=MAX(map_rows.verified_at, excluded.verified_at)`,
     )
     .run(
       row.id,
@@ -61,28 +89,27 @@ function upsertMap(row: MapCsvRow) {
 }
 
 async function seedFromCsv() {
-  if (metaGet("map_seeded") === "1") return;
-  let text = "";
-  for (const file of [join(process.cwd(), SNAP), SNAP, "/var/www/bitacora/public/data/map.csv"]) {
-    try {
-      text = await readFile(file, "utf8");
-      if (text.includes("id,tipo,name")) break;
-    } catch {
-      /* next */
+  const text = await readFirstFile(SNAP);
+  const rows = mergeMapRows(parseMapCsv(text), [FOUNDING]);
+  sqlTx(() => {
+    const have = new Set(
+      openSqlite()
+        .prepare("SELECT id FROM map_rows")
+        .all()
+        .map((r) => String(r.id || "")),
+    );
+    for (const r of rows) {
+      if (!have.has(r.id)) upsertMap(r);
     }
-  }
-  const rows = parseMapCsv(text);
-  if (rows.length) {
-    sqlTx(() => {
-      for (const r of rows) upsertMap(r);
-    });
-  }
-  metaSet("map_seeded", "1");
+    if (!have.has(FOUNDING.id)) upsertMap(FOUNDING);
+  });
 }
 
 let seed: Promise<void> | null = null;
 function ensureSeed() {
-  if (!seed) seed = seedFromCsv().catch(() => metaSet("map_seeded", "1"));
+  if (!seed) seed = seedFromCsv().catch((err) => {
+    console.error("[map-csv] seed", err);
+  });
   return seed;
 }
 
@@ -102,6 +129,10 @@ function allRows(): MapCsvRow[] {
 
 export async function loadMapCsvText(): Promise<string> {
   await ensureSeed();
+  const rows = allRows();
+  if (!rows.some((r) => r.id === FOUNDING.id)) {
+    sqlTx(() => upsertMap(FOUNDING));
+  }
   return stringifyMapCsv(allRows());
 }
 
@@ -115,6 +146,7 @@ export async function saveMapCsvText(csv: string): Promise<boolean> {
   const added = incoming.filter((r) => !have.has(r.id)).length;
   if (added > 8) return false;
   const merged = mergeMapRows(current, incoming);
+  if (!merged.some((r) => r.id === FOUNDING.id)) merged.push(FOUNDING);
   sqlTx(() => {
     for (const r of merged) upsertMap(r);
   });
