@@ -191,35 +191,16 @@ function GlobeCanvas({
   const world = stats.data?.world;
   const mapPins = stats.data?.points || [];
   const overlayPins = stats.data?.overlay || [];
-  const lod = alt > 2.05 ? 3.4 : alt > 1.35 ? 2.1 : alt > 0.8 ? 1 : 0.45;
   const coinPins = useMemo(() => {
-    const key = (lat: number, lon: number) => `${Math.round(lat / lod)}_${Math.round(lon / lod)}`;
-    const shops = new Map<string, (typeof mapPins)[number]>();
-    const comms = new Map<string, (typeof mapPins)[number]>();
-    for (const p of overlayPins) {
-      if (p.kind === "community") comms.set(key(p.lat, p.lon), p);
-      else shops.set(key(p.lat, p.lon), p);
-    }
+    const byId = new Map<string, (typeof mapPins)[number]>();
     for (const p of mapPins) {
-      const k = key(p.lat, p.lon);
-      if (p.kind === "community") {
-        if (!comms.has(k)) comms.set(k, p);
-      } else if (!shops.has(k)) shops.set(k, p);
+      if (p.kind === "community" && p.id) byId.set(p.id, p);
     }
-    const overlayComm = overlayPins.filter((p) => p.kind === "community");
-    const shopRows = [...shops.values()];
-    const latam = (p: (typeof mapPins)[number]) => p.lat < 15 && p.lat > -56 && p.lon < -30 && p.lon > -95;
-    const commRows = [...comms.values()]
-      .filter((p) => !overlayComm.some((o) => o.id === p.id))
-      .map((p) => {
-        const k = key(p.lat, p.lon);
-        if (!shops.has(k)) return p;
-        return { ...p, lat: p.lat + lod * 0.12, lon: p.lon + lod * 0.16 };
-      })
-      .sort((a, b) => Number(latam(b)) - Number(latam(a)));
-    const shopN = Math.min(shopRows.length, lod >= 3 ? 160 : 200);
-    return [...overlayComm, ...commRows, ...shopRows.slice(0, shopN)];
-  }, [mapPins, overlayPins, lod]);
+    for (const p of overlayPins) {
+      if (p.kind === "community" && p.id) byId.set(p.id, p);
+    }
+    return [...byId.values()];
+  }, [mapPins, overlayPins]);
 
   return (
     <div className="space-y-3">
@@ -284,14 +265,11 @@ function GlobeCanvas({
           htmlElement={(d: { lat: number; lon: number; id?: string; kind?: "shop" | "community"; name?: string; logo?: string }) => {
             const el = document.createElement("button");
             const founding = d.id === "c:cc-btc";
-            const isComm = d.kind === "community" || founding;
-            const logo = isComm ? logoUrl(d.logo || "") : "";
-            const sizePx = founding ? 16 : isComm ? 14 : 8;
+            const logo = logoUrl(d.logo || "");
+            const sizePx = founding ? 14 : alt > 2 ? 9 : alt > 1.2 ? 11 : 13;
             el.type = "button";
             el.title = d.name || "";
-            el.style.cssText = isComm
-              ? `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`
-              : `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto`;
+            el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
             if (logo) {
               const img = document.createElement("img");
               img.src = logo;
@@ -308,7 +286,7 @@ function GlobeCanvas({
             }
             el.addEventListener("click", (ev) => {
               ev.stopPropagation();
-              enter(d.lat, d.lon, isComm ? 13 : 14, undefined, d);
+              enter(d.lat, d.lon, 13, undefined, d);
             });
             return el;
           }}

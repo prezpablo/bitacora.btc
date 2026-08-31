@@ -67,7 +67,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 18;
+const STATS_VER = 19;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -299,7 +299,6 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
     bump(locate(p.lon, p.lat, idx), "shops");
     markCity(locate(p.lon, p.lat, idx), p.lat, p.lon);
-    addListing({ id: p.id, lat: p.lat, lon: p.lon, n: 1, kind: "shop" });
   }
   for (const c of comms) {
     if (!Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
@@ -324,13 +323,14 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
+      if (!isComm) continue;
       const pin: GlobeDot = {
         id: r.id,
         lat: r.lat,
         lon: r.lon,
         n: 2,
         name: r.name,
-        kind: isComm ? "community" : "shop",
+        kind: "community",
         logo: r.logo || undefined,
       };
       if (addListing(pin) || listings.has(r.id)) overlay.push(listings.get(r.id) || pin);
