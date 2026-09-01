@@ -2,11 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://bitacorabtc.org/</loc>
+    <lastmod>2026-09-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="es" href="https://bitacorabtc.org/?lang=es"/>
     <xhtml:link rel="alternate" hreflang="pt" href="https://bitacorabtc.org/?lang=pt"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://bitacorabtc.org/?lang=en"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bitacorabtc.org/"/>
+  </url>
+  <url>
+    <loc>https://bitacorabtc.org/?lang=es</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://bitacorabtc.org/?lang=pt</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bitacorabtc.org/?lang=en</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

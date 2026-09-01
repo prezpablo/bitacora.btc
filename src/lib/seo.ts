@@ -164,6 +164,14 @@ export function jsonLd(lang: AppLang, origin: string) {
         },
       },
       {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: SITE_NAME, item: origin },
+          { "@type": "ListItem", position: 2, name: "Mapa", item: `${origin}/#mapa` },
+          { "@type": "ListItem", position: 3, name: "FAQ", item: `${origin}/#faq-seo` },
+        ],
+      },
+      {
         "@type": "WebPage",
         "@id": `${origin}/#page`,
         url: origin,

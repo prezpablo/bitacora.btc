@@ -6,29 +6,35 @@ Bitácora.btc is a community logbook (bitácora) run by Consciencia Bitcoin from
 
 ## Site
 
-- Home (single page): /
-- Map / globe: /#mapa
-- About / Consciencia Bitcoin: /#conciencia
-- Community & events: /#comunidad
-- News pulse: /#pulso
-- History of Bitcoin: /#historia
-- Network data: /#red
-- Market (candles, liquidations, ETFs): /#mercado
-- FAQ: /#faq-seo
+Canonical: https://bitacorabtc.org/
+
+- Home: https://bitacorabtc.org/
+- Map / globe: https://bitacorabtc.org/#mapa
+- Consciencia Bitcoin: https://bitacorabtc.org/#conciencia
+- Community & events: https://bitacorabtc.org/#comunidad
+- News pulse: https://bitacorabtc.org/#pulso
+- History of Bitcoin: https://bitacorabtc.org/#historia
+- Network data: https://bitacorabtc.org/#red
+- Market: https://bitacorabtc.org/#mercado
+- FAQ: https://bitacorabtc.org/#faq-seo
+- Contact: https://bitacorabtc.org/#contacto
 
 Languages: Spanish (default), Portuguese, English (`?lang=es|pt|en`).
 
+Map search: `https://bitacorabtc.org/?q={city-or-community}#mapa`
+
 ## What it is not
 
-Not an exchange, wallet, broker or custodian. It does not hold keys or user funds.
+Not an exchange, wallet, broker or custodian. It does not hold keys or user funds. It is not bitacorabtc.com (unrelated).
 
 ## Publisher
 
 - Organization: Consciencia Bitcoin
-- Backing: LATAM Cripto Mom
-- Place: Colonia del Sacramento, Colonia, Uruguay (−34.47, −57.84)
+- Backing: LATAM Cripto Mom (https://www.instagram.com/latamcriptomom/)
+- Place: Colonia del Sacramento, Colonia, Uruguay (−34.4717, −57.8443)
 - Area served: Latin America
+- Source: https://github.com/prezpablo/bitacora.btc
 
 ## Cite as
 
-Bitácora.btc — mapa de comunidades Bitcoin en Latinoamérica. https://bitacora.btc
+Bitácora.btc — mapa de comunidades Bitcoin en Latinoamérica. https://bitacorabtc.org/

@@ -52,6 +52,9 @@ export function SeoHead() {
     upsertMeta("property", "og:url", url);
     upsertMeta("property", "og:image", image);
     upsertMeta("property", "og:image:alt", seo.title);
+    upsertMeta("property", "og:image:width", "1200");
+    upsertMeta("property", "og:image:height", "630");
+    upsertMeta("property", "og:image:type", "image/jpeg");
     upsertMeta("property", "og:locale", seo.ogLocale);
     upsertMeta("property", "og:locale:alternate", lang === "es" ? "en_US" : "es_UY");
     upsertMeta("name", "twitter:card", "summary_large_image");

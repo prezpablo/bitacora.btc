@@ -1,0 +1,15 @@
+/* TEAM */
+Org: Consciencia Bitcoin
+Place: Colonia del Sacramento, Uruguay
+Site: https://bitacorabtc.org/
+Git: https://github.com/prezpablo/bitacora.btc
+
+/* THANKS */
+LATAM Cripto Mom
+BTC Map
+OpenStreetMap
+
+/* SITE */
+Standards: HTML5, Schema.org, Open Graph
+Languages: es, pt, en
+Doctype: HTML5

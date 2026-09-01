@@ -53,7 +53,12 @@ export function MapSearch({
   places: MerchantPlace[];
   onPick: (hit: SearchHit) => void;
 }) {
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("q")?.slice(0, 80) || "";
+  });
+  const fromUrl = useRef(q.length > 0);
+  const pickedUrl = useRef(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -163,6 +168,15 @@ export function MapSearch({
   const flat = hits;
 
   useEffect(() => setActive(0), [hits.length, q]);
+
+  useEffect(() => {
+    if (!fromUrl.current || pickedUrl.current) return;
+    const first = hits[0];
+    if (!first) return;
+    pickedUrl.current = true;
+    onPick(first);
+    setQ(first.label);
+  }, [hits, onPick]);
 
   useEffect(() => {
     function onDoc(ev: MouseEvent) {
