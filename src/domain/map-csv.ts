@@ -160,10 +160,22 @@ export function logoUrl(raw: string) {
     const u = new URL(href);
     if (u.protocol === "http:") u.protocol = "https:";
     if (u.protocol !== "https:") return "";
+    if (u.hostname === "btcmap.org" && u.pathname.includes("netlify/images")) {
+      const inner = u.searchParams.get("url");
+      if (inner) return logoUrl(inner);
+    }
     return u.toString();
   } catch {
     return "";
   }
+}
+
+/** Same-origin proxy so BTC Map / Twitter / Wikimedia pass CSP and hotlink. */
+export function imgSrc(raw: string) {
+  const u = logoUrl(raw);
+  if (!u) return "";
+  if (u.startsWith("/") || u.startsWith("data:")) return u;
+  return `/logo?u=${encodeURIComponent(u)}`;
 }
 
 function cell(v: string | number) {

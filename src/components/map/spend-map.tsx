@@ -3,7 +3,7 @@ import { Locate, Star, Users } from "lucide-react";
 import type { Community, GradeBand, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
+import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
 import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
@@ -444,7 +444,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         occupied.add(`${c.lat.toFixed(4)},${c.lon.toFixed(4)}`);
         occupied.add(`${c.lat0.toFixed(4)},${c.lon0.toFixed(4)}`);
         const trust = communityTrust(c);
-        const logo = logoUrl(c.logo || "");
+        const logo = imgSrc(c.logo || "");
         const face = logo
           ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" referrerpolicy="no-referrer" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" /><span style="display:none;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`
           : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
@@ -914,7 +914,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <p className="text-xs tracking-wide text-muted-foreground uppercase">{sel.category}</p>
               <div className="flex items-center gap-3">
                 {local?.logo ? (
-                  <img src={local.logo} alt="" className="size-14 rounded-full object-cover" />
+                  <img src={imgSrc(local.logo)} alt="" className="size-14 rounded-full object-cover" />
                 ) : (
                   <span className="inline-flex size-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
                     ₿
@@ -1162,7 +1162,7 @@ function CommunityCard({
   useEffect(() => {
     setImgOk(true);
   }, [community.id, community.logo]);
-  const showImg = Boolean(logoUrl(community.logo || "")) && imgOk;
+  const showImg = Boolean(imgSrc(community.logo || "")) && imgOk;
   return (
     <div className="space-y-3">
       <p className="flex items-center gap-1 text-xs tracking-wide text-muted-foreground uppercase">
@@ -1172,7 +1172,7 @@ function CommunityCard({
       <div className="flex items-center gap-3">
         {showImg ? (
           <img
-            src={logoUrl(community.logo || "")}
+            src={imgSrc(community.logo || "")}
             alt=""
             referrerPolicy="no-referrer"
             className="size-16 rounded-full object-cover"

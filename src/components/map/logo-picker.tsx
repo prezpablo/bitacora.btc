@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useT } from "@/lib/i18n";
-import { logoUrl } from "@/domain";
+import { imgSrc, logoUrl } from "@/domain";
 
 export function LogoPicker({
   value,
@@ -11,7 +11,7 @@ export function LogoPicker({
 }) {
   const t = useT();
   const [err, setErr] = useState("");
-  const preview = logoUrl(value);
+  const preview = imgSrc(value);
 
   function apply(raw: string) {
     if (!raw.trim()) {

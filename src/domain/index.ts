@@ -82,6 +82,7 @@ export {
   mergeMapRows,
   parseMapCsv,
   logoUrl,
+  imgSrc,
   rowToCommunity,
   rowToLocal,
 } from "./map-csv";

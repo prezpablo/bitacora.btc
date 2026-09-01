@@ -8,7 +8,7 @@ import { localeTag } from "@/lib/display";
 import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
-import { logoUrl } from "@/domain/map-csv";
+import { imgSrc } from "@/domain/map-csv";
 import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { getCityFrame } from "@/infrastructure/server-fns";
@@ -233,7 +233,7 @@ function GlobeCanvas({
       el.type = "button";
       el.title = d.name || "";
       el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
-      const logo = d.face === "logo" ? logoUrl(d.logo || "") : "";
+      const logo = d.face === "logo" ? imgSrc(d.logo || "") : "";
       if (logo) {
         const img = document.createElement("img");
         img.src = logo;
