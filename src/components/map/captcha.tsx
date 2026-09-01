@@ -84,8 +84,19 @@ export function CaptchaBox({
 
   useEffect(() => {
     void load();
+    return () => mineAbort.current?.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!nonce || !id || !code) return;
+    if (hp.trim()) return;
+    if (typed.trim().toUpperCase() !== code) return;
+    if (Date.now() - born < 400) return;
+    onOk(true);
+    onTicket?.({ id, answer: typed.trim().toUpperCase(), nonce });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nonce]);
 
   function pass() {
     if (!id || !code) return;
@@ -185,7 +196,7 @@ export function CaptchaBox({
           autoComplete="off"
           spellCheck={false}
           maxLength={8}
-          disabled={loading || !code || !nonce}
+          disabled={loading || !code}
           aria-invalid={fail ? true : undefined}
         />
         <button
@@ -197,9 +208,10 @@ export function CaptchaBox({
           onClick={pass}
           disabled={loading || !code || !nonce}
         >
-          {ok ? t("captchaOk") : t("captchaCheck")}
+          {ok ? t("captchaOk") : nonce ? t("captchaCheck") : t("captchaPow")}
         </button>
       </div>
+      {!nonce && code && !fail ? <p className="text-xs text-muted-foreground">{t("captchaPow")}</p> : null}
       {fail ? <p className="text-xs text-short">{fail}</p> : null}
     </div>
   );

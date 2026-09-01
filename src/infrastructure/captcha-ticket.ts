@@ -37,13 +37,24 @@ export function powMatches(salt: string, nonce: string, bits: number) {
   return powZeroBits(digest) >= bits;
 }
 
+function adaptiveBits() {
+  try {
+    const row = openSqlite()
+      .prepare("SELECT COUNT(*) AS c FROM captcha WHERE created > ?")
+      .get(Date.now() - 10 * 60_000);
+    return Number(row?.c) > 25 ? 16 : POW_BITS;
+  } catch {
+    return POW_BITS;
+  }
+}
+
 export function issueCaptchaTicket(): { id: string; code: string; salt: string; bits: number } | null {
   if (tooMany(clientKey("captcha-issue"), 40, 60 * 60_000)) return null;
   if (tooMany("captcha-issue:global", 400, 60 * 60_000)) return null;
   const id = randomBytes(9).toString("hex");
   const code = roll();
   const salt = randomBytes(8).toString("hex");
-  const bits = POW_BITS;
+  const bits = adaptiveBits();
   const now = Date.now();
   try {
     ensurePowCols();
