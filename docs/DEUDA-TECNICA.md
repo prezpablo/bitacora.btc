@@ -168,6 +168,6 @@ SQLite en el VPS alcanza para miles de pines. Postgres no hace falta hasta haber
 
 ## 6. Relación con el roadmap
 
-Las verificaciones de Q1 en el Roadmap Web3 **no están cumplidas** mientras el VPS no sirva `main` (globo local, teselas OSM, pines CARGA, acuse de contacto).
+Las verificaciones de Q1 que ya corren en el VPS (globo local, teselas OSM, pines CARGA, acuse de contacto, captcha) **salieron del roadmap visual**. Q1 abierto: Umbrel en Colonia. Seguridad P0/P1 de VPS **cerrada** (SSH, fail2ban, HTTPS nip.io, backup SQLite, CSP). Pendiente de producto: P1.7 Better Auth/PGLite, P1.8 BTC Map en RAM, P1.5 backup semanal fuera del VPS.
 
 Este documento describe el estado al **30/08/2026**. Actualizarlo en cada deploy que cierre una fila P0/P1.

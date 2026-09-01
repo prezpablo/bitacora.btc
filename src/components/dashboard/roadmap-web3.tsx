@@ -13,6 +13,18 @@ export function RoadmapWeb3() {
         <h2 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{t("rmTitle")}</h2>
         <p className="max-w-3xl text-sm text-pretty text-muted-foreground sm:text-base">{copy.lead}</p>
       </header>
+      <aside className="rounded-lg border border-primary/40 bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
+        <p className="text-xs font-medium tracking-wide text-primary uppercase">{t("rmBarTitle")}</p>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-foreground">
+          {copy.bar.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+      </aside>
+      <p className="rounded-lg bg-card p-4 text-sm leading-relaxed text-pretty text-muted-foreground shadow-[var(--shadow-border)] sm:p-5">
+        <span className="font-medium text-foreground">{t("rmDoneTitle")}. </span>
+        {copy.done}
+      </p>
       <ol className="grid gap-3">
         {copy.phases.map((p) => (
           <li key={p.id} className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
