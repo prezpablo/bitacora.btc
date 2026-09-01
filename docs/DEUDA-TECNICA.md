@@ -64,7 +64,7 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 |---|---|---|
 | CSV como base de datos | `pins-io.ts`, `map-csv-io.ts` + `sqlite.ts` | **En curso (30 ago 2026):** SQLite WAL en `data/bitacora.sqlite` (node:sqlite). El CSV queda como copia de respaldo. Tope 80 pines pendientes. |
 | BTC Map entero en RAM | `btc-map.ts`, TTL 6 h | `GET /v2/elements` (decenas de miles de puntos). El primer hit es el más caro. |
-| Globo 3D en la primera visita | `world-globe.tsx` | Varios móviles a la vez pegan más que todo Mercado. |
+| Globo 3D en la primera visita | `world-globe.tsx` | Cliente ~1,9 MB gzip ~535 KB (lazy). **Nitro (31 ago):** stub 0,23 KB — salió el chunk de 4,3 MB del server. |
 | **Dominio canónico** | BNS + btc.us + Caddy | Ver §2.1. Hoy el candado vive en sslip.io; la barra no queda en `bitacora.btc.us`. |
 | Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | **Firebase (31 ago):** sin `VITE_FIREBASE_*` Vite aliasa a `firebase-stub.ts` — no entra al bundle. Auth Grok sigue apagada (`VITE_AUTH_ENABLED=false`). |
 

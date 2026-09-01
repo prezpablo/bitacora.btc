@@ -142,6 +142,28 @@ function authPopupPlugin(): Plugin {
   };
 }
 
+function globeStubOnServer(): Plugin {
+  const stub = join(process.cwd(), "src/infrastructure/globe-stub.ts");
+  const hit = (id: string) =>
+    id === "react-globe.gl" ||
+    id === "globe.gl" ||
+    id === "three-globe" ||
+    id === "three-render-objects" ||
+    id.startsWith("react-globe.gl/") ||
+    id.startsWith("globe.gl/") ||
+    id.startsWith("three-globe/");
+  return {
+    name: "bitacora-globe-ssr-stub",
+    enforce: "pre",
+    apply: "build",
+    resolveId(id) {
+      const env = this.environment?.name;
+      if (env !== "ssr" && env !== "nitro") return;
+      if (hit(id)) return stub;
+    },
+  };
+}
+
 function firebaseAliases() {
   const on = Boolean(process.env.VITE_FIREBASE_API_KEY && process.env.VITE_FIREBASE_PROJECT_ID);
   if (on) return {};
@@ -175,6 +197,7 @@ export default defineConfig(({ command, isPreview }) => ({
     external: ["react-globe.gl", "three", "three-globe", "node:sqlite"],
   },
   plugins: [
+    globeStubOnServer(),
     pgliteBootstrapPlugin(),
     // Before tanstackStart so /auth/popup never falls through to the SPA.
     authPopupPlugin(),
