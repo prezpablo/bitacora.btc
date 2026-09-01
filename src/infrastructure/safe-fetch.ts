@@ -35,7 +35,7 @@ export function ipPublic(ip: string) {
 }
 
 const SELF_HOST =
-  /(^|\.)nip\.io$|(^|\.)sslip\.io$|(^|\.)localhost$|metadata\.google\.internal$|^bitacorabtc\.org$|^www\.bitacorabtc\.org$/i;
+  /(^|\.)nip\.io$|(^|\.)sslip\.io$|(^|\.)localhost$|metadata\.google\.internal$|^bitacora\.org$|^www\.bitacora\.org$|^bitacorabtc\.org$|^www\.bitacorabtc\.org$/i;
 const SELF_IP = new Set(["45.158.116.49", "2a0a:3840:8078:116::2d9e:7431:1337"]);
 
 export function isPublicHttp(raw: string) {

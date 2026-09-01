@@ -32,9 +32,9 @@ http://45.158.116.49 {
 	redir https://45.158.116.49.nip.io{uri} permanent
 }
 
-# Cuando `dig +short bitacorabtc.org` = 45.158.116.49, descomentá y recargá Caddy.
+# Cuando `dig +short bitacora.org` = 45.158.116.49, descomentá y recargá Caddy.
 # Después: PUBLIC_ORIGIN = ORG_ORIGIN en src/lib/seo.ts y un ZIP.
-# bitacorabtc.org {
+# bitacora.org {
 # 	encode gzip zstd
 # 	header {
 # 		-Server
@@ -45,7 +45,7 @@ http://45.158.116.49 {
 # 	}
 # 	reverse_proxy 127.0.0.1:8080
 # }
-# www.bitacorabtc.org {
-# 	redir https://bitacorabtc.org{uri} permanent
+# www.bitacora.org {
+# 	redir https://bitacora.org{uri} permanent
 # }
 

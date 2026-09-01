@@ -11,10 +11,10 @@ export const GEO = {
   placename: "Colonia del Sacramento, Uruguay",
 };
 
-/** Espejo actual (IP). Canónica hasta que bitacorabtc.org resuelva. */
+/** Espejo actual (IP). Canónica hasta que bitacora.org apunte al VPS. */
 export const LIVE_ORIGIN = "https://45.158.116.49.nip.io";
-/** Dominio ICANN. El día que el A apunte al VPS, PUBLIC_ORIGIN = este. */
-export const ORG_ORIGIN = "https://bitacorabtc.org";
+/** Dominio ICANN. El día que el A = 45.158.116.49, PUBLIC_ORIGIN = este. */
+export const ORG_ORIGIN = "https://bitacora.org";
 export const PUBLIC_ORIGIN = LIVE_ORIGIN;
 
 export const SAME_AS = [
