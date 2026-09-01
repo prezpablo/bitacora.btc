@@ -11,11 +11,11 @@ export const GEO = {
   placename: "Colonia del Sacramento, Uruguay",
 };
 
+/** URL canónica pública. No usar btc.us (404) ni el host de Grok. */
+export const PUBLIC_ORIGIN = "https://45.158.116.49.nip.io";
+
 export function siteOrigin() {
-  const host = (typeof import.meta !== "undefined" && import.meta.env?.VITE_PUBLIC_HOSTNAME) || "";
-  if (host) return `https://${String(host).replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
-  if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
-  return "https://45.158.116.49.nip.io";
+  return PUBLIC_ORIGIN;
 }
 
 export const SEO: Record<

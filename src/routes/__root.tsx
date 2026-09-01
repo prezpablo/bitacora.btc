@@ -2,14 +2,14 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
-import { siteOrigin } from "@/lib/seo";
+import { PUBLIC_ORIGIN } from "@/lib/seo";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
 const TITLE = "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica";
 const DESC =
   "Mapa interactivo de comunidades, nodos y comercios que aceptan Bitcoin en Latinoamérica. Eventos, pulso on-chain y educación. Una iniciativa de Consciencia Bitcoin desde Colonia del Sacramento, Uruguay.";
-const ORIGIN = siteOrigin();
+const ORIGIN = PUBLIC_ORIGIN;
 const CANONICAL = `${ORIGIN}/`;
 
 export const Route = createRootRoute({
