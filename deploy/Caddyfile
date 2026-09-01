@@ -2,8 +2,9 @@
 	email latamcriptomom@gmail.com
 }
 
-# Candado Let's Encrypt. La IP cruda no tiene cert; HTTP cae acá.
-45.158.116.49.sslip.io {
+# sslip.io a veces da NXDOMAIN en DNS de celulares (Spamhaus / ISP).
+# nip.io es el mismo servicio; el candado se pide para los cuatro nombres.
+45.158.116.49.sslip.io, 45-158-116-49.sslip.io, 45.158.116.49.nip.io, 45-158-116-49.nip.io {
 	encode gzip zstd
 	header {
 		-Server
@@ -26,6 +27,7 @@
 	}
 }
 
-http:// {
-	redir https://45.158.116.49.sslip.io{uri} permanent
+# HTTP de la IP (sin nombre) → nip, no sslip.
+http://45.158.116.49 {
+	redir https://45.158.116.49.nip.io{uri} permanent
 }
