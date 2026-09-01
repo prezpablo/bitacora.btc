@@ -80,8 +80,8 @@ const es: RoadCopy = {
 
 const en: RoadCopy = {
   lead: "Through the April 2028 halving. What already runs on the VPS left this list. What remains is what you can still point at as missing: our own node, identity without custody, and bitcoin payments.",
-  note: "Standing rule: the map is read with no account and no wallet. We do not sell accounts. No ID or phone. Bitácora does not custody funds.",
-  done: "Contact with acknowledgement, captcha and CARGA code, pin caps, globe and map with no paid CDN, OSM tiles, BTC Map plus our register, price and network in separate sections, weekly POC fixed on zoom, Instagram-only does not verify, bitcoin contribute QR, HTTPS on nip.io, SSH with root closed.",
+  note: "Standing rule: the map is read with no account and no wallet. We do not sell accounts. No ID or phone. Bitácora does not hold funds.",
+  done: "Contact with acknowledgement, captcha and CARGA code, pin caps, globe and map with no paid CDN, OSM tiles, BTC Map plus our register, price and network in separate sections, weekly POC fixed on zoom, Instagram-only does not verify, bitcoin contribute QR, HTTPS on nip.io, SSH with root login disabled.",
   bar: [
     "Anonymous reading: no KYC, no ad cookies, no wallet to browse.",
     "No custody: we do not hold keys or third-party sats.",
@@ -113,7 +113,7 @@ const en: RoadCopy = {
       ],
       checks: [
         "On a phone on mobile data, the 2D map is usable without mounting the 3D globe.",
-        "Killing Binance does not blank the chart (it falls to OKX or another series).",
+        "If Binance is down, the chart is not blank (it falls to OKX or another series).",
       ],
     },
     {
@@ -147,16 +147,16 @@ const en: RoadCopy = {
 };
 
 const pt: RoadCopy = {
-  lead: "Até ao halving de abril de 2028. O que já corre no VPS saiu desta lista. Fica o que ainda se pode apontar como em falta: nó próprio, identidade sem custódia e cobrança em bitcoin.",
+  lead: "Até o halving de abril de 2028. O que já corre no VPS saiu desta lista. Fica o que ainda se pode apontar como em falta: nó próprio, identidade sem custódia e cobrança em bitcoin.",
   note: "Critério permanente: lê-se o mapa sem conta e sem carteira. Não se vendem contas. Não se pede documento nem telefone. A Bitácora não custodia fundos.",
-  done: "Contacto com aviso, captcha e código CARGA, tetos de pines, globo e mapa sem CDN pago, teselas OSM, BTC Map mais registo próprio, preço e rede em secções distintas, POC semanal fixo no zoom, Instagram sozinho não verifica, QR de contributo em bitcoin, HTTPS em nip.io, SSH sem root.",
+  done: "Contato com aviso, captcha e código CARGA, tetos de pins, globo e mapa sem CDN pago, tiles OSM, BTC Map mais registro próprio, preço e rede em seções distintas, POC semanal fixo no zoom, Instagram sozinho não verifica, QR de contribuição em bitcoin, HTTPS em nip.io, SSH sem root.",
   bar: [
-    "Leitura anónima: sem KYC, sem cookie de anúncios, sem carteira para consultar.",
+    "Leitura anônima: sem KYC, sem cookie de anúncios, sem carteira para consultar.",
     "Sem custódia: não se guardam chaves nem sats de terceiros.",
     "Verificação pública: código CARGA numa rede própria. Lightning (fatura ou LNURL) é opcional e posterior. Nunca um documento.",
     "Dinheiro nativo: contributos e provas só em bitcoin (on-chain / Lightning). Nada de cartões.",
     "Nó próprio: Umbrel em Colonia alimenta Rede quando está sincronizado. Se estiver desligado, fallback público e o sítio não cai.",
-    "Host que controlamos (VPS Njalla). IPFS / app no Umbrel fica para o troço até ao halving. O mapa nunca exige carteira.",
+    "Host que controlamos (VPS Njalla). IPFS / app no Umbrel fica para o trecho até o halving. O mapa nunca exige carteira.",
   ],
   phases: [
     {
@@ -168,7 +168,7 @@ const pt: RoadCopy = {
       ],
       checks: [
         "Com o Umbrel sincronizado, a altura em Rede coincide com o Mempool local (± 1 bloco).",
-        "Com o Umbrel desligado, mapa, história e contacto continuam; Rede usa o explorer público.",
+        "Com o Umbrel desligado, mapa, história e contato continuam; Rede usa o explorer público.",
       ],
     },
     {
@@ -180,7 +180,7 @@ const pt: RoadCopy = {
         "Se uma fonte de velas não responder, o gráfico continua com outra; o resto da bitácora não cai.",
       ],
       checks: [
-        "Num telemóvel com dados, o mapa 2D usa-se sem montar o globo 3D.",
+        "Num celular com dados, o mapa 2D usa-se sem montar o globo 3D.",
         "Cortar a Binance não deixa o gráfico em branco (cai para OKX ou outra série).",
       ],
     },
