@@ -211,6 +211,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
               {t("legalTitle")}
             </a>
           </div>
+          <img
+            src="/logos/veintiuno-libre.svg"
+            alt="Veintiuno Libre. Código abierto. Dinero abierto. Comunidad abierta."
+            width={280}
+            height={280}
+            className="mt-[0.382rem] h-auto w-[11.09rem] sm:w-[13.944rem]"
+          />
         </div>
       </footer>
       <StorageBanner />
