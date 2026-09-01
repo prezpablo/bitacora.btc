@@ -384,7 +384,8 @@ export async function fetchBtcCommunities(): Promise<Community[]> {
   if (commInflight) return commInflight;
   commInflight = (async () => {
     const snap = readCommSnap();
-    if (snap.length && fileAgeMs(COMM_SNAP) < TTL) {
+    const snapLogos = snap.filter((c) => c.logo).length;
+    if (snap.length && fileAgeMs(COMM_SNAP) < TTL && snapLogos > snap.length * 0.2) {
       commCache = { at: Date.now(), rows: snap };
       return snap;
     }

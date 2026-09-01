@@ -170,12 +170,12 @@ export function logoUrl(raw: string) {
   }
 }
 
-/** Same-origin proxy so BTC Map / Twitter / Wikimedia pass CSP and hotlink. */
+/** Direct HTTPS: CSP ya permite `img-src https:`. `/logo` solo si el VPS tiene la ruta. */
 export function imgSrc(raw: string) {
   const u = logoUrl(raw);
   if (!u) return "";
   if (u.startsWith("/") || u.startsWith("data:")) return u;
-  return `/logo?u=${encodeURIComponent(u)}`;
+  return u;
 }
 
 function cell(v: string | number) {

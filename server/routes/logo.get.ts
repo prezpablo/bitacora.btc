@@ -15,8 +15,13 @@ const ALLOW = [
   /(^|\.)nostr\.build$/i,
   /(^|\.)meetupstatic\.com$/i,
   /(^|\.)telegram\.org$/i,
+  /(^|\.)cdn-telegram\.org$/i,
   /(^|\.)einundzwanzig\.space$/i,
   /(^|\.)fbcdn\.net$/i,
+  /(^|\.)googleusercontent\.com$/i,
+  /(^|\.)primal\.net$/i,
+  /(^|\.)b-cdn\.net$/i,
+  /(^|\.)evbuc\.com$/i,
 ];
 
 function hostOk(h: string) {
