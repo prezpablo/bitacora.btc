@@ -25,6 +25,7 @@ export const Route = createRootRoute({
           "Bitcoin, mapa Bitcoin, comunidades Bitcoin, Latinoamérica, comercios Bitcoin, Lightning, autocustodia, Consciencia Bitcoin, Colonia del Sacramento, Uruguay",
       },
       { name: "author", content: "Consciencia Bitcoin" },
+      { name: "google-site-verification", content: "w4NkiP98t6wqRqMRrpXgVAY4Q3n82dCclvOV4AVw9uc" },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1" },
       { name: "theme-color", content: "#f7931a" },
       { name: "geo.region", content: "UY-CO" },

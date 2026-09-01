@@ -41,6 +41,7 @@ export function SeoHead() {
     upsertMeta("name", "keywords", seo.keywords);
     upsertMeta("name", "robots", "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
     upsertMeta("name", "author", "Consciencia Bitcoin");
+    upsertMeta("name", "google-site-verification", "w4NkiP98t6wqRqMRrpXgVAY4Q3n82dCclvOV4AVw9uc");
     upsertMeta("name", "geo.region", GEO.region);
     upsertMeta("name", "geo.placename", GEO.placename);
     upsertMeta("name", "geo.position", `${GEO.lat};${GEO.lon}`);
