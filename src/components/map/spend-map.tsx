@@ -25,7 +25,7 @@ import { MapSearch, type SearchHit } from "./map-search";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
 import type { PayKey } from "@/domain/pays";
 import { HoursEditor, HoursView } from "./hours-editor";
-import { CaptchaBox } from "./captcha";
+import { CaptchaBox, type CaptchaTicket } from "./captcha";
 import { PayPicker, PayRow } from "./pay-row";
 import { AddressSearch } from "./address-search";
 import { SocialPicker, SocialRow } from "./social-row";
@@ -205,6 +205,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [picked, setPicked] = useState<SocialKey[]>([]);
   const [handles, setHandles] = useState<Partial<Record<SocialKey, string>>>({});
   const [captchaOk, setCaptchaOk] = useState(false);
+  const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [sync, setSync] = useState<"off" | "wait" | "on" | "fail">(firebaseConfigured() ? "wait" : "off");
 
   useEffect(() => {
@@ -568,7 +569,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     saveCommunities(nextComms);
     const csv = dumpMapCsv(nextStore, nextComms, query.data ?? []);
     writeExtra(CSV_CACHE, csv);
-    return saveMapCsv({ data: { csv } }).then(
+    return saveMapCsv({ data: { csv, captchaId: ticket?.id, captcha: ticket?.answer } }).then(
       (r) => {
         if (r.ok) setSync("on");
         else setSync("fail");
@@ -903,7 +904,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   </button>
                 ))}
               </div>
-              <CaptchaBox key={selComm.id} ok={captchaOk} onOk={setCaptchaOk} />
+              <CaptchaBox key={selComm.id} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
               {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
               <Button type="button" className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk}>
                 {t("publishVote")}
@@ -989,7 +990,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   </button>
                 ))}
               </div>
-              <CaptchaBox key={sel.id} ok={captchaOk} onOk={setCaptchaOk} />
+              <CaptchaBox key={sel.id} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
               {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
               <Button type="button" className="w-full" onClick={() => vote(sel)} disabled={!captchaOk}>
                 {t("publishVote")}
@@ -1070,7 +1071,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                     onToggle={toggleSocial}
                     onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
                   />
-                  <CaptchaBox key="shop" ok={captchaOk} onOk={setCaptchaOk} />
+                  <CaptchaBox key="shop" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
                   {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
                   <Button
                     className="w-full"
@@ -1110,7 +1111,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                     onToggle={toggleSocial}
                     onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
                   />
-                  <CaptchaBox key="comm" ok={captchaOk} onOk={setCaptchaOk} />
+                  <CaptchaBox key="comm" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
                   {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
                   <Button className="w-full" onClick={saveCommunity} disabled={!captchaOk}>
                     {t("publishComm")}

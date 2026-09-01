@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pin } from "lucide-react";
-import { CaptchaBox } from "@/components/map/captcha";
+import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { SocialRow } from "@/components/map/social-row";
 import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
 import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
@@ -53,6 +53,7 @@ export function CommunityPinsBoard() {
   const [proof, setProof] = useState("");
   const [links, setLinks] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
+  const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [copied, setCopied] = useState(false);
@@ -125,11 +126,13 @@ export function CommunityPinsBoard() {
         .map((u) => u.trim())
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
-      const res = await submitCommunityPin({ data: { name: name.trim(), blurb, proof: proofUrl, links: extra } });
+      const res = await submitCommunityPin({
+        data: { name: name.trim(), blurb, proof: proofUrl, links: extra, captchaId: ticket?.id, captcha: ticket?.answer },
+      });
       const wait = Math.max(0, 700 - (Date.now() - started));
       if (wait) await new Promise((r) => window.setTimeout(r, wait));
       if (!res?.ok || !res.token || !res.id) {
-        setErr(res?.error === "rate" ? t("pinRate") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
+        setErr(res?.error === "rate" ? t("pinRate") : res?.error === "captcha" ? t("captchaNeed") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
       }
       keepPending({ id: res.id, token: res.token, name: name.trim(), proof: proofUrl });
@@ -303,7 +306,7 @@ export function CommunityPinsBoard() {
               />
             </label>
             <div className="sm:col-span-2">
-              <CaptchaBox key="pin" ok={captchaOk} onOk={setCaptchaOk} />
+              <CaptchaBox key="pin" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
             </div>
             {err ? <p className="text-sm text-primary sm:col-span-2">{err}</p> : null}
             <button

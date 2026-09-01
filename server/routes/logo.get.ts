@@ -28,6 +28,26 @@ function hostOk(h: string) {
   return ALLOW.some((re) => re.test(h));
 }
 
+const logoHits = new Map<string, number[]>();
+
+function logoLimited(ip: string) {
+  const now = Date.now();
+  const windowMs = 10 * 60_000;
+  const arr = (logoHits.get(ip) || []).filter((t) => now - t < windowMs);
+  const all = [...logoHits.values()].reduce((n, a) => n + a.filter((t) => now - t < windowMs).length, 0);
+  if (arr.length >= 80 || all >= 800) return true;
+  arr.push(now);
+  logoHits.set(ip, arr);
+  if (logoHits.size > 4000) {
+    for (const [k, v] of logoHits) {
+      const keep = v.filter((t) => now - t < windowMs);
+      if (!keep.length) logoHits.delete(k);
+      else logoHits.set(k, keep);
+    }
+  }
+  return false;
+}
+
 function unwrap(raw: string) {
   try {
     const u = new URL(raw);
@@ -44,6 +64,11 @@ function unwrap(raw: string) {
 }
 
 export default defineEventHandler(async (event) => {
+  const ip = String(event.node?.req?.headers?.["x-real-ip"] || event.node?.req?.socket?.remoteAddress || "anon");
+  if (logoLimited(ip)) {
+    setResponseStatus(event, 429);
+    return "";
+  }
   const href = unwrap(String(getQuery(event).u || ""));
   if (!href) {
     setResponseStatus(event, 404);
@@ -65,18 +90,32 @@ export default defineEventHandler(async (event) => {
     const res = await fetch(href, {
       headers: { Accept: "image/*,*/*;q=0.8", "User-Agent": "Mozilla/5.0 Bitacora.btc" },
       signal: AbortSignal.timeout(10_000),
-      redirect: "follow",
+      redirect: "manual",
     });
-    if (!res.ok) {
+    let final = res;
+    if (res.status >= 300 && res.status < 400) {
+      const loc = res.headers.get("location");
+      const next = loc ? unwrap(new URL(loc, href).toString()) : "";
+      if (!next) {
+        setResponseStatus(event, 404);
+        return "";
+      }
+      final = await fetch(next, {
+        headers: { Accept: "image/*,*/*;q=0.8", "User-Agent": "Mozilla/5.0 Bitacora.btc" },
+        signal: AbortSignal.timeout(10_000),
+        redirect: "manual",
+      });
+    }
+    if (!final.ok) {
       setResponseStatus(event, 404);
       return "";
     }
-    const type = (res.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
+    const type = (final.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
     if (!/^image\//i.test(type) && type !== "application/octet-stream") {
       setResponseStatus(event, 404);
       return "";
     }
-    const buf = Buffer.from(await res.arrayBuffer());
+    const buf = Buffer.from(await final.arrayBuffer());
     if (!buf.length || buf.length > MAX) {
       setResponseStatus(event, 404);
       return "";

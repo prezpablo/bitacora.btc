@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { ContributeQr } from "@/components/contribute-qr";
-import { CaptchaBox } from "@/components/map/captcha";
+import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { sendContact } from "@/infrastructure/server-fns";
 import { useT, type CopyKey } from "@/lib/i18n";
 
@@ -64,6 +64,7 @@ export function ContactBlock() {
   const [topic, setTopic] = useState<(typeof TOPICS)[number]["id"]>("general");
   const [hp, setHp] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
+  const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState(false);
   const [thanksName, setThanksName] = useState("");
@@ -83,10 +84,11 @@ export function ContactBlock() {
     try {
       const autoKey = (TOPICS.find((x) => x.id === topic) ?? TOPICS[0]).auto;
       const auto = t(autoKey, { name: name.trim() });
-      const res = await sendContact({ data: { name, email, message, topic, auto, hp } });
+      const res = await sendContact({ data: { name, email, message, topic, auto, hp, captchaId: ticket?.id, captcha: ticket?.answer } });
       if (!res.ok) {
         if (res.error === "email") setErr(t("contactEmailBad"));
         else if (res.error === "need") setErr(t("contactNeed"));
+        else if (res.error === "captcha") setErr(t("captchaNeed"));
         else if (res.error === "rate") setErr(t("contactRate"));
         else setErr(t("contactFail"));
         return;
@@ -212,7 +214,7 @@ export function ContactBlock() {
           <input tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
         </div>
         <div className="sm:col-span-2">
-          <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} />
+          <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
         </div>
         {err ? (
           <p role="alert" className="text-sm text-short sm:col-span-2">

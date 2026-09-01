@@ -55,9 +55,16 @@ CREATE TABLE IF NOT EXISTS rate_hits (
   k TEXT NOT NULL,
   t INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS captcha (
+  id TEXT PRIMARY KEY,
+  hash TEXT NOT NULL,
+  created INTEGER NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
 CREATE INDEX IF NOT EXISTS rate_hits_kt ON rate_hits (k, t);
+CREATE INDEX IF NOT EXISTS captcha_created ON captcha (created);
 `;
 
 function dbPath() {

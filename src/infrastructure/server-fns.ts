@@ -16,6 +16,7 @@ import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, tooMany } from "./rate-limit";
 import { isPublicHttp } from "./safe-fetch";
+import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinOnBoard, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
 import { parseMapCsv, socialsFromCsv, stringifyMapCsv } from "@/domain/map-csv";
 
@@ -94,12 +95,16 @@ export const getNetworkEvents = createServerFn({ method: "POST" }).handler(async
 export const getCityFrame = createServerFn({ method: "POST" })
   .validator((input: { lat: number; lon: number; zoom?: number }) => input)
   .handler(async ({ data }): Promise<CityFrame> => {
+    if (tooMany(clientKey("geo"), 40, 60 * 60_000) || tooMany("geo:global", 240, 60 * 60_000)) {
+      return { lat: data.lat, lon: data.lon, south: data.lat - 0.14, north: data.lat + 0.14, west: data.lon - 0.18, east: data.lon + 0.18, label: "" };
+    }
     return await nominatimCity(data.lat, data.lon, data.zoom ?? 10);
   });
 
 export const searchAddress = createServerFn({ method: "POST" })
   .validator((input: { q: string; lang?: string }) => input)
   .handler(async ({ data }): Promise<StreetHit[]> => {
+    if (tooMany(clientKey("addr"), 40, 60 * 60_000) || tooMany("addr:global", 240, 60 * 60_000)) return [];
     return await searchStreets(data.q, data.lang || "es");
   });
 
@@ -117,10 +122,15 @@ export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Pr
   return text;
 });
 
+export const issueCaptcha = createServerFn({ method: "POST" }).handler(async (): Promise<{ id: string; code: string } | null> => {
+  return issueCaptchaTicket();
+});
+
 export const saveMapCsv = createServerFn({ method: "POST" })
-  .validator((input: { csv: string }) => input)
+  .validator((input: { csv: string; captchaId?: string; captcha?: string; hp?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     if (tooMany(clientKey("csv"), 6, 60 * 60_000)) return { ok: false };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "")) return { ok: false };
     const ok = await savePublicMapCsv(data.csv);
     if (ok) clearGlobeStatsCache();
     return { ok };
@@ -148,8 +158,9 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
 });
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { name: string; blurb: string; proof: string; links?: string[] }) => input)
+  .validator((input: { name: string; blurb: string; proof: string; links?: string[]; captchaId?: string; captcha?: string; hp?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "")) return { ok: false, error: "captcha" };
     const name = data.name.trim().slice(0, 80);
     const blurb = data.blurb.trim().slice(0, 220);
     const proof = safeHttp(data.proof);
@@ -234,9 +245,10 @@ export const verifyMapListing = createServerFn({ method: "POST" })
 const contactHits = new Map<string, number>();
 
 export const sendContact = createServerFn({ method: "POST" })
-  .validator((input: { name: string; email: string; message: string; topic?: string; auto?: string; hp?: string }) => input)
+  .validator((input: { name: string; email: string; message: string; topic?: string; auto?: string; hp?: string; captchaId?: string; captcha?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; relay?: string; ack?: string; subject?: string; activate?: boolean }> => {
     if ((data.hp || "").trim()) return { ok: true };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "")) return { ok: false, error: "captcha" };
     const name = (data.name || "").trim().slice(0, 80);
     const email = (data.email || "").trim().toLowerCase().slice(0, 120);
     const message = (data.message || "").trim().slice(0, 2000);

@@ -1,15 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { issueCaptcha } from "@/infrastructure/server-fns";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-function rollCode() {
-  let s = "";
-  for (let i = 0; i < 5; i++) s += ABC[Math.floor(Math.random() * ABC.length)]!;
-  return s;
-}
+export type CaptchaTicket = { id: string; answer: string };
 
 function noise(seed: number) {
   const out: { x1: number; y1: number; x2: number; y2: number }[] = [];
@@ -32,33 +27,53 @@ function noise(seed: number) {
 export function CaptchaBox({
   ok,
   onOk,
+  onTicket,
 }: {
   ok: boolean;
   onOk: (v: boolean) => void;
+  onTicket?: (t: CaptchaTicket | null) => void;
 }) {
   const t = useT();
-  const [code, setCode] = useState(rollCode);
+  const [id, setId] = useState("");
+  const [code, setCode] = useState("");
   const [typed, setTyped] = useState("");
   const [hp, setHp] = useState("");
   const [born, setBorn] = useState(() => Date.now());
   const [fail, setFail] = useState("");
+  const [loading, setLoading] = useState(true);
   const lines = useMemo(() => noise(code.split("").reduce((a, c) => a + c.charCodeAt(0), 0)), [code]);
 
-  useEffect(() => {
+  async function load() {
+    setLoading(true);
     onOk(false);
-    // only when the challenge itself changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code]);
-
-  function refresh() {
-    setCode(rollCode());
+    onTicket?.(null);
     setTyped("");
     setFail("");
-    setBorn(Date.now());
-    onOk(false);
+    try {
+      const row = await issueCaptcha();
+      if (!row?.id || !row.code) {
+        setId("");
+        setCode("");
+        setFail(t("captchaFail"));
+        return;
+      }
+      setId(row.id);
+      setCode(row.code);
+      setBorn(Date.now());
+    } catch {
+      setFail(t("captchaFail"));
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function check() {
+  useEffect(() => {
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function pass() {
+    if (!id || !code) return;
     if (hp.trim()) {
       setFail(t("captchaFail"));
       return;
@@ -67,13 +82,14 @@ export function CaptchaBox({
       setFail(t("captchaSlow"));
       return;
     }
-    if (typed.trim().toUpperCase() === code) {
-      setFail("");
-      onOk(true);
-    } else {
+    if (typed.trim().toUpperCase() !== code) {
       setFail(t("captchaFail"));
-      refresh();
+      void load();
+      return;
     }
+    setFail("");
+    onOk(true);
+    onTicket?.({ id, answer: typed.trim().toUpperCase() });
   }
 
   return (
@@ -93,7 +109,7 @@ export function CaptchaBox({
               strokeWidth={1}
             />
           ))}
-          {code.split("").map((ch, i) => (
+          {(loading ? "·····" : code).split("").map((ch, i) => (
             <text
               key={i}
               x={22 + i * 32}
@@ -111,7 +127,7 @@ export function CaptchaBox({
         <button
           type="button"
           className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-card text-primary"
-          onClick={refresh}
+          onClick={() => void load()}
           aria-label={t("captchaRefresh")}
           title={t("captchaRefresh")}
         >
@@ -129,16 +145,20 @@ export function CaptchaBox({
           onChange={(e) => {
             const v = e.target.value;
             setTyped(v);
-            const match = v.trim().toUpperCase() === code;
-            if (match && !hp.trim() && Date.now() - born >= 400) {
+            const match = v.trim().toUpperCase() === code && !!code && !hp.trim() && Date.now() - born >= 400;
+            if (match) {
               setFail("");
               onOk(true);
-            } else if (ok) onOk(false);
+              onTicket?.({ id, answer: v.trim().toUpperCase() });
+            } else if (ok) {
+              onOk(false);
+              onTicket?.(null);
+            }
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              check();
+              pass();
             }
           }}
           placeholder={t("captchaHint")}
@@ -146,6 +166,7 @@ export function CaptchaBox({
           autoComplete="off"
           spellCheck={false}
           maxLength={8}
+          disabled={loading || !code}
           aria-invalid={fail ? true : undefined}
         />
         <button
@@ -154,7 +175,8 @@ export function CaptchaBox({
             "h-10 shrink-0 rounded-md px-3 text-xs font-semibold",
             ok ? "bg-long text-white" : "bg-primary text-white",
           )}
-          onClick={check}
+          onClick={pass}
+          disabled={loading || !code}
         >
           {ok ? t("captchaOk") : t("captchaCheck")}
         </button>

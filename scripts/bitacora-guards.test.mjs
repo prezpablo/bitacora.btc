@@ -52,3 +52,11 @@ test("map HTML escapes user names", () => {
   assert.match(src, /escapeHtml\(c\.name\)/);
   assert.match(src, /escapeHtml\(p\.name\)/);
 });
+
+test("writes require a captcha ticket", () => {
+  const src = read("src/infrastructure/server-fns.ts");
+  assert.match(src, /consumeCaptchaTicket/);
+  assert.match(src, /issueCaptcha/);
+  const csv = src.slice(src.indexOf("export const saveMapCsv"), src.indexOf("function safeHttp"));
+  assert.match(csv, /consumeCaptchaTicket/);
+});
