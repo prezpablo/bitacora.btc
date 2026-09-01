@@ -164,6 +164,22 @@ function globeStubOnServer(): Plugin {
   };
 }
 
+function authOffStubOnBuild(): Plugin {
+  const authStub = join(process.cwd(), "src/infrastructure/auth-lib-stub.ts");
+  const pgliteStub = join(process.cwd(), "src/infrastructure/pglite-stub.ts");
+  const off = process.env.VITE_AUTH_ENABLED === "false";
+  return {
+    name: "bitacora-auth-off-stub",
+    enforce: "pre",
+    apply: "build",
+    resolveId(id) {
+      if (!off) return;
+      if (id === "better-auth" || id.startsWith("better-auth/")) return authStub;
+      if (id === "@electric-sql/pglite" || id.startsWith("@electric-sql/pglite/")) return pgliteStub;
+    },
+  };
+}
+
 function firebaseAliases() {
   const on = Boolean(process.env.VITE_FIREBASE_API_KEY && process.env.VITE_FIREBASE_PROJECT_ID);
   if (on) return {};
@@ -198,6 +214,7 @@ export default defineConfig(({ command, isPreview }) => ({
   },
   plugins: [
     globeStubOnServer(),
+    authOffStubOnBuild(),
     pgliteBootstrapPlugin(),
     // Before tanstackStart so /auth/popup never falls through to the SPA.
     authPopupPlugin(),

@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Community, MerchantPlace } from "@/domain";
 import { logoUrl } from "@/domain/map-csv";
@@ -42,6 +42,14 @@ function asPlace(el: RawEl): MerchantPlace | null {
   };
 }
 
+function fileAgeMs(path: string) {
+  try {
+    return Date.now() - statSync(path).mtimeMs;
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}
+
 function readSnap(): MerchantPlace[] {
   try {
     const rows = JSON.parse(readFileSync(SHOP_SNAP, "utf8")) as MerchantPlace[];
@@ -66,6 +74,10 @@ async function loadAll(): Promise<MerchantPlace[]> {
   if (inflight) return inflight;
   inflight = (async () => {
     const snap = readSnap();
+    if (snap.length >= 50 && fileAgeMs(SHOP_SNAP) < TTL) {
+      cache = { at: Date.now(), places: snap };
+      return snap;
+    }
     try {
       const res = await fetch("https://api.btcmap.org/v2/elements", {
         headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
@@ -372,6 +384,10 @@ export async function fetchBtcCommunities(): Promise<Community[]> {
   if (commInflight) return commInflight;
   commInflight = (async () => {
     const snap = readCommSnap();
+    if (snap.length && fileAgeMs(COMM_SNAP) < TTL) {
+      commCache = { at: Date.now(), rows: snap };
+      return snap;
+    }
     try {
       const res = await fetch("https://api.btcmap.org/v2/areas", {
         headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },

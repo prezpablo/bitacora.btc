@@ -54,7 +54,7 @@ P1 de seguridad: fail2ban, unattended-upgrades, backup SQLite **en VPS**, CSP, h
 | Tope global de pines | **Cerrado en `main`:** 30 altas/hora en todo el server + 8/IP + 80 pendientes |
 | Copia SQLite **fuera** del VPS | **Primera copia (31 ago 2026 20:44):** `Documentos\bitacora-backups\bitacora-20260831-2140.sqlite.gz` (~1,5 KB). Repetir **semanal** con el mismo `scp`. El tamaño chico = el SQLite del VPS aún tiene poco; el backup está bien. |
 | PAT GitHub pegado en el chat | **Cerrado (31 ago 2026):** revocado. Deploy: ZIP, nunca un token en el chat. |
-| Firebase / better-auth en el bundle | **Firebase cerrado en `main`:** stub si no hay claves. Better-auth/PGLite siguen en el server del scaffold. |
+| Firebase / better-auth en el bundle | **Cerrado (1 sep):** stub de Firebase sin claves; stub de Better Auth/PGLite si `VITE_AUTH_ENABLED=false`. |
 
 El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 
@@ -63,10 +63,10 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 | Deuda | Dónde | Efecto |
 |---|---|---|
 | CSV como base de datos | `pins-io.ts`, `map-csv-io.ts` + `sqlite.ts` | **En curso (30 ago 2026):** SQLite WAL en `data/bitacora.sqlite` (node:sqlite). El CSV queda como copia de respaldo. Tope 80 pines pendientes. |
-| BTC Map entero en RAM | `btc-map.ts`, TTL 6 h | `GET /v2/elements` (decenas de miles de puntos). El primer hit es el más caro. |
+| BTC Map entero en RAM | `btc-map.ts`, TTL 6 h | **Mitigado (1 sep):** si el snap en `data/btcmap-*.json` tiene menos de 6 h, no se vuelve a bajar el dump. El cold start (snap viejo o ausente) sigue siendo el JSON entero. |
 | Globo 3D en la primera visita | `world-globe.tsx` | Cliente ~1,9 MB gzip ~535 KB (lazy). **Nitro (31 ago):** stub 0,23 KB — salió el chunk de 4,3 MB del server. |
 | **Dominio canónico** | BNS + btc.us + Caddy | Ver §2.1. Hoy el candado vive en sslip.io; la barra no queda en `bitacora.btc.us`. |
-| Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | **Firebase (31 ago):** sin `VITE_FIREBASE_*` Vite aliasa a `firebase-stub.ts` — no entra al bundle. Auth Grok sigue apagada (`VITE_AUTH_ENABLED=false`). |
+| Dependencias apagadas en el bundle | `firebase`, `better-auth`, PGLite | **Firebase + Better Auth/PGLite (1 sep 2026):** `VITE_AUTH_ENABLED=false` → stub en el build. Auth Grok sigue apagada. |
 
 ### 2.1 Dominio — aplazado a propósito (31 ago 2026)
 
@@ -91,7 +91,7 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 | Deuda | Dónde | Efecto |
 |---|---|---|
 | Desk con `staleTime: 0` en precio | `desk.tsx` | **Cerrado en `main`:** market 8s, extras 20s, tick 1.5s, onchain 5s; sin refetch al foco. |
-| Rate-limit en un `Map` | `rate-limit.ts` | Reinicio = cero. IPs distintas = el Map crece sin techo. |
+| Rate-limit en un `Map` | `rate-limit.ts` | **Mitigado (1 sep):** cada hit también va a SQLite `rate_hits`. Reinicio ya no borra el tope de la hora. |
 | Scraper de pines en el request | `pin-verify.ts` + Jina | Verificar varios pines juntos bloquea el event loop. |
 | Pins: 8/hora/IP + **30/h global** | `submitCommunityPin` | **Cerrado en `main` (31 ago).** Tablero sigue en 48. |
 

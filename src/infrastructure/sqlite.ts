@@ -51,8 +51,13 @@ CREATE TABLE IF NOT EXISTS meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS rate_hits (
+  k TEXT NOT NULL,
+  t INTEGER NOT NULL
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
+CREATE INDEX IF NOT EXISTS rate_hits_kt ON rate_hits (k, t);
 `;
 
 function dbPath() {
