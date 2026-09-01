@@ -21,21 +21,16 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <div className="min-w-0">
       <h1
-        aria-label="Bitácora.btc"
         className={cn(
           "font-display flex items-baseline leading-none font-medium tracking-tight text-foreground",
           compact ? "text-2xl sm:text-3xl" : "text-[2rem] sm:text-5xl",
         )}
       >
-        <span aria-hidden="true" className="inline-flex items-baseline">
-          <span className="relative mr-[0.04em] inline-block h-[0.92em] w-[0.92em] shrink-0">
-            <span className="invisible select-none">B</span>
-            <BitcoinMark className="absolute inset-0 h-full w-full" />
-          </span>
-          <span>
-            itácora<span className="text-primary">.btc</span>
-          </span>
+        <span className="relative mr-[0.02em] inline-block h-[0.92em] w-[0.78em] shrink-0">
+          <span className="text-transparent">B</span>
+          <BitcoinMark className="pointer-events-none absolute inset-0 h-full w-full" />
         </span>
+        itácora<span className="text-primary">.btc</span>
       </h1>
       {compact ? null : (
         <p className="mt-2 text-base text-pretty text-muted-foreground sm:text-xl">
