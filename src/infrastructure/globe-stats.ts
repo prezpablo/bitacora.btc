@@ -2,7 +2,7 @@ import type { GlobeCountryStat, GlobeDot, GlobeStats } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
-import { parseMapCsv } from "@/domain/map-csv";
+import { logoUrl, parseMapCsv } from "@/domain/map-csv";
 import { dedupeCommunities } from "@/domain/community-dedupe";
 import { loadMapCsvText } from "./map-csv-io";
 import { readFirstFile } from "./data-files";
@@ -313,7 +313,7 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       n: 1,
       name: c.name,
       kind: "community",
-      logo: c.logo || undefined,
+      logo: logoUrl(c.logo || "") || undefined,
     });
   }
   const overlay: GlobeDot[] = [];
@@ -332,9 +332,16 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
         n: 2,
         name: r.name,
         kind: "community",
-        logo: r.logo || undefined,
+        logo: logoUrl(r.logo || "") || undefined,
       };
-      if (addListing(pin) || listings.has(r.id)) overlay.push(listings.get(r.id) || pin);
+      const prev = listings.get(r.id);
+      if (prev) {
+        if (pin.logo && !prev.logo) prev.logo = pin.logo;
+        overlay.push(prev);
+      } else {
+        addListing(pin);
+        overlay.push(pin);
+      }
     }
   } catch {
     /* csv optional */

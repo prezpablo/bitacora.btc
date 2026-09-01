@@ -202,7 +202,10 @@ function GlobeCanvas({
       if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
     }
     for (const p of overlayPins) {
-      if (p.kind === "community" && p.id) byId.set(p.id, { ...p, id: p.id, name: p.name || p.id });
+      if (p.kind === "community" && p.id) {
+        const prev = byId.get(p.id);
+        byId.set(p.id, { ...p, id: p.id, name: p.name || prev?.name || p.id, logo: p.logo || prev?.logo });
+      }
     }
     return layoutCityLogos(dedupeCommunities([...byId.values()]), 0.035);
   }, [mapPins, overlayPins]);
@@ -235,6 +238,8 @@ function GlobeCanvas({
         const img = document.createElement("img");
         img.src = logo;
         img.alt = d.name || "";
+        img.referrerPolicy = "no-referrer";
+        img.decoding = "async";
         img.width = sizePx;
         img.height = sizePx;
         img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;background:#f7931a";

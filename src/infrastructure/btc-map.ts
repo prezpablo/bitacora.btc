@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Community, MerchantPlace } from "@/domain";
+import { logoUrl } from "@/domain/map-csv";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 
 type RawEl = {
@@ -307,6 +308,16 @@ function areaLinks(tags: Record<string, unknown>): SocialLink[] {
   return rows;
 }
 
+function pickAreaIcon(tags: Record<string, unknown>) {
+  for (const k of ["icon:square", "icon", "icon:background", "image", "logo"]) {
+    const v = tags[k];
+    if (typeof v !== "string" || !v.trim()) continue;
+    const u = logoUrl(v);
+    if (u) return u;
+  }
+  return "";
+}
+
 function asCommunity(el: RawArea): Community | null {
   const deleted = String(el.deleted_at || "");
   if (/^\d{4}-\d{2}/.test(deleted)) return null;
@@ -319,7 +330,7 @@ function asCommunity(el: RawArea): Community | null {
   const center = areaCenter(tags);
   if (!center || !Number.isFinite(center.lat) || !Number.isFinite(center.lon)) return null;
   const name = String(tags.name || tags["name:es"] || tags["name:en"] || el.id);
-  const icon = typeof tags["icon:square"] === "string" ? tags["icon:square"] : typeof tags.icon === "string" ? tags.icon : "";
+  const icon = pickAreaIcon(tags);
   const continent = typeof tags.continent === "string" ? tags.continent : "";
   return {
     id: `btcmap:${el.id}`,

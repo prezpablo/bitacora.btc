@@ -150,11 +150,14 @@ export function paysFromCsv(raw: string): PayKey[] {
 }
 
 export function logoUrl(raw: string) {
-  const t = raw.trim();
-  if (!t || t.startsWith("data:")) return "";
+  const t = String(raw || "").trim();
+  if (!t) return "";
+  if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml)/i.test(t) && t.length < 400_000) return t;
+  if (t.startsWith("data:") || /^javascript:/i.test(t)) return "";
   if (t.startsWith("/") && !t.startsWith("//") && /\.(png|jpe?g|webp|gif|svg)(\?|$)/i.test(t)) return t;
   try {
-    const u = new URL(t.startsWith("//") ? `https:${t}` : /^https?:\/\//i.test(t) ? t : `https://${t}`);
+    const href = t.startsWith("//") ? `https:${t}` : /^https?:\/\//i.test(t) ? t : `https://${t}`;
+    const u = new URL(href);
     if (u.protocol === "http:") u.protocol = "https:";
     if (u.protocol !== "https:") return "";
     return u.toString();

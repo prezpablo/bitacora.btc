@@ -446,7 +446,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         const trust = communityTrust(c);
         const logo = logoUrl(c.logo || "");
         const face = logo
-          ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" />`
+          ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" referrerpolicy="no-referrer" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" /><span style="display:none;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`
           : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
         const check = trust.verified
           ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
@@ -465,7 +465,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           setDrop(null);
         });
         const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
-          ${logo ? `<img src="${logo}" alt="" width="32" height="32" style="border-radius:50%;object-fit:cover" />` : ""}
+          ${logo ? `<img src="${logo.replace(/"/g, "")}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
           <div><strong>${c.name.replace(/</g, "")}</strong><br/><span style="opacity:.7">@${c.slug.replace(/</g, "")}</span></div>
         </div>`;
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
@@ -1162,7 +1162,7 @@ function CommunityCard({
   useEffect(() => {
     setImgOk(true);
   }, [community.id, community.logo]);
-  const showImg = Boolean(community.logo) && imgOk;
+  const showImg = Boolean(logoUrl(community.logo || "")) && imgOk;
   return (
     <div className="space-y-3">
       <p className="flex items-center gap-1 text-xs tracking-wide text-muted-foreground uppercase">
@@ -1172,8 +1172,9 @@ function CommunityCard({
       <div className="flex items-center gap-3">
         {showImg ? (
           <img
-            src={community.logo}
+            src={logoUrl(community.logo || "")}
             alt=""
+            referrerPolicy="no-referrer"
             className="size-16 rounded-full object-cover"
             onError={() => setImgOk(false)}
           />

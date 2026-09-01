@@ -89,7 +89,11 @@ export function dedupeCommunities<T extends NamedPin>(rows: T[]): T[] {
       kept.push(row);
       continue;
     }
-    if (rank(row) > rank(kept[i])) kept[i] = row;
+    if (rank(row) > rank(kept[i])) {
+      kept[i] = { ...kept[i], ...row, logo: row.logo || kept[i].logo };
+    } else {
+      kept[i] = { ...row, ...kept[i], logo: kept[i].logo || row.logo };
+    }
   }
   return kept;
 }
