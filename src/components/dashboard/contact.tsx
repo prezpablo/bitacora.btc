@@ -84,7 +84,7 @@ export function ContactBlock() {
     try {
       const autoKey = (TOPICS.find((x) => x.id === topic) ?? TOPICS[0]).auto;
       const auto = t(autoKey, { name: name.trim() });
-      const res = await sendContact({ data: { name, email, message, topic, auto, hp, captchaId: ticket?.id, captcha: ticket?.answer } });
+      const res = await sendContact({ data: { name, email, message, topic, auto, hp, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce } });
       if (!res.ok) {
         if (res.error === "email") setErr(t("contactEmailBad"));
         else if (res.error === "need") setErr(t("contactNeed"));

@@ -569,7 +569,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     saveCommunities(nextComms);
     const csv = dumpMapCsv(nextStore, nextComms, query.data ?? []);
     writeExtra(CSV_CACHE, csv);
-    return saveMapCsv({ data: { csv, captchaId: ticket?.id, captcha: ticket?.answer } }).then(
+    return saveMapCsv({ data: { csv, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce } }).then(
       (r) => {
         if (r.ok) setSync("on");
         else setSync("fail");

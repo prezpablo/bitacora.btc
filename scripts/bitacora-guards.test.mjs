@@ -59,4 +59,12 @@ test("writes require a captcha ticket", () => {
   assert.match(src, /issueCaptcha/);
   const csv = src.slice(src.indexOf("export const saveMapCsv"), src.indexOf("function safeHttp"));
   assert.match(csv, /consumeCaptchaTicket/);
+  assert.match(csv, /captchaNonce/);
 });
+
+test("captcha ticket checks proof-of-work", () => {
+  const src = read("src/infrastructure/captcha-ticket.ts");
+  assert.match(src, /powMatches/);
+  assert.match(src, /salt/);
+});
+

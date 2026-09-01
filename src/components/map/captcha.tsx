@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { issueCaptcha } from "@/infrastructure/server-fns";
+import { minePow } from "@/lib/pow";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-export type CaptchaTicket = { id: string; answer: string };
+export type CaptchaTicket = { id: string; answer: string; nonce: string };
 
 function noise(seed: number) {
   const out: { x1: number; y1: number; x2: number; y2: number }[] = [];
@@ -41,28 +42,42 @@ export function CaptchaBox({
   const [born, setBorn] = useState(() => Date.now());
   const [fail, setFail] = useState("");
   const [loading, setLoading] = useState(true);
+  const [nonce, setNonce] = useState("");
+  const mineAbort = useRef<AbortController | null>(null);
   const lines = useMemo(() => noise(code.split("").reduce((a, c) => a + c.charCodeAt(0), 0)), [code]);
 
   async function load() {
+    mineAbort.current?.abort();
     setLoading(true);
     onOk(false);
     onTicket?.(null);
     setTyped("");
     setFail("");
+    setNonce("");
     try {
       const row = await issueCaptcha();
-      if (!row?.id || !row.code) {
+      if (!row?.id || !row.code || !row.salt) {
         setId("");
         setCode("");
         setFail(t("captchaFail"));
+        setLoading(false);
         return;
       }
       setId(row.id);
       setCode(row.code);
       setBorn(Date.now());
+      setLoading(false);
+      const ac = new AbortController();
+      mineAbort.current = ac;
+      const found = await minePow(row.salt, row.bits || 13, ac.signal);
+      if (ac.signal.aborted) return;
+      if (!found) {
+        setFail(t("captchaFail"));
+        return;
+      }
+      setNonce(found);
     } catch {
       setFail(t("captchaFail"));
-    } finally {
       setLoading(false);
     }
   }
@@ -87,9 +102,13 @@ export function CaptchaBox({
       void load();
       return;
     }
+    if (!nonce) {
+      setFail(t("captchaSlow"));
+      return;
+    }
     setFail("");
     onOk(true);
-    onTicket?.({ id, answer: typed.trim().toUpperCase() });
+    onTicket?.({ id, answer: typed.trim().toUpperCase(), nonce });
   }
 
   return (
@@ -145,11 +164,11 @@ export function CaptchaBox({
           onChange={(e) => {
             const v = e.target.value;
             setTyped(v);
-            const match = v.trim().toUpperCase() === code && !!code && !hp.trim() && Date.now() - born >= 400;
+            const match = v.trim().toUpperCase() === code && !!code && !!nonce && !hp.trim() && Date.now() - born >= 400;
             if (match) {
               setFail("");
               onOk(true);
-              onTicket?.({ id, answer: v.trim().toUpperCase() });
+              onTicket?.({ id, answer: v.trim().toUpperCase(), nonce });
             } else if (ok) {
               onOk(false);
               onTicket?.(null);
@@ -166,7 +185,7 @@ export function CaptchaBox({
           autoComplete="off"
           spellCheck={false}
           maxLength={8}
-          disabled={loading || !code}
+          disabled={loading || !code || !nonce}
           aria-invalid={fail ? true : undefined}
         />
         <button
@@ -176,7 +195,7 @@ export function CaptchaBox({
             ok ? "bg-long text-white" : "bg-primary text-white",
           )}
           onClick={pass}
-          disabled={loading || !code}
+          disabled={loading || !code || !nonce}
         >
           {ok ? t("captchaOk") : t("captchaCheck")}
         </button>

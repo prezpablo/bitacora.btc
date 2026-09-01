@@ -127,7 +127,7 @@ export function CommunityPinsBoard() {
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
       const res = await submitCommunityPin({
-        data: { name: name.trim(), blurb, proof: proofUrl, links: extra, captchaId: ticket?.id, captcha: ticket?.answer },
+        data: { name: name.trim(), blurb, proof: proofUrl, links: extra, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce },
       });
       const wait = Math.max(0, 700 - (Date.now() - started));
       if (wait) await new Promise((r) => window.setTimeout(r, wait));

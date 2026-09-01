@@ -122,15 +122,17 @@ export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Pr
   return text;
 });
 
-export const issueCaptcha = createServerFn({ method: "POST" }).handler(async (): Promise<{ id: string; code: string } | null> => {
-  return issueCaptchaTicket();
-});
+export const issueCaptcha = createServerFn({ method: "POST" }).handler(
+  async (): Promise<{ id: string; code: string; salt: string; bits: number } | null> => {
+    return issueCaptchaTicket();
+  },
+);
 
 export const saveMapCsv = createServerFn({ method: "POST" })
-  .validator((input: { csv: string; captchaId?: string; captcha?: string; hp?: string }) => input)
+  .validator((input: { csv: string; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     if (tooMany(clientKey("csv"), 6, 60 * 60_000)) return { ok: false };
-    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "")) return { ok: false };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false };
     const ok = await savePublicMapCsv(data.csv);
     if (ok) clearGlobeStatsCache();
     return { ok };
@@ -158,9 +160,9 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
 });
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { name: string; blurb: string; proof: string; links?: string[]; captchaId?: string; captcha?: string; hp?: string }) => input)
+  .validator((input: { name: string; blurb: string; proof: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
-    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "")) return { ok: false, error: "captcha" };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = data.name.trim().slice(0, 80);
     const blurb = data.blurb.trim().slice(0, 220);
     const proof = safeHttp(data.proof);
@@ -245,10 +247,10 @@ export const verifyMapListing = createServerFn({ method: "POST" })
 const contactHits = new Map<string, number>();
 
 export const sendContact = createServerFn({ method: "POST" })
-  .validator((input: { name: string; email: string; message: string; topic?: string; auto?: string; hp?: string; captchaId?: string; captcha?: string }) => input)
+  .validator((input: { name: string; email: string; message: string; topic?: string; auto?: string; hp?: string; captchaId?: string; captcha?: string; captchaNonce?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; relay?: string; ack?: string; subject?: string; activate?: boolean }> => {
     if ((data.hp || "").trim()) return { ok: true };
-    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "")) return { ok: false, error: "captcha" };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = (data.name || "").trim().slice(0, 80);
     const email = (data.email || "").trim().toLowerCase().slice(0, 120);
     const message = (data.message || "").trim().slice(0, 2000);
