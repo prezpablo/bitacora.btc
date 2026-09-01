@@ -2,9 +2,7 @@
 	email latamcriptomom@gmail.com
 }
 
-# sslip.io a veces da NXDOMAIN en DNS de celulares (Spamhaus / ISP).
-# nip.io es el mismo servicio; el candado se pide para los cuatro nombres.
-45.158.116.49.sslip.io, 45-158-116-49.sslip.io, 45.158.116.49.nip.io, 45-158-116-49.nip.io {
+bitacorabtc.org {
 	encode gzip zstd
 	header {
 		-Server
@@ -27,25 +25,14 @@
 	}
 }
 
-# HTTP de la IP (sin nombre) → nip, no sslip.
-http://45.158.116.49 {
-	redir https://45.158.116.49.nip.io{uri} permanent
+www.bitacorabtc.org {
+	redir https://bitacorabtc.org{uri} permanent
 }
 
-# Cuando `dig +short bitacora.org` = 45.158.116.49, descomentá y recargá Caddy.
-# Después: PUBLIC_ORIGIN = ORG_ORIGIN en src/lib/seo.ts y un ZIP.
-# bitacora.org {
-# 	encode gzip zstd
-# 	header {
-# 		-Server
-# 		X-Content-Type-Options nosniff
-# 		Referrer-Policy no-referrer
-# 		X-Frame-Options SAMEORIGIN
-# 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
-# 	}
-# 	reverse_proxy 127.0.0.1:8080
-# }
-# www.bitacora.org {
-# 	redir https://bitacora.org{uri} permanent
-# }
+45.158.116.49.sslip.io, 45-158-116-49.sslip.io, 45.158.116.49.nip.io, 45-158-116-49.nip.io {
+	redir https://bitacorabtc.org{uri} permanent
+}
 
+http://45.158.116.49 {
+	redir https://bitacorabtc.org{uri} permanent
+}

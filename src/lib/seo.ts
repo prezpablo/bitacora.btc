@@ -11,11 +11,10 @@ export const GEO = {
   placename: "Colonia del Sacramento, Uruguay",
 };
 
-/** Espejo actual (IP). Canónica hasta que bitacora.org apunte al VPS. */
+/** Espejo IP (respaldo). Canónica = bitacorabtc.org (Let’s Encrypt activo). */
 export const LIVE_ORIGIN = "https://45.158.116.49.nip.io";
-/** Dominio ICANN. El día que el A = 45.158.116.49, PUBLIC_ORIGIN = este. */
-export const ORG_ORIGIN = "https://bitacora.org";
-export const PUBLIC_ORIGIN = LIVE_ORIGIN;
+export const ORG_ORIGIN = "https://bitacorabtc.org";
+export const PUBLIC_ORIGIN = ORG_ORIGIN;
 
 export const SAME_AS = [
   "https://github.com/prezpablo/bitacora.btc",
