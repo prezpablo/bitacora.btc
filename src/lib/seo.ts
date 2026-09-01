@@ -125,8 +125,17 @@ export function jsonLd(lang: AppLang, origin: string) {
         name: SITE_NAME,
         alternateName: ["bitacora.btc", "Bitácora BTC", "Consciencia Bitcoin"],
         url: origin,
-        logo: `${origin}/logos/conciencia-bitcoin.png`,
-        image: `${origin}/og.jpg`,
+        logo: {
+          "@type": "ImageObject",
+          url: `${origin}/logos/conciencia-bitcoin.png`,
+          contentUrl: `${origin}/logos/conciencia-bitcoin.png`,
+        },
+        image: {
+          "@type": "ImageObject",
+          url: `${origin}/og.jpg`,
+          width: 1200,
+          height: 630,
+        },
         foundingDate: "2026",
         foundingLocation: {
           "@type": "Place",
@@ -159,17 +168,12 @@ export function jsonLd(lang: AppLang, origin: string) {
         publisher: { "@id": `${origin}/#org` },
         potentialAction: {
           "@type": "SearchAction",
-          target: `${origin}/?q={search_term_string}#mapa`,
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${origin}/?q={search_term_string}`,
+          },
           "query-input": "required name=search_term_string",
         },
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: SITE_NAME, item: origin },
-          { "@type": "ListItem", position: 2, name: "Mapa", item: `${origin}/#mapa` },
-          { "@type": "ListItem", position: 3, name: "FAQ", item: `${origin}/#faq-seo` },
-        ],
       },
       {
         "@type": "WebPage",
@@ -180,7 +184,12 @@ export function jsonLd(lang: AppLang, origin: string) {
         inLanguage,
         isPartOf: { "@id": `${origin}/#site` },
         about: { "@id": `${origin}/#org` },
-        primaryImageOfPage: `${origin}/og.jpg`,
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: `${origin}/og.jpg`,
+          width: 1200,
+          height: 630,
+        },
         speakable: {
           "@type": "SpeakableSpecification",
           cssSelector: ["#conciencia h2", "#conciencia h3", "#faq-seo"],
@@ -189,6 +198,7 @@ export function jsonLd(lang: AppLang, origin: string) {
       {
         "@type": "FAQPage",
         "@id": `${origin}/#faq`,
+        url: origin,
         inLanguage,
         mainEntity: faqs.map((f) => ({
           "@type": "Question",
