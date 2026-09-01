@@ -182,6 +182,8 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
 export const verifyCommunityPin = createServerFn({ method: "POST" })
   .validator((input: { id: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    if (tooMany(clientKey("pin-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
+    if (tooMany("pin-verify:global", 80, 60 * 60_000)) return { ok: false, error: "rate" };
     const rows = await loadPins();
     const pin = rows.find((p) => p.id === data.id);
     if (!pin) return { ok: false, error: "missing" };
@@ -213,6 +215,8 @@ export const cancelCommunityPin = createServerFn({ method: "POST" })
 export const verifyMapListing = createServerFn({ method: "POST" })
   .validator((input: { id: string; token?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; error?: string }> => {
+    if (tooMany(clientKey("map-verify"), 12, 60 * 60_000)) return { ok: false, token: data.token, error: "rate" };
+    if (tooMany("map-verify:global", 80, 60 * 60_000)) return { ok: false, token: data.token, error: "rate" };
     const text = await loadMapCsvText();
     const rows = parseMapCsv(text);
     const row = rows.find((r) => r.id === data.id);

@@ -34,6 +34,10 @@ export function ipPublic(ip: string) {
   return false;
 }
 
+const SELF_HOST =
+  /(^|\.)nip\.io$|(^|\.)sslip\.io$|(^|\.)localhost$|metadata\.google\.internal$|^bitacorabtc\.org$|^www\.bitacorabtc\.org$/i;
+const SELF_IP = new Set(["45.158.116.49", "2a0a:3840:8078:116::2d9e:7431:1337"]);
+
 export function isPublicHttp(raw: string) {
   try {
     const u = new URL(raw);
@@ -44,6 +48,8 @@ export function isPublicHttp(raw: string) {
       return false;
     }
     if (host === "::1" || host.endsWith(".onion")) return false;
+    if (SELF_HOST.test(host)) return false;
+    if (SELF_IP.has(host)) return false;
     if (isIP(host) && !ipPublic(host)) return false;
     if (/^(127\.|10\.|0\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(host)) return false;
     return true;
@@ -57,7 +63,7 @@ async function dnsPublic(host: string) {
   try {
     const rows = await lookup(host, { all: true, verbatim: true });
     if (!rows.length) return false;
-    return rows.every((r) => ipPublic(r.address));
+    return rows.every((r) => ipPublic(r.address) && !SELF_IP.has(r.address));
   } catch {
     return false;
   }

@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
     "test": "node --test --experimental-strip-types 'scripts/**/*.test.mjs' 'src/**/*.test.ts'",
-    "test:bitacora": "node --test --experimental-strip-types scripts/bitacora-guards.test.mjs src/domain/community-pins.test.ts",
+    "test:bitacora": "node --test --experimental-strip-types scripts/bitacora-guards.test.mjs src/domain/community-pins.test.ts src/infrastructure/safe-fetch.test.ts src/lib/utils.test.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

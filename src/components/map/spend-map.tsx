@@ -15,7 +15,7 @@ import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMe
 import { boxAround, locateBest, type CityFrame } from "@/infrastructure/geo";
 import { useT } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
-import { cn } from "@/lib/utils";
+import { cn, escapeHtml } from "@/lib/utils";
 import { extrasAllowed, readExtra, writeExtra } from "@/lib/storage-consent";
 import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
 import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
@@ -444,7 +444,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         occupied.add(`${c.lat.toFixed(4)},${c.lon.toFixed(4)}`);
         occupied.add(`${c.lat0.toFixed(4)},${c.lon0.toFixed(4)}`);
         const trust = communityTrust(c);
-        const logo = imgSrc(c.logo || "");
+        const logo = escapeHtml(imgSrc(c.logo || ""));
         const face = logo
           ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" referrerpolicy="no-referrer" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" /><span style="display:none;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`
           : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
@@ -466,7 +466,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         });
         const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
           ${logo ? `<img src="${logo.replace(/"/g, "")}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
-          <div><strong>${c.name.replace(/</g, "")}</strong><br/><span style="opacity:.7">@${c.slug.replace(/</g, "")}</span></div>
+          <div><strong>${escapeHtml(c.name)}</strong><br/><span style="opacity:.7">@${escapeHtml(c.slug)}</span></div>
         </div>`;
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);
@@ -492,7 +492,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           setDrop(null);
           setDraft(store[p.id]?.description || "");
         });
-        m.bindTooltip(p.name, { direction: "top", sticky: true });
+        m.bindTooltip(escapeHtml(p.name), { direction: "top", sticky: true });
         m.addTo(group);
       }
     });
@@ -510,7 +510,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       const glyph = hit.kind === "community" ? "₿" : hit.kind === "city" ? "●" : "₿";
       const icon = L.divIcon({
         className: "",
-        html: `<div class="bitacora-hit" role="img" aria-label="${hit.label.replace(/"/g, "")}">
+        html: `<div class="bitacora-hit" role="img" aria-label="${escapeHtml(hit.label)}">
           <span class="bitacora-hit-pulse"></span>
           <span class="bitacora-hit-head">${glyph}</span>
           <span class="bitacora-hit-point"></span>
@@ -519,7 +519,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         iconAnchor: [16, 44],
       });
       const marker = L.marker([hit.lat, hit.lon], { icon, zIndexOffset: 800, interactive: false });
-      marker.bindPopup(`<strong>${hit.label.replace(/</g, "")}</strong><br/><span>${hit.hint.replace(/</g, "")}</span>`, {
+      marker.bindPopup(`<strong>${escapeHtml(hit.label)}</strong><br/><span>${escapeHtml(hit.hint)}</span>`, {
         closeButton: false,
         offset: [0, -36],
       });

@@ -29,10 +29,12 @@ const es: RoadCopy = {
       when: "sep 2026 – ene 2027",
       items: [
         "Encender un Umbrel en Colonia (Bitcoin Core y Mempool) para leer altura de bloque y comisiones en casa.",
+        "El VPS habla con el Umbrel solo por un túnel (WireGuard o Tailscale). Nada de RPC ni Mempool abiertos al router.",
       ],
       checks: [
         "Con el Umbrel sincronizado, la altura en Red coincide con el Mempool local (± 1 bloque).",
         "Con el Umbrel apagado, mapa, historia y contacto siguen; Red usa el explorer público.",
+        "Desde internet no se abre el RPC ni la UI del Umbrel (solo el túnel).",
       ],
     },
     {
@@ -97,10 +99,12 @@ const en: RoadCopy = {
       when: "Sep 2026 – Jan 2027",
       items: [
         "Turn on an Umbrel in Colonia (Bitcoin Core and Mempool) to read block height and fees at home.",
+        "The VPS talks to the Umbrel only through a tunnel (WireGuard or Tailscale). No RPC or Mempool ports on the router.",
       ],
       checks: [
         "With Umbrel synced, Network height matches the local Mempool (± 1 block).",
         "With Umbrel off, map, history and contact still work; Network uses the public explorer.",
+        "From the public internet the Umbrel RPC and UI stay closed (tunnel only).",
       ],
     },
     {
@@ -165,10 +169,12 @@ const pt: RoadCopy = {
       when: "set 2026 – jan 2027",
       items: [
         "Ligar um Umbrel em Colonia (Bitcoin Core e Mempool) para ler altura de bloco e comissões em casa.",
+        "O VPS fala com o Umbrel só por um túnel (WireGuard ou Tailscale). Nada de RPC ou Mempool abertos no router.",
       ],
       checks: [
         "Com o Umbrel sincronizado, a altura em Rede coincide com o Mempool local (± 1 bloco).",
         "Com o Umbrel desligado, mapa, história e contato continuam; Rede usa o explorer público.",
+        "Na internet pública o RPC e a UI do Umbrel ficam fechados (só o túnel).",
       ],
     },
     {

@@ -25,3 +25,15 @@ export function formatCompact(n: number) {
     maximumFractionDigits: 1,
   }).format(n);
 }
+
+const HTML_ESC: Record<string, string> = {
+  "&": "\u0026amp;",
+  "<": "\u0026lt;",
+  ">": "\u0026gt;",
+  '"': "\u0026quot;",
+  "'": "\u0026#39;",
+};
+
+export function escapeHtml(raw: string) {
+  return String(raw ?? "").replace(/[&<>"']/g, (ch) => HTML_ESC[ch] || ch);
+}

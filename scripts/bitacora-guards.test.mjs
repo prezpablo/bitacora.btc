@@ -33,3 +33,22 @@ test("rate limit writes sqlite", () => {
   const src = read("src/infrastructure/rate-limit.ts");
   assert.match(src, /INSERT INTO rate_hits/);
 });
+
+test("verify endpoints are rate-limited", () => {
+  const src = read("src/infrastructure/server-fns.ts");
+  assert.match(src, /pin-verify/);
+  assert.match(src, /map-verify/);
+});
+
+test("scraper rejects loopback and self-host", () => {
+  const src = read("src/infrastructure/safe-fetch.ts");
+  assert.match(src, /SELF_IP/);
+  assert.match(src, /45\.158\.116\.49/);
+  assert.match(src, /nip\\?\.io/);
+});
+
+test("map HTML escapes user names", () => {
+  const src = read("src/components/map/spend-map.tsx");
+  assert.match(src, /escapeHtml\(c\.name\)/);
+  assert.match(src, /escapeHtml\(p\.name\)/);
+});
