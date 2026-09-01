@@ -20,4 +20,4 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
-Sitemap: https://bitácora.btc.us/sitemap.xml
+Sitemap: https://45.158.116.49.nip.io/sitemap.xml

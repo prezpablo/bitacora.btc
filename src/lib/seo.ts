@@ -15,7 +15,7 @@ export function siteOrigin() {
   const host = (typeof import.meta !== "undefined" && import.meta.env?.VITE_PUBLIC_HOSTNAME) || "";
   if (host) return `https://${String(host).replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
   if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
-  return "https://bitácora.btc.us";
+  return "https://45.158.116.49.nip.io";
 }
 
 export const SEO: Record<

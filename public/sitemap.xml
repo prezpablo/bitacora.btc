@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://bitácora.btc.us/</loc>
+    <loc>https://45.158.116.49.nip.io/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bitácora.btc.us/?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://bitácora.btc.us/?lang=pt"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bitácora.btc.us/?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://bitácora.btc.us/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://45.158.116.49.nip.io/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://45.158.116.49.nip.io/?lang=pt"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://45.158.116.49.nip.io/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://45.158.116.49.nip.io/"/>
   </url>
 </urlset>

@@ -195,8 +195,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-[1rem] gap-y-[0.382rem] text-sm text-muted-foreground">
             <p>
-              <a href="https://bitácora.btc.us" className="text-foreground">
-                bitácora.btc
+              <a href="https://45.158.116.49.nip.io" className="text-foreground">
+                bitacora.btc.us
               </a>
               {" · "}
               {t("taglineShort")}
