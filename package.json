@@ -16,7 +16,8 @@
     "build:vps": "NITRO_PRESET=node-server node scripts/with-app-env.mjs vite build && npm run db:migrate",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --test 'scripts/**/*.test.mjs'",
+    "test": "node --test --experimental-strip-types 'scripts/**/*.test.mjs' 'src/**/*.test.ts'",
+    "test:bitacora": "node --test --experimental-strip-types scripts/bitacora-guards.test.mjs src/domain/community-pins.test.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

@@ -99,7 +99,7 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 
 - Healthcheck HTTP `GET /healthz` (`server/routes/healthz.get.ts`).
 - Sin cola de scrapes ni de mails.
-- Casi sin tests de pines, CSV ni fallback de feeds.
+- Tests: pines CSV (`src/domain/community-pins.test.ts`) + guardas de mapa/rate-limit (`scripts/bitacora-guards.test.mjs`). Falta cobertura de feeds y de `applyPublicMapPatch` ejecutada.
 - `i18n.ts` monolito (415 claves × 3): funciona, es difícil de revisar.
 - Cancelar pin: ahora exige el código CARGA (ya no está en la UI).
 
