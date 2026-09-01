@@ -12,6 +12,7 @@ import { searchStreets, type StreetHit } from "./address";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
+import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, tooMany } from "./rate-limit";
 import { isPublicHttp } from "./safe-fetch";
@@ -103,30 +104,15 @@ export const searchAddress = createServerFn({ method: "POST" })
   });
 
 export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Promise<string> => {
-  let text = await loadMapCsvText();
+  const text = await loadMapCsvText();
   try {
     const rows = parseMapCsv(text);
-    const pending = rows.filter((r) => (r.id.startsWith("local:") || r.id.startsWith("c:")) && r.token && !r.verifiedAt).slice(0, 4);
-    if (pending.length) {
-      const now = Date.now();
-      const hits = await Promise.all(
-        pending.map(async (r) => {
-          const urls = socialsFromCsv(r.socials).map((l) => l.url).filter(Boolean);
-          if (!urls.length) return "";
-          const ok = await scrapeShowsToken(urls[0]!, r.token, urls.slice(1));
-          return ok ? r.id : "";
-        }),
-      );
-      const yes = new Set(hits.filter(Boolean));
-      if (yes.size) {
-        for (const r of rows) if (yes.has(r.id)) r.verifiedAt = now;
-        text = stringifyMapCsv(rows);
-        await saveMapCsvText(text);
-        clearGlobeStatsCache();
-      }
-    }
+    const pending = rows
+      .filter((r) => (r.id.startsWith("local:") || r.id.startsWith("c:")) && r.token && !r.verifiedAt)
+      .map((r) => r.id);
+    enqueuePendingMap(pending);
   } catch {
-    /* listing scrape optional */
+    /* queue optional */
   }
   return text;
 });
@@ -154,6 +140,7 @@ function safeHttp(raw: string) {
 export const getCommunityPins = createServerFn({ method: "POST" }).handler(async (): Promise<CommunityPin[]> => {
   try {
     const rows = await loadPins();
+    enqueuePendingPins(rows.filter((p) => !p.verified && Date.now() - p.created < PIN_TTL_MS).map((p) => p.id));
     return rows.filter((p) => pinOnBoard(p)).slice(0, 48);
   } catch {
     return [];

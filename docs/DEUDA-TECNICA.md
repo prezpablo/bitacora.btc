@@ -92,7 +92,7 @@ El VPS no tiene aún el tope de pines ni el token de cancel: hace falta ZIP.
 |---|---|---|
 | Desk con `staleTime: 0` en precio | `desk.tsx` | **Cerrado en `main`:** market 8s, extras 20s, tick 1.5s, onchain 5s; sin refetch al foco. |
 | Rate-limit en un `Map` | `rate-limit.ts` | **Mitigado (1 sep):** cada hit también va a SQLite `rate_hits`. Reinicio ya no borra el tope de la hora. |
-| Scraper de pines en el request | `pin-verify.ts` + Jina | Verificar varios pines juntos bloquea el event loop. |
+| Scraper de pines en el request | `pin-verify.ts` + Jina | **Mitigado (1 sep):** GET de mapa/pines **encola** (1 job, tope 12). El botón “ya cargué” sigue scrapeando en el click. |
 | Pins: 8/hora/IP + **30/h global** | `submitCommunityPin` | **Cerrado en `main` (31 ago).** Tablero sigue en 48. |
 
 ### P3 — higiene
