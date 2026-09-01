@@ -31,3 +31,21 @@
 http://45.158.116.49 {
 	redir https://45.158.116.49.nip.io{uri} permanent
 }
+
+# Cuando `dig +short bitacorabtc.org` = 45.158.116.49, descomentá y recargá Caddy.
+# Después: PUBLIC_ORIGIN = ORG_ORIGIN en src/lib/seo.ts y un ZIP.
+# bitacorabtc.org {
+# 	encode gzip zstd
+# 	header {
+# 		-Server
+# 		X-Content-Type-Options nosniff
+# 		Referrer-Policy no-referrer
+# 		X-Frame-Options SAMEORIGIN
+# 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+# 	}
+# 	reverse_proxy 127.0.0.1:8080
+# }
+# www.bitacorabtc.org {
+# 	redir https://bitacorabtc.org{uri} permanent
+# }
+

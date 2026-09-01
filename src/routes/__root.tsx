@@ -2,15 +2,15 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
-import { PUBLIC_ORIGIN } from "@/lib/seo";
+import { jsonLd, PUBLIC_ORIGIN, SEO } from "@/lib/seo";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
-const TITLE = "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica";
-const DESC =
-  "Mapa interactivo de comunidades, nodos y comercios que aceptan Bitcoin en Latinoamérica. Eventos, pulso on-chain y educación. Una iniciativa de Consciencia Bitcoin desde Colonia del Sacramento, Uruguay.";
+const TITLE = SEO.es.title;
+const DESC = SEO.es.description;
 const ORIGIN = PUBLIC_ORIGIN;
 const CANONICAL = `${ORIGIN}/`;
+const LD = JSON.stringify(jsonLd("es", ORIGIN));
 
 export const Route = createRootRoute({
   head: () => ({
@@ -37,7 +37,10 @@ export const Route = createRootRoute({
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANONICAL },
       { property: "og:image", content: `${ORIGIN}/og.jpg` },
+      { property: "og:image:alt", content: TITLE },
       { property: "og:locale", content: "es_UY" },
+      { property: "og:locale:alternate", content: "en_US" },
+      { property: "og:locale:alternate", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESC },
@@ -65,6 +68,7 @@ export const Route = createRootRoute({
     <html lang="es" className="antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: LD }} />
       </head>
       <body>
         <PreviewHostBridge />
