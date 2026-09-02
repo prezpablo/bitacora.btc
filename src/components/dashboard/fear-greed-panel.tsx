@@ -1,6 +1,7 @@
 import type { FearGreedPayload } from "@/domain";
 import { cn } from "@/lib/utils";
 import { useT, type CopyKey } from "@/lib/i18n";
+import { Sparkline } from "./spark";
 import { StaleStamp } from "./stale-stamp";
 
 const LABELS: Record<string, CopyKey> = {

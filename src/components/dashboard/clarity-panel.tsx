@@ -1,6 +1,7 @@
 import type { ClarityPayload } from "@/domain";
 import { formatCompact, formatPct } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { Sparkline } from "./spark";
 import { StaleStamp } from "./stale-stamp";
 
 export function ClarityPanel({ data }: { data: ClarityPayload | null }) {

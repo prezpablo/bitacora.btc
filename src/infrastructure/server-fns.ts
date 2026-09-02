@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, EventsPayload, LiqRange, MarketPayload, MarketTick, MerchantPlace, OnchainPayload, PulsePayload } from "@/domain";
 import type { GlobeStats } from "@/domain/globe";
-import { fetchDeskExtras, fetchLiveMarket, fetchTick } from "./compose";
-import { fetchEtfFlows, fetchOnchainLive, fetchPulse } from "./extra-feeds";
+import { fetchLiveMarket, fetchTick } from "./compose";
+import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
 import { withLastKnown } from "./last-known";
 import { fetchBtcCommunities, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
@@ -30,7 +30,16 @@ export const getMarket = createServerFn({ method: "POST" })
 export const getDeskExtras = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange }) => input)
   .handler(async ({ data }): Promise<DeskExtras> => {
-    return await fetchDeskExtras(data.range);
+    const [onchain, clarity, fearGreed, liquidity, pulse] = await Promise.all([
+      withLastKnown("onchain", () => fetchOnchain(data.range), (d) => d.height > 0 || d.hashSeries.length > 0).catch(
+        () => null,
+      ),
+      withLastKnown("clarity", fetchClarity, (d) => Number.isFinite(d.yes)).catch(() => null),
+      withLastKnown("fear-greed", fetchFearGreed, (d) => Number.isFinite(d.value)).catch(() => null),
+      withLastKnown("liquidity", fetchLiquidity, (d) => d.price > 0).catch(() => null),
+      withLastKnown("pulse", fetchPulse, (d) => d.news.length > 0 || d.trends.length > 0).catch(() => null),
+    ]);
+    return { onchain, clarity, fearGreed, liquidity, pulse };
   });
 
 export const getTick = createServerFn({ method: "POST" }).handler(async (): Promise<MarketTick> => {

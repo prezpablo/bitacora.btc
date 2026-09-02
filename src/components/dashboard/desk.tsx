@@ -3,7 +3,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
-import { buildModelMarket } from "@/infrastructure/compose";
+import { buildModelMarket } from "@/infrastructure/model-market";
 import { getDeskExtras, getEtfFlows, getMarket, getOnchainLive, getPulse, getTick } from "@/infrastructure/server-fns";
 import { cn, formatPct, formatUsd } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
