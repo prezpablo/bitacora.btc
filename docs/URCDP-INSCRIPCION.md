@@ -47,7 +47,7 @@ Recomendación: **una sola inscripción** llamada `Contacto y seguridad — Bit�
 4. Completar los pasos del formulario (Decreto 414/009 art. 16). Usar los textos del §3; no copiar marketing.
 5. Revisar que el domicilio de notificaciones coincida con Colonia y que el canal de derechos sea el formulario de Contacto del sitio.
 6. Enviar. El sistema deja el registro en revisión de la URCDP.
-7. Guardar el comprobante / número de registro. Cuando esté **aprobado**, anotar el código en este archivo y, si se quiere, en el aviso legal (hoy dice “en trámite de presentación”).
+**Presentada:** 2 set 2026. Estado en SRCiudadanoWeb: pendiente de revisión. Nombre del trámite: `Contacto y seguridad — Bitácora.btc`. Titular: persona física. Cuando esté **aprobado**, anotar el código abajo y en `legal-eu.ts`.
 8. **Actualización trimestral** (Decreto 414/009 art. 20): si cambia finalidad, destinatarios, hosting o tipos de dato, comunicar. Si no cambió nada material, igual entrar a la bandeja y confirmar vigencia cuando el sistema lo pida.
 
 Si alguna vez se usó el sistema viejo con un usuario compartido: opción **Migración Usuarios** (mail + usuario anterior). No aplica a un alta nueva.

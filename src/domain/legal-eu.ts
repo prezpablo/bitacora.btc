@@ -78,7 +78,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Derechos",
-      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace por el formulario de Contacto, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\nLa inscripción de la base de contacto y de seguridad ante la URCDP está en trámite de presentación. El directorio del mapa, por ser un listado público que vos mismo publicás, se informa como tal en esa presentación.",
+      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace por el formulario de Contacto, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\nLa inscripción de la base de contacto y de seguridad ante la URCDP se presentó el 2 de setiembre de 2026 (estado: pendiente de revisión). El número de inscripción se publicará aquí cuando esté aprobado. El directorio del mapa, por ser un listado público que vos mismo publicás, se informa como tal en esa presentación.",
     },
     {
       title: "Almacenamiento en el terminal (cookies)",
@@ -168,7 +168,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Rights",
-      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests go through the Contact form, with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\nRegistration of the contact and security database with the URCDP is being prepared. The map directory, as a public listing you yourself publish, is disclosed as such in that filing.",
+      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests go through the Contact form, with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\nRegistration of the contact and security database with the URCDP was filed on 2 September 2026 (status: pending review). The registration number will be published here when approved. The map directory, as a public listing you yourself publish, is disclosed as such in that filing.",
     },
     {
       title: "Storage on the device (cookies)",
@@ -258,7 +258,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Direitos",
-      body: "Podes exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14.º a 16.º da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e a não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido faz-se pelo formulário de Contacto, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14.º e 15.º). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controlo do art. 77.º RGPD.\n\nA inscrição da base de contacto e de segurança perante a URCDP está em preparação. O diretório do mapa, por ser uma lista pública que tu próprio publicas, informa-se como tal nessa apresentação.",
+      body: "Podes exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14.º a 16.º da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e a não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido faz-se pelo formulário de Contacto, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14.º e 15.º). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controlo do art. 77.º RGPD.\n\nA inscrição da base de contacto e de segurança perante a URCDP foi apresentada a 2 de setembro de 2026 (estado: pendente de revisão). O número de inscrição publicar-se-á aqui quando estiver aprovado. O diretório do mapa, por ser uma lista pública que tu próprio publicas, informa-se como tal nessa apresentação.",
     },
     {
       title: "Armazenamento no terminal (cookies)",
