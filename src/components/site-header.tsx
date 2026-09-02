@@ -212,7 +212,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </a>
           </div>
           <img
-            src="https://raw.githubusercontent.com/prezpablo/bitacora.btc/main/public/logos/veintiuno-libre.png"
+            src="https://raw.githubusercontent.com/prezpablo/bitacora.btc/main/public/logos/veintiuno-libre.png?v=2"
             alt="Veintiuno Libre. Código abierto. Dinero abierto. Comunidad abierta."
             width={280}
             height={280}
