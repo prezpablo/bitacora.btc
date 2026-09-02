@@ -1,9 +1,51 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
+import { CONTRIBUTE_ONCHAIN, CONTRIBUTE_URI } from "@/domain/contribute";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const SRC = "/contribuir-qr.png";
+
+function AddressRow() {
+  const t = useT();
+  const [copied, setCopied] = useState(false);
+
+  async function copy(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(CONTRIBUTE_ONCHAIN);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard puede estar bloqueado */
+    }
+  }
+
+  return (
+    <div className="mt-3 max-w-xl space-y-2" onClick={(e) => e.stopPropagation()}>
+      <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("contributeOnchain")}</p>
+      <p className="break-all font-mono text-sm text-foreground">
+        <a href={CONTRIBUTE_URI} className="text-foreground underline-offset-2 hover:underline">
+          {CONTRIBUTE_ONCHAIN}
+        </a>
+      </p>
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          className="h-9 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
+          onClick={copy}
+        >
+          {copied ? t("contributeCopied") : t("contributeCopy")}
+        </button>
+        <a href={CONTRIBUTE_URI} className="text-sm font-medium text-foreground underline underline-offset-2">
+          bitcoin:
+        </a>
+      </div>
+      <p className="text-xs text-pretty text-muted-foreground">{t("contributeAddrNote")}</p>
+    </div>
+  );
+}
 
 export function ContributeQr({ compact = false }: { compact?: boolean }) {
   const t = useT();
@@ -59,28 +101,38 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
   const layer =
     open && ready
       ? createPortal(
-          <button
-            type="button"
-            aria-label={t("closeQr")}
-            onClick={() => setOpen(false)}
-            className="flex cursor-pointer flex-col items-center justify-center bg-background/90 p-4"
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            className="flex flex-col items-center justify-center bg-background/90 p-4"
             style={{ position: "fixed", inset: 0, zIndex: 2147483646 }}
+            onClick={() => setOpen(false)}
           >
-            <img
-              src={SRC}
-              alt={t("contributeAlt")}
-              width={520}
-              height={520}
-              className="w-full max-w-[min(92vw,28rem)] rounded-md bg-card shadow-[var(--shadow-border)]"
-            />
-            <p
-              id={titleId}
-              className="mt-4 max-w-sm text-center text-base text-pretty text-foreground sm:text-lg"
+            <div
+              className="flex w-full max-w-[min(92vw,28rem)] flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
             >
-              {t("contributeCaption")}
-            </p>
-            <p className="mt-2 max-w-sm text-center text-xs text-pretty text-muted-foreground">{t("contributeAddrNote")}</p>
-          </button>,
+              <img
+                src={SRC}
+                alt={t("contributeAlt")}
+                width={520}
+                height={520}
+                className="w-full rounded-md bg-card shadow-[var(--shadow-border)]"
+              />
+              <p id={titleId} className="mt-4 text-center text-base text-pretty text-foreground sm:text-lg">
+                {t("contributeCaption")}
+              </p>
+              <AddressRow />
+              <button
+                type="button"
+                className="mt-4 h-9 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
+                onClick={() => setOpen(false)}
+              >
+                {t("closeQr")}
+              </button>
+            </div>
+          </div>,
           document.body,
         )
       : null;
@@ -100,7 +152,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
             <p className="mt-2 max-w-xl text-sm text-pretty text-muted-foreground sm:text-base">
               {t("contributeHint")}
             </p>
-            <p className="mt-2 max-w-xl text-xs text-pretty text-muted-foreground">{t("contributeAddrNote")}</p>
+            <AddressRow />
           </div>
         </section>
       )}
