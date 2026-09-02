@@ -1,0 +1,6 @@
+Contact: https://bitacorabtc.org/legal#contacto
+Expires: 2027-09-02T00:00:00.000Z
+Preferred-Languages: es, en, pt
+Canonical: https://bitacorabtc.org/.well-known/security.txt
+Policy: https://bitacorabtc.org/legal#aviso
+Acknowledgments: https://bitacorabtc.org/legal#terminos

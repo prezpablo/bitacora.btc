@@ -23,11 +23,12 @@
   --color-subtle: #efece7;
   --color-muted: #5c6370;
   --color-muted-foreground: #5c6370;
-  --color-primary: #f7931a;
+  --color-primary: #9a5600;
   --color-primary-foreground: #ffffff;
+  --color-brand: #f7931a;
   --color-border: #e6e6e6;
   --color-border-strong: #c8c8c8;
-  --color-ring: #f7931a;
+  --color-ring: #9a5600;
   --color-long: #0ecb81;
   --color-short: #f6465d;
   --color-doji: #848e9c;

@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHmac } from "node:crypto";
 import { getRequest } from "@tanstack/react-start/server";
 import { openSqlite } from "./sqlite";
 
@@ -37,7 +37,8 @@ function prune(now: number) {
 }
 
 export function hashClientIp(raw: string) {
-  return createHash("sha256").update(`bitacora.btc|${raw}`).digest("hex").slice(0, 24);
+  const pepper = process.env.BITACORA_IP_PEPPER || process.env.BITACORA_SQLITE || "bitacora.btc";
+  return createHmac("sha256", pepper).update(raw).digest("hex").slice(0, 24);
 }
 
 /** Último hop de X-Forwarded-For = el que Caddy agrega (no el spoof al inicio). */

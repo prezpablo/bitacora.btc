@@ -49,6 +49,17 @@ export function StorageBanner() {
           >
             {t("storeOk")}
           </button>
+          <button
+            type="button"
+            className="h-9 rounded-md px-3 text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
+            onClick={() => {
+              wipeExtras();
+              setStorageChoice("min");
+              setShow(false);
+            }}
+          >
+            {t("storeWipe")}
+          </button>
         </div>
       </div>
     </div>

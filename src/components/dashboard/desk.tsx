@@ -80,7 +80,7 @@ export function Desk() {
   }, []);
   useEffect(() => {
     const h = hash.replace(/^#/, "");
-    if (h === "legal" || h === "aviso" || h === "privacidad" || h === "cookies" || h === "accesibilidad") {
+    if (h === "legal" || h === "aviso" || h === "privacidad" || h === "cookies" || h === "accesibilidad" || h === "terminos") {
       window.location.replace(h === "legal" ? "/legal" : `/legal#${h}`);
     }
   }, [hash]);
@@ -246,6 +246,7 @@ export function Desk() {
             <p className="mt-1 text-base text-pretty text-muted-foreground">
               {t("mercadoLead")}
             </p>
+            <p className="mt-2 text-xs text-pretty text-muted-foreground">{t("marketDisclaimer")}</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-right">

@@ -217,8 +217,8 @@ export function ContactBlock() {
             required
           />
         </label>
-        <div className="hidden" aria-hidden>
-          <input tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+        <div className="hidden" aria-hidden="true">
+          <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={(e) => setHp(e.target.value)} />
         </div>
         <div className="sm:col-span-2">
           <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />

@@ -350,7 +350,7 @@ function PinCard({ pin, onCopy }: { pin: CommunityPin; onCopy?: () => void }) {
             {pin.name}
           </button>
         ) : (
-          <a href={href} target="_blank" rel="noreferrer" className="truncate no-underline hover:underline">
+          <a href={href} target="_blank" rel="noopener noreferrer" className="truncate no-underline hover:underline">
             {pin.name}
           </a>
         )}

@@ -233,6 +233,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <a href="/legal#accesibilidad" className="text-foreground">
               {t("legalA11y")}
             </a>
+            <a href="/legal#terminos" className="text-foreground">
+              {t("legalTerms")}
+            </a>
           </nav>
         </div>
       </footer>

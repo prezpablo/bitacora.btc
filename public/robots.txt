@@ -18,6 +18,6 @@ Allow: /
 User-agent: Amazonbot
 Allow: /
 User-agent: Bytespider
-Allow: /
+Disallow: /
 
 Sitemap: https://bitacorabtc.org/sitemap.xml

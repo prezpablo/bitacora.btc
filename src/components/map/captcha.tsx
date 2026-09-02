@@ -164,9 +164,9 @@ export function CaptchaBox({
           <RefreshCw className="size-4" />
         </button>
       </div>
-      <label className="hidden">
+      <label className="hidden" aria-hidden="true">
         {t("hpWeb")}
-        <input tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+        <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={(e) => setHp(e.target.value)} />
       </label>
       <div className="flex gap-2">
         <input

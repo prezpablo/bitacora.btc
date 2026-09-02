@@ -22,6 +22,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
   const [news, setNews] = useState<NewsItem[]>(source);
   const [trStatus, setTrStatus] = useState<"ok" | "partial" | "off" | "loading">("loading");
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
   const n = news.length;
   const asOf = data?.asOf;
 
@@ -54,12 +55,12 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
   }, [lang, asOf]);
 
   useEffect(() => {
-    if (n < 2) return;
+    if (n < 2 || paused) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
     const id = window.setInterval(() => setI((v) => (v + 1) % n), 8_000);
     return () => window.clearInterval(id);
-  }, [n, data?.asOf]);
+  }, [n, data?.asOf, paused]);
 
   const featured = n ? news[i % n] : null;
   const rest = n ? news.filter((_, idx) => idx !== i % n).slice(0, 5) : [];
@@ -93,9 +94,19 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
           </div>
         </div>
         {n ? (
-          <p className="font-mono text-xs tabular-nums text-muted-foreground">
-            {((i % n) + 1).toString().padStart(2, "0")}/{n.toString().padStart(2, "0")}
-          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="rounded-md bg-elevated px-2 py-1 text-xs font-medium text-foreground"
+              onClick={() => setPaused((v) => !v)}
+              aria-pressed={paused}
+            >
+              {paused ? t("pulsePlay") : t("pulsePause")}
+            </button>
+            <p className="font-mono text-xs tabular-nums text-muted-foreground">
+              {((i % n) + 1).toString().padStart(2, "0")}/{n.toString().padStart(2, "0")}
+            </p>
+          </div>
         ) : null}
       </div>
 
@@ -114,7 +125,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
           key={featured.id}
           href={featured.url}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="velar-news-in mt-4 block rounded-xl bg-elevated px-4 py-3 shadow-[var(--shadow-border)] hover:bg-subtle"
         >
           <p className="text-xs font-medium tracking-wide text-long uppercase">
@@ -143,7 +154,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
               <a
                 href={row.url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="flex items-start justify-between gap-3 py-2.5 hover:text-foreground"
               >
                 <div className="min-w-0">

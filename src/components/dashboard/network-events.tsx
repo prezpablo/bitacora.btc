@@ -131,7 +131,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
         <a
           href={ev.url}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="mt-1 inline-flex h-10 items-center justify-center rounded-md bg-primary text-sm font-medium text-white no-underline"
         >
           {t("netEnter")}

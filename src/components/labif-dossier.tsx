@@ -418,6 +418,9 @@ export function LabifDossier() {
             <a href="/legal#accesibilidad" className="text-[#1d1d1b] underline-offset-2 hover:underline">
               Accesibilidad
             </a>
+            <a href="/legal#terminos" className="text-[#1d1d1b] underline-offset-2 hover:underline">
+              Términos
+            </a>
           </nav>
         </div>
       </footer>

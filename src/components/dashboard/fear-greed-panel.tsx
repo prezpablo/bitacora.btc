@@ -75,7 +75,7 @@ export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
           <a
             href={data.url}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-foreground underline-offset-2 hover:underline"
           >
             Alternative.me

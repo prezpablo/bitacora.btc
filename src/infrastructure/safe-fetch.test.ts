@@ -10,4 +10,7 @@ test("scraper does not follow loopback or the VPS itself", () => {
   assert.equal(isPublicHttp("https://bitacorabtc.org/"), false);
   assert.equal(isPublicHttp("https://x.com/consciencia"), true);
   assert.equal(isPublicHttp("javascript:alert(1)"), false);
+  assert.equal(isPublicHttp("http://x.com/consciencia"), false);
+  assert.equal(isPublicHttp("file:///etc/passwd"), false);
+  assert.equal(isPublicHttp("gopher://127.0.0.1:70/"), false);
 });

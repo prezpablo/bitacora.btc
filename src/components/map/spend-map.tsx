@@ -1204,6 +1204,45 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         </aside>
       </div>
 
+      <details className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
+        <summary className="cursor-pointer text-sm font-medium text-foreground">
+          {t("mapListTitle")} ({visibleComms.length + places.length})
+        </summary>
+        <ul className="mt-3 columns-1 gap-x-6 text-sm sm:columns-2">
+          {visibleComms.map((c) => (
+            <li key={`c-${c.id}`} className="break-inside-avoid py-0.5">
+              <button
+                type="button"
+                className="text-left text-foreground underline-offset-2 hover:underline"
+                onClick={() => {
+                  setSelComm(c);
+                  setSel(null);
+                }}
+              >
+                {c.name}
+              </button>
+              <span className="text-muted-foreground"> · {c.slug}</span>
+            </li>
+          ))}
+          {places.slice(0, 80).map((p) => (
+            <li key={`p-${p.id}`} className="break-inside-avoid py-0.5">
+              <button
+                type="button"
+                className="text-left text-foreground underline-offset-2 hover:underline"
+                onClick={() => {
+                  setSel(p);
+                  setSelComm(null);
+                  setDraft(store[p.id]?.description || "");
+                }}
+              >
+                {p.name}
+              </button>
+              <span className="text-muted-foreground"> · {p.category}</span>
+            </li>
+          ))}
+        </ul>
+      </details>
+
       <section className="mt-4 rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
         <h2 className="text-sm font-medium tracking-wide text-foreground uppercase">{t("verifyHow")}</h2>
         <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">

@@ -29,7 +29,7 @@ export function HistoryTimeline() {
             <a
               href={m.url}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="mt-3 inline-flex h-9 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline hover:opacity-90"
             >
               {m.cta}
@@ -46,7 +46,7 @@ export function HistoryTimeline() {
             <a
               href={WHITEPAPER.original}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="mt-3 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground no-underline hover:opacity-90"
             >
               {t("paperRead")}
@@ -55,7 +55,7 @@ export function HistoryTimeline() {
         </div>
         {lang !== "en" ? (
           <p className="mt-3 text-sm">
-            <a href={localPaper} target="_blank" rel="noreferrer">
+            <a href={localPaper} target="_blank" rel="noopener noreferrer">
               {t("paperAlso")} ({lang.toUpperCase()})
             </a>
           </p>

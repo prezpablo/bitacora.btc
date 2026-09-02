@@ -41,7 +41,7 @@ const SELF_IP = new Set(["45.158.116.49", "2a0a:3840:8078:116::2d9e:7431:1337"])
 export function isPublicHttp(raw: string) {
   try {
     const u = new URL(raw);
-    if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+    if (u.protocol !== "https:") return false;
     if (u.username || u.password) return false;
     const host = u.hostname.replace(/^\[|\]$/g, "").toLowerCase();
     if (!host || host === "localhost" || host.endsWith(".local") || host.endsWith(".internal") || host.endsWith(".localhost")) {
@@ -70,7 +70,7 @@ async function dnsPublic(host: string) {
 }
 
 export async function fetchPublic(url: string, hops = 0): Promise<string> {
-  if (hops > 3 || !isPublicHttp(url)) return "";
+  if (hops > 2 || !isPublicHttp(url)) return "";
   let host = "";
   try {
     host = new URL(url).hostname.replace(/^\[|\]$/g, "");
@@ -82,7 +82,7 @@ export async function fetchPublic(url: string, hops = 0): Promise<string> {
     const res = await fetch(url, {
       method: "GET",
       redirect: "manual",
-      signal: AbortSignal.timeout(7000),
+      signal: AbortSignal.timeout(5000),
       headers: {
         Accept: "text/html,application/json,text/plain,application/xml;q=0.9,*/*;q=0.8",
         "User-Agent": UA,

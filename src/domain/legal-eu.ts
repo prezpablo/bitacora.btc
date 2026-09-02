@@ -13,12 +13,17 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Aviso legal · responsable",
       id: "aviso",
-      body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil consta en la inscripción ante la URCDP y se facilita a quien ejerza derechos, acreditando la suya, por el formulario de Contacto.\n\nNo hay Delegado de Protección de Datos designado: no resulta obligatorio para este volumen y esta finalidad. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es el formulario de Contacto de este sitio. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras.",
+      body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil consta en la inscripción ante la URCDP y se facilita a quien ejerza derechos, acreditando la suya, por el formulario de Contacto.\n\nNo hay Delegado de Protección de Datos: no es obligatorio (Ley n.º 19.670 art. 40 y Decreto n.º 64/020) porque no somos entidad pública, no tratamos datos sensibles como actividad principal ni operamos a gran escala. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es el formulario de Contacto de este sitio. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras. Bitácora.btc no es un Proveedor de Servicios de Activos Virtuales (Ley n.º 20.345).",
+    },
+    {
+      title: "Términos y condiciones",
+      id: "terminos",
+      body: "Al usar el sitio aceptás estas reglas. Bitácora.btc no custodia, no intermedia y no administra llaves (Ley n.º 20.345: no es PSAV). El contenido del mapa y de los anuncios lo publican terceros; el responsable puede retirarlo si es ilícito, engañoso o viola estas reglas. Las contribuciones al directorio se publican para replicar el CSV; los datos geográficos de OSM y BTC Map siguen ODbL (© OpenStreetMap contributors). El módulo Mercado es información educativa: no es asesoramiento financiero ni recomendación de inversión (Ley n.º 17.250). La estrella de verificado indica dos enlaces públicos, un promedio alto con votos o la allowlist de fundación: no es un sello del BCU ni una garantía comercial.\n\nLey aplicable: República Oriental del Uruguay. Jurisdicción: tribunales de Uruguay. Privacidad: esta misma página, ancla Privacidad.",
     },
     {
       title: "Qué datos se tratan y para qué",
       id: "privacidad",
-      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.",
+      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación por Contacto.",
       table: {
         head: ["Interacción", "Datos", "Base (Ley 18.331)", "Conservación"],
         rows: [
@@ -73,7 +78,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Derechos",
-      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace por el formulario de Contacto, acreditando identidad. Responderemos en los plazos legales. Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\nLa inscripción de la base de contacto y de seguridad ante la URCDP está en trámite de presentación. El directorio del mapa, por ser un listado público que vos mismo publicás, se informa como tal en esa presentación.",
+      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace por el formulario de Contacto, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\nLa inscripción de la base de contacto y de seguridad ante la URCDP está en trámite de presentación. El directorio del mapa, por ser un listado público que vos mismo publicás, se informa como tal en esa presentación.",
     },
     {
       title: "Almacenamiento en el terminal (cookies)",
@@ -83,11 +88,11 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Accesibilidad",
       id: "accesibilidad",
-      body: "La soberanía tecnológica incluye poder usar el sitio con teclado y lector de pantalla. No declaramos conformidad WCAG 2.2 AA ni con la Directiva (UE) 2019/882: hay brechas abiertas y este texto no es un certificado.\n\nHoy: enlace de salto al contenido, selector de idioma con aria, landmarks parciales, QR con texto alternativo y navegación etiquetada.\n\nBrechas en curso: el captcha es visual y no tiene alternativa no visual (WCAG 1.1.1 / 1.4.5); el globo 3D y el gráfico de velas no son usables con teclado ni lector; imágenes de eventos con alt vacío; errores de formulario no ligados al campo (3.3.1); algunos controles pueden fallar el tamaño mínimo de 24 px (2.5.8); el globo no respeta prefers-reduced-motion.\n\nPlan: avisos aria-live en formularios, captcha no visual (pregunta o Turnstile), alternativa textual al globo y a las velas, reduced-motion y contraste verificado del naranja Bitcoin.",
+      body: "La soberanía tecnológica incluye poder usar el sitio con teclado y lector de pantalla. Declaración de autoevaluación, 2 de setiembre de 2026: recorrido de código y teclado. No es auditoría externa ni certificado WCAG 2.2 AA ni Directiva (UE) 2019/882.\n\nHoy: enlace de salto al contenido (primer control al tabular), selector de idioma con aria, landmarks parciales, QR con texto alternativo, navegación etiquetada y lista textual de lugares bajo el mapa.\n\nBrechas en curso: el captcha es visual y no tiene alternativa no visual (WCAG 1.1.1 / 1.4.5), aunque hay prueba de trabajo; el globo 3D y el gráfico de velas no son usables con teclado ni lector; imágenes de eventos con alt vacío; algunos controles pueden fallar el tamaño mínimo de 24 px (2.5.8).\n\nPlan: avisos aria-live en todos los campos, captcha no visual, reduced-motion en el globo.",
     },
     {
       title: "Menores",
-      body: "El servicio no está dirigido a menores de 18 años (mayoría de edad en Uruguay) ni, para visitantes del EEE, a menores de 16 (art. 8 RGPD). No verificamos edad. Si un adulto acredita que recabamos datos de un menor, los suprimimos.",
+      body: "El sitio no está dirigido a niños. La Ley 18.331 no fija una edad de consentimiento digital: rige el Código de la Niñez y la Adolescencia y la capacidad progresiva; en general el consentimiento lo presta el representante legal. Para visitantes del EEE, además aplica el umbral de 16 años del art. 8 RGPD. No verificamos edad. Si un adulto acredita que recabamos datos de un menor, los suprimimos.",
     },
   ],
 };
@@ -98,12 +103,17 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Legal notice · controller",
       id: "aviso",
-      body: "The site’s brand is Bitácora.btc. The controller is a natural person, domiciled in Colonia del Sacramento, Department of Colonia, Oriental Republic of Uruguay, under the Consciencia Bitcoin by LATAM Cripto Mom initiative. The controller’s civil identity is filed with the URCDP and is provided to anyone exercising their rights, after proving their own identity, via the Contact form.\n\nNo Data Protection Officer is appointed: it is not required at this scale. There is no EU representative (GDPR art. 27). The service is offered from Uruguay to the Latin-American bitcoiner community; if it is later aimed at the EEA market, a representative will be designated.\n\nNotices and rights requests go through this site’s Contact form. There is no user registration, no authentication, no custody of funds and no wallet linking.",
+      body: "The site’s brand is Bitácora.btc. The controller is a natural person, domiciled in Colonia del Sacramento, Department of Colonia, Oriental Republic of Uruguay, under the Consciencia Bitcoin by LATAM Cripto Mom initiative. The controller’s civil identity is filed with the URCDP and is provided to anyone exercising their rights, after proving their own identity, via the Contact form.\n\nNo Data Protection Officer is appointed: it is not required (Act 19.670 art. 40 and Decree 64/020) because we are not a public body, we do not process sensitive data as a core activity and we do not operate at large scale. There is no EU representative (GDPR art. 27). The service is offered from Uruguay to the Latin-American bitcoiner community; if it is later aimed at the EEA market, a representative will be designated.\n\nNotices and rights requests go through this site’s Contact form. There is no user registration, no authentication, no custody of funds and no wallet linking. Bitácora.btc is not a Virtual Asset Service Provider (Act 20.345).",
+    },
+    {
+      title: "Terms of use",
+      id: "terminos",
+      body: "By using the site you accept these rules. Bitácora.btc does not custody, intermediate or hold keys (Act 20.345: it is not a VASP). Map and announcement content is published by third parties; the controller may take it down if it is unlawful, misleading or breaches these rules. Directory contributions are published so the CSV can be replicated; OSM and BTC Map geographic data remain under ODbL (© OpenStreetMap contributors). The Market module is educational information: it is not financial advice or an investment recommendation (Act 17.250). The verified star means two public links, a high average with votes, or the founding allowlist: it is not a BCU seal or a commercial warranty.\n\nGoverning law: Oriental Republic of Uruguay. Jurisdiction: Uruguayan courts. Privacy: this page, Privacy anchor.",
     },
     {
       title: "What data we process and why",
       id: "privacidad",
-      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.",
+      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification via Contact.",
       table: {
         head: ["Interaction", "Data", "Legal basis (Act 18.331)", "Retention"],
         rows: [
@@ -158,7 +168,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Rights",
-      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests go through the Contact form, with proof of identity. We will answer within the legal time limits. You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\nRegistration of the contact and security database with the URCDP is being prepared. The map directory, as a public listing you yourself publish, is disclosed as such in that filing.",
+      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests go through the Contact form, with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\nRegistration of the contact and security database with the URCDP is being prepared. The map directory, as a public listing you yourself publish, is disclosed as such in that filing.",
     },
     {
       title: "Storage on the device (cookies)",
@@ -168,11 +178,11 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Accessibility",
       id: "accesibilidad",
-      body: "Technological sovereignty includes using the site with a keyboard and a screen reader. We do not declare WCAG 2.2 AA or Directive (EU) 2019/882 conformity: gaps remain and this text is not a certificate.\n\nToday: skip link to main, language control with aria, partial landmarks, QR alt text and a labelled nav.\n\nOpen gaps: the captcha is visual with no non-visual alternative (WCAG 1.1.1 / 1.4.5); the 3D globe and candle chart are not keyboard- or screen-reader usable; event images with empty alt; form errors not tied to fields (3.3.1); some controls may fail the 24 px minimum (2.5.8); the globe ignores prefers-reduced-motion.\n\nPlan: aria-live on forms, a non-visual captcha (question or Turnstile), a text alternative to the globe and candles, reduced-motion and a contrast check on Bitcoin orange.",
+      body: "Technological sovereignty includes using the site with a keyboard and a screen reader. Self-assessment dated 2 September 2026: code and keyboard review. This is not an external audit or a WCAG 2.2 AA or Directive (EU) 2019/882 certificate.\n\nToday: skip link to main (first tab stop), language control with aria, partial landmarks, QR alt text, labelled nav and a text list of places under the map.\n\nOpen gaps: the captcha is visual with no non-visual alternative (WCAG 1.1.1 / 1.4.5), though a proof-of-work runs; the 3D globe and candle chart are not keyboard- or screen-reader usable; event images with empty alt; some controls may fail the 24 px minimum (2.5.8).\n\nPlan: aria-live on every field, a non-visual captcha, reduced-motion on the globe.",
     },
     {
       title: "Children",
-      body: "The service is not directed at persons under 18 (age of majority in Uruguay) nor, for EEA visitors, at persons under 16 (GDPR art. 8). We do not verify age. If an adult shows that we collected a child’s data, we erase it.",
+      body: "The site is not directed at children. Act 18.331 does not set a digital-consent age: the Code on Children and Adolescents and evolving capacity apply; as a rule a legal representative consents. For EEA visitors, GDPR art. 8’s age 16 also applies. We do not verify age. If an adult shows that we collected a child’s data, we erase it.",
     },
   ],
 };
@@ -183,12 +193,17 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Aviso legal · responsável",
       id: "aviso",
-      body: "A marca do sítio é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil consta da inscrição perante a URCDP e faculta-se a quem exercer direitos, mediante prova da sua, pelo formulário de Contacto.\n\nNão há Encarregado de Proteção de Dados nomeado: não é obrigatório neste volume. Não há representante na União Europeia (art. 27.º RGPD). O serviço oferece-se a partir do Uruguai à comunidade bitcoiner da América Latina; se se dirigir de forma efetiva ao mercado do EEE, será designado representante.\n\nO canal para notificações e para exercer direitos é o formulário de Contacto deste sítio. Não há registo de utilizadores, não há autenticação, não há custódia de fundos nem vinculação de carteiras.",
+      body: "A marca do sítio é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil consta da inscrição perante a URCDP e faculta-se a quem exercer direitos, mediante prova da sua, pelo formulário de Contacto.\n\nNão há Encarregado de Proteção de Dados: não é obrigatório (Lei n.º 19.670 art. 40.º e Decreto n.º 64/020) porque não somos entidade pública, não tratamos dados sensíveis como atividade principal nem operamos em grande escala. Não há representante na União Europeia (art. 27.º RGPD). O serviço oferece-se a partir do Uruguai à comunidade bitcoiner da América Latina; se se dirigir de forma efetiva ao mercado do EEE, será designado representante.\n\nO canal para notificações e para exercer direitos é o formulário de Contacto deste sítio. Não há registo de utilizadores, não há autenticação, não há custódia de fundos nem vinculação de carteiras. A Bitácora.btc não é um Prestador de Serviços de Ativos Virtuais (Lei n.º 20.345).",
+    },
+    {
+      title: "Termos e condições",
+      id: "terminos",
+      body: "Ao usar o sítio aceitas estas regras. A Bitácora.btc não custodia, não intermedia e não administra chaves (Lei n.º 20.345: não é PSAV). O conteúdo do mapa e dos anúncios é publicado por terceiros; o responsável pode retirá-lo se for ilícito, enganoso ou violar estas regras. As contribuições ao diretório publicam-se para replicar o CSV; os dados geográficos de OSM e BTC Map seguem ODbL (© OpenStreetMap contributors). O módulo Mercado é informação educativa: não é aconselhamento financeiro nem recomendação de investimento (Lei n.º 17.250). A estrela de verificado indica dois links públicos, uma média alta com votos ou a allowlist de fundação: não é um selo do BCU nem garantia comercial.\n\nLei aplicável: República Oriental do Uruguai. Jurisdição: tribunais do Uruguai. Privacidade: esta mesma página, âncora Privacidade.",
     },
     {
       title: "Que dados se tratam e para quê",
       id: "privacidad",
-      body: "Aplica-se o princípio de minimização (arts. 7.º e 8.º da Lei 18.331): só o necessário para cada finalidade, veraz e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão recolhemos palavras-passe, documentos de identidade, biometria, historial financeiro nem chaves de criptoativos. O diretório público não inclui correio nem telefone de particulares: só redes sociais ou identificadores que tu publicas.",
+      body: "Aplica-se o princípio de minimização (arts. 7.º e 8.º da Lei 18.331): só o necessário para cada finalidade, veraz e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão recolhemos palavras-passe, documentos de identidade, biometria, historial financeiro nem chaves de criptoativos. O diretório público não inclui correio nem telefone de particulares: só redes sociais ou identificadores que tu publicas.\n\nO art. 2.º da Lei 18.331 também alcança, quando corresponda, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação pelo Contacto.",
       table: {
         head: ["Interação", "Dados", "Base (Lei 18.331)", "Conservação"],
         rows: [
@@ -243,7 +258,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Direitos",
-      body: "Podes exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14.º a 16.º da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e a não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido faz-se pelo formulário de Contacto, com prova de identidade. Responderemos nos prazos legais. Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controlo do art. 77.º RGPD.\n\nA inscrição da base de contacto e de segurança perante a URCDP está em preparação. O diretório do mapa, por ser uma lista pública que tu próprio publicas, informa-se como tal nessa apresentação.",
+      body: "Podes exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14.º a 16.º da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e a não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido faz-se pelo formulário de Contacto, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14.º e 15.º). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controlo do art. 77.º RGPD.\n\nA inscrição da base de contacto e de segurança perante a URCDP está em preparação. O diretório do mapa, por ser uma lista pública que tu próprio publicas, informa-se como tal nessa apresentação.",
     },
     {
       title: "Armazenamento no terminal (cookies)",
@@ -253,11 +268,11 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Acessibilidade",
       id: "accesibilidad",
-      body: "A soberania tecnológica inclui poder usar o sítio com teclado e leitor de ecrã. Não declaramos conformidade WCAG 2.2 AA nem com a Diretiva (UE) 2019/882: há falhas abertas e este texto não é um certificado.\n\nHoje: ligação de salto para o conteúdo, seletor de idioma com aria, landmarks parciais, QR com texto alternativo e navegação etiquetada.\n\nFalhas em curso: o captcha é visual e não tem alternativa não visual (WCAG 1.1.1 / 1.4.5); o globo 3D e o gráfico de velas não são usáveis com teclado nem leitor; imagens de eventos com alt vazio; erros de formulário não ligados ao campo (3.3.1); alguns controlos podem falhar os 24 px (2.5.8); o globo ignora prefers-reduced-motion.\n\nPlano: avisos aria-live nos formulários, captcha não visual (pergunta ou Turnstile), alternativa textual ao globo e às velas, reduced-motion e contraste verificado do laranja Bitcoin.",
+      body: "A soberania tecnológica inclui poder usar o sítio com teclado e leitor de ecrã. Declaração de autoavaliação, 2 de setembro de 2026: revisão de código e teclado. Não é auditoria externa nem certificado WCAG 2.2 AA nem Diretiva (UE) 2019/882.\n\nHoje: ligação de salto para o conteúdo (primeiro controlo ao tabular), seletor de idioma com aria, landmarks parciais, QR com texto alternativo, navegação etiquetada e lista textual de lugares sob o mapa.\n\nFalhas em curso: o captcha é visual e não tem alternativa não visual (WCAG 1.1.1 / 1.4.5), embora haja prova de trabalho; o globo 3D e o gráfico de velas não são usáveis com teclado nem leitor; imagens de eventos com alt vazio; alguns controlos podem falhar os 24 px (2.5.8).\n\nPlano: avisos aria-live em todos os campos, captcha não visual, reduced-motion no globo.",
     },
     {
       title: "Menores",
-      body: "O serviço não se dirige a menores de 18 anos (maioridade no Uruguai) nem, para visitantes do EEE, a menores de 16 (art. 8.º RGPD). Não verificamos idade. Se um adulto provar que recolhemos dados de um menor, apagamo-los.",
+      body: "O sítio não se dirige a crianças. A Lei 18.331 não fixa uma idade de consentimento digital: aplica-se o Código da Infância e da Adolescência e a capacidade progressiva; em regra consente o representante legal. Para visitantes do EEE, aplica-se também o limiar de 16 anos do art. 8.º RGPD. Não verificamos idade. Se um adulto provar que recolhemos dados de um menor, apagamo-los.",
     },
   ],
 };

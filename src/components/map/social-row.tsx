@@ -103,7 +103,7 @@ export function SocialRow({ links }: { links: { label: string; url: string; key?
             key={l.url}
             href={l.url}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             title={l.label}
             aria-label={l.label}
             className={cn(

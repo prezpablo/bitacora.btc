@@ -46,7 +46,7 @@ export function CommunityFeedPanel({ compact = false }: { compact?: boolean }) {
         ) : (
           rows.map((p) => (
             <li key={p.id} className="border-b border-border pb-3 last:border-0 last:pb-0">
-              <a href={p.url} target="_blank" rel="noreferrer" className="group block no-underline">
+              <a href={p.url} target="_blank" rel="noopener noreferrer" className="group block no-underline">
                 <p className="text-sm font-medium text-pretty text-foreground group-hover:text-primary">{p.title}</p>
                 {!compact && p.body ? (
                   <p className="mt-1 text-sm text-pretty text-muted-foreground">{p.body}</p>

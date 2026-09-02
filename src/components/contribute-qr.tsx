@@ -79,6 +79,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
             >
               {t("contributeCaption")}
             </p>
+            <p className="mt-2 max-w-sm text-center text-xs text-pretty text-muted-foreground">{t("contributeAddrNote")}</p>
           </button>,
           document.body,
         )
@@ -99,6 +100,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
             <p className="mt-2 max-w-xl text-sm text-pretty text-muted-foreground sm:text-base">
               {t("contributeHint")}
             </p>
+            <p className="mt-2 max-w-xl text-xs text-pretty text-muted-foreground">{t("contributeAddrNote")}</p>
           </div>
         </section>
       )}

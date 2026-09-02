@@ -21,18 +21,21 @@ export function PrivacyAccept({
         required
         onChange={(e) => onChange(e.target.checked)}
       />
-      <p className="text-pretty leading-snug">
-        <label htmlFor={id}>{t("privacyAccept")} </label>
-        <a
-          href="/legal#privacidad"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-foreground underline underline-offset-2"
-        >
-          {t("legalPrivacy")}
-        </a>
-        .
-      </p>
+      <div className="min-w-0">
+        <p className="text-pretty leading-snug">
+          <label htmlFor={id}>{t("privacyAccept")} </label>
+          <a
+            href="/legal#privacidad"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-foreground underline underline-offset-2"
+          >
+            {t("legalPrivacy")}
+          </a>
+          .
+        </p>
+        <p className="mt-1 text-xs leading-snug text-pretty text-muted-foreground">{t("privacyArt13")}</p>
+      </div>
     </div>
   );
 }

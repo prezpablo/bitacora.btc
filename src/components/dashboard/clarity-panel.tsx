@@ -63,7 +63,7 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
           <a
             href={data.url}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-foreground underline-offset-2 hover:underline"
           >
             {t("clView")}

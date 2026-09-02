@@ -70,7 +70,7 @@ try {
   } else bad("storage banner", "not visible on first visit");
 
   const footerNav = page.locator("footer nav[aria-label]");
-  for (const href of ["/legal#aviso", "/legal#privacidad", "/legal#cookies", "/legal#accesibilidad"]) {
+  for (const href of ["/legal#aviso", "/legal#privacidad", "/legal#cookies", "/legal#accesibilidad", "/legal#terminos"]) {
     const n = await page.locator(`footer a[href="${href}"]`).count();
     if (n < 1) bad("home footer", href);
     else ok(`home footer ${href}`);
@@ -90,7 +90,7 @@ try {
   } else bad("legal menu", JSON.stringify(navLinks));
   if ((await page.locator("#contacto").count()) < 1) bad("legal contact", "missing");
   else ok("legal has contact form");
-  const ids = ["aviso", "privacidad", "cookies", "accesibilidad"];
+  const ids = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"];
   for (const id of ids) {
     const el = page.locator(`#${id}`);
     if ((await el.count()) !== 1) bad(`legal #${id}`, "missing");
@@ -124,6 +124,7 @@ try {
   else bad("contact aria-required", String(required));
   await page.screenshot({ path: `${OUT}/privacy-contact.png`, fullPage: false });
 
+  await page.locator("#comunidad").waitFor({ state: "attached", timeout: 15000 });
   await page.locator("#comunidad").scrollIntoViewIfNeeded();
   const pinBox = page.locator("#privacy-pin");
   await pinBox.waitFor({ state: "visible", timeout: 15000 });
@@ -142,7 +143,7 @@ try {
   const labif = await goto("/labif");
   if (!labif || labif.status() >= 400) bad("labif status", String(labif?.status()));
   else ok("labif 200");
-  for (const href of ["/legal#aviso", "/legal#privacidad", "/legal#cookies", "/legal#accesibilidad"]) {
+  for (const href of ["/legal#aviso", "/legal#privacidad", "/legal#cookies", "/legal#accesibilidad", "/legal#terminos"]) {
     if ((await page.locator(`a[href="${href}"]`).count()) < 1) bad("labif footer", href);
     else ok(`labif ${href}`);
   }
