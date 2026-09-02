@@ -73,7 +73,7 @@ No es clausulado; es deuda de interfaz que el texto legal debe **no** sobreprome
 | L2.1 | Captcha visual sin alternativa no visual | Alta (bloquea contacto y altas) |
 | L2.2 | Errores de formulario no ligados al campo (`aria-describedby` / `aria-invalid`) | Alta |
 | L2.3 | Skip-link: el i18n existe; verificar que el control sea el primero al tabular | **Hecho (P0 plan):** `SiteShell` lo pone primero. Clausulado actualizado. |
-| L2.4 | Globo y velas sin teclado / lector; `prefers-reduced-motion` | Media (alternativa textual) |
+| L2.4 | Globo y velas sin teclado / lector | Media. `prefers-reduced-motion` **hecho** (sin auto-rotar ni vuelo) |
 | L2.5 | Contraste del naranja Bitcoin y tamaños táctiles 24 px | Media |
 | L2.6 | Imágenes de eventos con `alt` vacío | Baja |
 

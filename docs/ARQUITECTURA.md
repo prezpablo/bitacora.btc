@@ -36,10 +36,10 @@ flowchart TB
   Inf --> Ext
 ```
 
-- **`domain/`** — tipos (`MarketPayload`, `OnchainPayload`, `EtfFlowPayload`, `MerchantLocal`, `Community`, `NetworkEvent`) y reglas: velas/EMA, liquidaciones, calificación 1–5, horarios CSV, promedio ETF no vive acá (sí `addScore`, `hoursToCsv`, `gradeOf`).
-- **`application/`** — `loadMarket` (fallback de feeds), `loadExtras`, `assembleMarket`. Puertos: `MarketFeed`, `ExtrasFeed`, `LoadLiqBlend`.
-- **`infrastructure/`** — adaptadores: klines, liquidaciones, mempool, Bitbo ETF, BTC Map, Luma/Meetup/Eventbrite, CSV, Firebase opcional.
-- **`components/`** — solo presentación. Habla con el servidor vía `server-fns.ts` + React Query.
+- **`domain/`** — tipos (`MarketPayload`, `OnchainPayload`, `EtfFlowPayload`, `MerchantLocal`, `Community`, `NetworkEvent`) y reglas: velas/EMA, liquidaciones, calificación 1–5, horarios CSV, recuadro de mapa (`boxAround` / `CityFrame`), serie sintética (fixture determinista).
+- **`application/`** — `loadMarket`, `loadExtras`, `assembleMarket`, `buildModelMarket`. Puertos: `MarketFeed`, `ExtrasFeed`, `LoadLiqBlend`, `ModelMarket`.
+- **`infrastructure/`** — adaptadores: klines, liquidaciones, mempool, Bitbo ETF, BTC Map, Luma/Meetup/Eventbrite, CSV, Firebase opcional. Disco: `last-known.server.ts` (suffix `.server` para no entrar al bundle). `server-fns.ts` es el único borde hacia la UI.
+- **`components/`** — presentación. Habla con el servidor vía `server-fns.ts` + React Query. El fallback de mercado (`buildModelMarket`) entra por `application/`, no por feeds.
 
 El servidor de TanStack Start (`createServerFn`) es el borde: el browser no pega a Binance/BTC Map en crudo para el desk; el mapa sí usa Leaflet/OSM en cliente.
 

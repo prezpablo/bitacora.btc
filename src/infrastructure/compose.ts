@@ -1,5 +1,5 @@
 import { type ChartRange, type LiqRange, type MarketPayload } from "@/domain";
-import { loadExtras, loadMarket } from "@/application";
+import { loadExtras, loadMarket, buildModelMarket } from "@/application";
 import type { ExtrasFeed } from "@/application";
 import {
   fetchClarity,
@@ -10,7 +10,6 @@ import {
 } from "./extra-feeds";
 import { binanceFeed, hyperliquidFeed, okxFeed } from "./market-feeds";
 import { blendExchangeLiquidation, fetchTopExchangeTapes } from "./exchange-liq";
-import { buildModelMarket } from "./model-market";
 
 export { buildModelMarket };
 

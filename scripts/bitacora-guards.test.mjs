@@ -1,11 +1,27 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(root, p), "utf8");
+const exists = (p) => existsSync(join(root, p));
+
+function walkTs(rel) {
+  const out = [];
+  const start = join(root, rel);
+  const stack = [start];
+  while (stack.length) {
+    const dir = stack.pop();
+    for (const name of readdirSync(dir)) {
+      const p = join(dir, name);
+      if (statSync(p).isDirectory()) stack.push(p);
+      else if (/\.(ts|tsx)$/.test(name)) out.push(p.slice(root.length + 1).replaceAll("\\", "/"));
+    }
+  }
+  return out;
+}
 
 test("public map patch still caps new rows and vote jumps", () => {
   const src = read("src/domain/map-csv.ts");
@@ -58,8 +74,10 @@ test("scraper rejects loopback and self-host", () => {
 
 test("map HTML escapes user names", () => {
   const src = read("src/components/map/spend-map.tsx");
-  assert.match(src, /escapeHtml\(c\.name\)/);
-  assert.match(src, /escapeHtml\(p\.name\)/);
+  assert.match(src, /escapeHtml\(imgSrc/);
+  assert.match(src, /\{c\.name\}/);
+  assert.match(src, /\{p\.name\}/);
+  assert.equal(src.includes("innerHTML =") && src.includes("${c.name}"), false);
 });
 
 test("writes require a captcha ticket", () => {
@@ -75,5 +93,27 @@ test("captcha ticket checks proof-of-work", () => {
   const src = read("src/infrastructure/captcha-ticket.ts");
   assert.match(src, /powMatches/);
   assert.match(src, /salt/);
+});
+
+test("clean architecture: no lib/btc facade, last-known is server-only", () => {
+  assert.equal(exists("src/lib/btc"), false);
+  assert.equal(exists("src/infrastructure/last-known.ts"), false);
+  const lk = read("src/infrastructure/last-known.server.ts");
+  assert.match(lk, /from "node:fs"/);
+  assert.match(lk, /withLastKnown/);
+  const desk = read("src/components/dashboard/desk.tsx");
+  assert.match(desk, /buildModelMarket } from "@\/application"/);
+  assert.equal(desk.includes("@/infrastructure/model-market"), false);
+});
+
+test("UI does not import disk or feed adapters", () => {
+  const files = walkTs("src/components");
+  const banned = /from ["']@\/infrastructure\/(last-known|sqlite|extra-feeds|compose|model-market)/;
+  const fsImport = /from ["']node:fs/;
+  for (const f of files) {
+    const src = read(f);
+    assert.equal(banned.test(src), false, f);
+    assert.equal(fsImport.test(src), false, f);
+  }
 });
 

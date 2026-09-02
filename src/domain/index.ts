@@ -35,6 +35,9 @@ export type {
 export { eventIsLive } from "./entities";
 export type { ContinentId } from "./geo-regions";
 export { continentOf, continentFromLabel, isoFromCountryName } from "./geo-regions";
+export type { CityFrame, GeoFix } from "./geo-frame";
+export { boxAround, frameFromFix } from "./geo-frame";
+export { syntheticCandles, syntheticDailyHistory } from "./synthetic";
 
 export {
   KIND_LABEL,

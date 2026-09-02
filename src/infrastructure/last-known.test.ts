@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { readLast, setLastKnownDir, withLastKnown } from "./last-known.ts";
+import { readLast, setLastKnownDir, withLastKnown } from "./last-known.server.ts";
 
 test("withLastKnown serves the last good payload when the source fails", async () => {
   const dir = mkdtempSync(join(tmpdir(), "bitacora-last-"));

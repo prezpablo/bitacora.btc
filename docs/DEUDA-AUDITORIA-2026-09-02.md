@@ -51,13 +51,13 @@ La auditoría describe el sitio **antes** de `/legal`, de la Ley 18.331 en el cl
 
 | # | Por qué no se cierra aquí |
 |---|---|
-| 5 URCDP | Trámite del operador. Guía: [`URCDP-INSCRIPCION.md`](URCDP-INSCRIPCION.md). |
+| 5 URCDP | **Presentada 2 set 2026**, pendiente de revisión. Número cuando aprueben. |
 | 8 ALTCHA/Turnstile | El PoW ya está; el código visual sigue. Turnstile contradice soberanía. Cola L2.1. |
-| 2 BIP-322 + monitoreo QR | Hace falta la dirección y una clave. El operador publica el texto; no se fabrica un addr. |
-| 11 Relé fuera de EE.UU. | FormSubmit→Gmail sigue; el art. 13 ahora lo dice. Migrar SMTP es operación. |
-| 12 Runbook 24/72 h | Plantilla: [`INCIDENTES-URCDP.md`](INCIDENTES-URCDP.md). Ejecutarlo es del operador. |
-| 14 CAA / DMARC / preload | DNS y correo. Caddy ya manda HSTS. |
-| 18 Caché de 8 APIs caídas | **Hecho:** `withLastKnown` en extras, ETF, pulso, on-chain live y eventos. UI: «último dato». |
+| 2 BIP-322 + monitoreo QR | Dirección on-chain publicada. UniSat no tiene Sign Message en la UI; Sparrow o Coldcard. |
+| 11 Relé fuera de EE.UU. | FormSubmit→Gmail sigue; el art. 13 lo dice. |
+| 12 Runbook 24/72 h | Plantilla: [`INCIDENTES-URCDP.md`](INCIDENTES-URCDP.md). |
+| 14 CAA / DMARC / preload | **SPF/DMARC/CAA hechos** (DonWeb, 2 set). HSTS preload no enviado. |
+| 18 Caché de 8 APIs caídas | **Hecho.** Disco en `last-known.server.ts`. |
 | CSP sin `unsafe-inline` | Leaflet e inline del mapa. Queda P2. |
 | Proxy BFF de 15 APIs | P2 del plan híbrido. |
 
@@ -65,9 +65,9 @@ La auditoría describe el sitio **antes** de `/legal`, de la Ley 18.331 en el cl
 
 ## 3. Operador (fuera de git)
 
-1. Inscripción URCDP (nombre civil **solo** en la ficha).  
-2. `BITACORA_IP_PEPPER` largo en el unit systemd.  
-3. Publicar dirección `bitcoin:` / `lightning:` (y, si hay, nota BIP-322).  
-4. SPF/DKIM/DMARC y CAA.  
+1. Inscripción URCDP — **presentada**, esperar número.  
+2. `BITACORA_IP_PEPPER` — **hecho** (`/etc/bitacora.env`).  
+3. Publicar Lightning si existe; BIP-322 de la `bc1q` (Sparrow).  
+4. SPF/DKIM/DMARC y CAA — **hecho** (sin DKIM: el dominio no envía mail).  
 5. SMTP propio o DPA con el relé.  
 6. Runbook de incidentes impreso / ensayado.

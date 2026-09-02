@@ -3,7 +3,7 @@ import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, 
 import type { GlobeStats } from "@/domain/globe";
 import { fetchLiveMarket, fetchTick } from "./compose";
 import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
-import { withLastKnown } from "./last-known";
+import { withLastKnown } from "./last-known.server";
 import { fetchBtcCommunities, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";

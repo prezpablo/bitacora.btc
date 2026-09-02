@@ -1,13 +1,27 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 31 de agosto de 2026  
-**Alcance:** código en `main` + VPS Njalla (`45.158.116.49`, Caddy + Node un proceso).  
-**No es** un load test de laboratorio: es el techo **antes de que se note**, leído del código y del servidor.
+**Fecha:** 2 de setiembre de 2026  
+**Alcance:** código en `main` + VPS Njalla (`45.158.116.49`, Caddy + Node). Canónica: `https://bitacorabtc.org`.  
+**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Plan híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Auditoría 2 set:** [`DEUDA-AUDITORIA-2026-09-02.md`](DEUDA-AUDITORIA-2026-09-02.md)
 
-Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado). Persistencia: SQLite (`data/bitacora.sqlite`) + CSV de respaldo. Sin cuentas.
+## Estado 2 set 2026 (fases)
 
-**Legal / 18.331 / RGPD:** cola aparte en [`docs/DEUDA-LEGAL.md`](DEUDA-LEGAL.md) (auditoría 1 sep 2026, cotejada con el código).  
-**Plan híbrido (SEO/AEO + Caddy + Umbrel):** [`docs/DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) (sep 2026). Canónica vigente: `https://bitacorabtc.org`.
+| Fase | Qué | Estado |
+|---|---|---|
+| P0 producto / VPS | `/legal`, 18.331, CSV sin tokens, skip-link, canónica `.org`, `node:fs` fuera del client, last-known de APIs | **Cerrado** |
+| P0 deploy | ZIP a `/var/www/bitacora` (no hay `.git` en el VPS) | Procedimiento estable |
+| P1 URCDP | `Contacto y seguridad — Bitácora.btc` | **Presentada 2 set**, pendiente de revisión |
+| P1 DNS | SPF `-all`, DMARC `p=reject`, CAA Let’s Encrypt (DonWeb) | **Cerrado** |
+| P1 pimienta IP | `/etc/bitacora.env` + drop-in systemd | **Cerrado en VPS** |
+| P1 QR on-chain | `bc1q…kk83t` en texto + PNG | Cerrado. BIP-322 pendiente (UniSat no firma a mano) |
+| P1 arquitectura | Facade `lib/btc` muerto; serie modelo en `application/`; `last-known.server.ts`; `boxAround` en dominio | **Esta tanda** |
+| P2 | CSP sin `unsafe-inline`, BFF de APIs, Umbrel | Abierto |
+| P3 a11y | Captcha no visual, aria-live/invalid, globo/velas con teclado, alt eventos | Abierto. `prefers-reduced-motion` globo/mapa **hecho** |
+| Operador | Lightning, SMTP fuera de EE.UU., Telegram 403/429, backup SQLite semanal, HSTS preload | Abierto |
+
+**No reabrir:** sslip.io como canónica (el `.org` ya manda). Nginx. CMP de ads. Connect-wallet. Turnstile.
+
+---
 
 
 ---

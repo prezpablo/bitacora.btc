@@ -90,7 +90,7 @@ Plantilla: `deploy/umbrel-pull.example.sh`. No corre hasta tener IP Tailscale.
 
 ## P3 — accesibilidad (el plan la nombra; no es el borde)
 
-Misma cola que `DEUDA-LEGAL.md` L2. No declarar WCAG 2.2 AA hasta cerrar captcha, globo/velas con teclado, `aria-invalid`, contraste del naranja y `prefers-reduced-motion`.
+Misma cola que `DEUDA-LEGAL.md` L2. No declarar WCAG 2.2 AA hasta cerrar captcha, globo/velas con teclado y `aria-invalid`. `prefers-reduced-motion` en globo, mapa y pulso: **hecho** (2 set).
 
 ---
 

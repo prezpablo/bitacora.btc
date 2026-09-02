@@ -12,8 +12,9 @@ import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { imgSrc } from "@/domain/map-csv";
 import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
 import { ClientOnly } from "@/components/dashboard/client-only";
+import { boxAround } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
-import { boxAround, locateBest } from "@/infrastructure/geo";
+import { locateBest } from "@/infrastructure/geo";
 
 const GEO_URL = "/data/ne-110m-countries.json";
 
