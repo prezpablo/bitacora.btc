@@ -26,9 +26,9 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
           compact ? "text-2xl sm:text-3xl" : "text-[2rem] sm:text-5xl",
         )}
       >
-        <span className="relative mr-[0.02em] inline-block h-[0.92em] w-[0.78em] shrink-0">
-          <span className="text-transparent">B</span>
-          <BitcoinMark className="pointer-events-none absolute inset-0 h-full w-full" />
+        <span className="relative mr-[0.06em] inline-block w-[0.95em] shrink-0">
+          <span className="text-transparent select-none">B</span>
+          <BitcoinMark className="pointer-events-none absolute left-1/2 top-[0.16em] size-[1.12em] -translate-x-1/2" />
         </span>
         itácora<span className="text-primary">.btc</span>
       </h1>
