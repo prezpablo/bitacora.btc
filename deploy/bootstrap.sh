@@ -113,6 +113,12 @@ NITRO_PRESET=node-server VITE_PUBLIC_HOSTNAME="$PUBLIC_HOST" npm run build:vps 2
 
 install -m 644 "$APP_DIR/deploy/Caddyfile" /etc/caddy/Caddyfile
 
+if [ ! -f /etc/bitacora.env ]; then
+  umask 077
+  printf 'BITACORA_IP_PEPPER=%s\n' "$(openssl rand -hex 32)" > /etc/bitacora.env
+  chmod 600 /etc/bitacora.env
+fi
+
 cat >/etc/systemd/system/bitacora.service <<EOF
 [Unit]
 Description=Bitacora.btc
@@ -127,6 +133,7 @@ Environment=PORT=8080
 Environment=NITRO_HOST=127.0.0.1
 Environment=NITRO_PORT=8080
 Environment=BITACORA_SQLITE=$APP_DIR/data/bitacora.sqlite
+EnvironmentFile=-/etc/bitacora.env
 ExecStart=/usr/bin/node $APP_DIR/.output/server/index.mjs
 Restart=always
 RestartSec=4
