@@ -3,6 +3,7 @@ import { ExternalLink, Radio } from "lucide-react";
 import type { NewsItem, PulsePayload } from "@/domain";
 import { translateNews } from "@/infrastructure/translate";
 import { formatAgo, useT } from "@/lib/i18n";
+import { usePrefersReducedMotion } from "@/lib/motion";
 import { StaleStamp } from "./stale-stamp";
 import { LANGS, useLocale, type AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
   const [trStatus, setTrStatus] = useState<"ok" | "partial" | "off" | "loading">("loading");
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const reduceMotion = usePrefersReducedMotion();
   const n = news.length;
   const asOf = data?.asOf;
 
@@ -56,12 +58,10 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
   }, [lang, asOf]);
 
   useEffect(() => {
-    if (n < 2 || paused) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    if (n < 2 || paused || reduceMotion) return;
     const id = window.setInterval(() => setI((v) => (v + 1) % n), 8_000);
     return () => window.clearInterval(id);
-  }, [n, data?.asOf, paused]);
+  }, [n, data?.asOf, paused, reduceMotion]);
 
   const featured = n ? news[i % n] : null;
   const rest = n ? news.filter((_, idx) => idx !== i % n).slice(0, 5) : [];

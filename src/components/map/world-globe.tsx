@@ -7,6 +7,7 @@ import { mapKeys, useGlobeStats } from "@/lib/map-query";
 import { localeTag } from "@/lib/display";
 import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
+import { usePrefersReducedMotion } from "@/lib/motion";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { imgSrc } from "@/domain/map-csv";
 import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
@@ -61,6 +62,7 @@ function GlobeCanvas({
 }) {
   const t = useT();
   const lang = useLocale((s) => s.lang);
+  const reduceMotion = usePrefersReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
   const globeRef = useRef<{ controls: () => { autoRotate: boolean; autoRotateSpeed: number }; pointOfView: () => { lat: number; lng: number; altitude: number } } | null>(null);
   const entered = useRef(false);
@@ -114,6 +116,18 @@ function GlobeCanvas({
     }
     return out;
   }, [geo.data, stats.data]);
+
+  useEffect(() => {
+    const g = globeRef.current;
+    if (!g) return;
+    try {
+      const c = g.controls();
+      c.autoRotate = !reduceMotion;
+      c.autoRotateSpeed = reduceMotion ? 0 : 0.4;
+    } catch {
+      /* still loading */
+    }
+  }, [reduceMotion, Globe]);
 
   useEffect(() => {
     let stop = false;
@@ -343,8 +357,8 @@ function GlobeCanvas({
             const g = globeRef.current;
             if (!g) return;
             const c = g.controls();
-            c.autoRotate = true;
-            c.autoRotateSpeed = 0.4;
+            c.autoRotate = !reduceMotion;
+            c.autoRotateSpeed = reduceMotion ? 0 : 0.4;
           }}
         />
       ) : (

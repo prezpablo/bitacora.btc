@@ -14,6 +14,7 @@ import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, locateBest, type CityFrame } from "@/infrastructure/geo";
 import { useT } from "@/lib/i18n";
+import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
 import { cn, escapeHtml } from "@/lib/utils";
 import { extrasAllowed, readExtra, writeExtra } from "@/lib/storage-consent";
@@ -166,13 +167,14 @@ function applyFix(
     }).addTo(here);
   }
   const bounds = L.latLngBounds([city.south, city.west], [city.north, city.east]);
+  const fly = !prefersReducedMotion();
   if (accuracy < 4000) {
     const z = accuracy < 150 ? 16 : accuracy < 600 ? 15 : 14;
-    map.setView([lat, lon], z, { animate: true });
+    map.setView([lat, lon], z, { animate: fly });
   } else if (bounds.isValid()) {
-    map.fitBounds(bounds, { padding: [28, 28], maxZoom: 13, animate: true });
+    map.fitBounds(bounds, { padding: [28, 28], maxZoom: 13, animate: fly });
   } else {
-    map.setView([city.lat, city.lon], 13, { animate: true });
+    map.setView([city.lat, city.lon], 13, { animate: fly });
   }
 }
 
@@ -613,7 +615,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   function flyTo(hit: SearchHit) {
     setHit(hit);
-    mapRef.current?.setView([hit.lat, hit.lon], hit.kind === "city" ? 13 : 16, { animate: true });
+    mapRef.current?.setView([hit.lat, hit.lon], hit.kind === "city" ? 13 : 16, { animate: !prefersReducedMotion() });
     setDrop(null);
     if (hit.kind === "community") {
       setSelComm(hit.community);
@@ -799,7 +801,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setMode("comercio");
     setShopAddr(formatStreet(hit, lang));
     setAddrHit(hit);
-    mapRef.current?.setView([hit.lat, hit.lon], 17, { animate: true });
+    mapRef.current?.setView([hit.lat, hit.lon], 17, { animate: !prefersReducedMotion() });
   }
 
   function saveCommunity() {
