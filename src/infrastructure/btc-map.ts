@@ -24,6 +24,20 @@ let inflight: Promise<MerchantPlace[]> | null = null;
 let commCache: { at: number; rows: Community[] } | null = null;
 let commInflight: Promise<Community[]> | null = null;
 
+function pickShopImage(tags?: Record<string, string>) {
+  if (!tags) return "";
+  for (const k of ["image", "image:0", "logo", "brand:logo", "contact:image"]) {
+    const u = logoUrl(tags[k] || "");
+    if (u) return u;
+  }
+  const wiki = tags["brand:wikimedia_commons"] || tags.wikimedia_commons || "";
+  if (/^File:/i.test(wiki)) {
+    const file = wiki.replace(/^File:/i, "").trim();
+    if (file) return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}`;
+  }
+  return "";
+}
+
 function asPlace(el: RawEl): MerchantPlace | null {
   if (el.deleted_at) return null;
   const o = el.osm_json;
@@ -39,6 +53,7 @@ function asPlace(el: RawEl): MerchantPlace | null {
     name,
     category: el.tags?.category || o.tags?.amenity || o.tags?.shop || o.tags?.tourism || "lugar",
     createdAt: el.created_at ? Date.parse(el.created_at) : Date.now(),
+    logo: pickShopImage(o.tags) || undefined,
   };
 }
 
@@ -162,6 +177,7 @@ async function overpassBbox(b: { west: number; south: number; east: number; nort
       name: tags.name || tags.brand || "Comercio Bitcoin",
       category: tags.amenity || tags.shop || tags.tourism || "lugar",
       createdAt: Date.now(),
+      logo: pickShopImage(tags) || undefined,
     });
   }
   return out;

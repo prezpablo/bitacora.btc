@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
+import { PrivacyAccept } from "@/components/privacy-accept";
 import { SocialRow } from "@/components/map/social-row";
 import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
 import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
@@ -53,6 +54,7 @@ export function CommunityPinsBoard() {
   const [proof, setProof] = useState("");
   const [links, setLinks] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
+  const [privacyOk, setPrivacyOk] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -106,6 +108,10 @@ export function CommunityPinsBoard() {
     setErr("");
     if (!captchaOk) {
       setErr(t("captchaNeed"));
+      return;
+    }
+    if (!privacyOk) {
+      setErr(t("privacyAcceptNeed"));
       return;
     }
     const proofUrl = proof.trim().match(/^https?:\/\//i) ? proof.trim() : `https://${proof.trim()}`;
@@ -195,9 +201,9 @@ export function CommunityPinsBoard() {
                 key={p.id}
                 pin={p}
                 onCopy={
-                  p.token
+                  pending?.id === p.id && pending.token
                     ? () => {
-                        void navigator.clipboard.writeText(p.token).then(() => {
+                        void navigator.clipboard.writeText(pending.token).then(() => {
                           setCopied(true);
                           window.setTimeout(() => setCopied(false), 4000);
                         });
@@ -308,11 +314,14 @@ export function CommunityPinsBoard() {
             <div className="sm:col-span-2">
               <CaptchaBox key="pin" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
             </div>
+            <div className="sm:col-span-2">
+              <PrivacyAccept id="privacy-pin" checked={privacyOk} onChange={setPrivacyOk} />
+            </div>
             {err ? <p className="text-sm text-primary sm:col-span-2">{err}</p> : null}
             <button
               type="submit"
               className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
-              disabled={busy}
+              disabled={busy || !privacyOk}
             >
               {t("pinSubmit")}
             </button>

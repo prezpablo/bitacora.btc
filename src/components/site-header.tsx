@@ -8,7 +8,7 @@ import { COPY, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale, type AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
-const NAV: { hash: string; key: CopyKey }[] = [
+const NAV: { hash: string; key: CopyKey; href?: string }[] = [
   { hash: "mapa", key: "navMapa" },
   { hash: "conciencia", key: "navParticipe" },
   { hash: "roadmap", key: "navRoadmap" },
@@ -17,7 +17,12 @@ const NAV: { hash: string; key: CopyKey }[] = [
   { hash: "historia", key: "navHistoria" },
   { hash: "red", key: "navRed" },
   { hash: "mercado", key: "navMercado" },
-  { hash: "legal", key: "legalTitle" },
+  { hash: "legal", key: "legalTitle", href: "/legal" },
+  { hash: "contacto", key: "navContacto" },
+];
+
+const NAV_LEGAL: { hash: string; key: CopyKey; href?: string }[] = [
+  { hash: "privacidad", key: "legalPrivacy" },
   { hash: "contacto", key: "navContacto" },
 ];
 
@@ -55,7 +60,13 @@ export function SiteHeader() {
   const offsetRef = useRef(116);
   const lockRef = useRef<string | null>(null);
   const lockTimer = useRef(0);
-  const [spy, setSpy] = useState(() => (hash || "mapa").replace(/^#/, "") || "mapa");
+  const legalPage = pathname === "/legal";
+  const items = legalPage ? NAV_LEGAL : NAV;
+  const [spy, setSpy] = useState(() => {
+    const h = String(hash || "").replace(/^#/, "");
+    if (h) return h;
+    return pathname === "/legal" ? "privacidad" : "mapa";
+  });
 
   useEffect(() => {
     hydrate();
@@ -76,7 +87,7 @@ export function SiteHeader() {
   }, [lang]);
 
   useEffect(() => {
-    const ids = NAV.map((n) => n.hash);
+    const ids = items.map((n) => n.hash);
 
     const go = (id: string) => {
       const node = document.getElementById(id);
@@ -124,9 +135,9 @@ export function SiteHeader() {
       window.removeEventListener("click", onClick, true);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [pathname]);
+  }, [pathname, legalPage]);
 
-  const activeHash = spy || "mapa";
+  const activeHash = spy || items[0]!.hash;
 
   return (
     <header ref={headRef} className="sticky top-0 z-[80] isolate border-b border-border bg-background">
@@ -141,12 +152,13 @@ export function SiteHeader() {
       </div>
       <nav className="border-t border-border" aria-label={labels.navAria} lang={lang}>
         <div className="mx-auto flex max-w-6xl flex-wrap justify-center px-1 sm:px-[1.618rem]">
-          {NAV.map((item) => {
+          {items.map((item) => {
             const active = activeHash === item.hash;
+            const href = item.href ?? (pathname === "/" ? `#${item.hash}` : `/#${item.hash}`);
             return (
               <a
                 key={`${lang}-${item.hash}`}
-                href={`#${item.hash}`}
+                href={legalPage ? `#${item.hash}` : href}
                 className={cn(
                   "inline-flex max-w-[48%] items-center justify-center border-b-2 px-[0.5rem] py-[0.618rem] text-center text-[0.7rem] leading-tight no-underline sm:max-w-none sm:px-[0.618rem] sm:text-sm",
                   active
@@ -201,23 +213,27 @@ export function SiteShell({ children }: { children: ReactNode }) {
               {" · "}
               {t("taglineShort")}
             </p>
-            <a href="#datos" className="text-foreground">
+            <a href="/#datos" className="text-foreground">
               {t("dataOrigin")}
             </a>
-            <a href="#soberania" className="text-foreground">
+            <a href="/#soberania" className="text-foreground">
               {t("sovTitle")}
             </a>
-            <a href="#legal" className="text-foreground">
-              {t("legalTitle")}
-            </a>
           </div>
-          <img
-            src="/logos/veintiuno-libre.png"
-            alt="Veintiuno Libre. Código abierto. Dinero abierto. Comunidad abierta."
-            width={280}
-            height={280}
-            className="mt-[0.382rem] h-auto w-[11.09rem] sm:w-[13.944rem]"
-          />
+          <nav aria-label={t("legalNavAria")} className="flex flex-wrap items-center justify-center gap-x-[1rem] gap-y-[0.382rem] text-sm">
+            <a href="/legal#aviso" className="text-foreground">
+              {t("legalAviso")}
+            </a>
+            <a href="/legal#privacidad" className="text-foreground">
+              {t("legalPrivacy")}
+            </a>
+            <a href="/legal#cookies" className="text-foreground">
+              {t("legalCookies")}
+            </a>
+            <a href="/legal#accesibilidad" className="text-foreground">
+              {t("legalA11y")}
+            </a>
+          </nav>
         </div>
       </footer>
       <StorageBanner />

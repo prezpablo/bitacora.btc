@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { parsePinsCsv, stringifyPinsCsv, mergePins, type CommunityPin } from "@/domain/community-pins";
+import { parsePinsCsv, stringifyPinsCsvPublic, mergePins, type CommunityPin } from "@/domain/community-pins";
 import { openSqlite, sqlTx } from "./sqlite";
 import { readFirstFile } from "./data-files";
 
@@ -70,7 +70,7 @@ function ensureSeed() {
 
 async function snapCsv(rows: CommunityPin[]) {
   try {
-    const csv = stringifyPinsCsv(rows);
+    const csv = stringifyPinsCsvPublic(rows);
     await mkdir(dirname(join(process.cwd(), SNAP)), { recursive: true });
     await writeFile(join(process.cwd(), SNAP), csv, "utf8");
   } catch {

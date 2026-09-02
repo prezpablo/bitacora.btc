@@ -6,6 +6,10 @@
 
 Marca: Consciencia Bitcoin. Producto: desk público (mapa, pines, pulso, mercado). Persistencia: SQLite (`data/bitacora.sqlite`) + CSV de respaldo. Sin cuentas.
 
+**Legal / 18.331 / RGPD:** cola aparte en [`docs/DEUDA-LEGAL.md`](DEUDA-LEGAL.md) (auditoría 1 sep 2026, cotejada con el código).  
+**Plan híbrido (SEO/AEO + Caddy + Umbrel):** [`docs/DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) (sep 2026). Canónica vigente: `https://bitacorabtc.org`.
+
+
 ---
 
 ## 1. Cómo está armado hoy

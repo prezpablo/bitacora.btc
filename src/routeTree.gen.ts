@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LabifRouteImport } from './routes/labif'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as MapaRouteImport } from './routes/mapa'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const LabifRoute = LabifRouteImport.update({
   path: '/labif',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
@@ -32,30 +38,34 @@ const MapaRoute = MapaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/labif': typeof LabifRoute
+  '/legal': typeof LegalRoute
   '/mapa': typeof MapaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/labif': typeof LabifRoute
+  '/legal': typeof LegalRoute
   '/mapa': typeof MapaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/labif': typeof LabifRoute
+  '/legal': typeof LegalRoute
   '/mapa': typeof MapaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/labif' | '/mapa'
+  fullPaths: '/' | '/labif' | '/legal' | '/mapa'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/labif' | '/mapa'
-  id: '__root__' | '/' | '/labif' | '/mapa'
+  to: '/' | '/labif' | '/legal' | '/mapa'
+  id: '__root__' | '/' | '/labif' | '/legal' | '/mapa'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LabifRoute: typeof LabifRoute
+  LegalRoute: typeof LegalRoute
   MapaRoute: typeof MapaRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabifRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mapa': {
       id: '/mapa'
       path: '/mapa'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LabifRoute: LabifRoute,
+  LegalRoute: LegalRoute,
   MapaRoute: MapaRoute,
 }
 export const routeTree = rootRouteImport

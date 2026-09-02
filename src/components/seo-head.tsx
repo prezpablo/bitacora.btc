@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { FAQ, GEO, SEO, SITE_NAME, jsonLd, siteOrigin } from "@/lib/seo";
+import { useRouterState } from "@tanstack/react-router";
+import { FAQ, GEO, SITE_NAME, jsonLd, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
 import { useLocale, type AppLang } from "@/lib/locale";
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
@@ -30,10 +31,12 @@ function upsertLink(rel: string, href: string, extra?: Record<string, string>) {
 
 export function SeoHead() {
   const lang = useLocale((s) => s.lang);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
-    const seo = SEO[lang];
+    const path = pagePath(pathname);
+    const seo = pageSeo(path, lang);
     const origin = siteOrigin();
-    const url = `${origin}/`;
+    const url = path === "/" ? `${origin}/` : `${origin}${path}`;
     const image = `${origin}/og.jpg`;
     document.title = seo.title;
     document.documentElement.lang = lang;
@@ -76,7 +79,7 @@ export function SeoHead() {
       document.head.appendChild(ld);
     }
     ld.textContent = JSON.stringify(jsonLd(lang, origin));
-  }, [lang]);
+  }, [lang, pathname]);
   return null;
 }
 

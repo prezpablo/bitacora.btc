@@ -26,7 +26,6 @@ import { ConcienciaBlock } from "./conciencia";
 import { ContactBlock } from "./contact";
 import { RoadmapWeb3 } from "./roadmap-web3";
 import { SoberaniaBlock } from "./soberania";
-import { LegalEu } from "./legal-eu";
 import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { DATOS, useT } from "@/lib/i18n";
@@ -79,6 +78,12 @@ export function Desk() {
   useEffect(() => {
     setAllowFetch(true);
   }, []);
+  useEffect(() => {
+    const h = hash.replace(/^#/, "");
+    if (h === "legal" || h === "aviso" || h === "privacidad" || h === "cookies" || h === "accesibilidad") {
+      window.location.replace(h === "legal" ? "/legal" : `/legal#${h}`);
+    }
+  }, [hash]);
 
   const fallback = useMemo(() => buildModelMarket(range, liq), [range, liq]);
 
@@ -355,7 +360,6 @@ export function Desk() {
       </section>
 
       <SoberaniaBlock />
-      <LegalEu />
 
       <section id="contacto" className="scroll-mt-[var(--header-offset)]">
         <ContactBlock />

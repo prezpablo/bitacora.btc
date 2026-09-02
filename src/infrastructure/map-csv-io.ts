@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { applyPublicMapPatch, mergeMapRows, parseMapCsv, stringifyMapCsv, type MapCsvRow } from "@/domain/map-csv";
+import { applyPublicMapPatch, mergeMapRows, parseMapCsv, stringifyMapCsv, stringifyMapCsvPublic, type MapCsvRow } from "@/domain/map-csv";
 import { FOUNDING_UY } from "@/domain/globe";
 import { openSqlite, sqlTx } from "./sqlite";
 import { readFirstFile } from "./data-files";
@@ -116,7 +116,7 @@ function ensureSeed() {
 
 async function snapCsv(rows: MapCsvRow[]) {
   try {
-    const csv = stringifyMapCsv(rows);
+    const csv = stringifyMapCsvPublic(rows);
     await mkdir(dirname(join(process.cwd(), SNAP)), { recursive: true });
     await writeFile(join(process.cwd(), SNAP), csv, "utf8");
   } catch {

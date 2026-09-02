@@ -16,7 +16,17 @@ export function StorageBanner() {
       className="fixed inset-x-0 bottom-0 z-[85] border-t border-border bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-6"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-pretty text-muted-foreground">{t("storeLead")}</p>
+        <p className="text-sm text-pretty text-muted-foreground">
+          {t("storeLead")}{" "}
+          <a href="/legal#cookies" className="font-medium text-foreground underline underline-offset-2">
+            {t("legalCookies")}
+          </a>
+          {" · "}
+          <a href="/legal#privacidad" className="font-medium text-foreground underline underline-offset-2">
+            {t("legalPrivacy")}
+          </a>
+          .
+        </p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"

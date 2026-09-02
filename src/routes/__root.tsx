@@ -61,12 +61,6 @@ export const Route = createRootRoute({
       { rel: "alternate", href: `${CANONICAL}?lang=pt`, hrefLang: "pt" },
       { rel: "alternate", href: `${CANONICAL}?lang=en`, hrefLang: "en" },
       { rel: "alternate", href: CANONICAL, hrefLang: "x-default" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap",
-      },
     ],
   }),
   component: () => (

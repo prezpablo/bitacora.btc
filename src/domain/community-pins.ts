@@ -111,6 +111,11 @@ export function stringifyPinsCsv(rows: CommunityPin[]) {
   return [PIN_HEADERS.join(","), ...body].join("\n") + "\n";
 }
 
+/** CSV público: el código CARGA no sale a GitHub ni al tablero. */
+export function stringifyPinsCsvPublic(rows: CommunityPin[]) {
+  return stringifyPinsCsv(rows.map((p) => ({ ...p, token: "" })));
+}
+
 export function mergePins(base: CommunityPin[], incoming: CommunityPin[]) {
   const map = new Map(base.map((p) => [p.id, p]));
   for (const p of incoming) {

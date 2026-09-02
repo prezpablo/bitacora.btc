@@ -17,12 +17,14 @@
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
     "test": "node --test --experimental-strip-types 'scripts/**/*.test.mjs' 'src/**/*.test.ts'",
-    "test:bitacora": "node --test --experimental-strip-types scripts/bitacora-guards.test.mjs src/domain/community-pins.test.ts src/infrastructure/safe-fetch.test.ts src/lib/utils.test.ts src/lib/pow.test.ts",
+    "test:bitacora": "node --test --experimental-strip-types scripts/bitacora-guards.test.mjs scripts/privacy-a11y-guards.test.mjs src/domain/community-pins.test.ts src/infrastructure/safe-fetch.test.ts src/lib/utils.test.ts src/lib/pow.test.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
+    "@fontsource/ubuntu": "^5.3.0",
+    "@fontsource/ubuntu-mono": "^5.3.0",
     "@hookform/resolvers": "^5.7.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",

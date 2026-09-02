@@ -55,6 +55,71 @@ export const SEO: Record<
   },
 };
 
+export const PAGE_SEO: Record<
+  string,
+  Record<AppLang, { title: string; description: string }>
+> = {
+  "/mapa": {
+    es: {
+      title: "Mapa Bitcoin Latam | Bitácora.btc",
+      description:
+        "Mapa de comunidades y comercios que aceptan Bitcoin en Latinoamérica. Nodos, meetups y educación soberana. Sin cuentas ni custodia.",
+    },
+    en: {
+      title: "Bitcoin map Latin America | Bitácora.btc",
+      description:
+        "Map of Bitcoin communities and merchants in Latin America. Nodes, meetups and sovereign education. No accounts, no custody.",
+    },
+    pt: {
+      title: "Mapa Bitcoin Latam | Bitácora.btc",
+      description:
+        "Mapa de comunidades e comércios que aceitam Bitcoin na América Latina. Nós, meetups e educação soberana. Sem contas nem custódia.",
+    },
+  },
+  "/legal": {
+    es: {
+      title: "Aviso, privacidad y cookies | Bitácora.btc",
+      description:
+        "Aviso legal, política de privacidad, cookies y accesibilidad de Bitácora.btc. Uruguay, Ley 18.331 y RGPD.",
+    },
+    en: {
+      title: "Legal notice, privacy and cookies | Bitácora.btc",
+      description:
+        "Legal notice, privacy policy, cookies and accessibility of Bitácora.btc. Uruguay Act 18.331 and GDPR.",
+    },
+    pt: {
+      title: "Aviso, privacidade e cookies | Bitácora.btc",
+      description:
+        "Aviso legal, política de privacidade, cookies e acessibilidade da Bitácora.btc. Uruguai, Lei 18.331 e RGPD.",
+    },
+  },
+  "/labif": {
+    es: {
+      title: "LABIF · Bitácora.btc",
+      description: "Dossier LABIF de Bitácora.btc: indicadores, soberanía de datos y comunidad Bitcoin en Colonia.",
+    },
+    en: {
+      title: "LABIF · Bitácora.btc",
+      description: "LABIF dossier for Bitácora.btc: indicators, data sovereignty and the Bitcoin community in Colonia.",
+    },
+    pt: {
+      title: "LABIF · Bitácora.btc",
+      description: "Dossier LABIF da Bitácora.btc: indicadores, soberania dos dados e comunidade Bitcoin em Colonia.",
+    },
+  },
+};
+
+export function pageSeo(path: string, lang: AppLang) {
+  const home = SEO[lang];
+  const extra = PAGE_SEO[path]?.[lang];
+  return extra ? { ...home, ...extra } : home;
+}
+
+export function pagePath(path: string) {
+  if (!path || path === "/") return "/";
+  return path.endsWith("/") ? path.slice(0, -1) : path;
+}
+
 export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
   es: [
     {

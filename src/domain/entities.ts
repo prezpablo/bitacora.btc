@@ -179,6 +179,7 @@ export type MerchantPlace = {
   category: string;
   createdAt: number;
   description?: string;
+  logo?: string;
 };
 
 export type MerchantVote = { stars: 1 | 2 | 3 | 4 | 5; at: number; by: string };

@@ -8,6 +8,7 @@ import {
   pinOnBoard,
   pinPending,
   stringifyPinsCsv,
+  stringifyPinsCsvPublic,
   type CommunityPin,
 } from "./community-pins.ts";
 
@@ -44,6 +45,13 @@ test("CSV round-trip keeps token and links", () => {
   assert.equal(again.length, 1);
   assert.equal(again[0]!.token, "CARGA-ABC234");
   assert.deepEqual(again[0]!.links, ["https://x.com/a", "https://njump.me/npub1x"]);
+});
+
+test("public CSV strips CARGA token", () => {
+  const rows = [pin()];
+  const pub = parsePinsCsv(stringifyPinsCsvPublic(rows));
+  assert.equal(pub[0]!.token, "");
+  assert.equal(pub[0]!.name, "Nodo");
 });
 
 test("mergePins does not un-verify", () => {

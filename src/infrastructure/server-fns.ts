@@ -18,7 +18,7 @@ import { clientKey, tooMany } from "./rate-limit";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinOnBoard, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
-import { parseMapCsv, socialsFromCsv, stringifyMapCsv } from "@/domain/map-csv";
+import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
 
 export const getMarket = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange; liq: LiqRange }) => input)
@@ -116,10 +116,11 @@ export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Pr
       .filter((r) => (r.id.startsWith("local:") || r.id.startsWith("c:")) && r.token && !r.verifiedAt)
       .map((r) => r.id);
     enqueuePendingMap(pending);
+    return stringifyMapCsvPublic(rows);
   } catch {
     /* queue optional */
   }
-  return text;
+  return stringifyMapCsvPublic(parseMapCsv(text));
 });
 
 export const issueCaptcha = createServerFn({ method: "POST" }).handler(
@@ -153,7 +154,10 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
   try {
     const rows = await loadPins();
     enqueuePendingPins(rows.filter((p) => !p.verified && Date.now() - p.created < PIN_TTL_MS).map((p) => p.id));
-    return rows.filter((p) => pinOnBoard(p)).slice(0, 48);
+    return rows
+      .filter((p) => pinOnBoard(p))
+      .slice(0, 48)
+      .map((p) => ({ ...p, token: "" }));
   } catch {
     return [];
   }
@@ -195,6 +199,7 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
 export const verifyCommunityPin = createServerFn({ method: "POST" })
   .validator((input: { id: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    if (tooMany(clientKey("pin-verify-burst"), 5, 5_000)) return { ok: false, error: "rate" };
     if (tooMany(clientKey("pin-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
     if (tooMany("pin-verify:global", 80, 60 * 60_000)) return { ok: false, error: "rate" };
     const rows = await loadPins();
@@ -228,6 +233,7 @@ export const cancelCommunityPin = createServerFn({ method: "POST" })
 export const verifyMapListing = createServerFn({ method: "POST" })
   .validator((input: { id: string; token?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; error?: string }> => {
+    if (tooMany(clientKey("map-verify-burst"), 5, 5_000)) return { ok: false, token: data.token, error: "rate" };
     if (tooMany(clientKey("map-verify"), 12, 60 * 60_000)) return { ok: false, token: data.token, error: "rate" };
     if (tooMany("map-verify:global", 80, 60 * 60_000)) return { ok: false, token: data.token, error: "rate" };
     const text = await loadMapCsvText();

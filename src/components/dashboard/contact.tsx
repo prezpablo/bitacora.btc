@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { ContributeQr } from "@/components/contribute-qr";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
+import { PrivacyAccept } from "@/components/privacy-accept";
 import { sendContact } from "@/infrastructure/server-fns";
 import { useT, type CopyKey } from "@/lib/i18n";
 
@@ -64,6 +65,7 @@ export function ContactBlock() {
   const [topic, setTopic] = useState<(typeof TOPICS)[number]["id"]>("general");
   const [hp, setHp] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
+  const [privacyOk, setPrivacyOk] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState(false);
@@ -78,6 +80,10 @@ export function ContactBlock() {
     setHint("");
     if (!captchaOk) {
       setErr(t("captchaNeed"));
+      return;
+    }
+    if (!privacyOk) {
+      setErr(t("privacyAcceptNeed"));
       return;
     }
     setBusy(true);
@@ -131,6 +137,7 @@ export function ContactBlock() {
       setEmail("");
       setMessage("");
       setCaptchaOk(false);
+      setPrivacyOk(false);
     } catch {
       setErr(t("contactFail"));
     } finally {
@@ -216,6 +223,9 @@ export function ContactBlock() {
         <div className="sm:col-span-2">
           <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
         </div>
+        <div className="sm:col-span-2">
+          <PrivacyAccept id="privacy-contact" checked={privacyOk} onChange={setPrivacyOk} />
+        </div>
         {err ? (
           <p role="alert" className="text-sm text-short sm:col-span-2">
             {err}
@@ -231,7 +241,7 @@ export function ContactBlock() {
         <button
           type="submit"
           className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
-          disabled={busy || !captchaOk}
+          disabled={busy || !captchaOk || !privacyOk}
         >
           {busy ? t("loading") : t("contactSend")}
         </button>

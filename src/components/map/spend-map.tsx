@@ -4,7 +4,7 @@ import type { Community, GradeBand, MerchantLocal, MerchantPlace } from "@/domai
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
-import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
+import { dedupeCommunities, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
@@ -17,6 +17,7 @@ import { useT } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
 import { cn, escapeHtml } from "@/lib/utils";
 import { extrasAllowed, readExtra, writeExtra } from "@/lib/storage-consent";
+import { PrivacyAccept } from "@/components/privacy-accept";
 import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
 import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { SiteShell } from "@/components/site-header";
@@ -65,6 +66,14 @@ function loadCommunities(): Community[] {
 
 function saveCommunities(rows: Community[]) {
   writeExtra(COMM, JSON.stringify(rows));
+}
+
+function coinFaceHtml(logo: string, size: number) {
+  const src = escapeHtml(imgSrc(logo)).replace(/"/g, "");
+  if (src) {
+    return `<img src="${src}" alt="" width="${size}" height="${size}" referrerpolicy="no-referrer" decoding="async" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" /><span style="display:none;width:${size}px;height:${size}px">${BITCOIN_MARK_SVG}</span>`;
+  }
+  return `<span style="display:block;width:${size}px;height:${size}px">${BITCOIN_MARK_SVG}</span>`;
 }
 
 function slugify(s: string) {
@@ -202,6 +211,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [mode, setMode] = useState<"comercio" | "comunidad">("comercio");
   const [form, setForm] = useState<CommForm>(EMPTY_FORM);
   const [formErr, setFormErr] = useState("");
+  const [privacyOk, setPrivacyOk] = useState(false);
   const [picked, setPicked] = useState<SocialKey[]>([]);
   const [handles, setHandles] = useState<Partial<Record<SocialKey, string>>>({});
   const [captchaOk, setCaptchaOk] = useState(false);
@@ -285,9 +295,21 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         category: s.category || "propuesta",
         createdAt: s.listedAt,
         description: s.description,
+        logo: s.logo,
       }));
     const seen = new Set(extra.map((p) => p.id));
-    const api = (query.data ?? []).filter((p) => !store[p.id]?.removed && !seen.has(p.id));
+    const api = (query.data ?? [])
+      .filter((p) => !store[p.id]?.removed && !seen.has(p.id))
+      .map((p) => {
+        const local = store[p.id];
+        return {
+          ...p,
+          lat: local?.lat ?? p.lat,
+          lon: local?.lon ?? p.lon,
+          name: local?.name || p.name,
+          logo: pickListingLogo(local?.logo, p.logo),
+        };
+      });
     return [...extra, ...api];
   }, [query.data, store, filter]);
 
@@ -295,7 +317,21 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const allComms = useMemo(() => {
     const map = new Map<string, Community>();
     for (const c of btcComms.data ?? []) map.set(c.id || c.slug, c);
-    for (const c of overlayComms) map.set(c.id || c.slug, c);
+    for (const c of overlayComms) {
+      const prev = map.get(c.id) || (c.slug ? map.get(c.slug) : undefined);
+      if (prev) {
+        map.set(prev.id, {
+          ...prev,
+          ...c,
+          lat: Number.isFinite(c.lat) ? c.lat : prev.lat,
+          lon: Number.isFinite(c.lon) ? c.lon : prev.lon,
+          logo: pickListingLogo(c.logo, prev.logo),
+          name: c.name || prev.name,
+        });
+      } else {
+        map.set(c.id || c.slug, c);
+      }
+    }
     if (![...map.values()].some((c) => c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug)) {
       map.set(FOUNDING_UY.id, {
         id: FOUNDING_UY.id,
@@ -405,6 +441,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         setGeo("ok");
         return;
       }
+      if (!extrasAllowed()) {
+        setGeo("idle");
+        return;
+      }
       void locateBest(false, (lat, lon, zoom) =>
         getCityFrame({ data: { lat, lon, zoom } }).catch(() => boxAround(lat, lon)),
       )
@@ -434,66 +474,90 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (!map || !group) return;
     void import("leaflet").then((L) => {
       group.clearLayers();
-      const occupied = new Set<string>();
-      const z = map.getZoom();
-      const clat = map.getCenter().lat;
-      const mpp = (40075016.686 * Math.cos((clat * Math.PI) / 180)) / (256 * 2 ** z);
-      const gapDeg = Math.max(0.0012, (44 * mpp) / (111320 * Math.max(0.2, Math.cos((clat * Math.PI) / 180))));
-      const laid = layoutCityLogos(visibleComms, gapDeg);
-      for (const c of laid) {
-        occupied.add(`${c.lat.toFixed(5)},${c.lon.toFixed(5)}`);
-        occupied.add(`${c.lat.toFixed(4)},${c.lon.toFixed(4)}`);
-        occupied.add(`${c.lat0.toFixed(4)},${c.lon0.toFixed(4)}`);
-        const trust = communityTrust(c);
-        const logo = escapeHtml(imgSrc(c.logo || ""));
-        const face = logo
-          ? `<img src="${logo.replace(/"/g, "")}" alt="" width="28" height="28" referrerpolicy="no-referrer" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" /><span style="display:none;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`
-          : `<span style="display:block;width:28px;height:28px">${BITCOIN_MARK_SVG}</span>`;
-        const check = trust.verified
+      type MapPin = {
+        id: string;
+        name: string;
+        lat: number;
+        lon: number;
+        logo?: string;
+        slug?: string;
+        kind: "community" | "shop";
+        verified: boolean;
+        comm?: Community;
+        place?: MerchantPlace;
+      };
+      const pins: MapPin[] = [];
+      for (const c of visibleComms) {
+        pins.push({
+          id: c.id,
+          name: c.name,
+          lat: c.lat,
+          lon: c.lon,
+          logo: pickListingLogo(c.logo),
+          slug: c.slug,
+          kind: "community",
+          verified: communityTrust(c).verified,
+          comm: c,
+        });
+      }
+      for (const p of places) {
+        const local = store[p.id];
+        const count = local?.voteCount ?? local?.votes?.length ?? 0;
+        const score = count ? (local?.score ?? 0) : 0;
+        pins.push({
+          id: p.id,
+          name: p.name,
+          lat: p.lat,
+          lon: p.lon,
+          logo: pickListingLogo(local?.logo, p.logo),
+          kind: "shop",
+          verified: listingTrust(local?.links, score, count, (local?.verifiedAt ?? 0) > 0).verified,
+          place: p,
+        });
+      }
+      const laid = placeTruePins(pins);
+      laid.sort((a, b) => {
+        if (a.kind !== b.kind) return a.kind === "shop" ? -1 : 1;
+        if (a.verified !== b.verified) return a.verified ? 1 : -1;
+        return (a.name || "").localeCompare(b.name || "", "es");
+      });
+      for (const pin of laid) {
+        const selected =
+          (pin.kind === "shop" && hit?.kind === "place" && hit.id === pin.id) ||
+          (pin.kind === "community" && hit?.kind === "community" && hit.id === pin.id);
+        const size = pin.kind === "community" ? (selected ? 36 : 32) : selected ? 34 : pin.logo ? 28 : 26;
+        const face = coinFaceHtml(pin.logo || "", size - 4);
+        const check = pin.verified
           ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : "";
         const icon = L.divIcon({
           className: "",
-          html: `<div style="position:relative;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
+          html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
         });
-        const m = L.marker([c.lat, c.lon], { icon, zIndexOffset: 400 });
+        const founding = pin.comm && (pin.comm.id === FOUNDING_UY.id || pin.comm.slug === FOUNDING_UY.slug);
+        const z = founding ? 700 : pin.kind === "community" ? 400 : pin.verified ? 280 : 200;
+        const m = L.marker([pin.lat, pin.lon], { icon, zIndexOffset: z });
         m.on("click", (ev) => {
           L.DomEvent.stopPropagation(ev);
-          setSelComm(c);
-          setSel(null);
           setDrop(null);
+          if (pin.kind === "community" && pin.comm) {
+            setSelComm({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 });
+            setSel(null);
+          } else if (pin.place) {
+            setSel({ ...pin.place, lat: pin.lat0, lon: pin.lon0, logo: pin.logo });
+            setSelComm(null);
+            setDraft(store[pin.id]?.description || "");
+          }
         });
+        const logo = escapeHtml(imgSrc(pin.logo || "")).replace(/"/g, "");
+        const sub = pin.kind === "community" ? `@${escapeHtml(pin.slug || pin.id)}` : escapeHtml(pin.place?.category || "");
         const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
-          ${logo ? `<img src="${logo.replace(/"/g, "")}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
-          <div><strong>${escapeHtml(c.name)}</strong><br/><span style="opacity:.7">@${escapeHtml(c.slug)}</span></div>
+          ${logo ? `<img src="${logo}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
+          <div><strong>${escapeHtml(pin.name)}</strong><br/><span style="opacity:.7">${sub}</span></div>
         </div>`;
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
-        m.addTo(group);
-      }
-      for (const p of places) {
-        const k = `${p.lat.toFixed(5)},${p.lon.toFixed(5)}`;
-        if (occupied.has(k)) continue;
-        occupied.add(k);
-        const selected = hit && hit.kind === "place" && hit.id === p.id;
-        const size = selected ? 36 : 26;
-        const m = L.marker([p.lat, p.lon], {
-          icon: L.divIcon({
-            className: "",
-            html: `<div style="width:${size}px;height:${size}px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">${BITCOIN_MARK_SVG}</div>`,
-            iconSize: [size, size],
-            iconAnchor: [size / 2, size / 2],
-          }),
-        });
-        m.on("click", (ev) => {
-          L.DomEvent.stopPropagation(ev);
-          setSel(p);
-          setSelComm(null);
-          setDrop(null);
-          setDraft(store[p.id]?.description || "");
-        });
-        m.bindTooltip(escapeHtml(p.name), { direction: "top", sticky: true });
         m.addTo(group);
       }
     });
@@ -596,6 +660,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }
 
   function vote(place: MerchantPlace) {
+    if (!privacyOk) {
+      setFormErr(t("privacyAcceptNeed"));
+      return;
+    }
     if (!captchaOk) {
       setFormErr(t("captchaNeed"));
       return;
@@ -630,6 +698,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }
 
   function propose() {
+    if (!privacyOk) {
+      setFormErr(t("privacyAcceptNeed"));
+      return;
+    }
     if (!drop || !shopName.trim()) return;
     const issues = addrHit && shopAddr.trim() === formatStreet(addrHit, lang) ? addressIssues(addrHit) : (["pick"] as const);
     if (issues.length) {
@@ -687,6 +759,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }
 
   function voteCommunity(c: Community) {
+    if (!privacyOk) {
+      setFormErr(t("privacyAcceptNeed"));
+      return;
+    }
     if (!captchaOk) {
       setFormErr(t("captchaNeed"));
       return;
@@ -728,6 +804,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   function saveCommunity() {
     if (!drop) return;
+    if (!privacyOk) {
+      setFormErr(t("privacyAcceptNeed"));
+      return;
+    }
     if (!captchaOk) {
       setFormErr(t("captchaNeed"));
       return;
@@ -868,11 +948,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <div className="space-y-3">
               <CommunityCard
                 community={selComm}
-                onToken={(token) => {
-                  const next = comms.map((c) => (c.id === selComm.id ? { ...c, verifyToken: token } : c));
-                  setComms(next);
-                  persist(store, next);
-                }}
                 onVerified={() => {
                   const next = comms.map((c) => (c.id === selComm.id ? { ...c, verifiedAt: Date.now() } : c));
                   setComms(next);
@@ -905,8 +980,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 ))}
               </div>
               <CaptchaBox key={selComm.id} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+              <PrivacyAccept id="privacy-map-vote-comm" checked={privacyOk} onChange={setPrivacyOk} />
               {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-              <Button type="button" className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk}>
+              <Button type="button" className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk || !privacyOk}>
                 {t("publishVote")}
               </Button>
             </div>
@@ -914,8 +990,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <div className="space-y-3">
               <p className="text-xs tracking-wide text-muted-foreground uppercase">{sel.category}</p>
               <div className="flex items-center gap-3">
-                {local?.logo ? (
-                  <img src={imgSrc(local.logo)} alt="" className="size-14 rounded-full object-cover" />
+                {pickListingLogo(local?.logo, sel.logo) ? (
+                  <img src={imgSrc(pickListingLogo(local?.logo, sel.logo))} alt="" className="size-14 rounded-full object-cover" />
                 ) : (
                   <span className="inline-flex size-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
                     ₿
@@ -991,8 +1067,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 ))}
               </div>
               <CaptchaBox key={sel.id} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+              <PrivacyAccept id="privacy-map-vote-shop" checked={privacyOk} onChange={setPrivacyOk} />
               {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-              <Button type="button" className="w-full" onClick={() => vote(sel)} disabled={!captchaOk}>
+              <Button type="button" className="w-full" onClick={() => vote(sel)} disabled={!captchaOk || !privacyOk}>
                 {t("publishVote")}
               </Button>
               {removable ? (
@@ -1072,11 +1149,12 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                     onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
                   />
                   <CaptchaBox key="shop" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+                  <PrivacyAccept id="privacy-map-shop" checked={privacyOk} onChange={setPrivacyOk} />
                   {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
                   <Button
                     className="w-full"
                     onClick={propose}
-                    disabled={!captchaOk || addressIssues(addrHit).length > 0}
+                    disabled={!captchaOk || !privacyOk || addressIssues(addrHit).length > 0}
                   >
                     {t("proposeShop")}
                   </Button>
@@ -1112,8 +1190,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                     onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
                   />
                   <CaptchaBox key="comm" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+                  <PrivacyAccept id="privacy-map-comm" checked={privacyOk} onChange={setPrivacyOk} />
                   {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-                  <Button className="w-full" onClick={saveCommunity} disabled={!captchaOk}>
+                  <Button className="w-full" onClick={saveCommunity} disabled={!captchaOk || !privacyOk}>
                     {t("publishComm")}
                   </Button>
                 </div>
@@ -1150,11 +1229,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
 function CommunityCard({
   community,
-  onToken,
   onVerified,
 }: {
   community: Community;
-  onToken: (token: string) => void;
   onVerified: () => void;
 }) {
   const t = useT();
@@ -1195,12 +1272,11 @@ function CommunityCard({
       </div>
       {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
       <SocialRow links={community.links} />
-      {!trust.verified ? (
+      {!trust.verified && community.verifyToken ? (
         <ScrapeVerifyBox
           id={community.id}
           token={community.verifyToken}
           hasLinks={community.links.length > 0}
-          onToken={onToken}
           onVerified={onVerified}
         />
       ) : null}
@@ -1212,25 +1288,18 @@ function ScrapeVerifyBox({
   id,
   token,
   hasLinks,
-  onToken,
   onVerified,
 }: {
   id: string;
   token?: string;
   hasLinks: boolean;
-  onToken: (token: string) => void;
   onVerified: () => void;
 }) {
   const t = useT();
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const tokenFn = useRef(onToken);
   const doneFn = useRef(onVerified);
-  tokenFn.current = onToken;
   doneFn.current = onVerified;
-  useEffect(() => {
-    if (!token) tokenFn.current(makePinToken());
-  }, [id, token]);
   useEffect(() => {
     if (!token || !hasLinks) return;
     let stop = false;
@@ -1255,6 +1324,7 @@ function ScrapeVerifyBox({
       window.clearTimeout(first);
     };
   }, [id, token, hasLinks, t]);
+  if (!token) return null;
   return (
     <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
       <p className="text-muted-foreground">{t("verifyScrapeHint")}</p>

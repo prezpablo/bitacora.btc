@@ -233,6 +233,11 @@ export function stringifyMapCsv(rows: MapCsvRow[]): string {
   return [MAP_CSV_HEADERS.join(","), ...body].join("\n") + "\n";
 }
 
+/** Snapshot GitHub / GET público: sin códigos CARGA. SQLite sí los guarda. */
+export function stringifyMapCsvPublic(rows: MapCsvRow[]): string {
+  return stringifyMapCsv(rows.map((r) => ({ ...r, token: "" })));
+}
+
 export function parseMapCsv(text: string): MapCsvRow[] {
   const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
   if (!lines.length) return [];

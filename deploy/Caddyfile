@@ -11,7 +11,12 @@ bitacorabtc.org {
 		X-Frame-Options SAMEORIGIN
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		Permissions-Policy "camera=(), microphone=(), payment=(), usb=()"
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https: https://static.btcmap.org https://*.btcmap.org; connect-src 'self' https://get.geojs.io https://ipwho.is https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com https://static.btcmap.org https://api.btcmap.org; worker-src 'self' blob:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https: https://static.btcmap.org https://*.btcmap.org; connect-src 'self' https://get.geojs.io https://ipwho.is https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://server.arcgisonline.com https://static.btcmap.org https://api.btcmap.org; worker-src 'self' blob:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co"
+	}
+	# Extractores (no AEO). GPTBot / Claude / Perplexity / Google siguen.
+	@extractors header_regexp User-Agent (?i)(CCBot|Bytespider|Diffbot|ImagesiftBot|magpie-crawler|YouBot|DataForSeoBot|PetalBot|Scrapy|python-requests)
+	handle @extractors {
+		abort
 	}
 	reverse_proxy 127.0.0.1:8080 {
 		header_up X-Real-IP {remote_host}

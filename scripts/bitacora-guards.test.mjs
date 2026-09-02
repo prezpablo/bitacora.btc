@@ -34,8 +34,17 @@ test("rate limit writes sqlite", () => {
   assert.match(src, /INSERT INTO rate_hits/);
 });
 
+test("public map snapshot strips tokens", () => {
+  const src = read("src/infrastructure/map-csv-io.ts");
+  assert.match(src, /stringifyMapCsvPublic/);
+  const pins = read("src/infrastructure/pins-io.ts");
+  assert.match(pins, /stringifyPinsCsvPublic/);
+});
+
 test("verify endpoints are rate-limited", () => {
   const src = read("src/infrastructure/server-fns.ts");
+  assert.match(src, /pin-verify-burst/);
+  assert.match(src, /map-verify-burst/);
   assert.match(src, /pin-verify/);
   assert.match(src, /map-verify/);
 });

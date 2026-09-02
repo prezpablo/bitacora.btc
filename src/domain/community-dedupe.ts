@@ -181,6 +181,68 @@ export function layoutCityLogos<T extends NamedPin>(rows: T[], gapDeg: number): 
   return placed;
 }
 
+const M_PER_DEG = 111_320;
+
+function metersToDeg(m: number, lat: number) {
+  const cos = Math.max(0.2, Math.cos((lat * Math.PI) / 180));
+  return { dlat: m / M_PER_DEG, dlon: m / (M_PER_DEG * cos) };
+}
+
+/**
+ * Keep the CSV / BTC Map coordinates. Only separate pins that sit on the same
+ * point (≤ cellM). The nudge stays under ~140 m, so entry zoom cannot fling
+ * a city cluster into the next country.
+ */
+export function placeTruePins<T extends NamedPin>(rows: T[], cellM = 28, radiusM = 52): LaidPin<T>[] {
+  const groups = new Map<string, T[]>();
+  for (const r of rows) {
+    if (!r?.id || !Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
+    const { dlat, dlon } = metersToDeg(cellM, r.lat);
+    const key = `${Math.round(r.lat / dlat)}_${Math.round(r.lon / dlon)}`;
+    const g = groups.get(key) || [];
+    g.push(r);
+    groups.set(key, g);
+  }
+  const laid: LaidPin<T>[] = [];
+  for (const g of groups.values()) {
+    g.sort((a, b) => (a.name || "").localeCompare(b.name || "", "es"));
+    if (g.length === 1) {
+      const r = g[0];
+      laid.push({ ...r, lat0: r.lat, lon0: r.lon, lng: r.lon, slot: 0, slots: 1 });
+      continue;
+    }
+    const lat0 = g.reduce((s, r) => s + r.lat, 0) / g.length;
+    const lon0 = g.reduce((s, r) => s + r.lon, 0) / g.length;
+    const rad = radiusM * (g.length > 8 ? 1.4 : 1);
+    const { dlat, dlon } = metersToDeg(rad, lat0);
+    g.forEach((r, i) => {
+      const ang = (2 * Math.PI * i) / g.length - Math.PI / 2;
+      const lat = lat0 + Math.sin(ang) * dlat;
+      const lon = lon0 + Math.cos(ang) * dlon;
+      laid.push({
+        ...r,
+        lat0: r.lat,
+        lon0: r.lon,
+        lat,
+        lon,
+        lng: lon,
+        slot: i,
+        slots: g.length,
+      });
+    });
+  }
+  return laid;
+}
+
+/** Prefer CSV logo, then BTC Map, then empty (caller draws the ₿). */
+export function pickListingLogo(...candidates: (string | undefined)[]) {
+  for (const raw of candidates) {
+    const t = String(raw || "").trim();
+    if (t) return t;
+  }
+  return "";
+}
+
 /** @deprecated use layoutCityLogos */
 export function spreadSameCity<T extends NamedPin>(rows: T[], cellDeg = 0.14): (T & { slot: number; slots: number })[] {
   return layoutCityLogos(rows, Math.max(0.02, cellDeg * 0.35));

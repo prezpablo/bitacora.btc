@@ -405,6 +405,20 @@ export function LabifDossier() {
             <br />
             Colonia del Sacramento, Uruguay · Agosto 2026
           </p>
+          <nav aria-label="Textos legales" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm">
+            <a href="/legal#aviso" className="text-[#1d1d1b] underline-offset-2 hover:underline">
+              Aviso legal
+            </a>
+            <a href="/legal#privacidad" className="text-[#1d1d1b] underline-offset-2 hover:underline">
+              Privacidad
+            </a>
+            <a href="/legal#cookies" className="text-[#1d1d1b] underline-offset-2 hover:underline">
+              Cookies
+            </a>
+            <a href="/legal#accesibilidad" className="text-[#1d1d1b] underline-offset-2 hover:underline">
+              Accesibilidad
+            </a>
+          </nav>
         </div>
       </footer>
     </div>

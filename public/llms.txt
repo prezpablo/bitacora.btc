@@ -18,6 +18,7 @@ Canonical: https://bitacorabtc.org/
 - Market: https://bitacorabtc.org/#mercado
 - FAQ: https://bitacorabtc.org/#faq-seo
 - Contact: https://bitacorabtc.org/#contacto
+- Legal: https://bitacorabtc.org/legal
 
 Languages: Spanish (default), Portuguese, English (`?lang=es|pt|en`).
 
