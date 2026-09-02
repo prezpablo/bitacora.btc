@@ -3,6 +3,7 @@ import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, 
 import type { GlobeStats } from "@/domain/globe";
 import { fetchDeskExtras, fetchLiveMarket, fetchTick } from "./compose";
 import { fetchEtfFlows, fetchOnchainLive, fetchPulse } from "./extra-feeds";
+import { withLastKnown } from "./last-known";
 import { fetchBtcCommunities, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";
@@ -37,12 +38,12 @@ export const getTick = createServerFn({ method: "POST" }).handler(async (): Prom
 });
 
 export const getOnchainLive = createServerFn({ method: "POST" }).handler(async (): Promise<Partial<OnchainPayload>> => {
-  return await fetchOnchainLive();
+  return await withLastKnown("onchain-live", () => fetchOnchainLive(), (d) => Boolean(d.height));
 });
 
 export const getEtfFlows = createServerFn({ method: "POST" }).handler(async (): Promise<EtfFlowPayload | null> => {
   try {
-    return await fetchEtfFlows();
+    return await withLastKnown("etf", fetchEtfFlows, (d) => d.series.length > 0 || d.lastUsdM !== 0);
   } catch {
     return null;
   }
@@ -51,7 +52,7 @@ export const getEtfFlows = createServerFn({ method: "POST" }).handler(async (): 
 export const getPulse = createServerFn({ method: "POST" })
   .validator((input: { lang?: string }) => input)
   .handler(async ({ data }): Promise<PulsePayload> => {
-    return await fetchPulse(data?.lang);
+    return await withLastKnown("pulse", () => fetchPulse(data?.lang), (d) => d.news.length > 0 || d.trends.length > 0);
   });
 
 export const getGlobeStats = createServerFn({ method: "POST" }).handler(async (): Promise<GlobeStats> => {
@@ -89,7 +90,7 @@ export const getCommunityFeed = createServerFn({ method: "POST" }).handler(async
 });
 
 export const getNetworkEvents = createServerFn({ method: "POST" }).handler(async (): Promise<EventsPayload> => {
-  return await fetchNetworkEvents();
+  return await withLastKnown("events", fetchNetworkEvents, (d) => d.events.length > 0);
 });
 
 export const getCityFrame = createServerFn({ method: "POST" })

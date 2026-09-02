@@ -118,6 +118,7 @@ export type ClarityPayload = {
   endDate: number;
   history: SeriesPoint[];
   url: string;
+  asOf: number;
 };
 
 export type FearGreedPayload = {

@@ -10,6 +10,7 @@ import { useLocale, type AppLang } from "@/lib/locale";
 import { useT, type CopyKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { StaleStamp } from "./stale-stamp";
 
 const KIND_COPY: { key: EventKind; label: CopyKey }[] = [
   { key: "meetup", label: "netKindMeetup" },
@@ -396,6 +397,7 @@ export function NetworkEvents() {
           {t("netTitle")}
         </h2>
         <p className="mt-1 text-sm text-pretty text-muted-foreground">{t("netLead")}</p>
+        <StaleStamp asOf={q.data?.asOf} />
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">

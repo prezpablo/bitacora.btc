@@ -8,6 +8,7 @@ import {
   fetchOnchain,
   fetchPulse,
 } from "./extra-feeds";
+import { withLastKnown } from "./last-known";
 import { binanceFeed, hyperliquidFeed, okxFeed } from "./market-feeds";
 import { syntheticCandles, syntheticDailyHistory } from "./synthetic";
 import { blendExchangeLiquidation, fetchTopExchangeTapes } from "./exchange-liq";
@@ -40,11 +41,12 @@ export function buildModelMarket(range: ChartRange, _liq: LiqRange): MarketPaylo
 }
 
 const extrasFeed: ExtrasFeed = {
-  onchain: fetchOnchain,
-  clarity: fetchClarity,
-  fearGreed: fetchFearGreed,
-  liquidity: fetchLiquidity,
-  pulse: fetchPulse,
+  onchain: (range) =>
+    withLastKnown("onchain", () => fetchOnchain(range), (d) => d.height > 0 || d.hashSeries.length > 0),
+  clarity: () => withLastKnown("clarity", fetchClarity, (d) => Number.isFinite(d.yes)),
+  fearGreed: () => withLastKnown("fear-greed", fetchFearGreed, (d) => Number.isFinite(d.value)),
+  liquidity: () => withLastKnown("liquidity", fetchLiquidity, (d) => d.price > 0),
+  pulse: () => withLastKnown("pulse", fetchPulse, (d) => d.news.length > 0 || d.trends.length > 0),
 };
 
 export function fetchLiveMarket(range: ChartRange, liq: LiqRange) {

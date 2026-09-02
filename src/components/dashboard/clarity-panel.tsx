@@ -1,7 +1,7 @@
 import type { ClarityPayload } from "@/domain";
 import { formatCompact, formatPct } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
-import { Sparkline } from "./spark";
+import { StaleStamp } from "./stale-stamp";
 
 export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
   const t = useT();
@@ -19,6 +19,7 @@ export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
         <div className="min-w-0">
           <h2 className="text-base font-medium text-foreground">{t("clTitle")}</h2>
           <p className="text-sm text-pretty text-muted-foreground">{t("clLead")}</p>
+          <StaleStamp asOf={data?.asOf} />
         </div>
         {hist.length >= 2 ? (
           <Sparkline values={hist} color="var(--color-ma-1w)" />

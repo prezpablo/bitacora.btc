@@ -214,6 +214,7 @@ export async function fetchClarity(): Promise<ClarityPayload> {
       endDate: end,
       history,
       url: `https://polymarket.com/event/${CLARITY_SLUG}`,
+      asOf: Date.now(),
     };
   } finally {
     clearTimeout(timer);

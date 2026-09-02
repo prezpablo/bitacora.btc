@@ -1,7 +1,7 @@
 import type { FearGreedPayload } from "@/domain";
 import { cn } from "@/lib/utils";
 import { useT, type CopyKey } from "@/lib/i18n";
-import { Sparkline } from "./spark";
+import { StaleStamp } from "./stale-stamp";
 
 const LABELS: Record<string, CopyKey> = {
   "Extreme Fear": "fgExtFear",
@@ -38,6 +38,7 @@ export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
         <div className="min-w-0">
           <h2 className="text-base font-medium text-foreground">{t("fgTitle")}</h2>
           <p className="text-sm text-pretty text-muted-foreground">{t("fgLead")}</p>
+          <StaleStamp asOf={data?.asOf} />
         </div>
         {hist.length >= 2 ? (
           <Sparkline values={hist} color="var(--color-ma-1m)" />

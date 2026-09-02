@@ -57,7 +57,7 @@ La auditoría describe el sitio **antes** de `/legal`, de la Ley 18.331 en el cl
 | 11 Relé fuera de EE.UU. | FormSubmit→Gmail sigue; el art. 13 ahora lo dice. Migrar SMTP es operación. |
 | 12 Runbook 24/72 h | Plantilla: [`INCIDENTES-URCDP.md`](INCIDENTES-URCDP.md). Ejecutarlo es del operador. |
 | 14 CAA / DMARC / preload | DNS y correo. Caddy ya manda HSTS. |
-| 18 Caché de 8 APIs caídas | P1 técnico aparte; no mezclar con legal. |
+| 18 Caché de 8 APIs caídas | **Hecho:** `withLastKnown` en extras, ETF, pulso, on-chain live y eventos. UI: «último dato». |
 | CSP sin `unsafe-inline` | Leaflet e inline del mapa. Queda P2. |
 | Proxy BFF de 15 APIs | P2 del plan híbrido. |
 

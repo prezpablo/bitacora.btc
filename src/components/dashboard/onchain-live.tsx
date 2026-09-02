@@ -3,6 +3,7 @@ import { formatCompact } from "@/lib/utils";
 import { localeTag } from "@/lib/display";
 import { useLocale } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
+import { StaleStamp } from "./stale-stamp";
 
 function ehLabel(eh: number) {
   if (eh >= 1000) return `${(eh / 1000).toFixed(2)} ZH/s`;
@@ -52,6 +53,7 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
         <span className="velar-live-dot size-2 rounded-full bg-primary" />
         <h2 className="text-xs font-semibold tracking-wide text-primary uppercase">{t("liveOn")}</h2>
         <span className="text-xs text-muted-foreground">mempool</span>
+        <StaleStamp asOf={data.asOf} />
       </div>
       <table className="w-full table-fixed text-sm">
         <thead>

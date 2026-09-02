@@ -3,6 +3,7 @@ import { ExternalLink, Radio } from "lucide-react";
 import type { NewsItem, PulsePayload } from "@/domain";
 import { translateNews } from "@/infrastructure/translate";
 import { formatAgo, useT } from "@/lib/i18n";
+import { StaleStamp } from "./stale-stamp";
 import { LANGS, useLocale, type AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
@@ -76,6 +77,7 @@ export function NewsCycle({ data }: { data: PulsePayload | null }) {
           <p className="text-sm text-pretty text-muted-foreground">
             {t("pulseLead")}
           </p>
+          <StaleStamp asOf={asOf} />
           <div role="group" aria-label={t("langAria")} className="mt-2 inline-flex rounded-md bg-elevated p-0.5 shadow-[var(--shadow-border)]">
             {LANGS.map((l) => (
               <button

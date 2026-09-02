@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { EtfFlowPayload, SeriesPoint } from "@/domain";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { StaleStamp } from "./stale-stamp";
 
 function moneyM(n: number) {
   const sign = n > 0 ? "+" : n < 0 ? "−" : "";
@@ -145,6 +146,7 @@ export function EtfFlowPanel({ data }: { data: EtfFlowPayload | null }) {
           {t("etfSource")}
           {data ? ` · ${data.lastDate}` : ""}
         </span>
+        <StaleStamp asOf={data?.asOf} />
         <div className="ml-auto flex gap-1">
           {(["1m", "3m", "all"] as const).map((k) => (
             <button
