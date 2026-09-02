@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { FAQ, GEO, SITE_NAME, jsonLd, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
+import { FAQ, GEO, OG_IMAGE_PATH, SITE_NAME, jsonLd, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
 import { useLocale, type AppLang } from "@/lib/locale";
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
@@ -37,7 +37,7 @@ export function SeoHead() {
     const seo = pageSeo(path, lang);
     const origin = siteOrigin();
     const url = path === "/" ? `${origin}/` : `${origin}${path}`;
-    const image = `${origin}/og.jpg`;
+    const image = `${origin}${OG_IMAGE_PATH}`;
     document.title = seo.title;
     document.documentElement.lang = lang;
     upsertMeta("name", "description", seo.description);

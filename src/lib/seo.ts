@@ -16,6 +16,9 @@ export const LIVE_ORIGIN = "https://45.158.116.49.nip.io";
 export const ORG_ORIGIN = "https://bitacorabtc.org";
 export const PUBLIC_ORIGIN = ORG_ORIGIN;
 
+/** Query para romper la caché de WhatsApp/Facebook (el jpg viejo era Velar). */
+export const OG_IMAGE_PATH = "/og.jpg?v=20260902";
+
 export const SAME_AS = [
   "https://github.com/prezpablo/bitacora.btc",
   "https://www.instagram.com/latamcriptomom/",
@@ -197,7 +200,7 @@ export function jsonLd(lang: AppLang, origin: string) {
         },
         image: {
           "@type": "ImageObject",
-          url: `${origin}/og.jpg`,
+          url: `${origin}${OG_IMAGE_PATH}`,
           width: 1200,
           height: 630,
         },
@@ -251,7 +254,7 @@ export function jsonLd(lang: AppLang, origin: string) {
         about: { "@id": `${origin}/#org` },
         primaryImageOfPage: {
           "@type": "ImageObject",
-          url: `${origin}/og.jpg`,
+          url: `${origin}${OG_IMAGE_PATH}`,
           width: 1200,
           height: 630,
         },

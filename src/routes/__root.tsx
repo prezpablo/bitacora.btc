@@ -2,7 +2,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
-import { jsonLd, PUBLIC_ORIGIN, SEO } from "@/lib/seo";
+import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, SEO } from "@/lib/seo";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
@@ -37,7 +37,7 @@ export const Route = createRootRoute({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANONICAL },
-      { property: "og:image", content: `${ORIGIN}/og.jpg` },
+      { property: "og:image", content: `${ORIGIN}${OG_IMAGE_PATH}` },
       { property: "og:image:alt", content: TITLE },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -48,7 +48,7 @@ export const Route = createRootRoute({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESC },
-      { name: "twitter:image", content: `${ORIGIN}/og.jpg` },
+      { name: "twitter:image", content: `${ORIGIN}${OG_IMAGE_PATH}` },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
