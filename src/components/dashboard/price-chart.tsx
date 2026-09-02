@@ -399,7 +399,7 @@ export function PriceChart({
     const vbH = frame.h;
     const slim = vbW < 540;
     const heatW = heatOn ? (slim ? 30 : 48) : 0;
-    const labelW = slim ? 52 : 72;
+    const labelW = slim ? 58 : 72;
     const plotW = Math.max(120, vbW - PAD.l - heatW - labelW - GAP);
     const t0 = activeView.t0;
     const t1 = activeView.t1;
@@ -1874,23 +1874,13 @@ function MaEndLabels({
           />
           <rect x={x} y={m.y - 11} width={w} height={22} rx={3} fill={m.color} />
           <text
-            x={x + 6}
-            y={m.y}
-            fill="var(--color-background)"
-            fontSize="10"
-            fontWeight="700"
-            dominantBaseline="middle"
-          >
-            {m.tag}
-          </text>
-          <text
-            x={x + w - 5}
+            x={x + w / 2}
             y={m.y}
             fill="var(--color-background)"
             fontSize="11"
-            fontWeight="600"
+            fontWeight="700"
             fontFamily="var(--font-mono)"
-            textAnchor="end"
+            textAnchor="middle"
             dominantBaseline="middle"
           >
             {axisUsd(m.value)}
