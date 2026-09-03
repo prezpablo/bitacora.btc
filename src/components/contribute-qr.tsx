@@ -16,6 +16,31 @@ const SRC: Record<Rail, string> = {
   ln: "/contribuir-ln.png",
 };
 
+function copyText(text: string): boolean {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.setAttribute("aria-hidden", "true");
+  ta.style.position = "fixed";
+  ta.style.top = "0";
+  ta.style.left = "0";
+  ta.style.width = "1px";
+  ta.style.height = "1px";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try {
+    ok = document.execCommand("copy");
+  } catch {
+    ok = false;
+  }
+  document.body.removeChild(ta);
+  return ok;
+}
+
 function CopyRow({
   rail,
   onRail,
@@ -26,20 +51,36 @@ function CopyRow({
   centered?: boolean;
 }) {
   const t = useT();
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "ok" | "fail">("idle");
   const value = rail === "ln" ? CONTRIBUTE_BOLT12 : CONTRIBUTE_ONCHAIN;
   const href = rail === "ln" ? CONTRIBUTE_LN_URI : CONTRIBUTE_URI;
 
-  async function copy(e: MouseEvent) {
+  useEffect(() => {
+    setStatus("idle");
+  }, [rail]);
+
+  useEffect(() => {
+    if (status === "idle") return;
+    const n = window.setTimeout(() => setStatus("idle"), 2800);
+    return () => window.clearTimeout(n);
+  }, [status]);
+
+  function copy(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard puede estar bloqueado */
+    if (copyText(value)) {
+      setStatus("ok");
+      return;
     }
+    const clip = navigator.clipboard;
+    if (clip?.writeText) {
+      void clip.writeText(value).then(
+        () => setStatus("ok"),
+        () => setStatus("fail"),
+      );
+      return;
+    }
+    setStatus("fail");
   }
 
   return (
@@ -82,12 +123,15 @@ function CopyRow({
           className="h-7 rounded-md bg-elevated px-2.5 text-xs font-medium text-foreground"
           onClick={copy}
         >
-          {copied ? t("contributeCopied") : t("contributeCopy")}
+          {t("contributeCopy")}
         </button>
         <a href={href} className="text-xs font-medium text-foreground underline underline-offset-2">
           {rail === "ln" ? "lightning:" : "bitcoin:"}
         </a>
       </div>
+      <p role="status" aria-live="polite" className="min-h-[1rem] text-xs font-medium text-primary">
+        {status === "ok" ? t("contributeCopied") : status === "fail" ? t("contributeCopyFail") : "\u00a0"}
+      </p>
       <p className="text-[11px] text-pretty text-muted-foreground">{rail === "ln" ? t("contributeLnNote") : t("contributeAddrNote")}</p>
     </div>
   );
