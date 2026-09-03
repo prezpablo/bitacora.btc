@@ -17,7 +17,7 @@ export const ORG_ORIGIN = "https://bitacorabtc.org";
 export const PUBLIC_ORIGIN = ORG_ORIGIN;
 
 /** Query para romper la caché de WhatsApp/Facebook (el jpg viejo era Velar). */
-export const OG_IMAGE_PATH = "/og.jpg?v=20260902";
+export const OG_IMAGE_PATH = "/og.jpg?v=20260903";
 
 export const SAME_AS = [
   "https://github.com/prezpablo/bitacora.btc",
