@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Locate, Star, Users } from "lucide-react";
-import type { Community, GradeBand, MerchantLocal, MerchantPlace } from "@/domain";
+import { Locate } from "lucide-react";
+import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { addScore, canRemove, dumpMapCsv, GRADE_HEX, gradeOf, communityTrust, listingTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
+import { addScore, canRemove, dumpMapCsv, listingTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
 import { dedupeCommunities, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
-import { getCityFrame, saveMapCsv, verifyMapListing } from "@/infrastructure/server-fns";
+import { getCityFrame, saveMapCsv } from "@/infrastructure/server-fns";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
@@ -25,13 +25,15 @@ import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark
 import { SiteShell } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { MapSearch, type SearchHit } from "./map-search";
+import { CommunityCard, PlaceCard } from "./map-listing-card";
+import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
 import type { PayKey } from "@/domain/pays";
-import { HoursEditor, HoursView } from "./hours-editor";
+import { HoursEditor } from "./hours-editor";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
-import { PayPicker, PayRow } from "./pay-row";
+import { PayPicker } from "./pay-row";
 import { AddressSearch } from "./address-search";
-import { SocialPicker, SocialRow } from "./social-row";
+import { SocialPicker } from "./social-row";
 import { addressIssues, formatStreet, type StreetHit } from "@/infrastructure/address";
 import {
   firebaseConfigured,
@@ -113,32 +115,6 @@ function applyCsv(text: string) {
     else store[r.id] = rowToLocal(r);
   }
   return { store, comms };
-}
-
-function StarMeter({ score, votes }: { score: number; votes: number }) {
-  const avg = votes > 0 ? score : 0;
-  const pct = Math.max(0, Math.min(100, (avg / 5) * 100));
-  return (
-    <div className="flex items-center gap-2">
-      <div className="relative inline-flex">
-        <div className="flex text-muted-foreground">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <Star key={n} className="size-5" />
-          ))}
-        </div>
-        <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${pct}%` }}>
-          <div className="flex text-primary">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Star key={n} className="size-5" fill="currentColor" />
-            ))}
-          </div>
-        </div>
-      </div>
-      <span className="font-mono text-sm text-foreground">
-        {avg.toFixed(1)} · {votes}
-      </span>
-    </div>
-  );
 }
 
 function applyFix(
@@ -906,10 +882,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }
 
   const local = sel ? store[sel.id] : undefined;
-  const g = sel ? gradeOf(local, Date.now()) : null;
-  const shopTrust = sel
-    ? listingTrust(local?.links, g?.avg ?? 0, g?.count ?? 0, (local?.verifiedAt ?? 0) > 0)
-    : null;
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
 
@@ -1004,194 +976,76 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 }}
               />
               <StarMeter score={selComm.score ?? 0} votes={selComm.voteCount ?? selComm.votes?.length ?? 0} />
-              {voteOpen ? (
-                <>
-              <label className="block text-sm">
-                {t("fldNick")}
-                <input
-                  className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]"
-                  value={nick}
-                  onChange={(e) => setNick(e.target.value)}
-                />
-              </label>
-              <div className="flex gap-1" role="group" aria-label={t("ratingAria")}>
-                {([1, 2, 3, 4, 5] as const).map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => setStars(n)}
-                    className={cn(
-                      "inline-flex size-10 items-center justify-center rounded-md",
-                      n <= stars ? "text-primary" : "text-muted-foreground",
-                    )}
-                    aria-label={t("starsN", { n })}
-                  >
-                    <Star className="size-5" fill={n <= stars ? "currentColor" : "none"} />
-                  </button>
-                ))}
-              </div>
-              <CaptchaBox key={selComm.id} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
-              <PrivacyAccept id="privacy-map-vote-comm" checked={privacyOk} onChange={setPrivacyOk} />
-              {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-              <Button type="button" className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk || !privacyOk}>
-                {t("publishVote")}
-              </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={() => setVoteOpen(false)}>
-                {t("pinCancel")}
-              </Button>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Button type="button" className="w-full" onClick={() => { setVoteOpen(true); setFormErr(""); }}>
-                    {t("mapLoadVote")}
-                  </Button>
-                  <Button type="button" variant="outline" className="w-full" onClick={cancelSel}>
-                    {t("pinCancel")}
-                  </Button>
-                </div>
-              )}
+              <MapVotePanel
+                open={voteOpen}
+                captchaKey={selComm.id}
+                privacyId="privacy-map-vote-comm"
+                nick={nick}
+                onNick={setNick}
+                stars={stars}
+                onStars={setStars}
+                captchaOk={captchaOk}
+                onCaptcha={setCaptchaOk}
+                onTicket={setTicket}
+                privacyOk={privacyOk}
+                onPrivacy={setPrivacyOk}
+                err={formErr}
+                onPublish={() => voteCommunity(selComm)}
+                onOpen={() => {
+                  setVoteOpen(true);
+                  setFormErr("");
+                }}
+                onHide={() => setVoteOpen(false)}
+                onDismiss={cancelSel}
+              />
             </div>
           ) : sel ? (
             <div className="space-y-3">
-              <p className="text-xs tracking-wide text-muted-foreground uppercase">{sel.category}</p>
-              <div className="flex items-center gap-3">
-                {pickListingLogo(local?.logo, sel.logo) ? (
-                  <img src={imgSrc(pickListingLogo(local?.logo, sel.logo))} alt="" className="size-14 rounded-full object-cover" />
-                ) : (
-                  <span className="inline-flex size-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
-                    ₿
-                  </span>
-                )}
-                <div>
-                <h3 className="flex items-center gap-2 text-lg font-medium text-foreground">
-                  {sel.name}
-                  {shopTrust?.verified ? (
-                    <VerifiedStar title={t("verified")} className="size-7" />
-                  ) : null}
-                </h3>
-                </div>
-              </div>
-              {g ? (
-                <div className="space-y-1">
-                  <StarMeter score={g.avg ?? 0} votes={g.count} />
-                  <p className="text-sm" style={{ color: GRADE_HEX[g.band] }}>
-                    {g.band === "baja"
-                      ? t("gradeLow")
-                      : g.band === "media"
-                        ? t("gradeMid")
-                        : g.band === "alta"
-                          ? t("gradeHigh")
-                          : t("gradeNew")}
-                    {g.avg != null ? ` · ${g.avg.toFixed(1)}/5` : ""} ·{" "}
-                    {g.count === 1 ? t("gradeNotes1") : t("gradeNotesN", { n: g.count })}
-                  </p>
-                </div>
-              ) : null}
-              {local?.description ? <p className="text-sm text-pretty text-foreground">{local.description}</p> : null}
-              {local?.notes ? (
-                <p className="text-sm text-pretty text-muted-foreground">
-                  <span className="font-medium text-foreground">{t("notesPrefix")} </span>
-                  {local.notes}
-                </p>
-              ) : null}
-              {local?.address ? <p className="text-sm text-muted-foreground">{local.address}</p> : null}
-              {local?.hours ? <HoursView hours={local.hours} /> : null}
-              {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
-              {local?.links?.length ? <SocialRow links={local.links} /> : null}
-              {removable ? (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
-                >
-                  {t("removeLow")}
-                </Button>
-              ) : null}
-              {voteOpen ? (
-                <>
-              <label className="block text-sm">
-                {t("fldNick")}
-                <input
-                  className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]"
-                  value={nick}
-                  onChange={(e) => setNick(e.target.value)}
-                />
-              </label>
-              <label className="block text-sm">
-                {t("fldDesc")}
-                <textarea
-                  className="mt-1 min-h-20 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  placeholder={t("phVote")}
-                />
-              </label>
-              <div className="flex gap-1" role="group" aria-label={t("ratingAria")}>
-                {([1, 2, 3, 4, 5] as const).map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => setStars(n)}
-                    className={cn(
-                      "inline-flex size-10 items-center justify-center rounded-md",
-                      n <= stars ? "text-primary" : "text-muted-foreground",
-                    )}
-                    aria-label={t("starsN", { n })}
-                  >
-                    <Star className="size-5" fill={n <= stars ? "currentColor" : "none"} />
-                  </button>
-                ))}
-              </div>
-              <CaptchaBox key={sel.id} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
-              <PrivacyAccept id="privacy-map-vote-shop" checked={privacyOk} onChange={setPrivacyOk} />
-              {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-              <Button type="button" className="w-full" onClick={() => vote(sel)} disabled={!captchaOk || !privacyOk}>
-                {t("publishVote")}
-              </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={() => setVoteOpen(false)}>
-                {t("pinCancel")}
-              </Button>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Button type="button" className="w-full" onClick={() => { setVoteOpen(true); setFormErr(""); }}>
-                    {t("mapLoadVote")}
-                  </Button>
-                  <Button type="button" variant="outline" className="w-full" onClick={cancelSel}>
-                    {t("pinCancel")}
-                  </Button>
-                </div>
-              )}
+              <PlaceCard
+                place={sel}
+                local={local}
+                removable={removable}
+                onRemove={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
+              />
+              <MapVotePanel
+                open={voteOpen}
+                captchaKey={sel.id}
+                privacyId="privacy-map-vote-shop"
+                nick={nick}
+                onNick={setNick}
+                stars={stars}
+                onStars={setStars}
+                draft={draft}
+                onDraft={setDraft}
+                captchaOk={captchaOk}
+                onCaptcha={setCaptchaOk}
+                onTicket={setTicket}
+                privacyOk={privacyOk}
+                onPrivacy={setPrivacyOk}
+                err={formErr}
+                onPublish={() => vote(sel)}
+                onOpen={() => {
+                  setVoteOpen(true);
+                  setFormErr("");
+                }}
+                onHide={() => setVoteOpen(false)}
+                onDismiss={cancelSel}
+              />
             </div>
           ) : drop && dropKind === "pick" ? (
-            <div className="space-y-2">
-              <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("newPoint")}</p>
-              <Button
-                type="button"
-                className="w-full"
-                onClick={() => {
-                  setDropKind("comercio");
-                  setMode("comercio");
-                  setFormErr("");
-                }}
-              >
-                {t("mapLoadShop")}
-              </Button>
-              <Button
-                type="button"
-                className="w-full"
-                onClick={() => {
-                  setDropKind("comunidad");
-                  setMode("comunidad");
-                  setFormErr("");
-                }}
-              >
-                {t("mapLoadComm")}
-              </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={cancelDrop}>
-                {t("pinCancel")}
-              </Button>
-            </div>
+            <MapDropPick
+              onShop={() => {
+                setDropKind("comercio");
+                setMode("comercio");
+                setFormErr("");
+              }}
+              onComm={() => {
+                setDropKind("comunidad");
+                setMode("comunidad");
+                setFormErr("");
+              }}
+              onCancel={cancelDrop}
+            />
           ) : drop ? (
             <div className="space-y-3">
               <p className="text-xs tracking-wide text-muted-foreground uppercase">
@@ -1372,131 +1226,3 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   return embedded ? body : <SiteShell>{body}</SiteShell>;
 }
 
-function CommunityCard({
-  community,
-  onVerified,
-}: {
-  community: Community;
-  onVerified: () => void;
-}) {
-  const t = useT();
-  const trust = communityTrust(community);
-  const [imgOk, setImgOk] = useState(true);
-  useEffect(() => {
-    setImgOk(true);
-  }, [community.id, community.logo]);
-  const showImg = Boolean(imgSrc(community.logo || "")) && imgOk;
-  return (
-    <div className="space-y-3">
-      <p className="flex items-center gap-1 text-xs tracking-wide text-muted-foreground uppercase">
-        <Users className="size-3.5" />
-        {t("modeComm")}
-      </p>
-      <div className="flex items-center gap-3">
-        {showImg ? (
-          <img
-            src={imgSrc(community.logo || "")}
-            alt=""
-            referrerPolicy="no-referrer"
-            className="size-16 rounded-full object-cover"
-            onError={() => setImgOk(false)}
-          />
-        ) : (
-          <span className="inline-flex size-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground">
-            ₿
-          </span>
-        )}
-        <div>
-          <h3 className="flex items-center gap-2 text-lg font-medium">
-            {community.name}
-            {trust.verified ? <VerifiedStar title={t("verified")} className="size-7" /> : null}
-          </h3>
-          <p className="font-mono text-xs text-muted-foreground">@{community.slug}</p>
-          {!trust.verified ? <p className="mt-1 text-xs text-muted-foreground">{t("verifyPending")}</p> : null}
-        </div>
-      </div>
-      {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
-      <SocialRow links={community.links} />
-      {!trust.verified && community.verifyToken ? (
-        <ScrapeVerifyBox
-          id={community.id}
-          token={community.verifyToken}
-          hasLinks={community.links.length > 0}
-          onVerified={onVerified}
-        />
-      ) : null}
-    </div>
-  );
-}
-
-function ScrapeVerifyBox({
-  id,
-  token,
-  hasLinks,
-  onVerified,
-}: {
-  id: string;
-  token?: string;
-  hasLinks: boolean;
-  onVerified: () => void;
-}) {
-  const t = useT();
-  const [err, setErr] = useState("");
-  const [busy, setBusy] = useState(false);
-  const doneFn = useRef(onVerified);
-  doneFn.current = onVerified;
-  useEffect(() => {
-    if (!token || !hasLinks) return;
-    let stop = false;
-    const tick = async () => {
-      setBusy(true);
-      try {
-        const res = await verifyMapListing({ data: { id, token } });
-        if (stop) return;
-        if (res.ok) doneFn.current();
-        else if (res.error === "links") setErr(t("verifyNeedLink"));
-      } catch {
-        /* next */
-      } finally {
-        if (!stop) setBusy(false);
-      }
-    };
-    const n = window.setInterval(() => void tick(), 10000);
-    const first = window.setTimeout(() => void tick(), 2000);
-    return () => {
-      stop = true;
-      window.clearInterval(n);
-      window.clearTimeout(first);
-    };
-  }, [id, token, hasLinks, t]);
-  if (!token) return null;
-  return (
-    <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
-      <p className="text-muted-foreground">{t("verifyScrapeHint")}</p>
-      {token ? (
-        <p>
-          <code className="rounded bg-primary px-1.5 py-0.5 font-mono text-sm font-bold text-white">{token}</code>
-        </p>
-      ) : null}
-      {!hasLinks ? <p className="text-primary">{t("verifyNeedLink")}</p> : null}
-      {err ? <p className="text-primary">{err}</p> : null}
-      <Button
-        type="button"
-        className="w-full"
-        disabled={busy || !hasLinks || !token}
-        onClick={() => {
-          if (!token) return;
-          setBusy(true);
-          void verifyMapListing({ data: { id, token } })
-            .then((res) => {
-              if (res.ok) onVerified();
-              else setErr(res.error === "links" ? t("verifyNeedLink") : t("pinProofFail"));
-            })
-            .finally(() => setBusy(false));
-        }}
-      >
-        {t("pinCheck")}
-      </Button>
-    </div>
-  );
-}
