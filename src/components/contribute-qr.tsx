@@ -1,11 +1,6 @@
 import { useEffect, useId, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
-import {
-  CONTRIBUTE_BOLT12,
-  CONTRIBUTE_LN_URI,
-  CONTRIBUTE_ONCHAIN,
-  CONTRIBUTE_URI,
-} from "@/domain/contribute";
+import { contributePayload } from "@/domain/contribute";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +36,26 @@ function copyText(text: string): boolean {
   return ok;
 }
 
+function sameAddr(got: string, expected: string) {
+  const n = got.trim().replace(/\s+/g, "").toLowerCase();
+  const e = expected.toLowerCase();
+  if (n === e) return true;
+  if (n === `bitcoin:${e}` || n === `lightning:${e}`) return true;
+  return false;
+}
+
+async function clipboardMatches(expected: string): Promise<"ok" | "hijack" | "unknown"> {
+  const read = navigator.clipboard?.readText;
+  if (!read) return "unknown";
+  try {
+    const got = await read.call(navigator.clipboard);
+    if (!got) return "unknown";
+    return sameAddr(got, expected) ? "ok" : "hijack";
+  } catch {
+    return "unknown";
+  }
+}
+
 function CopyRow({
   rail,
   onRail,
@@ -51,37 +66,60 @@ function CopyRow({
   centered?: boolean;
 }) {
   const t = useT();
-  const [status, setStatus] = useState<"idle" | "ok" | "fail">("idle");
-  const value = rail === "ln" ? CONTRIBUTE_BOLT12 : CONTRIBUTE_ONCHAIN;
-  const href = rail === "ln" ? CONTRIBUTE_LN_URI : CONTRIBUTE_URI;
+  const [status, setStatus] = useState<"idle" | "ok" | "fail" | "bad" | "hijack">("idle");
+  const payload = contributePayload(rail);
 
   useEffect(() => {
     setStatus("idle");
   }, [rail]);
 
   useEffect(() => {
-    if (status === "idle") return;
-    const n = window.setTimeout(() => setStatus("idle"), 2800);
+    if (status === "idle" || status === "hijack") return;
+    const n = window.setTimeout(() => setStatus("idle"), 3200);
     return () => window.clearTimeout(n);
   }, [status]);
+
+  function afterCopy(expected: string) {
+    setStatus("ok");
+    window.setTimeout(() => {
+      void clipboardMatches(expected).then((r) => {
+        if (r === "hijack") setStatus("hijack");
+      });
+    }, 450);
+  }
 
   function copy(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (copyText(value)) {
-      setStatus("ok");
+    if (!payload.ok) {
+      setStatus("bad");
+      return;
+    }
+    if (copyText(payload.value)) {
+      afterCopy(payload.value);
       return;
     }
     const clip = navigator.clipboard;
     if (clip?.writeText) {
-      void clip.writeText(value).then(
-        () => setStatus("ok"),
+      void clip.writeText(payload.value).then(
+        () => afterCopy(payload.value),
         () => setStatus("fail"),
       );
       return;
     }
     setStatus("fail");
   }
+
+  const live =
+    status === "ok"
+      ? t("contributeCopied", { hint: payload.hint })
+      : status === "fail"
+        ? t("contributeCopyFail")
+        : status === "bad"
+          ? t("contributeBadAddr")
+          : status === "hijack"
+            ? t("contributeHijack", { hint: payload.hint })
+            : "\u00a0";
 
   return (
     <div
@@ -112,9 +150,9 @@ function CopyRow({
           </button>
         ))}
       </div>
-      <p className="break-all font-mono text-[11px] leading-snug text-foreground sm:text-xs">
-        <a href={href} className="text-foreground underline-offset-2 hover:underline">
-          {value}
+      <p className="break-all font-mono text-[11px] leading-snug tracking-wide text-foreground sm:text-xs">
+        <a href={payload.href} className="text-foreground underline-offset-2 hover:underline">
+          {payload.grouped}
         </a>
       </p>
       <div className={cn("flex flex-wrap items-center gap-1.5", centered && "justify-center")}>
@@ -125,12 +163,16 @@ function CopyRow({
         >
           {t("contributeCopy")}
         </button>
-        <a href={href} className="text-xs font-medium text-foreground underline underline-offset-2">
+        <a href={payload.href} className="text-xs font-medium text-foreground underline underline-offset-2">
           {rail === "ln" ? "lightning:" : "bitcoin:"}
         </a>
       </div>
-      <p role="status" aria-live="polite" className="min-h-[1rem] text-xs font-medium text-primary">
-        {status === "ok" ? t("contributeCopied") : status === "fail" ? t("contributeCopyFail") : "\u00a0"}
+      <p
+        role="status"
+        aria-live="assertive"
+        className={cn("min-h-[1rem] text-xs font-medium text-primary", (status === "hijack" || status === "bad") && "font-semibold")}
+      >
+        {live}
       </p>
       <p className="text-[11px] text-pretty text-muted-foreground">{rail === "ln" ? t("contributeLnNote") : t("contributeAddrNote")}</p>
     </div>
