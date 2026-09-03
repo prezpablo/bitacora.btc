@@ -1,20 +1,32 @@
 import { useEffect, useId, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { CONTRIBUTE_ONCHAIN, CONTRIBUTE_URI } from "@/domain/contribute";
+import {
+  CONTRIBUTE_BOLT12,
+  CONTRIBUTE_LN_URI,
+  CONTRIBUTE_ONCHAIN,
+  CONTRIBUTE_URI,
+} from "@/domain/contribute";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const SRC = "/contribuir-qr.png";
+type Rail = "onchain" | "ln";
 
-function AddressRow() {
+const SRC: Record<Rail, string> = {
+  onchain: "/contribuir-qr.png",
+  ln: "/contribuir-ln.png",
+};
+
+function CopyRow({ rail }: { rail: Rail }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
+  const value = rail === "ln" ? CONTRIBUTE_BOLT12 : CONTRIBUTE_ONCHAIN;
+  const href = rail === "ln" ? CONTRIBUTE_LN_URI : CONTRIBUTE_URI;
 
   async function copy(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await navigator.clipboard.writeText(CONTRIBUTE_ONCHAIN);
+      await navigator.clipboard.writeText(value);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -24,10 +36,12 @@ function AddressRow() {
 
   return (
     <div className="mt-3 max-w-xl space-y-2" onClick={(e) => e.stopPropagation()}>
-      <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("contributeOnchain")}</p>
+      <p className="text-xs tracking-wide text-muted-foreground uppercase">
+        {rail === "ln" ? t("contributeLightning") : t("contributeOnchain")}
+      </p>
       <p className="break-all font-mono text-sm text-foreground">
-        <a href={CONTRIBUTE_URI} className="text-foreground underline-offset-2 hover:underline">
-          {CONTRIBUTE_ONCHAIN}
+        <a href={href} className="text-foreground underline-offset-2 hover:underline">
+          {value}
         </a>
       </p>
       <div className="flex flex-wrap items-center gap-2">
@@ -38,11 +52,39 @@ function AddressRow() {
         >
           {copied ? t("contributeCopied") : t("contributeCopy")}
         </button>
-        <a href={CONTRIBUTE_URI} className="text-sm font-medium text-foreground underline underline-offset-2">
-          bitcoin:
+        <a href={href} className="text-sm font-medium text-foreground underline underline-offset-2">
+          {rail === "ln" ? "lightning:" : "bitcoin:"}
         </a>
       </div>
-      <p className="text-xs text-pretty text-muted-foreground">{t("contributeAddrNote")}</p>
+      <p className="text-xs text-pretty text-muted-foreground">
+        {rail === "ln" ? t("contributeLnNote") : t("contributeAddrNote")}
+      </p>
+    </div>
+  );
+}
+
+function RailSwitch({ rail, onRail }: { rail: Rail; onRail: (r: Rail) => void }) {
+  const t = useT();
+  return (
+    <div className="flex flex-wrap gap-1" role="tablist" aria-label={t("payRail")}>
+      {(["onchain", "ln"] as const).map((id) => (
+        <button
+          key={id}
+          type="button"
+          role="tab"
+          aria-selected={rail === id}
+          className={cn(
+            "h-9 rounded-md px-3 text-sm font-medium",
+            rail === id ? "bg-primary text-primary-foreground" : "bg-elevated text-foreground",
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRail(id);
+          }}
+        >
+          {id === "ln" ? t("contributeLightning") : t("contributeOnchain")}
+        </button>
+      ))}
     </div>
   );
 }
@@ -51,6 +93,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [rail, setRail] = useState<Rail>("onchain");
   const titleId = useId();
 
   useEffect(() => setReady(true), []);
@@ -81,8 +124,8 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
       aria-controls={titleId}
     >
       <img
-        src={SRC}
-        alt={t("contributeAlt")}
+        src={SRC[rail]}
+        alt={rail === "ln" ? t("contributeAltLn") : t("contributeAlt")}
         width={compact ? 44 : 168}
         height={compact ? 44 : 168}
         className={cn(
@@ -114,16 +157,19 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={SRC}
-                alt={t("contributeAlt")}
+                src={SRC[rail]}
+                alt={rail === "ln" ? t("contributeAltLn") : t("contributeAlt")}
                 width={520}
                 height={520}
-                className="w-full rounded-md bg-card shadow-[var(--shadow-border)]"
+                className="w-full rounded-md bg-white p-3 shadow-[var(--shadow-border)]"
               />
               <p id={titleId} className="mt-4 text-center text-base text-pretty text-foreground sm:text-lg">
                 {t("contributeCaption")}
               </p>
-              <AddressRow />
+              <div className="mt-3">
+                <RailSwitch rail={rail} onRail={setRail} />
+              </div>
+              <CopyRow rail={rail} />
               <button
                 type="button"
                 className="mt-4 h-9 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
@@ -152,7 +198,10 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
             <p className="mt-2 max-w-xl text-sm text-pretty text-muted-foreground sm:text-base">
               {t("contributeHint")}
             </p>
-            <AddressRow />
+            <div className="mt-3">
+              <RailSwitch rail={rail} onRail={setRail} />
+            </div>
+            <CopyRow rail={rail} />
           </div>
         </section>
       )}
