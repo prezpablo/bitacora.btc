@@ -801,6 +801,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         setFormErr("");
         setCaptchaOk(false);
         setVoteOpen(false);
+      }
+    });
+    void upsertCommunity(row).then(
       (ok) => {
         if (ok) setSync("on");
       },
