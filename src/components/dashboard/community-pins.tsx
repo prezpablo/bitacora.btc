@@ -61,6 +61,7 @@ export function CommunityPinsBoard() {
   const [copied, setCopied] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
     setPending(readPending());
@@ -219,8 +220,23 @@ export function CommunityPinsBoard() {
       </div>
 
       <div className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
-        <p className="text-sm font-medium text-foreground">{t("pinFormTitle")}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
+        {pending || generating || formOpen ? (
+          <>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-medium text-foreground">{t("pinFormTitle")}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
+              </div>
+              {!pending && !generating ? (
+                <button
+                  type="button"
+                  className="h-9 shrink-0 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
+                  onClick={() => setFormOpen(false)}
+                >
+                  {t("pinCancel")}
+                </button>
+              ) : null}
+            </div>
         {generating && !pending ? (
           <div
             className="mt-6 flex min-h-32 flex-col items-center justify-center gap-2"
@@ -326,6 +342,16 @@ export function CommunityPinsBoard() {
               {t("pinSubmit")}
             </button>
           </form>
+        )}
+          </>
+        ) : (
+          <button
+            type="button"
+            className="h-10 w-full rounded-md bg-primary px-3 text-sm font-medium text-white"
+            onClick={() => setFormOpen(true)}
+          >
+            {t("pinNewAd")}
+          </button>
         )}
       </div>
     </div>
