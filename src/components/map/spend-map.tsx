@@ -211,6 +211,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [nick, setNick] = useState("colaborador");
   const [filter, setFilter] = useState<"todas" | "comercios" | "comunidades">("todas");
   const [drop, setDrop] = useState<{ lat: number; lon: number } | null>(null);
+  const [dropKind, setDropKind] = useState<"pick" | "comercio" | "comunidad">("pick");
+  const [voteOpen, setVoteOpen] = useState(false);
   const [mode, setMode] = useState<"comercio" | "comunidad">("comercio");
   const [form, setForm] = useState<CommForm>(EMPTY_FORM);
   const [formErr, setFormErr] = useState("");
@@ -434,9 +436,12 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       });
       map.on("click", (ev: { latlng: { lat: number; lng: number } }) => {
         setDrop({ lat: ev.latlng.lat, lon: ev.latlng.lng });
+        setDropKind("pick");
         setSel(null);
         setSelComm(null);
         setHit(null);
+        setVoteOpen(false);
+        setFormErr("");
       });
       requestAnimationFrame(() => map?.invalidateSize());
       pushBbox();
@@ -545,6 +550,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.on("click", (ev) => {
           L.DomEvent.stopPropagation(ev);
           setDrop(null);
+          setDropKind("pick");
+          setVoteOpen(false);
+          setFormErr("");
           if (pin.kind === "community" && pin.comm) {
             setSelComm({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 });
             setSel(null);
@@ -618,6 +626,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setHit(hit);
     mapRef.current?.setView([hit.lat, hit.lon], hit.kind === "city" ? 13 : 16, { animate: !prefersReducedMotion() });
     setDrop(null);
+    setDropKind("pick");
+    setVoteOpen(false);
     if (hit.kind === "community") {
       setSelComm(hit.community);
       setSel(null);
@@ -696,6 +706,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         setFormErr("");
         setCaptchaOk(false);
         setDraft("");
+        setVoteOpen(false);
       }
     });
   }
@@ -747,6 +758,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     });
     setSel(place);
     setDrop(null);
+    setDropKind("pick");
+    setVoteOpen(false);
     setPicked([]);
     setHandles({});
     setShopName("");
@@ -787,9 +800,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       else {
         setFormErr("");
         setCaptchaOk(false);
-      }
-    });
-    void upsertCommunity(row).then(
+        setVoteOpen(false);
       (ok) => {
         if (ok) setSync("on");
       },
@@ -799,6 +810,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   function pinFromAddress(hit: StreetHit) {
     setDrop({ lat: hit.lat, lon: hit.lon });
+    setDropKind("comercio");
     setMode("comercio");
     setShopAddr(formatStreet(hit, lang));
     setAddrHit(hit);
@@ -842,6 +854,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     persist(store, next);
     setSelComm(row);
     setDrop(null);
+    setDropKind("pick");
+    setVoteOpen(false);
     setForm(EMPTY_FORM);
     setFormErr("");
     setPicked([]);
@@ -857,6 +871,35 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   function toggleSocial(k: SocialKey) {
     setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
+  }
+
+  function cancelDrop() {
+    setDrop(null);
+    setDropKind("pick");
+    setFormErr("");
+    setCaptchaOk(false);
+    setPrivacyOk(false);
+    setShopName("");
+    setShopDesc("");
+    setShopNotes("");
+    setShopHours(EMPTY_HOURS);
+    setShopPays([]);
+    setShopAddr("");
+    setAddrHit(null);
+    setShopLogo("");
+    setForm(EMPTY_FORM);
+    setPicked([]);
+    setHandles({});
+  }
+
+  function cancelSel() {
+    setSel(null);
+    setSelComm(null);
+    setVoteOpen(false);
+    setFormErr("");
+    setCaptchaOk(false);
+    setPrivacyOk(false);
+    setDraft("");
   }
 
   const local = sel ? store[sel.id] : undefined;
@@ -958,6 +1001,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 }}
               />
               <StarMeter score={selComm.score ?? 0} votes={selComm.voteCount ?? selComm.votes?.length ?? 0} />
+              {voteOpen ? (
+                <>
               <label className="block text-sm">
                 {t("fldNick")}
                 <input
@@ -988,6 +1033,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <Button type="button" className="w-full" onClick={() => voteCommunity(selComm)} disabled={!captchaOk || !privacyOk}>
                 {t("publishVote")}
               </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={() => setVoteOpen(false)}>
+                {t("pinCancel")}
+              </Button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Button type="button" className="w-full" onClick={() => { setVoteOpen(true); setFormErr(""); }}>
+                    {t("mapLoadVote")}
+                  </Button>
+                  <Button type="button" variant="outline" className="w-full" onClick={cancelSel}>
+                    {t("pinCancel")}
+                  </Button>
+                </div>
+              )}
             </div>
           ) : sel ? (
             <div className="space-y-3">
@@ -1036,6 +1095,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               {local?.hours ? <HoursView hours={local.hours} /> : null}
               {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
               {local?.links?.length ? <SocialRow links={local.links} /> : null}
+              {removable ? (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
+                >
+                  {t("removeLow")}
+                </Button>
+              ) : null}
+              {voteOpen ? (
+                <>
               <label className="block text-sm">
                 {t("fldNick")}
                 <input
@@ -1075,35 +1145,55 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <Button type="button" className="w-full" onClick={() => vote(sel)} disabled={!captchaOk || !privacyOk}>
                 {t("publishVote")}
               </Button>
-              {removable ? (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
-                >
-                  {t("removeLow")}
-                </Button>
-              ) : null}
+              <Button type="button" variant="outline" className="w-full" onClick={() => setVoteOpen(false)}>
+                {t("pinCancel")}
+              </Button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Button type="button" className="w-full" onClick={() => { setVoteOpen(true); setFormErr(""); }}>
+                    {t("mapLoadVote")}
+                  </Button>
+                  <Button type="button" variant="outline" className="w-full" onClick={cancelSel}>
+                    {t("pinCancel")}
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : drop && dropKind === "pick" ? (
+            <div className="space-y-2">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("newPoint")}</p>
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => {
+                  setDropKind("comercio");
+                  setMode("comercio");
+                  setFormErr("");
+                }}
+              >
+                {t("mapLoadShop")}
+              </Button>
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => {
+                  setDropKind("comunidad");
+                  setMode("comunidad");
+                  setFormErr("");
+                }}
+              >
+                {t("mapLoadComm")}
+              </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={cancelDrop}>
+                {t("pinCancel")}
+              </Button>
             </div>
           ) : drop ? (
             <div className="space-y-3">
-              <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("newPoint")}</p>
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  className={cn("h-8 rounded-md px-3 text-xs", mode === "comercio" ? "bg-primary text-white" : "bg-elevated")}
-                  onClick={() => setMode("comercio")}
-                >
-                  {t("modeShop")}
-                </button>
-                <button
-                  type="button"
-                  className={cn("h-8 rounded-md px-3 text-xs", mode === "comunidad" ? "bg-primary text-white" : "bg-elevated")}
-                  onClick={() => setMode("comunidad")}
-                >
-                  {t("modeComm")}
-                </button>
-              </div>
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
+                {dropKind === "comunidad" || mode === "comunidad" ? t("mapLoadComm") : t("mapLoadShop")}
+              </p>
               {mode === "comercio" ? (
                 <div className="space-y-2">
                   <label className="block text-sm">
@@ -1161,6 +1251,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   >
                     {t("proposeShop")}
                   </Button>
+                  <Button type="button" variant="outline" className="w-full" onClick={cancelDrop}>
+                    {t("pinCancel")}
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1198,6 +1291,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   <Button className="w-full" onClick={saveCommunity} disabled={!captchaOk || !privacyOk}>
                     {t("publishComm")}
                   </Button>
+                  <Button type="button" variant="outline" className="w-full" onClick={cancelDrop}>
+                    {t("pinCancel")}
+                  </Button>
                 </div>
               )}
             </div>
@@ -1220,6 +1316,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onClick={() => {
                   setSelComm(c);
                   setSel(null);
+                  setVoteOpen(false);
+                  setDrop(null);
                 }}
               >
                 {c.name}
@@ -1235,6 +1333,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onClick={() => {
                   setSel(p);
                   setSelComm(null);
+                  setVoteOpen(false);
+                  setDrop(null);
                   setDraft(store[p.id]?.description || "");
                 }}
               >
