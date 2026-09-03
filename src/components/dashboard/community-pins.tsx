@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
@@ -62,6 +62,8 @@ export function CommunityPinsBoard() {
   const [pending, setPending] = useState<Pending | null>(null);
   const [generating, setGenerating] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const cancelled = useRef(false);
 
   useEffect(() => {
     setPending(readPending());
@@ -85,6 +87,24 @@ export function CommunityPinsBoard() {
   function keepPending(p: Pending | null) {
     setPending(p);
     writePending(p);
+  }
+
+  function abort() {
+    cancelled.current = true;
+    keepPending(null);
+    setName("");
+    setBlurb("");
+    setProof("");
+    setLinks("");
+    setCaptchaOk(false);
+    setPrivacyOk(false);
+    setTicket(null);
+    setErr("");
+    setBusy(false);
+    setGenerating(false);
+    setCopied(false);
+    setCaptchaKey((n) => n + 1);
+    setFormOpen(false);
   }
 
   const live = useMemo(() => {
@@ -126,6 +146,7 @@ export function CommunityPinsBoard() {
     }
     setBusy(true);
     setGenerating(true);
+    cancelled.current = false;
     const started = Date.now();
     try {
       const extra = links
@@ -138,6 +159,7 @@ export function CommunityPinsBoard() {
       });
       const wait = Math.max(0, 700 - (Date.now() - started));
       if (wait) await new Promise((r) => window.setTimeout(r, wait));
+      if (cancelled.current) return;
       if (!res?.ok || !res.token || !res.id) {
         setErr(res?.error === "rate" ? t("pinRate") : res?.error === "captcha" ? t("captchaNeed") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
@@ -227,15 +249,13 @@ export function CommunityPinsBoard() {
                 <p className="text-sm font-medium text-foreground">{t("pinFormTitle")}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
               </div>
-              {!pending && !generating ? (
-                <button
-                  type="button"
-                  className="h-9 shrink-0 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
-                  onClick={() => setFormOpen(false)}
-                >
-                  {t("pinCancel")}
-                </button>
-              ) : null}
+              <button
+                type="button"
+                className="h-9 shrink-0 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
+                onClick={abort}
+              >
+                {t("pinCancel")}
+              </button>
             </div>
         {generating && !pending ? (
           <div
@@ -276,6 +296,9 @@ export function CommunityPinsBoard() {
               disabled={busy}
             >
               {t("pinCheck")}
+            </button>
+            <button type="button" className="h-10 w-full rounded-md bg-elevated px-3 text-sm font-medium text-foreground" onClick={abort}>
+              {t("pinCancel")}
             </button>
           </div>
         ) : (
@@ -328,19 +351,28 @@ export function CommunityPinsBoard() {
               />
             </label>
             <div className="sm:col-span-2">
-              <CaptchaBox key="pin" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+              <CaptchaBox key={`pin-${captchaKey}`} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
             </div>
             <div className="sm:col-span-2">
               <PrivacyAccept id="privacy-pin" checked={privacyOk} onChange={setPrivacyOk} />
             </div>
             {err ? <p className="text-sm text-primary sm:col-span-2">{err}</p> : null}
-            <button
-              type="submit"
-              className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
-              disabled={busy || !privacyOk}
-            >
-              {t("pinSubmit")}
-            </button>
+            <div className="flex flex-wrap gap-2 sm:col-span-2">
+              <button
+                type="submit"
+                className="h-9 min-w-40 flex-1 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
+                disabled={busy || !privacyOk}
+              >
+                {t("pinSubmit")}
+              </button>
+              <button
+                type="button"
+                className="h-9 rounded-md bg-elevated px-3 text-sm font-medium text-foreground"
+                onClick={abort}
+              >
+                {t("pinCancel")}
+              </button>
+            </div>
           </form>
         )}
           </>
