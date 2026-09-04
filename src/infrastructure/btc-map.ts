@@ -430,3 +430,45 @@ export async function fetchBtcCommunities(): Promise<Community[]> {
   }
   return [];
 }
+
+export async function fetchRemoteCommunities(): Promise<Community[]> {
+  const snap = readCommSnap();
+  try {
+    const res = await fetch("https://api.btcmap.org/v2/areas", {
+      headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+      signal: AbortSignal.timeout(90_000),
+    });
+    if (!res.ok) throw new Error(`btcmap areas ${res.status}`);
+    const text = await res.text();
+    const raw = JSON.parse(text, (k, v) => {
+      if (k === "geo_json") {
+        const c = geoCentroid(v);
+        return c || v;
+      }
+      return v;
+    }) as RawArea[];
+    const rows: Community[] = [];
+    const seen = new Set<string>();
+    for (const el of raw) {
+      const c = asCommunity(el);
+      if (!c || seen.has(c.id)) continue;
+      seen.add(c.id);
+      rows.push(c);
+    }
+    if (rows.length) writeCommSnap(rows);
+    return rows.length ? rows : snap;
+  } catch {
+    return snap;
+  }
+}
+
+/** Weekly: pull BTC Map and insert only ids Bitácora does not already have. */
+export async function syncCatalogFromBtcMap() {
+  const { mergeNewCatalog } = await import("./catalog");
+  const shops = await refreshDump(readSnap());
+  const comms = await fetchRemoteCommunities();
+  const added = mergeNewCatalog(shops, comms);
+  commCache = null;
+  console.info(`[catalog] weekly +${added.addedShops} shops +${added.addedComms} communities`);
+  return added;
+}

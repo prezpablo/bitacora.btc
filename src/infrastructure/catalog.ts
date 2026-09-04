@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Community, MerchantPlace } from "@/domain";
 import type { SocialLink } from "@/domain/socials";
-import { metaSet, openSqlite, sqlTx } from "./sqlite.ts";
+import { metaGet, metaSet, openSqlite, sqlTx } from "./sqlite.ts";
 
 function seedFiles(name: string) {
   return [
@@ -106,8 +106,75 @@ export function replaceCatalog(shops: MerchantPlace[], comms: Community[], wipe 
   });
 }
 
+const WEEK_MS = 7 * 86_400_000;
+const LOCK_MS = 2 * 3_600_000;
+
+/** Insert only ids Bitácora does not have. Never touches map_rows (user overlay). */
+export function mergeNewCatalog(shops: MerchantPlace[], comms: Community[]) {
+  let addedShops = 0;
+  let addedComms = 0;
+  sqlTx((d) => {
+    const have = new Set(
+      d
+        .prepare("SELECT id FROM catalog")
+        .all()
+        .map((r) => String(r.id || "")),
+    );
+    const ins = d.prepare(
+      `INSERT OR IGNORE INTO catalog(id, tipo, name, lat, lon, category, logo, description, socials, created, source)
+       VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+    );
+    for (const p of shops) {
+      if (!p.id || have.has(p.id) || !Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
+      ins.run(p.id, "shop", p.name || p.id, p.lat, p.lon, p.category || "", p.logo || "", p.description || "", "", p.createdAt || 0, "btcmap");
+      have.add(p.id);
+      addedShops++;
+    }
+    for (const c of comms) {
+      if (!c.id || have.has(c.id) || !Number.isFinite(c.lat) || !Number.isFinite(c.lon)) continue;
+      ins.run(
+        c.id,
+        "community",
+        c.name || c.id,
+        c.lat,
+        c.lon,
+        c.slug || "",
+        c.logo || "",
+        c.description || "",
+        JSON.stringify(c.links || []),
+        c.createdAt || 0,
+        "btcmap",
+      );
+      have.add(c.id);
+      addedComms++;
+    }
+    metaSet("catalog_at", String(Date.now()));
+    metaSet("catalog_n", String(have.size));
+    metaSet("catalog_added", `${addedShops},${addedComms}`);
+  });
+  return { addedShops, addedComms };
+}
+
+/** Once a week, compare BTC Map and insert only new rows. Never blocks the map. */
+export function maybeWeeklyCatalogSync() {
+  if (process.env.BITACORA_CATALOG_SYNC === "0") return;
+  const at = Number(metaGet("catalog_at") || 0);
+  if (at && Date.now() - at < WEEK_MS) return;
+  const lock = Number(metaGet("catalog_sync_lock") || 0);
+  if (lock && Date.now() - lock < LOCK_MS) return;
+  metaSet("catalog_sync_lock", String(Date.now()));
+  void import("./btc-map")
+    .then((m) => m.syncCatalogFromBtcMap())
+    .catch((err) => {
+      console.error("[catalog] weekly sync", err);
+    });
+}
+
 export function ensureCatalog() {
-  if (catalogCount() >= 50) return;
+  if (catalogCount() >= 50) {
+    maybeWeeklyCatalogSync();
+    return;
+  }
   const shops = readSeed<MerchantPlace>("btcmap-shops.json");
   const comms = readSeed<Community>("btcmap-comms.json");
   if (!shops.length && !comms.length) return;

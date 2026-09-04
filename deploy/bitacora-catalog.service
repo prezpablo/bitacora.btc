@@ -1,0 +1,12 @@
+[Unit]
+Description=Bitacora weekly BTC Map catalog compare
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=bitacora
+WorkingDirectory=/var/www/bitacora
+EnvironmentFile=-/etc/bitacora.env
+ExecStart=/usr/bin/node --experimental-strip-types /var/www/bitacora/scripts/sync-catalog.ts
+Nice=10
+TimeoutStartSec=180
