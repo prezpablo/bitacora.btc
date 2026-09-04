@@ -198,11 +198,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
               {t("initiative")}
             </p>
             <img
-              src="/latam-cripto-mom.png"
+              src="/latam-cripto-mom.jpg"
               alt="Latam Cripto Mom"
               width={88}
               height={88}
-              className="size-[4.236rem] sm:size-[5.236rem]"
+              loading="lazy"
+              decoding="async"
+              className="size-[4.236rem] sm:size-[5.236rem] rounded-full object-cover"
             />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-[1rem] gap-y-[0.382rem] text-sm text-muted-foreground">

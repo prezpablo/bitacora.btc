@@ -1,13 +1,17 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { GlobeFocus } from "@/domain/globe";
-import { prefetchMapStore } from "@/lib/map-query";
+import { prefetchGlobe, prefetchMapStore } from "@/lib/map-query";
 
 const WorldGlobe = lazy(() => import("./world-globe").then((m) => ({ default: m.WorldGlobe })));
 const SpendMap = lazy(() => import("./spend-map").then((m) => ({ default: m.SpendMap })));
 
 function MapFallback() {
-  return <div className="flex h-[min(70dvh,640px)] items-center justify-center rounded-lg bg-white text-sm text-neutral-500">…</div>;
+  return (
+    <div className="flex h-[min(70dvh,640px)] items-center justify-center rounded-lg bg-[#0b0d10] text-sm text-neutral-400">
+      <span className="inline-flex size-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-white">₿</span>
+    </div>
+  );
 }
 
 export function MapGate({ embedded = false }: { embedded?: boolean }) {
@@ -17,13 +21,23 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setReady(true);
-    void prefetchMapStore(qc);
+    const start = () => {
+      setReady(true);
+      void prefetchGlobe(qc);
+    };
+    const ric = window.requestIdleCallback;
+    if (ric) {
+      const id = ric(start, { timeout: 600 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const n = window.setTimeout(start, 80);
+    return () => window.clearTimeout(n);
   }, [qc]);
 
   function goMap(next?: GlobeFocus) {
     if (next) setFocus(next);
     setMode("map");
+    void prefetchMapStore(qc);
   }
 
   if (!ready) return <MapFallback />;

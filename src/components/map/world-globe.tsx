@@ -135,21 +135,29 @@ function GlobeCanvas({
     const timer = window.setTimeout(() => {
       if (!stop) setLoadErr((e) => e || "timeout");
     }, 12000);
-    void import("react-globe.gl")
-      .then((m) => {
-        const g = (m as { default?: unknown }).default ?? m;
-        const Cmp = (g as { default?: unknown }).default ?? g;
-        if (!stop) {
-          window.clearTimeout(timer);
-          setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
-        }
-      })
-      .catch((err: Error) => {
-        if (!stop) setLoadErr(err.message || "globe");
-      });
+    const load = () => {
+      void import("react-globe.gl")
+        .then((m) => {
+          const g = (m as { default?: unknown }).default ?? m;
+          const Cmp = (g as { default?: unknown }).default ?? g;
+          if (!stop) {
+            window.clearTimeout(timer);
+            setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
+          }
+        })
+        .catch((err: Error) => {
+          if (!stop) setLoadErr(err.message || "globe");
+        });
+    };
+    const idle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(load, { timeout: 400 })
+        : window.setTimeout(load, 0);
     return () => {
       stop = true;
       window.clearTimeout(timer);
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle as number);
+      else window.clearTimeout(idle as number);
     };
   }, []);
 

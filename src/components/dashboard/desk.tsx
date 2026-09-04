@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
 import { buildModelMarket } from "@/application";
 import { getDeskExtras, getEtfFlows, getMarket, getOnchainLive, getPulse, getTick } from "@/infrastructure/server-fns";
@@ -10,27 +10,32 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ClarityPanel } from "./clarity-panel";
 import { ClientOnly } from "./client-only";
-import { CommunityFeedPanel } from "./community-feed";
-import { NetworkEvents } from "./network-events";
 import { FearGreedPanel } from "./fear-greed-panel";
-import { HistoryTimeline } from "./history-timeline";
-import { CommunityPinsBoard } from "./community-pins";
 import { LiquidityPanel } from "./liquidity-panel";
 import { NewsCycle } from "./news-cycle";
 import { OnchainPanel } from "./onchain-panel";
 import { OnchainLiveBar } from "./onchain-live";
-import { EtfFlowPanel } from "./etf-flow";
-import { PriceChart } from "./price-chart";
-import { ContributeQr } from "@/components/contribute-qr";
 import { ConcienciaBlock } from "./conciencia";
-import { ContactBlock } from "./contact";
-import { RoadmapWeb3 } from "./roadmap-web3";
-import { SoberaniaBlock } from "./soberania";
 import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { DATOS, useT } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
+
+const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
+const CommunityPinsBoard = lazy(() => import("./community-pins").then((m) => ({ default: m.CommunityPinsBoard })));
+const CommunityFeedPanel = lazy(() => import("./community-feed").then((m) => ({ default: m.CommunityFeedPanel })));
+const NetworkEvents = lazy(() => import("./network-events").then((m) => ({ default: m.NetworkEvents })));
+const HistoryTimeline = lazy(() => import("./history-timeline").then((m) => ({ default: m.HistoryTimeline })));
+const RoadmapWeb3 = lazy(() => import("./roadmap-web3").then((m) => ({ default: m.RoadmapWeb3 })));
+const ContactBlock = lazy(() => import("./contact").then((m) => ({ default: m.ContactBlock })));
+const SoberaniaBlock = lazy(() => import("./soberania").then((m) => ({ default: m.SoberaniaBlock })));
+const EtfFlowPanel = lazy(() => import("./etf-flow").then((m) => ({ default: m.EtfFlowPanel })));
+const PriceChart = lazy(() => import("./price-chart").then((m) => ({ default: m.PriceChart })));
+
+function Soft() {
+  return <div className="h-24 rounded-lg bg-card shadow-[var(--shadow-border)]" />;
+}
 
 const CHART_RANGES: { value: ChartRange; label: string }[] = [
   { value: "1d", label: "1D" },
@@ -203,22 +208,34 @@ export function Desk() {
 
       <section id="conciencia" className="scroll-mt-[var(--header-offset)] space-y-4">
         <ConcienciaBlock />
-        <ContributeQr />
+        <Suspense fallback={<Soft />}>
+          <ContributeQr />
+        </Suspense>
       </section>
 
-      <RoadmapWeb3 />
+      <Suspense fallback={<Soft />}>
+        <RoadmapWeb3 />
+      </Suspense>
 
       <section id="comunidad" className="scroll-mt-[var(--header-offset)] space-y-6">
-        <CommunityPinsBoard />
-        <NetworkEvents />
-        <CommunityFeedPanel />
+        <Suspense fallback={<Soft />}>
+          <CommunityPinsBoard />
+        </Suspense>
+        <Suspense fallback={<Soft />}>
+          <NetworkEvents />
+        </Suspense>
+        <Suspense fallback={<Soft />}>
+          <CommunityFeedPanel />
+        </Suspense>
       </section>
 
       <section id="pulso" className="scroll-mt-[var(--header-offset)]">
         <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
       </section>
 
-      <HistoryTimeline />
+      <Suspense fallback={<Soft />}>
+        <HistoryTimeline />
+      </Suspense>
 
       <section id="red" className="scroll-mt-[var(--header-offset)] space-y-3">
         <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{t("redTitle")}</h2>
@@ -338,11 +355,15 @@ export function Desk() {
         </div>
         <div className="bg-plot">
           <ClientOnly fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
-            <PriceChart market={market} enabled={ma} heatOn={heatOn} />
+            <Suspense fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
+              <PriceChart market={market} enabled={ma} heatOn={heatOn} />
+            </Suspense>
           </ClientOnly>
         </div>
       </section>
-      <EtfFlowPanel data={etfFlows.data ?? null} />
+      <Suspense fallback={<Soft />}>
+        <EtfFlowPanel data={etfFlows.data ?? null} />
+      </Suspense>
       </section>
 
       <section id="datos" className="scroll-mt-[var(--header-offset)] rounded-lg bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-5">
@@ -360,10 +381,14 @@ export function Desk() {
         </details>
       </section>
 
-      <SoberaniaBlock />
+      <Suspense fallback={<Soft />}>
+        <SoberaniaBlock />
+      </Suspense>
 
       <section id="contacto" className="scroll-mt-[var(--header-offset)]">
-        <ContactBlock />
+        <Suspense fallback={<Soft />}>
+          <ContactBlock />
+        </Suspense>
       </section>
 
       {query.isError && (

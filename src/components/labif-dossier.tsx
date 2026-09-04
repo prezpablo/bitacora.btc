@@ -57,7 +57,7 @@ export function LabifDossier() {
             <figcaption className="text-xs tracking-wide text-[#5c6370] uppercase">Consciencia Bitcoin</figcaption>
           </figure>
           <figure className="m-0 flex flex-col items-center gap-2">
-            <img src="/latam-cripto-mom.png" alt="LATAM Cripto Mom" className="h-14 w-14 rounded-full object-cover" />
+            <img src="/latam-cripto-mom.jpg" alt="LATAM Cripto Mom" className="h-14 w-14 rounded-full object-cover" />
             <figcaption className="text-xs tracking-wide text-[#5c6370] uppercase">LATAM Cripto Mom</figcaption>
           </figure>
         </div>
@@ -398,7 +398,7 @@ export function LabifDossier() {
               </span>
             </div>
             <img src="/logos/conciencia-bitcoin.png" alt="Consciencia Bitcoin" className="size-16 rounded-full object-cover" />
-            <img src="/latam-cripto-mom.png" alt="LATAM Cripto Mom" className="size-16 rounded-full object-cover" />
+            <img src="/latam-cripto-mom.jpg" alt="LATAM Cripto Mom" className="size-16 rounded-full object-cover" />
           </div>
           <p className="text-center text-sm text-[#5c6370]">
             Una iniciativa de Consciencia Bitcoin by LATAM Cripto Mom

@@ -73,9 +73,13 @@ export function useMapEvents() {
   });
 }
 
+export function prefetchGlobe(qc: QueryClient) {
+  return qc.prefetchQuery({ queryKey: mapKeys.globe, queryFn: () => getGlobeStats(), staleTime: STALE.globe });
+}
+
 export function prefetchMapStore(qc: QueryClient) {
   return Promise.all([
-    qc.prefetchQuery({ queryKey: mapKeys.globe, queryFn: () => getGlobeStats(), staleTime: STALE.globe }),
+    prefetchGlobe(qc),
     qc.prefetchQuery({ queryKey: mapKeys.communities, queryFn: () => getBtcCommunities(), staleTime: STALE.communities }),
     qc.prefetchQuery({ queryKey: mapKeys.csv, queryFn: () => getMapCsv(), staleTime: STALE.csv }),
     qc.prefetchQuery({ queryKey: mapKeys.events, queryFn: () => getNetworkEvents(), staleTime: STALE.events }),

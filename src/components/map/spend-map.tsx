@@ -3,7 +3,7 @@ import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { addScore, canRemove, dumpMapCsv, listingTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
+import { addScore, canRemove, dumpMapCsv, listingTrust, communityTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
 import { dedupeCommunities, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
