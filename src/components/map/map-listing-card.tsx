@@ -16,6 +16,7 @@ export function CommunityCard({
   community,
   onVerified,
   onGo,
+  going,
 }: {
   community: Community;
   onVerified: () => void;
@@ -83,6 +84,7 @@ export function PlaceCard({
   removable,
   onRemove,
   onGo,
+  going,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
