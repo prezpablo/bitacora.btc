@@ -4,6 +4,7 @@ import type { Community, MerchantPlace } from "@/domain";
 import { logoUrl, parseMapCsv } from "@/domain/map-csv";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 import { loadMapCsvText } from "./map-csv-io";
+import { catalogAllShops, catalogCommunities, catalogShopsInBox, searchCatalogShops } from "./catalog";
 
 type RawEl = {
   id: string;
@@ -150,7 +151,7 @@ const FALLBACK: MerchantPlace[] = [
 
 export async function fetchAllMerchants(): Promise<MerchantPlace[]> {
   try {
-    const rows = await loadAll();
+    const rows = catalogAllShops();
     return rows.length ? rows : FALLBACK;
   } catch {
     const snap = readSnap();
@@ -209,15 +210,9 @@ export async function fetchMerchants(bbox: {
   north: number;
 }): Promise<MerchantPlace[]> {
   const map = new Map<string, MerchantPlace>();
-  const known = cache?.places?.length ? cache.places : readSnap();
-  for (const p of known) if (inBox(p, bbox)) map.set(p.id, p);
-  void loadAll();
-  if (map.size < 12) {
-    try {
-      for (const p of await overpassBbox(bbox)) map.set(p.id, p);
-    } catch {
-      /* overpass optional */
-    }
+  for (const p of catalogShopsInBox(bbox)) map.set(p.id, p);
+  if (!map.size) {
+    for (const p of readSnap()) if (inBox(p, bbox)) map.set(p.id, p);
   }
   try {
     const csv = await loadMapCsvText();
@@ -248,19 +243,9 @@ export async function fetchMerchants(bbox: {
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {
   const needle = q.trim().toLowerCase();
   if (needle.length < 2) return [];
-  try {
-    const all = await loadAll();
-    const hits: MerchantPlace[] = [];
-    for (const p of all) {
-      if (p.name.toLowerCase().includes(needle) || p.category.toLowerCase().includes(needle)) {
-        hits.push(p);
-        if (hits.length >= 8) break;
-      }
-    }
-    return hits.length ? hits : FALLBACK.filter((p) => p.name.toLowerCase().includes(needle));
-  } catch {
-    return FALLBACK.filter((p) => p.name.toLowerCase().includes(needle));
-  }
+  const hits = searchCatalogShops(needle, 8);
+  if (hits.length) return hits;
+  return FALLBACK.filter((p) => p.name.toLowerCase().includes(needle));
 }
 
 export async function searchCities(q: string): Promise<{ label: string; lat: number; lon: number }[]> {
@@ -429,69 +414,19 @@ function writeCommSnap(rows: Community[]) {
   }
 }
 
-/** Live BTC Map communities — federated, not copied into the CSV overlay. */
+/** Communities from Bitácora's catalog (seeded from BTC Map once). No live API on the request path. */
 export async function fetchBtcCommunities(): Promise<Community[]> {
   const now = Date.now();
   if (commCache && now - commCache.at < TTL && commCache.rows.length) return commCache.rows;
-  if (commInflight) return commInflight;
-  commInflight = (async () => {
-    const snap = readCommSnap();
-    const snapLogos = snap.filter((c) => c.logo).length;
-    if (snap.length && fileAgeMs(COMM_SNAP) < TTL && snapLogos > snap.length * 0.2) {
-      commCache = { at: Date.now(), rows: snap };
-      return snap;
-    }
-    try {
-      const res = await fetch("https://api.btcmap.org/v2/areas", {
-        headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
-        signal: AbortSignal.timeout(90_000),
-      });
-      if (!res.ok) throw new Error(`btcmap areas ${res.status}`);
-      const text = await res.text();
-      const raw = JSON.parse(text, (k, v) => {
-        if (k === "geo_json") {
-          const c = geoCentroid(v);
-          return c || v;
-        }
-        return v;
-      }) as RawArea[];
-      const rows: Community[] = [];
-      const seen = new Set<string>();
-      for (const el of raw) {
-        const c = asCommunity(el);
-        if (!c || seen.has(c.id)) continue;
-        seen.add(c.id);
-        rows.push(c);
-      }
-      for (const slug of ["punta-bitcoin", "bitcoin-school-argentina"]) {
-        if ([...seen].some((id) => id.endsWith(`:${slug}`) || id === `btcmap:${slug}`)) continue;
-        if (rows.some((c) => c.slug === slug)) continue;
-        try {
-          const one = await fetch(`https://api.btcmap.org/v2/areas/${slug}`, {
-            headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
-            signal: AbortSignal.timeout(15_000),
-          });
-          if (!one.ok) continue;
-          const el = (await one.json()) as RawArea;
-          const c = asCommunity(el);
-          if (c && !seen.has(c.id)) {
-            seen.add(c.id);
-            rows.push(c);
-          }
-        } catch {
-          /* one area optional */
-        }
-      }
-      const out = rows.length ? rows : snap;
-      if (rows.length) writeCommSnap(rows);
-      commCache = { at: Date.now(), rows: out };
-      return out;
-    } catch {
-      commCache = { at: Date.now(), rows: snap };
-      return snap;
-    }
-  })().finally(() => {
-    commInflight = null;
-  });
-  return commInflight;
+  const fromDb = catalogCommunities();
+  if (fromDb.length) {
+    commCache = { at: now, rows: fromDb };
+    return fromDb;
+  }
+  const snap = readCommSnap();
+  if (snap.length) {
+    commCache = { at: now, rows: snap };
+    return snap;
+  }
+  return [];
 }

@@ -63,8 +63,23 @@ CREATE TABLE IF NOT EXISTS captcha (
   created INTEGER NOT NULL,
   used INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS catalog (
+  id TEXT PRIMARY KEY,
+  tipo TEXT NOT NULL,
+  name TEXT NOT NULL,
+  lat REAL NOT NULL,
+  lon REAL NOT NULL,
+  category TEXT NOT NULL DEFAULT '',
+  logo TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  socials TEXT NOT NULL DEFAULT '',
+  created INTEGER NOT NULL DEFAULT 0,
+  source TEXT NOT NULL DEFAULT 'btcmap'
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
+CREATE INDEX IF NOT EXISTS catalog_tipo ON catalog (tipo);
+CREATE INDEX IF NOT EXISTS catalog_geo ON catalog (lat, lon);
 CREATE INDEX IF NOT EXISTS rate_hits_kt ON rate_hits (k, t);
 CREATE INDEX IF NOT EXISTS captcha_created ON captcha (created);
 `;
