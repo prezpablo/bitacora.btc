@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { GlobeFocus } from "@/domain/globe";
 import { prefetchGlobe, prefetchMapStore } from "@/lib/map-query";
+import { slowNet } from "@/lib/net";
 
 const WorldGlobe = lazy(() => import("./world-globe").then((m) => ({ default: m.WorldGlobe })));
 const SpendMap = lazy(() => import("./spend-map").then((m) => ({ default: m.SpendMap })));
@@ -16,11 +17,17 @@ function MapFallback() {
 
 export function MapGate({ embedded = false }: { embedded?: boolean }) {
   const qc = useQueryClient();
-  const [mode, setMode] = useState<"globe" | "map">("globe");
+  const [mode, setMode] = useState<"globe" | "map">(slowNet() ? "map" : "globe");
   const [focus, setFocus] = useState<GlobeFocus | undefined>();
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(slowNet());
 
   useEffect(() => {
+    if (slowNet()) {
+      setMode("map");
+      setReady(true);
+      void prefetchMapStore(qc);
+      return;
+    }
     const start = () => {
       setReady(true);
       void prefetchGlobe(qc);

@@ -20,6 +20,7 @@ import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { DATOS, useT } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
+import { slowNet } from "@/lib/net";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
@@ -79,9 +80,12 @@ export function Desk() {
   const uiLang = useLocale((s) => s.lang);
   const t = useT();
   const [allowFetch, setAllowFetch] = useState(false);
+  const [liveOk, setLiveOk] = useState(false);
   const hash = useRouterState({ select: (s) => s.location.hash });
   useEffect(() => {
     setAllowFetch(true);
+    const n = window.setTimeout(() => setLiveOk(true), slowNet() ? 2800 : 400);
+    return () => window.clearTimeout(n);
   }, []);
   useEffect(() => {
     const h = hash.replace(/^#/, "");
@@ -95,7 +99,7 @@ export function Desk() {
   const query = useQuery({
     queryKey: ["market", range, liq],
     queryFn: () => getMarket({ data: { range, liq } }),
-    enabled: allowFetch,
+    enabled: allowFetch && liveOk,
     staleTime: 8_000,
     refetchOnMount: false,
     refetchInterval: (q) => (q.state.status === "error" ? 8_000 : 12_000),
@@ -107,7 +111,7 @@ export function Desk() {
   const extras = useQuery({
     queryKey: ["extras", range],
     queryFn: () => getDeskExtras({ data: { range } }),
-    enabled: allowFetch,
+    enabled: allowFetch && liveOk,
     staleTime: 20_000,
     refetchOnMount: false,
     refetchInterval: 30_000,
@@ -119,7 +123,7 @@ export function Desk() {
   const pulse = useQuery({
     queryKey: ["pulse"],
     queryFn: () => getPulse({ data: { lang: uiLang } }),
-    enabled: allowFetch,
+    enabled: allowFetch && liveOk,
     staleTime: 90_000,
     refetchInterval: 120_000,
     refetchOnWindowFocus: true,
@@ -130,9 +134,9 @@ export function Desk() {
   const tick = useQuery({
     queryKey: ["tick"],
     queryFn: () => getTick(),
-    enabled: allowFetch,
+    enabled: allowFetch && liveOk,
     staleTime: 1_500,
-    refetchInterval: 2_000,
+    refetchInterval: () => (slowNet() ? 15_000 : 2_000),
     refetchOnWindowFocus: false,
     retry: 1,
     placeholderData: (prev) => prev,
@@ -141,10 +145,10 @@ export function Desk() {
   const onchainLive = useQuery({
     queryKey: ["onchain-live"],
     queryFn: () => getOnchainLive(),
-    enabled: allowFetch,
+    enabled: allowFetch && liveOk,
     staleTime: 5_000,
     refetchOnMount: false,
-    refetchInterval: 8_000,
+    refetchInterval: () => (slowNet() ? 20_000 : 8_000),
     refetchOnWindowFocus: false,
     retry: 2,
     placeholderData: (prev) => prev,
@@ -152,7 +156,7 @@ export function Desk() {
   const etfFlows = useQuery({
     queryKey: ["etf-flows"],
     queryFn: () => getEtfFlows(),
-    enabled: allowFetch,
+    enabled: allowFetch && liveOk,
     staleTime: 10 * 60_000,
     refetchOnMount: "always",
     refetchInterval: 10 * 60_000,
@@ -161,7 +165,7 @@ export function Desk() {
   });
 
   useEffect(() => {
-    if (!allowFetch) return;
+    if (!allowFetch || !liveOk) return;
     if (hash && hash !== "mercado") return;
     void query.refetch();
     void extras.refetch();

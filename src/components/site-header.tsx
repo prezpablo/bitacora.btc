@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ContributeQr } from "@/components/contribute-qr";
 import { StorageBanner } from "@/components/storage-banner";
 import { BrandMark } from "@/components/dashboard/brand-mark";
 import { SeoHead } from "@/components/seo-head";
 import { COPY, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale, type AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
+
+const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
 
 const NAV: { hash: string; key: CopyKey; href?: string }[] = [
   { hash: "mapa", key: "navMapa" },
@@ -146,7 +147,9 @@ export function SiteHeader() {
           <BrandMark compact />
         </Link>
         <div className="flex items-center gap-[0.618rem]">
-          <ContributeQr compact />
+          <Suspense fallback={null}>
+            <ContributeQr compact />
+          </Suspense>
           <LangButtons />
         </div>
       </div>
