@@ -10,6 +10,8 @@ import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
 import { nominatimCity, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
+import { fetchOsrmPath, type GuidePath } from "./osrm";
+import { pickGuideMode, type GuideMode } from "@/domain/guide";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
@@ -116,6 +118,22 @@ export const searchAddress = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<StreetHit[]> => {
     if (tooMany(clientKey("addr"), 40, 60 * 60_000) || tooMany("addr:global", 240, 60 * 60_000)) return [];
     return await searchStreets(data.q, data.lang || "es");
+  });
+
+export const getGuidePath = createServerFn({ method: "POST" })
+  .validator((input: { fromLat: number; fromLon: number; toLat: number; toLon: number }) => input)
+  .handler(async ({ data }): Promise<{ path: GuidePath; mode: GuideMode } | null> => {
+    if (tooMany(clientKey("route"), 30, 60 * 60_000) || tooMany("route:global", 200, 60 * 60_000)) return null;
+    const from = { lat: data.fromLat, lon: data.fromLon };
+    const to = { lat: data.toLat, lon: data.toLon };
+    if (![from.lat, from.lon, to.lat, to.lon].every(Number.isFinite)) return null;
+    const mode = pickGuideMode(from, to);
+    try {
+      const path = await fetchOsrmPath(from, to, mode);
+      return path.length ? { path, mode } : null;
+    } catch {
+      return null;
+    }
   });
 
 export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Promise<string> => {
