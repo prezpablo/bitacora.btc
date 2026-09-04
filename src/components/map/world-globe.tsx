@@ -233,18 +233,24 @@ function GlobeCanvas({
     return layoutCityLogos(dedupeCommunities([...byId.values()]), 0.035);
   }, [mapPins, overlayPins]);
 
+  const ownShops = useMemo(() => {
+    const rows: { id: string; name: string; lat: number; lon: number; logo?: string }[] = [];
+    for (const p of overlayPins) {
+      if (p.kind === "shop" && p.id && Number.isFinite(p.lat) && Number.isFinite(p.lon)) {
+        rows.push({ id: p.id, name: p.name || p.id, lat: p.lat, lon: p.lon, logo: p.logo });
+      }
+    }
+    return layoutCityLogos(rows, 0.02);
+  }, [overlayPins]);
+
   const far = alt > 1.48;
   const htmlPins = useMemo(() => {
-    if (!far) return coinPins.map((p) => ({ ...p, face: "logo" as const }));
-    const cell = 0.85;
-    const m = new Map<string, (typeof coinPins)[number] & { face: "btc" }>();
-    for (const p of coinPins) {
-      const k = `${Math.round(p.lat / cell)}_${Math.round(p.lon / cell)}`;
-      const prev = m.get(k);
-      if (!prev || p.id === FOUNDING_UY.id) m.set(k, { ...p, face: "btc" });
-    }
-    return [...m.values()];
-  }, [coinPins, far]);
+    if (far) return coinPins.map((p) => ({ ...p, face: "btc" as const }));
+    return [
+      ...coinPins.map((p) => ({ ...p, face: "logo" as const })),
+      ...ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const })),
+    ];
+  }, [coinPins, ownShops, far]);
 
   const enterRef = useRef(enter);
   enterRef.current = enter;

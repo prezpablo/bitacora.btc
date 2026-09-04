@@ -268,8 +268,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   const places = useMemo(() => {
     if (filter === "comunidades") return [];
+    const pad = 0.8;
     const extra: MerchantPlace[] = Object.entries(store)
       .filter(([, s]) => !s.removed && s.lat != null && s.lon != null)
+      .filter(
+        ([, s]) =>
+          s.lon! >= bbox.west - pad &&
+          s.lon! <= bbox.east + pad &&
+          s.lat! >= bbox.south - pad &&
+          s.lat! <= bbox.north + pad,
+      )
       .map(([id, s]) => ({
         id,
         lat: s.lat!,
@@ -294,7 +302,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         };
       });
     return [...extra, ...api];
-  }, [query.data, store, filter]);
+  }, [query.data, store, filter, bbox]);
 
   const overlayComms = comms;
   const allComms = useMemo(() => {

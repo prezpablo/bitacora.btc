@@ -68,7 +68,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 23;
+const STATS_VER = 24;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -324,19 +324,19 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       const iso = locateOrNearest(r.lon, r.lat, idx);
       bump(iso, isComm ? "comms" : "shops");
       markCity(iso, r.lat, r.lon);
-      if (!isComm) continue;
       const pin: GlobeDot = {
         id: r.id,
         lat: r.lat,
         lon: r.lon,
-        n: 2,
+        n: isComm ? 2 : 1,
         name: r.name,
-        kind: "community",
+        kind: isComm ? "community" : "shop",
         logo: logoUrl(r.logo || "") || undefined,
       };
       const prev = listings.get(r.id);
       if (prev) {
         if (pin.logo && !prev.logo) prev.logo = pin.logo;
+        if (pin.name && !prev.name) prev.name = pin.name;
         overlay.push(prev);
       } else {
         addListing(pin);

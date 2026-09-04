@@ -1,8 +1,9 @@
 import { mkdirSync, readFileSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Community, MerchantPlace } from "@/domain";
-import { logoUrl } from "@/domain/map-csv";
+import { logoUrl, parseMapCsv } from "@/domain/map-csv";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
+import { loadMapCsvText } from "./map-csv-io";
 
 type RawEl = {
   id: string;
@@ -217,6 +218,26 @@ export async function fetchMerchants(bbox: {
     } catch {
       /* overpass optional */
     }
+  }
+  try {
+    const csv = await loadMapCsvText();
+    for (const r of parseMapCsv(csv)) {
+      if (r.tipo === "community") continue;
+      if (!inBox(r, bbox)) continue;
+      const prev = map.get(r.id);
+      map.set(r.id, {
+        id: r.id,
+        lat: r.lat,
+        lon: r.lon,
+        name: r.name || prev?.name || r.id,
+        category: prev?.category || "propuesta",
+        createdAt: r.created || prev?.createdAt || Date.now(),
+        logo: r.logo || prev?.logo,
+        description: r.description || prev?.description,
+      });
+    }
+  } catch {
+    /* sqlite/csv optional */
   }
   if (!map.size) {
     for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, p);
