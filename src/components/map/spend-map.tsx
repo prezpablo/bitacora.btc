@@ -170,6 +170,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [geo, setGeo] = useState<"idle" | "wait" | "ok" | "denied">("idle");
   const [hit, setHit] = useState<SearchHit | null>(null);
   const [bbox, setBbox] = useState({ west: -56.35, south: -35.05, east: -55.95, north: -34.72 });
+  const [zoom, setZoom] = useState(focus?.zoom ?? 4);
+  const [mapReady, setMapReady] = useState(false);
   const [store, setStore] = useState<Record<string, MerchantLocal>>({});
   const [comms, setComms] = useState<Community[]>([]);
   const [sel, setSel] = useState<MerchantPlace | null>(null);
@@ -398,11 +400,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       userMark.current = L.layerGroup().addTo(map);
       mapRef.current = map;
       marks.current = group;
+      setMapReady(true);
+      setZoom(map.getZoom());
       requestAnimationFrame(() => map?.invalidateSize());
       const pushBbox = () => {
         if (!map) return;
         const b = map.getBounds();
         setBbox({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth() });
+        setZoom(map.getZoom());
       };
       map.on("moveend", pushBbox);
       map.on("zoomend", () => {
@@ -442,6 +447,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     });
     return () => {
       dead = true;
+      setMapReady(false);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -455,7 +461,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   useEffect(() => {
     const map = mapRef.current;
     const group = marks.current;
-    if (!map || !group) return;
+    if (!mapReady || !map || !group) return;
     void import("leaflet").then((L) => {
       group.clearLayers();
       type MapPin = {
@@ -465,8 +471,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         lon: number;
         logo?: string;
         slug?: string;
-        kind: "community" | "shop";
+        kind: "community" | "shop" | "city";
         verified: boolean;
+        count?: number;
         comm?: Community;
         place?: MerchantPlace;
       };
@@ -484,24 +491,52 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           comm: c,
         });
       }
-      for (const p of places) {
-        const local = store[p.id];
-        const count = local?.voteCount ?? local?.votes?.length ?? 0;
-        const score = count ? (local?.score ?? 0) : 0;
-        pins.push({
-          id: p.id,
-          name: p.name,
-          lat: p.lat,
-          lon: p.lon,
-          logo: pickListingLogo(local?.logo, p.logo),
-          kind: "shop",
-          verified: listingTrust(local?.links, score, count, (local?.verifiedAt ?? 0) > 0).verified,
-          place: p,
-        });
+      const far = zoom < 9;
+      if (far) {
+        const cell = zoom < 6 ? 1.2 : 0.42;
+        const cities = new Map<string, MapPin>();
+        for (const p of places) {
+          const k = `${Math.round(p.lat / cell)}_${Math.round(p.lon / cell)}`;
+          const prev = cities.get(k);
+          if (!prev) {
+            cities.set(k, {
+              id: `city:${k}`,
+              name: p.name,
+              lat: p.lat,
+              lon: p.lon,
+              logo: pickListingLogo(store[p.id]?.logo, p.logo),
+              kind: "city",
+              verified: false,
+              count: 1,
+            });
+          } else {
+            prev.count = (prev.count || 1) + 1;
+            prev.lat += (p.lat - prev.lat) / (prev.count || 2);
+            prev.lon += (p.lon - prev.lon) / (prev.count || 2);
+            if (!prev.logo) prev.logo = pickListingLogo(store[p.id]?.logo, p.logo);
+          }
+        }
+        pins.push(...cities.values());
+      } else {
+        for (const p of places) {
+          const local = store[p.id];
+          const count = local?.voteCount ?? local?.votes?.length ?? 0;
+          const score = count ? (local?.score ?? 0) : 0;
+          pins.push({
+            id: p.id,
+            name: p.name,
+            lat: p.lat,
+            lon: p.lon,
+            logo: pickListingLogo(local?.logo, p.logo),
+            kind: "shop",
+            verified: listingTrust(local?.links, score, count, (local?.verifiedAt ?? 0) > 0).verified,
+            place: p,
+          });
+        }
       }
       const laid = placeTruePins(pins);
       laid.sort((a, b) => {
-        if (a.kind !== b.kind) return a.kind === "shop" ? -1 : 1;
+        if (a.kind !== b.kind) return a.kind === "shop" ? -1 : a.kind === "city" ? 0 : 1;
         if (a.verified !== b.verified) return a.verified ? 1 : -1;
         return (a.name || "").localeCompare(b.name || "", "es");
       });
@@ -509,11 +544,26 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         const selected =
           (pin.kind === "shop" && hit?.kind === "place" && hit.id === pin.id) ||
           (pin.kind === "community" && hit?.kind === "community" && hit.id === pin.id);
-        const size = pin.kind === "community" ? (selected ? 36 : 32) : selected ? 34 : pin.logo ? 28 : 26;
+        const size =
+          pin.kind === "community"
+            ? selected
+              ? 36
+              : 32
+            : pin.kind === "city"
+              ? pin.count && pin.count > 8
+                ? 34
+                : 28
+              : selected
+                ? 34
+                : pin.logo
+                  ? 28
+                  : 26;
         const face = coinFaceHtml(pin.logo || "", size - 4);
         const check = pin.verified
           ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
-          : "";
+          : pin.kind === "city" && (pin.count || 0) > 1
+            ? `<span style="position:absolute;right:-6px;bottom:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#f7931a;color:#fff;font:700 10px/16px Ubuntu,sans-serif">${pin.count}</span>`
+            : "";
         const icon = L.divIcon({
           className: "",
           html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
@@ -521,7 +571,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           iconAnchor: [size / 2, size / 2],
         });
         const founding = pin.comm && (pin.comm.id === FOUNDING_UY.id || pin.comm.slug === FOUNDING_UY.slug);
-        const z = founding ? 700 : pin.kind === "community" ? 400 : pin.verified ? 280 : 200;
+        const z = founding ? 700 : pin.kind === "community" ? 400 : pin.kind === "city" ? 260 : pin.verified ? 280 : 200;
         const m = L.marker([pin.lat, pin.lon], { icon, zIndexOffset: z });
         m.on("click", (ev) => {
           L.DomEvent.stopPropagation(ev);
@@ -529,6 +579,12 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           setDropKind("pick");
           setVoteOpen(false);
           setFormErr("");
+          if (pin.kind === "city") {
+            map.setView([pin.lat0 ?? pin.lat, pin.lon0 ?? pin.lon], Math.max(12, zoom + 2), { animate: !prefersReducedMotion() });
+            setSel(null);
+            setSelComm(null);
+            return;
+          }
           if (pin.kind === "community" && pin.comm) {
             setSelComm({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 });
             setSel(null);
@@ -539,7 +595,12 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           }
         });
         const logo = escapeHtml(imgSrc(pin.logo || "")).replace(/"/g, "");
-        const sub = pin.kind === "community" ? `@${escapeHtml(pin.slug || pin.id)}` : escapeHtml(pin.place?.category || "");
+        const sub =
+          pin.kind === "community"
+            ? `@${escapeHtml(pin.slug || pin.id)}`
+            : pin.kind === "city"
+              ? `${pin.count || 1}`
+              : escapeHtml(pin.place?.category || "");
         const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
           ${logo ? `<img src="${logo}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
           <div><strong>${escapeHtml(pin.name)}</strong><br/><span style="opacity:.7">${sub}</span></div>
@@ -548,7 +609,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.addTo(group);
       }
     });
-  }, [places, store, visibleComms, hit]);
+  }, [places, store, visibleComms, hit, mapReady, zoom]);
 
   useEffect(() => {
     const map = mapRef.current;

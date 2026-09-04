@@ -65,13 +65,27 @@ function fileAgeMs(path: string) {
   }
 }
 
-function readSnap(): MerchantPlace[] {
+function readJsonPlaces(path: string): MerchantPlace[] {
   try {
-    const rows = JSON.parse(readFileSync(SHOP_SNAP, "utf8")) as MerchantPlace[];
+    const rows = JSON.parse(readFileSync(path, "utf8")) as MerchantPlace[];
     return Array.isArray(rows) ? rows.filter((p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lon) && p.id) : [];
   } catch {
     return [];
   }
+}
+
+function readSnap(): MerchantPlace[] {
+  const bundled = [
+    SHOP_SNAP,
+    join(process.cwd(), "public", "data", "btcmap-shops.json"),
+    join(process.cwd(), ".output", "public", "data", "btcmap-shops.json"),
+  ];
+  let best: MerchantPlace[] = [];
+  for (const path of bundled) {
+    const rows = readJsonPlaces(path);
+    if (rows.length > best.length) best = rows;
+  }
+  return best;
 }
 
 function writeSnap(places: MerchantPlace[]) {
@@ -87,37 +101,41 @@ async function loadAll(): Promise<MerchantPlace[]> {
   const now = Date.now();
   if (cache && now - cache.at < TTL && cache.places.length) return cache.places;
   if (inflight) return inflight;
-  inflight = (async () => {
-    const snap = readSnap();
-    if (snap.length >= 50 && fileAgeMs(SHOP_SNAP) < TTL) {
-      cache = { at: Date.now(), places: snap };
-      return snap;
-    }
-    try {
-      const res = await fetch("https://api.btcmap.org/v2/elements", {
-        headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
-        signal: AbortSignal.timeout(55_000),
-      });
-      if (!res.ok) throw new Error(`btcmap ${res.status}`);
-      const raw = (await res.json()) as RawEl[];
-      const places: MerchantPlace[] = [];
-      for (const el of raw) {
-        const p = asPlace(el);
-        if (p) places.push(p);
-      }
-      const out = places.length >= 50 ? places : snap.length ? snap : FALLBACK;
-      if (out.length >= 50) writeSnap(out);
-      cache = { at: Date.now(), places: out };
-      return out;
-    } catch {
-      const out = snap.length ? snap : FALLBACK;
-      cache = { at: Date.now(), places: out };
-      return out;
-    }
-  })().finally(() => {
+  const snap = readSnap();
+  if (snap.length >= 50) {
+    cache = { at: Date.now(), places: snap };
+    if (fileAgeMs(SHOP_SNAP) < TTL) return snap;
+    void refreshDump(snap);
+    return snap;
+  }
+  inflight = refreshDump(snap).finally(() => {
     inflight = null;
   });
   return inflight;
+}
+
+async function refreshDump(snap: MerchantPlace[]): Promise<MerchantPlace[]> {
+  try {
+    const res = await fetch("https://api.btcmap.org/v2/elements", {
+      headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+      signal: AbortSignal.timeout(55_000),
+    });
+    if (!res.ok) throw new Error(`btcmap ${res.status}`);
+    const raw = (await res.json()) as RawEl[];
+    const places: MerchantPlace[] = [];
+    for (const el of raw) {
+      const p = asPlace(el);
+      if (p) places.push(p);
+    }
+    const out = places.length >= 50 ? places : snap.length ? snap : FALLBACK;
+    if (out.length >= 50) writeSnap(out);
+    cache = { at: Date.now(), places: out };
+    return out;
+  } catch {
+    const out = snap.length ? snap : FALLBACK;
+    cache = { at: Date.now(), places: out };
+    return out;
+  }
 }
 
 const FALLBACK: MerchantPlace[] = [
@@ -148,7 +166,7 @@ function inBox(
 
 async function overpassBbox(b: { west: number; south: number; east: number; north: number }): Promise<MerchantPlace[]> {
   const span = Math.abs(b.east - b.west) * Math.abs(b.north - b.south);
-  if (span > 80) return [];
+  if (span > 200) return [];
   const q = `[out:json][timeout:20];(nwr["payment:bitcoin"="yes"](${b.south},${b.west},${b.north},${b.east});nwr["currency:XBT"="yes"](${b.south},${b.west},${b.north},${b.east}););out center tags;`;
   const res = await fetch("https://overpass-api.de/api/interpreter", {
     method: "POST",
@@ -190,12 +208,9 @@ export async function fetchMerchants(bbox: {
   north: number;
 }): Promise<MerchantPlace[]> {
   const map = new Map<string, MerchantPlace>();
-  try {
-    const all = await loadAll();
-    for (const p of all) if (inBox(p, bbox)) map.set(p.id, p);
-  } catch {
-    /* dump optional */
-  }
+  const known = cache?.places?.length ? cache.places : readSnap();
+  for (const p of known) if (inBox(p, bbox)) map.set(p.id, p);
+  void loadAll();
   if (map.size < 12) {
     try {
       for (const p of await overpassBbox(bbox)) map.set(p.id, p);
@@ -206,7 +221,7 @@ export async function fetchMerchants(bbox: {
   if (!map.size) {
     for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, p);
   }
-  return [...map.values()].slice(0, 500);
+  return [...map.values()].slice(0, 800);
 }
 
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {
