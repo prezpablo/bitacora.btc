@@ -1,6 +1,6 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 4 de setiembre de 2026  
+**Fecha:** 5 de setiembre de 2026  
 **Alcance:** código en `main` + VPS Njalla (`45.158.116.49`, Caddy + Node). Canónica: `https://bitacorabtc.org`.  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Plan híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Auditoría 2 set:** [`DEUDA-AUDITORIA-2026-09-02.md`](DEUDA-AUDITORIA-2026-09-02.md)
 
@@ -8,7 +8,7 @@
 
 | Capa | Qué vive ahí | ¿Cumple? |
 |---|---|---|
-| `domain/` | Entidades, CSV, guía, geo-fix, calle, legal | **Sí.** No importa infra. |
+| `domain/` | Entidades, CSV, guía, geo-fix, calle, legal, event-board | **Sí.** No importa infra. |
 | `application/` | Mercado, `locateOnConsent` | **Sí.** Puertos de mercado; geo fuse sin fetch. |
 | `infrastructure/` | OSRM, BTC Map, SQLite, Photon, GPS, server-fns | **Sí.** Adapters. |
 | `components/` | UI. `use-map-guide` orquesta Leaflet | **Parcial.** `spend-map.tsx` sigue siendo el formulario + pines. |
@@ -21,6 +21,8 @@ Regla de oro: el dominio no sabe de Leaflet ni de OSRM. La ruta y el GPS se pide
 - `domain/street-addr.ts` — validar calle
 - `hydrateMapCsv` — CSV → store (dominio)
 - `MIN_STREET_ACCURACY_M = 150` — aviso si el GPS es burdo
+- `domain/event-board.ts` — página 9, filtros, `?ep=`
+- `lib/in-view.ts` + `LazyMount` — IntersectionObserver (5 set)
 
 ### Qué queda gordo (no reescribir ahora)
 - `spend-map.tsx` (~1.3k) — alta de comercio/comunidad + pines
@@ -29,20 +31,59 @@ Regla de oro: el dominio no sabe de Leaflet ni de OSRM. La ruta y el GPS se pide
 
 ---
 
-## Prioridades (después de Ir / catálogo / 3G)
+## Prioridades (UX / carga — 5 set)
 
-| Pri | Ítem | Por qué ahora |
-|---|---|---|
-| **P0** | ZIP a VPS = `main` | El visitante no ve el repo |
-| **P1** | Precisión mínima (hecho: aviso `irLoose` + 150 m) | Evita rutas desde el ISP |
-| **P1** | URCDP pendiente de revisión | Legal, no código |
-| **P2** | Fusión sensorial (Kalman / watch continuo) | GPS ya elige el círculo más chico; el resto pide app nativa |
-| **P2** | PWA offline: última posición + catálogo + línea recta | El ruteo OSRM sigue pidiendo red |
-| **P2** | Partir el formulario de alta fuera de `spend-map` | Clean Architecture, no el visitante |
-| **P3** | Sacar LRM del bundle | Peso en 3G |
-| **P3** | a11y captcha no visual, globo teclado | Igual que antes |
+Tabla corta. Código ya bajado o deuda abierta.
+
+| Pri | Ítem | Código | Estado |
+|---|---|---|---|
+| **P0** | ZIP a VPS = `main` | procedimiento ZIP | Abierto cada release |
+| **P1** | Lazy por viewport | `src/lib/in-view.ts`, `src/components/lazy-mount.tsx`, `desk.tsx` | **Hecho 5 set** |
+| **P1** | Mercado/tick/on-chain sólo al llegar a `#mercado` | `wantLive` + `useInView` en `desk.tsx` | **Hecho 5 set** |
+| **P1** | Afiches de eventos lazy | `network-events.tsx` `loading=lazy decoding=async` | **Hecho 5 set** |
+| **P1** | Heatmap off en 3G | `heatOn = !slowNet()` | **Hecho 5 set** |
+| **P1** | URCDP pendiente de revisión | — | Legal |
+| **P2** | Lighthouse mobile 3G en `.org` | correr DevTools / CI | **Auditoría código 5 set** (ver § UX) |
+| **P2** | Tiles Leaflet 1x en 3G | `spend-map.tsx` | Abierto |
+| **P2** | Globo canvas liviano / diferido | `map-gate.tsx` ya salta globo en 3G | Parcial |
+| **P2** | Fuentes 400-first | `src/styles.css` Ubuntu latin-ext+700+mono | Abierto |
+| **P2** | Cluster pines zoom bajo | `spend-map.tsx` | Abierto |
+| **P2** | Partir alta fuera de `spend-map` | Clean Architecture | Abierto |
+| **P2** | PWA offline geo + catálogo | — | Abierto |
+| **P3** | Proxy WebP afiches | eventos (Luma/Meetup) | Abierto |
+| **P3** | Cursor `eafter=` | `event-board.ts` hoy offset | No: catálogo ~120 |
+| **P3** | Sacar LRM del bundle | `package.json` | Abierto |
+| **P3** | a11y captcha no visual, globo teclado | — | Abierto |
+| **P3** | Táctiles ≥ 44 px (QR `h-7`) | `contribute-qr.tsx` | Abierto |
 
 **No reabrir:** sslip.io como canónica (el `.org` ya manda). Nginx. CMP de ads. Connect-wallet.
+
+### Lighthouse (auditoría de código, 5 set)
+
+Sin run CI todavía. Lo que Lighthouse mobile va a marcar, y qué hay:
+
+| Categoría | Hallazgo | Mitigación |
+|---|---|---|
+| LCP | Globo Three / mapa Leaflet | 3G → mapa directo (`map-gate`). Resto: globo en idle. |
+| TBT | 5 queries de mercado al hidratar | **Hecho:** `enabled` espera `#mercado` (IO). |
+| Network | 9 JPG de Luma a la vez | **Hecho:** `loading=lazy` + LazyMount del tablero. |
+| CLS | globo/mapa | `min-h-[min(70dvh,640px)]` + fallback ₿. Afiches: `width/height`. |
+| JS unused | LRM, Recharts, Three | Recharts sólo si IO del chart; LRM P3. |
+| Fonts | 4 cortes Ubuntu | P2: 400 al inicio. |
+| a11y | captcha visual, velas sin teclado | P3. Skip-link y `prefers-reduced-motion` globo **hecho**. |
+
+**Cierre P2 Lighthouse:** en Chrome DevTools → Lighthouse → Mobile + Slow 4G sobre `https://bitacorabtc.org`. Pegar scores (Perf / a11y / BP) acá. Meta: Perf ≥ 80 en 4G simulado, ≥ 50 en 3G.
+
+### IntersectionObserver — cómo quedó
+
+```
+desk (mapa + conciencia)
+  └ LazyMount  → roadmap, pines, eventos, feed, pulso, historia, velas, contacto
+#mercado ref=useInView("280px")
+  └ wantLive habilita getMarket / extras / tick / onchain / etf / pulse
+```
+
+Una vez intersecta, **queda montado** (latch). Hash `#mercado|#red|#pulso|#datos` salta el gate.
 
 ---
 

@@ -81,7 +81,15 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
     <article className="flex flex-col overflow-hidden rounded-lg bg-elevated shadow-[var(--shadow-border)]">
       <div className="relative aspect-[16/10] bg-plot">
         {ev.image ? (
-          <img src={ev.image} alt={ev.title} className="size-full object-cover" />
+          <img
+            src={ev.image}
+            alt={ev.title}
+            className="size-full object-cover"
+            loading="lazy"
+            decoding="async"
+            width={480}
+            height={300}
+          />
         ) : (
           <span className="flex size-full items-center justify-center text-3xl text-primary">₿</span>
         )}

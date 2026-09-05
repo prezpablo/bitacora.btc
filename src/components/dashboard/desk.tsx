@@ -18,6 +18,8 @@ import { OnchainLiveBar } from "./onchain-live";
 import { ConcienciaBlock } from "./conciencia";
 import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
+import { LazyMount } from "@/components/lazy-mount";
+import { useInView } from "@/lib/in-view";
 import { DATOS, useT } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
 import { slowNet } from "@/lib/net";
@@ -75,13 +77,16 @@ function formatClock(ts: number) {
 export function Desk() {
   const [range, setRange] = useState<ChartRange>("1w");
   const [ma, setMa] = useState(DEFAULT_MA);
-  const [heatOn, setHeatOn] = useState(true);
+  const [heatOn, setHeatOn] = useState(() => !slowNet());
   const liq = asLiq(range);
   const uiLang = useLocale((s) => s.lang);
   const t = useT();
   const [allowFetch, setAllowFetch] = useState(false);
   const [liveOk, setLiveOk] = useState(false);
   const hash = useRouterState({ select: (s) => s.location.hash });
+  const live = useInView("280px");
+  const tab = hash.replace(/^#/, "");
+  const wantLive = live.shown || tab === "mercado" || tab === "red" || tab === "pulso" || tab === "datos";
   useEffect(() => {
     setAllowFetch(true);
     const n = window.setTimeout(() => setLiveOk(true), slowNet() ? 2800 : 400);
@@ -99,7 +104,7 @@ export function Desk() {
   const query = useQuery({
     queryKey: ["market", range, liq],
     queryFn: () => getMarket({ data: { range, liq } }),
-    enabled: allowFetch && liveOk,
+    enabled: allowFetch && liveOk && wantLive,
     staleTime: 8_000,
     refetchOnMount: false,
     refetchInterval: (q) => (q.state.status === "error" ? 8_000 : 12_000),
@@ -111,7 +116,7 @@ export function Desk() {
   const extras = useQuery({
     queryKey: ["extras", range],
     queryFn: () => getDeskExtras({ data: { range } }),
-    enabled: allowFetch && liveOk,
+    enabled: allowFetch && liveOk && wantLive,
     staleTime: 20_000,
     refetchOnMount: false,
     refetchInterval: 30_000,
@@ -123,7 +128,7 @@ export function Desk() {
   const pulse = useQuery({
     queryKey: ["pulse"],
     queryFn: () => getPulse({ data: { lang: uiLang } }),
-    enabled: allowFetch && liveOk,
+    enabled: allowFetch && liveOk && wantLive,
     staleTime: 90_000,
     refetchInterval: 120_000,
     refetchOnWindowFocus: true,
@@ -134,7 +139,7 @@ export function Desk() {
   const tick = useQuery({
     queryKey: ["tick"],
     queryFn: () => getTick(),
-    enabled: allowFetch && liveOk,
+    enabled: allowFetch && liveOk && wantLive,
     staleTime: 1_500,
     refetchInterval: () => (slowNet() ? 15_000 : 2_000),
     refetchOnWindowFocus: false,
@@ -145,7 +150,7 @@ export function Desk() {
   const onchainLive = useQuery({
     queryKey: ["onchain-live"],
     queryFn: () => getOnchainLive(),
-    enabled: allowFetch && liveOk,
+    enabled: allowFetch && liveOk && wantLive,
     staleTime: 5_000,
     refetchOnMount: false,
     refetchInterval: () => (slowNet() ? 20_000 : 8_000),
@@ -156,7 +161,7 @@ export function Desk() {
   const etfFlows = useQuery({
     queryKey: ["etf-flows"],
     queryFn: () => getEtfFlows(),
-    enabled: allowFetch && liveOk,
+    enabled: allowFetch && liveOk && wantLive,
     staleTime: 10 * 60_000,
     refetchOnMount: "always",
     refetchInterval: 10 * 60_000,
@@ -218,27 +223,39 @@ export function Desk() {
       </section>
 
       <Suspense fallback={<Soft />}>
-        <RoadmapWeb3 />
+        <LazyMount fallback={<Soft />} minHeight="10rem">
+          <RoadmapWeb3 />
+        </LazyMount>
       </Suspense>
 
       <section id="comunidad" className="scroll-mt-[var(--header-offset)] space-y-6">
         <Suspense fallback={<Soft />}>
-          <CommunityPinsBoard />
+          <LazyMount fallback={<Soft />} minHeight="12rem">
+            <CommunityPinsBoard />
+          </LazyMount>
         </Suspense>
         <Suspense fallback={<Soft />}>
-          <NetworkEvents />
+          <LazyMount fallback={<Soft />} minHeight="28rem">
+            <NetworkEvents />
+          </LazyMount>
         </Suspense>
         <Suspense fallback={<Soft />}>
-          <CommunityFeedPanel />
+          <LazyMount fallback={<Soft />} minHeight="10rem">
+            <CommunityFeedPanel />
+          </LazyMount>
         </Suspense>
       </section>
 
       <section id="pulso" className="scroll-mt-[var(--header-offset)]">
-        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
+        <LazyMount fallback={<Soft />} minHeight="8rem">
+          <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
+        </LazyMount>
       </section>
 
       <Suspense fallback={<Soft />}>
-        <HistoryTimeline />
+        <LazyMount fallback={<Soft />} minHeight="12rem">
+          <HistoryTimeline />
+        </LazyMount>
       </Suspense>
 
       <section id="red" className="scroll-mt-[var(--header-offset)] space-y-3">
@@ -258,7 +275,7 @@ export function Desk() {
         </div>
       </section>
 
-      <section id="mercado" className="scroll-mt-[var(--header-offset)] space-y-3">
+      <section id="mercado" ref={live.ref} className="scroll-mt-[var(--header-offset)] space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-display font-medium tracking-tight text-foreground">
@@ -358,11 +375,13 @@ export function Desk() {
           </div>
         </div>
         <div className="bg-plot">
-          <ClientOnly fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
-            <Suspense fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
-              <PriceChart market={market} enabled={ma} heatOn={heatOn} />
-            </Suspense>
-          </ClientOnly>
+          <LazyMount fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />} minHeight="20rem">
+            <ClientOnly fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
+              <Suspense fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
+                <PriceChart market={market} enabled={ma} heatOn={heatOn} />
+              </Suspense>
+            </ClientOnly>
+          </LazyMount>
         </div>
       </section>
       <Suspense fallback={<Soft />}>
@@ -386,12 +405,16 @@ export function Desk() {
       </section>
 
       <Suspense fallback={<Soft />}>
-        <SoberaniaBlock />
+        <LazyMount fallback={<Soft />} minHeight="8rem">
+          <SoberaniaBlock />
+        </LazyMount>
       </Suspense>
 
       <section id="contacto" className="scroll-mt-[var(--header-offset)]">
         <Suspense fallback={<Soft />}>
-          <ContactBlock />
+          <LazyMount fallback={<Soft />} minHeight="12rem">
+            <ContactBlock />
+          </LazyMount>
         </Suspense>
       </section>
 
