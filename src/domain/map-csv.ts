@@ -235,7 +235,11 @@ export function stringifyMapCsv(rows: MapCsvRow[]): string {
 
 /** Snapshot GitHub / GET público: sin códigos CARGA. SQLite sí los guarda. */
 export function stringifyMapCsvPublic(rows: MapCsvRow[]): string {
-  return stringifyMapCsv(rows.map((r) => ({ ...r, token: "" })));
+  return stringifyMapCsv(
+    rows
+      .filter((r) => r.tipo !== "shop" || !r.id.startsWith("local:") || r.verifiedAt > 0)
+      .map((r) => ({ ...r, token: "" })),
+  );
 }
 
 export function parseMapCsv(text: string): MapCsvRow[] {

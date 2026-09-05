@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { layoutCityLogos, pickListingLogo, placeTruePins } from "./community-dedupe.ts";
+import { dedupeShops, layoutCityLogos, pickListingLogo, placeTruePins } from "./community-dedupe.ts";
 
 const mvd = { lat: -34.9011, lon: -56.1645 };
 const santiago = { lat: -33.4489, lon: -70.6693 };
@@ -54,3 +54,13 @@ test("pickListingLogo prefers CSV over BTC Map", () => {
   assert.equal(pickListingLogo("", "https://btcmap.org/icon.png"), "https://btcmap.org/icon.png");
   assert.equal(pickListingLogo("", ""), "");
 });
+
+test("dedupeShops keeps the BTC Map node over a local clone", () => {
+  const out = dedupeShops([
+    { id: "local:-34.90110,-56.16450", name: "Moshi Moshi", lat: -34.9011, lon: -56.1645 },
+    { id: "node:123", name: "Moshi Moshi", lat: -34.90115, lon: -56.16455, logo: "https://x/a.png" },
+  ]);
+  assert.equal(out.length, 1);
+  assert.equal(out[0]!.id, "node:123");
+});
+

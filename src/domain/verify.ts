@@ -39,6 +39,16 @@ export function communityTrust(c: Community) {
   return base;
 }
 
-export function hasPublicId(links: CommunityLink[]) {
-  return links.some((l) => ID_KEYS.has(l.key || keyFromUrl(l.url)));
+export function hasScrapeLink(links: { key?: string; url: string }[] | undefined) {
+  return (links ?? []).some((l) => {
+    const u = (l.url || "").trim();
+    if (!/^https?:\/\//i.test(u)) return false;
+    if (/instagram\.com/i.test(u)) return false;
+    return true;
+  });
+}
+
+export function shopIsPublic(id: string, verifiedAt?: number) {
+  if (!id.startsWith("local:")) return true;
+  return (verifiedAt ?? 0) > 0;
 }

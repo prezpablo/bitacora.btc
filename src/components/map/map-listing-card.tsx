@@ -74,11 +74,13 @@ export function PlaceCard({
   local,
   removable,
   onRemove,
+  onVerified,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
   removable: boolean;
   onRemove: () => void;
+  onVerified?: () => void;
 }) {
   const t = useT();
   const g = gradeOf(local, Date.now());
@@ -127,6 +129,14 @@ export function PlaceCard({
       {local?.hours ? <HoursView hours={local.hours} /> : null}
       {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
       {local?.links?.length ? <SocialRow links={local.links} /> : null}
+      {!trust.verified && local?.verifyToken && onVerified ? (
+        <ScrapeVerifyBox
+          id={place.id}
+          token={local.verifyToken}
+          hasLinks={(local.links?.length ?? 0) > 0}
+          onVerified={onVerified}
+        />
+      ) : null}
       {removable ? (
         <Button variant="outline" className="w-full" onClick={onRemove}>
           {t("removeLow")}

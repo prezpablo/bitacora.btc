@@ -3,8 +3,8 @@ import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { canRemove, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust } from "@/domain";
-import { dedupeCommunities, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
+import { canRemove, communityTrust, dumpMapCsv, hasScrapeLink, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
+import { dedupeCommunities, dedupeShops, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
 import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } from "@/application/map-listings";
@@ -210,7 +210,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (filter === "comunidades") return [];
     const pad = 0.8;
     const extra: MerchantPlace[] = Object.entries(store)
-      .filter(([, s]) => !s.removed && s.lat != null && s.lon != null)
+      .filter(([id, s]) => !s.removed && s.lat != null && s.lon != null && (shopIsPublic(id, s.verifiedAt) || id === sel?.id))
       .filter(
         ([, s]) =>
           s.lon! >= bbox.west - pad &&
@@ -241,8 +241,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           logo: pickListingLogo(local?.logo, p.logo),
         };
       });
-    return [...extra, ...api];
-  }, [query.data, store, filter, bbox]);
+    return dedupeShops([...extra, ...api]);
+  }, [query.data, store, filter, bbox, sel?.id]);
 
   const overlayComms = comms;
   const allComms = useMemo(() => {
@@ -413,9 +413,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   useEffect(() => {
     const map = mapRef.current;
     const group = marks.current;
-    if (!mapReady || !map || !group) return;
-    void import("leaflet").then((L) => {
-      group.clearLayers();
+    const L = leafletRef.current;
+    if (!mapReady || !map || !group || !L) return;
+    group.clearLayers();
       type MapPin = {
         id: string;
         name: string;
@@ -560,18 +560,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);
       }
-    });
   }, [places, store, visibleComms, hit, mapReady, zoom]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
-    void import("leaflet").then((L) => {
-      if (hitMark.current) {
-        map.removeLayer(hitMark.current);
-        hitMark.current = null;
-      }
-      if (!hit) return;
+    const L = leafletRef.current;
+    if (!map || !L) return;
+    if (hitMark.current) {
+      map.removeLayer(hitMark.current);
+      hitMark.current = null;
+    }
+    if (!hit) return;
       const glyph = hit.kind === "community" ? "₿" : hit.kind === "city" ? "●" : "₿";
       const icon = L.divIcon({
         className: "",
@@ -591,7 +590,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       marker.addTo(map);
       marker.openPopup();
       hitMark.current = marker;
-    });
   }, [hit]);
 
   useEffect(() => {
@@ -683,6 +681,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("addrNeedPick"));
       return;
     }
+    const links = linksFromPicked(picked, handles);
+    if (!hasScrapeLink(links)) {
+      setFormErr(t("verifyNeedLink"));
+      return;
+    }
     if (!captchaOk) {
       setFormErr(t("captchaNeed"));
       return;
@@ -698,7 +701,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         pays: shopPays,
         address: shopAddr,
         logo: shopLogo,
-        links: linksFromPicked(picked, handles),
+        links,
         stars,
         nick,
       },
@@ -782,6 +785,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("captchaNeed"));
       return;
     }
+    const links = linksFromPicked(picked, handles);
+    if (!hasScrapeLink(links)) {
+      setFormErr(t("verifyNeedLink"));
+      return;
+    }
     const out = publishCommunity(
       { store, comms },
       drop,
@@ -790,7 +798,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         name: form.name,
         description: form.description,
         logo: form.logo,
-        links: linksFromPicked(picked, handles),
+        links,
       },
     );
     if (!out.ok) {
@@ -999,6 +1007,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 local={local}
                 removable={removable}
                 onRemove={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
+                onVerified={() => {
+                  if (!local) return;
+                  commit(sel.id, { ...local, verifiedAt: Date.now() });
+                }}
               />
               <MapVotePanel
                 open={voteOpen}

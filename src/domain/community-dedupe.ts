@@ -193,6 +193,40 @@ function metersToDeg(m: number, lat: number) {
  * point (≤ cellM). The nudge stays under ~140 m, so entry zoom cannot fling
  * a city cluster into the next country.
  */
+function sameShop(a: NamedPin, b: NamedPin) {
+  if (a.id && b.id && a.id === b.id) return true;
+  if (km(a, b) > 0.12) return false;
+  return nameHit(a.name, b.name);
+}
+
+function shopRank(p: NamedPin) {
+  let n = 0;
+  if (/^(node:|osm:|btcmap:)/i.test(p.id)) n += 10;
+  if (p.id.startsWith("local:")) n -= 3;
+  if (p.logo) n += 2;
+  n += Math.min(3, (p.name || "").length / 16);
+  return n;
+}
+
+/** One pin per café: catalog beats an unverified local clone. */
+export function dedupeShops<T extends NamedPin>(rows: T[]): T[] {
+  const kept: T[] = [];
+  for (const row of rows) {
+    if (!row?.id || !Number.isFinite(row.lat) || !Number.isFinite(row.lon)) continue;
+    const i = kept.findIndex((k) => sameShop(k, row));
+    if (i < 0) {
+      kept.push(row);
+      continue;
+    }
+    if (shopRank(row) > shopRank(kept[i])) {
+      kept[i] = { ...kept[i], ...row, logo: row.logo || kept[i].logo };
+    } else {
+      kept[i] = { ...row, ...kept[i], logo: kept[i].logo || row.logo };
+    }
+  }
+  return kept;
+}
+
 export function placeTruePins<T extends NamedPin>(rows: T[], cellM = 28, radiusM = 52): LaidPin<T>[] {
   const groups = new Map<string, T[]>();
   for (const r of rows) {
