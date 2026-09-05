@@ -426,6 +426,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         kind: "community" | "shop" | "city";
         verified: boolean;
         count?: number;
+        slots?: number;
         comm?: Community;
         place?: MerchantPlace;
       };
@@ -515,7 +516,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : pin.kind === "city" && (pin.count || 0) > 1
             ? `<span style="position:absolute;right:-6px;bottom:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#f7931a;color:#fff;font:700 10px/16px Ubuntu,sans-serif">${pin.count}</span>`
-            : "";
+            : pin.slots && pin.slots > 1
+              ? `<span style="position:absolute;right:-6px;bottom:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#f7931a;color:#fff;font:700 10px/16px Ubuntu,sans-serif">${pin.slots}</span>`
+              : "";
         const icon = L.divIcon({
           className: "",
           html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,

@@ -193,9 +193,26 @@ function metersToDeg(m: number, lat: number) {
  * point (≤ cellM). The nudge stays under ~140 m, so entry zoom cannot fling
  * a city cluster into the next country.
  */
+function genericName(s: string) {
+  const f = foldName(s);
+  if (!f) return true;
+  if (/^(node|osm|local|way|relation)[:\s]/.test(f)) return true;
+  const stripped = f
+    .replace(/\b(comercio|bitcoin|btc|shop|store|nuevo|propuesta|unnamed|sin|nombre|pin|lugar)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return !stripped;
+}
+
 function sameShop(a: NamedPin, b: NamedPin) {
   if (a.id && b.id && a.id === b.id) return true;
-  if (km(a, b) > 0.12) return false;
+  const d = km(a, b);
+  if (d > 0.08) return false;
+  const la = logoKey(a.logo);
+  const lb = logoKey(b.logo);
+  if (la && lb && la === lb) return true;
+  if (genericName(a.name) && genericName(b.name)) return true;
+  if (d <= 0.04 && (genericName(a.name) || genericName(b.name))) return true;
   return nameHit(a.name, b.name);
 }
 
@@ -228,8 +245,9 @@ export function dedupeShops<T extends NamedPin>(rows: T[]): T[] {
 }
 
 export function placeTruePins<T extends NamedPin>(rows: T[], cellM = 28, radiusM = 52): LaidPin<T>[] {
+  const uniqueRows = dedupeShops(rows);
   const groups = new Map<string, T[]>();
-  for (const r of rows) {
+  for (const r of uniqueRows) {
     if (!r?.id || !Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
     const { dlat, dlon } = metersToDeg(cellM, r.lat);
     const key = `${Math.round(r.lat / dlat)}_${Math.round(r.lon / dlon)}`;
@@ -239,18 +257,24 @@ export function placeTruePins<T extends NamedPin>(rows: T[], cellM = 28, radiusM
   }
   const laid: LaidPin<T>[] = [];
   for (const g of groups.values()) {
-    g.sort((a, b) => (a.name || "").localeCompare(b.name || "", "es"));
-    if (g.length === 1) {
-      const r = g[0];
+    const unique = dedupeShops(g);
+    unique.sort((a, b) => (a.name || "").localeCompare(b.name || "", "es"));
+    const lat0 = unique.reduce((s, r) => s + r.lat, 0) / unique.length;
+    const lon0 = unique.reduce((s, r) => s + r.lon, 0) / unique.length;
+    if (unique.length === 1 || unique.every((p) => genericName(p.name) && !p.logo)) {
+      const r = unique.slice().sort((a, b) => shopRank(b) - shopRank(a))[0]!;
       laid.push({ ...r, lat0: r.lat, lon0: r.lon, lng: r.lon, slot: 0, slots: 1 });
       continue;
     }
-    const lat0 = g.reduce((s, r) => s + r.lat, 0) / g.length;
-    const lon0 = g.reduce((s, r) => s + r.lon, 0) / g.length;
-    const rad = radiusM * (g.length > 8 ? 1.4 : 1);
+    if (unique.length > 6) {
+      const r = unique.slice().sort((a, b) => shopRank(b) - shopRank(a))[0]!;
+      laid.push({ ...r, lat0, lon0, lng: lon0, slot: 0, slots: unique.length });
+      continue;
+    }
+    const rad = radiusM * (unique.length > 4 ? 1.2 : 1);
     const { dlat, dlon } = metersToDeg(rad, lat0);
-    g.forEach((r, i) => {
-      const ang = (2 * Math.PI * i) / g.length - Math.PI / 2;
+    unique.forEach((r, i) => {
+      const ang = (2 * Math.PI * i) / unique.length - Math.PI / 2;
       const lat = lat0 + Math.sin(ang) * dlat;
       const lon = lon0 + Math.cos(ang) * dlon;
       laid.push({
@@ -261,7 +285,7 @@ export function placeTruePins<T extends NamedPin>(rows: T[], cellM = 28, radiusM
         lon,
         lng: lon,
         slot: i,
-        slots: g.length,
+        slots: unique.length,
       });
     });
   }
