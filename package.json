@@ -19,7 +19,7 @@
     "test": "node --test --experimental-strip-types 'scripts/**/*.test.mjs' 'src/**/*.test.ts'",
     "catalog:seed": "node --experimental-strip-types scripts/seed-catalog.ts",
     "catalog:sync": "node --experimental-strip-types scripts/sync-catalog.ts",
-    "test:bitacora": "node --test --experimental-strip-types scripts/bitacora-guards.test.mjs scripts/privacy-a11y-guards.test.mjs src/domain/community-pins.test.ts src/domain/community-dedupe.test.ts src/domain/contribute.test.ts src/domain/guide.test.ts src/domain/geo-fix.test.ts src/domain/street-addr.test.ts src/domain/map-compose.test.ts src/domain/verify.test.ts src/domain/fees.test.ts src/domain/event-board.test.ts src/domain/listing-patch.test.ts src/lib/in-view.test.ts src/lib/locale.test.ts src/infrastructure/translate.test.ts src/infrastructure/safe-fetch.test.ts src/infrastructure/last-known.test.ts src/infrastructure/catalog.test.ts src/infrastructure/pin-verify.test.ts src/lib/utils.test.ts src/lib/pow.test.ts",
+    "test:live": "node scripts/probe-live.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
