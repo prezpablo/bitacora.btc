@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { listingIsOurs } from "@/domain/listing-patch";
 import { submitListingPatch, verifyListingPatch, cancelListingPatch } from "@/infrastructure/server-fns";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -14,8 +13,11 @@ export function ListingPatchForm({
   address,
   notes,
   logo,
+  lat,
+  lon,
   isCommunity,
   onApplied,
+  onClose,
 }: {
   listingId: string;
   name: string;
@@ -23,13 +25,14 @@ export function ListingPatchForm({
   address?: string;
   notes?: string;
   logo?: string;
+  lat: number;
+  lon: number;
   isCommunity?: boolean;
   onApplied?: () => void;
+  onClose?: () => void;
 }) {
   const t = useT();
-  const ours = listingIsOurs(listingId);
   const disputeHref = `/?topic=dispute&listing=${encodeURIComponent(listingId)}#contacto`;
-  const [open, setOpen] = useState(false);
   const [nextName, setNextName] = useState(name);
   const [nextDesc, setNextDesc] = useState(description || "");
   const [nextAddr, setNextAddr] = useState(address || "");
@@ -43,31 +46,13 @@ export function ListingPatchForm({
   const [err, setErr] = useState("");
   const [pending, setPending] = useState<{ id: string; token: string } | null>(null);
 
-  if (!ours) {
-    return (
-      <p className="text-xs text-pretty text-muted-foreground">
-        {t("patchNotOurs")}{" "}
-        <a href={disputeHref} className="text-primary no-underline hover:underline">
-          {t("patchDispute")}
-        </a>
-      </p>
-    );
-  }
-
-  if (!open && !pending) {
-    return (
-      <div className="grid grid-cols-2 gap-2">
-        <Button type="button" size="sm" variant="outline" onClick={() => setOpen(true)}>
-          {t("patchUpdate")}
-        </Button>
-        <a
-          href={disputeHref}
-          className="inline-flex h-8 items-center justify-center rounded-md bg-elevated px-3 text-sm font-medium text-foreground no-underline shadow-[var(--shadow-border)]"
-        >
-          {t("patchDispute")}
-        </a>
-      </div>
-    );
+  function fail(code?: string) {
+    if (code === "captcha") setErr(t("captchaNeed"));
+    else if (code === "rate") setErr(t("patchRate"));
+    else if (code === "nochange") setErr(t("patchNochange"));
+    else if (code === "links") setErr(t("verifyNeedLink"));
+    else if (code === "need") setErr(t("patchNeed"));
+    else setErr(t("patchFail"));
   }
 
   if (pending) {
@@ -90,8 +75,8 @@ export function ListingPatchForm({
               .then((res) => {
                 if (res.ok) {
                   setPending(null);
-                  setOpen(false);
                   onApplied?.();
+                  onClose?.();
                 } else setErr(res.error === "proof" ? t("pinProofFail") : t("patchFail"));
               })
               .finally(() => setBusy(false));
@@ -105,22 +90,13 @@ export function ListingPatchForm({
           onClick={() => {
             void cancelListingPatch({ data: { id: pending.id, token: pending.token } });
             setPending(null);
-            setOpen(false);
+            onClose?.();
           }}
         >
           {t("pinCancel")}
         </button>
       </div>
     );
-  }
-
-  function fail(code?: string) {
-    if (code === "captcha") setErr(t("captchaNeed"));
-    else if (code === "rate") setErr(t("patchRate"));
-    else if (code === "nochange") setErr(t("patchNochange"));
-    else if (code === "links") setErr(t("verifyNeedLink"));
-    else if (code === "notours") setErr(t("patchNotOurs"));
-    else setErr(t("patchFail"));
   }
 
   return (
@@ -147,6 +123,9 @@ export function ListingPatchForm({
             notes: nextNotes,
             logo: nextLogo,
             proof,
+            lat,
+            lon,
+            community: Boolean(isCommunity),
             captchaId: ticket?.id,
             captcha: ticket?.answer,
             captchaNonce: ticket?.nonce,
@@ -191,7 +170,7 @@ export function ListingPatchForm({
         <Button type="submit" size="sm" disabled={busy}>
           {t("patchSubmit")}
         </Button>
-        <Button type="button" size="sm" variant="outline" onClick={() => setOpen(false)}>
+        <Button type="button" size="sm" variant="outline" onClick={() => onClose?.()}>
           {t("pinCancel")}
         </Button>
       </div>

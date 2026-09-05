@@ -3,8 +3,14 @@ import { openSqlite, sqlTx } from "./sqlite";
 
 function rowToPatch(r: Record<string, unknown>): ListingPatch {
   let fields: ListingPatch["fields"] = {};
+  let lat = 0;
+  let lon = 0;
   try {
-    fields = JSON.parse(String(r.fields || "{}")) as ListingPatch["fields"];
+    const parsed = JSON.parse(String(r.fields || "{}")) as ListingPatch["fields"] & { lat?: number; lon?: number };
+    lat = Number(parsed.lat) || 0;
+    lon = Number(parsed.lon) || 0;
+    const { lat: _a, lon: _b, ...rest } = parsed;
+    fields = rest;
   } catch {
     fields = {};
   }
@@ -15,6 +21,8 @@ function rowToPatch(r: Record<string, unknown>): ListingPatch {
     token: String(r.token || ""),
     proof: String(r.proof || ""),
     fields,
+    lat,
+    lon,
     created: Number(r.created) || Date.now(),
     verified: Number(r.verified) === 1,
     verifiedAt: Number(r.verified_at) || 0,
@@ -37,7 +45,7 @@ function upsertPatch(p: ListingPatch) {
       p.tipo,
       p.token,
       p.proof,
-      JSON.stringify(p.fields),
+      JSON.stringify({ ...p.fields, lat: p.lat, lon: p.lon }),
       p.created,
       p.verified ? 1 : 0,
       p.verifiedAt,

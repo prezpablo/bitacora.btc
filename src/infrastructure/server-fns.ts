@@ -351,6 +351,9 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     notes?: string;
     logo?: string;
     proof: string;
+    lat?: number;
+    lon?: number;
+    community?: boolean;
     captchaId?: string;
     captcha?: string;
     captchaNonce?: string;
@@ -367,8 +370,29 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     const proof = safeHttp(data.proof);
     if (!proof || !isPublicHttp(proof)) return { ok: false, error: "links" };
     const rows = parseMapCsv(await loadMapCsvText());
-    const row = rows.find((r) => r.id === data.listingId);
-    if (!row) return { ok: false, error: "notours" };
+    const existing = rows.find((r) => r.id === data.listingId);
+    const lat = Number(data.lat);
+    const lon = Number(data.lon);
+    const row = existing ?? {
+      id: data.listingId.trim().slice(0, 80),
+      tipo: data.community ? "community" as const : "shop" as const,
+      name: (data.name || "").trim().slice(0, 80),
+      lat,
+      lon,
+      address: (data.address || "").trim(),
+      description: (data.description || "").trim(),
+      notes: (data.notes || "").trim(),
+      score: 0,
+      votes: 0,
+      logo: (data.logo || "").trim(),
+      socials: "",
+      hours: "",
+      pays: "",
+      created: Date.now(),
+      token: "",
+      verifiedAt: 0,
+    };
+    if (!row.id || !Number.isFinite(row.lat) || !Number.isFinite(row.lon)) return { ok: false, error: "need" };
     const made = proposeListingPatch(
       row,
       {

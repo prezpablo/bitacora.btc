@@ -100,5 +100,28 @@ export function proposeListingPatch(
 }
 
 export function applyListingPatch(rows: MapCsvRow[], patch: ListingPatch, now = Date.now()): MapCsvRow[] {
+  const hit = rows.some((r) => r.id === patch.listingId);
+  if (!hit) {
+    const seed: MapCsvRow = {
+      id: patch.listingId,
+      tipo: patch.tipo,
+      name: patch.fields.name || patch.listingId,
+      lat: patch.lat,
+      lon: patch.lon,
+      address: patch.fields.address || "",
+      description: patch.fields.description || "",
+      notes: patch.fields.notes || "",
+      score: 0,
+      votes: 0,
+      logo: patch.fields.logo || "",
+      socials: "",
+      hours: "",
+      pays: "",
+      created: now,
+      token: patch.token,
+      verifiedAt: now,
+    };
+    return [...rows, applyPatchToRow(seed, patch, now)];
+  }
   return rows.map((r) => (r.id === patch.listingId ? applyPatchToRow(r, patch, now) : r));
 }

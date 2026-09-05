@@ -19,6 +19,8 @@ export type ListingPatch = {
   token: string;
   proof: string;
   fields: ListingPatchFields;
+  lat: number;
+  lon: number;
   created: number;
   verified: boolean;
   verifiedAt: number;
@@ -84,11 +86,11 @@ export function proposePatch(
   proof: string,
   now = Date.now(),
 ): { patch: ListingPatch } | { error: PatchErr } {
-  if (!listingIsOurs(row.id)) return { error: "notours" };
   const fields = sanitizePatchFields(raw);
   const url = cleanHttp(proof);
   if (!/^https?:\/\//i.test(url)) return { error: "links" };
-  if (!patchChanged(row, fields)) return { error: "nochange" };
+  if (listingIsOurs(row.id) && !patchChanged(row, fields)) return { error: "nochange" };
+  if (!listingIsOurs(row.id) && !patchChanged(row, fields) && !fields.name && !row.name) return { error: "need" };
   if (fields.name !== undefined && fields.name.length < 2) return { error: "name" };
   return {
     patch: {
@@ -98,6 +100,8 @@ export function proposePatch(
       token: makePinToken(),
       proof: url,
       fields,
+      lat: row.lat,
+      lon: row.lon,
       created: now,
       verified: false,
       verifiedAt: 0,
