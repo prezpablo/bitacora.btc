@@ -117,3 +117,9 @@ test("UI does not import disk or feed adapters", () => {
   }
 });
 
+test("map pins still trust-check shops and communities", () => {
+  const src = read("src/components/map/spend-map.tsx");
+  assert.match(src, /communityTrust/);
+  assert.match(src, /listingTrust/);
+});
+
