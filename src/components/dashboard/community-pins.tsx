@@ -4,7 +4,7 @@ import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { SocialRow } from "@/components/map/social-row";
 import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
-import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
+import { pinOnBoard, pinPending, pinTimeLeft, formatPinLeft, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import { VerifyIgHow } from "@/components/map/verify-ig-how";
 
 const PENDING_KEY = "bitacora-pin-pending";
 
-type Pending = { id: string; token: string; name: string; proof: string };
+type Pending = { id: string; token: string; name: string; proof: string; created: number };
 
 function readPending(): Pending | null {
   if (typeof window === "undefined") return null;
@@ -21,7 +21,7 @@ function readPending(): Pending | null {
     if (!raw) return null;
     const p = JSON.parse(raw) as Pending;
     if (!p.id || !p.token) return null;
-    return p;
+    return { ...p, created: Number(p.created) || Date.now() };
   } catch {
     return null;
   }
@@ -66,8 +66,15 @@ export function CommunityPinsBoard() {
   const [captchaKey, setCaptchaKey] = useState(0);
   const cancelled = useRef(false);
 
+  const [now, setNow] = useState(() => Date.now());
+
   useEffect(() => {
     setPending(readPending());
+  }, []);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -120,11 +127,13 @@ export function CommunityPinsBoard() {
         token: pending.token,
         verified: false,
         verifiedAt: 0,
-        created: Date.now(),
+        created: pending.created || now,
       });
     }
-    return rows.sort((a, b) => pinWeekPose(a.id).order - pinWeekPose(b.id).order);
-  }, [q.data, pending]);
+    return rows
+      .filter((p) => pinOnBoard(p, now))
+      .sort((a, b) => pinWeekPose(a.id).order - pinWeekPose(b.id).order);
+  }, [q.data, pending, now]);
 
   async function submit() {
     setErr("");
@@ -165,7 +174,7 @@ export function CommunityPinsBoard() {
         setErr(res?.error === "rate" ? t("pinRate") : res?.error === "captcha" ? t("captchaNeed") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
       }
-      keepPending({ id: res.id, token: res.token, name: name.trim(), proof: proofUrl });
+      keepPending({ id: res.id, token: res.token, name: name.trim(), proof: proofUrl, created: Date.now() });
       await q.refetch();
     } catch {
       setErr(t("pinNeed"));
@@ -224,6 +233,7 @@ export function CommunityPinsBoard() {
               <PinCard
                 key={p.id}
                 pin={p}
+                now={now}
                 onCopy={
                   pending?.id === p.id && pending.token
                     ? () => {
@@ -394,11 +404,11 @@ export function CommunityPinsBoard() {
   );
 }
 
-function PinCard({ pin, onCopy }: { pin: CommunityPin; onCopy?: () => void }) {
+function PinCard({ pin, now, onCopy }: { pin: CommunityPin; now: number; onCopy?: () => void }) {
   const t = useT();
   const pose = pinWeekPose(pin.id);
-  const days = pinDaysLeft(pin);
-  const waiting = pinPending(pin);
+  const left = formatPinLeft(pinTimeLeft(pin, now));
+  const waiting = pinPending(pin, now);
   const href = pin.proof;
   return (
     <li
@@ -420,7 +430,7 @@ function PinCard({ pin, onCopy }: { pin: CommunityPin; onCopy?: () => void }) {
       {pin.blurb ? <p className="mt-1 text-xs text-pretty text-muted-foreground">{pin.blurb}</p> : null}
       {pin.links.length ? <SocialRow links={pin.links.map((url) => ({ url, label: hostOf(url) }))} /> : null}
       <p className={cn("mt-2 font-mono text-[11px]", waiting ? "text-primary" : "text-muted-foreground")}>
-        {waiting ? t("pinWait") : t("pinDays", { n: days })}
+        {waiting ? t("pinWaitLeft", { left }) : t("pinLeft", { left })}
       </p>
     </li>
   );

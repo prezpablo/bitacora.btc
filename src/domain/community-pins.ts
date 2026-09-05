@@ -26,9 +26,41 @@ export function pinOnBoard(p: CommunityPin, now = Date.now()) {
   return pinAlive(p, now) || pinPending(p, now);
 }
 
+export function pinDeadline(p: CommunityPin) {
+  if (p.verified && p.verifiedAt > 0) return p.verifiedAt + PIN_TTL_MS;
+  return p.created + PIN_TTL_MS;
+}
+
+export function pinMsLeft(p: CommunityPin, now = Date.now()) {
+  return Math.max(0, pinDeadline(p) - now);
+}
+
+export type PinLeft = { ms: number; d: number; h: number; m: number; s: number };
+
+export function pinTimeLeft(p: CommunityPin, now = Date.now()): PinLeft {
+  const ms = pinMsLeft(p, now);
+  const total = Math.floor(ms / 1000);
+  return {
+    ms,
+    d: Math.floor(total / 86_400),
+    h: Math.floor((total % 86_400) / 3_600),
+    m: Math.floor((total % 3_600) / 60),
+    s: total % 60,
+  };
+}
+
+export function formatPinLeft(left: PinLeft) {
+  if (left.ms <= 0) return "0s";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  if (left.d > 0) return `${left.d}d ${pad(left.h)}h`;
+  if (left.h > 0) return `${left.h}h ${pad(left.m)}m`;
+  return `${left.m}m ${pad(left.s)}s`;
+}
+
 export function pinDaysLeft(p: CommunityPin, now = Date.now()) {
-  if (!pinAlive(p, now)) return 0;
-  return Math.max(0, Math.ceil((PIN_TTL_MS - (now - p.verifiedAt)) / 86_400_000));
+  const ms = pinMsLeft(p, now);
+  if (ms <= 0) return 0;
+  return Math.ceil(ms / 86_400_000);
 }
 
 /** Weekly shuffle so pins never keep a permanent rank. */
