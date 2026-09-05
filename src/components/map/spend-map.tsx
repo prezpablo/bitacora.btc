@@ -717,6 +717,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       }
       routingRef.current = null;
     }
+    setGuideSteps([]);
+    setGuideErr("");
+    pickOriginRef.current = false;
+    setPickOrigin(false);
+    guideToRef.current = null;
   }
 
   function placeGuideEnds(from: { lat: number; lon: number }, to: { lat: number; lon: number }) {
@@ -1143,6 +1148,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }
 
   function cancelSel() {
+    clearRoute();
     setSel(null);
     setSelComm(null);
     setVoteOpen(false);
@@ -1150,6 +1156,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setCaptchaOk(false);
     setPrivacyOk(false);
     setDraft("");
+    setDrop(null);
+    setDropKind("pick");
   }
 
   const local = sel ? store[sel.id] : undefined;
