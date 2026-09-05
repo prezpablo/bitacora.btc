@@ -15,8 +15,11 @@ export function pickBestFix(a: GeoFix | null | undefined, b: GeoFix | null | und
   return a.accuracy <= b.accuracy ? a : b;
 }
 
+/** Below this, a GPS fix is good enough to draw a street route without the tap-map fallback. */
+export const MIN_STREET_ACCURACY_M = 150;
+
 export function isPreciseFix(fix: GeoFix) {
-  return fix.source === "gps" && fix.accuracy <= 120;
+  return fix.source === "gps" && fix.accuracy <= MIN_STREET_ACCURACY_M;
 }
 
 export function isUsefulFix(fix: GeoFix) {

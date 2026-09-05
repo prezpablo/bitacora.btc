@@ -1,20 +1,9 @@
 import { countryName } from "@/lib/display";
 import type { AppLang } from "@/lib/locale";
+import { addressIssues, type AddrIssue, type StreetHit } from "@/domain/street-addr";
 
-export type StreetHit = {
-  id: string;
-  label: string;
-  hint: string;
-  lat: number;
-  lon: number;
-  street?: string;
-  number?: string;
-  city?: string;
-  country?: string;
-  countryCode?: string;
-};
-
-export type AddrIssue = "pick" | "street" | "number" | "city" | "country" | "coords";
+export type { AddrIssue, StreetHit };
+export { addressIssues };
 
 type PhotonFeature = {
   geometry?: { coordinates?: number[] };
@@ -55,17 +44,6 @@ export function formatStreet(hit: StreetHit, lang?: AppLang) {
     lang && hit.countryCode ? countryName(hit.countryCode, lang, hit.country || "") : hit.country || "";
   const hint = [hit.city, country].filter(Boolean).join(", ");
   return hint ? `${hit.label}, ${hint}` : hit.label;
-}
-
-export function addressIssues(hit: StreetHit | null): AddrIssue[] {
-  if (!hit) return ["pick"];
-  const miss: AddrIssue[] = [];
-  if (!Number.isFinite(hit.lat) || !Number.isFinite(hit.lon)) miss.push("coords");
-  if (!hit.street && !hit.label) miss.push("street");
-  if (!hit.number) miss.push("number");
-  if (!hit.city) miss.push("city");
-  if (!hit.country && !hit.countryCode) miss.push("country");
-  return miss;
 }
 
 export async function searchStreets(q: string, lang: string): Promise<StreetHit[]> {

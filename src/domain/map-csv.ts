@@ -365,6 +365,17 @@ export function rowToCommunity(row: MapCsvRow): Community {
   };
 }
 
+export function hydrateMapCsv(text: string) {
+  const rows = parseMapCsv(text);
+  const store: Record<string, MerchantLocal> = {};
+  const comms: Community[] = [];
+  for (const r of rows) {
+    if (r.tipo === "community") comms.push(rowToCommunity(r));
+    else store[r.id] = rowToLocal(r);
+  }
+  return { store, comms };
+}
+
 export function dumpMapCsv(
   store: Record<string, MerchantLocal>,
   comms: Community[],

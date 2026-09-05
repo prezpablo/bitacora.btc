@@ -1,8 +1,50 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 2 de setiembre de 2026  
+**Fecha:** 4 de setiembre de 2026  
 **Alcance:** código en `main` + VPS Njalla (`45.158.116.49`, Caddy + Node). Canónica: `https://bitacorabtc.org`.  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Plan híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Auditoría 2 set:** [`DEUDA-AUDITORIA-2026-09-02.md`](DEUDA-AUDITORIA-2026-09-02.md)
+
+## Clean Architecture (4 set)
+
+| Capa | Qué vive ahí | ¿Cumple? |
+|---|---|---|
+| `domain/` | Entidades, CSV, guía, geo-fix, calle, legal | **Sí.** No importa infra. |
+| `application/` | Mercado, `locateOnConsent` | **Sí.** Puertos de mercado; geo fuse sin fetch. |
+| `infrastructure/` | OSRM, BTC Map, SQLite, Photon, GPS, server-fns | **Sí.** Adapters. |
+| `components/` | UI. `use-map-guide` orquesta Leaflet | **Parcial.** `spend-map.tsx` sigue siendo el formulario + pines. |
+
+Regla de oro: el dominio no sabe de Leaflet ni de OSRM. La ruta y el GPS se piden **después** del clic (consentimiento).
+
+### Qué se partió en esta tanda
+- `use-map-guide.ts` — Ir, GPS, pasos, Cancelar
+- `leaflet-fix.ts` — círculo ⊙
+- `domain/street-addr.ts` — validar calle
+- `hydrateMapCsv` — CSV → store (dominio)
+- `MIN_STREET_ACCURACY_M = 150` — aviso si el GPS es burdo
+
+### Qué queda gordo (no reescribir ahora)
+- `spend-map.tsx` (~1.3k) — alta de comercio/comunidad + pines
+- `extra-feeds.ts`, `btc-map.ts`, `i18n.ts`
+- `leaflet-routing-machine` en package.json, casi sin uso (la línea la dibuja Leaflet a mano)
+
+---
+
+## Prioridades (después de Ir / catálogo / 3G)
+
+| Pri | Ítem | Por qué ahora |
+|---|---|---|
+| **P0** | ZIP a VPS = `main` | El visitante no ve el repo |
+| **P1** | Precisión mínima (hecho: aviso `irLoose` + 150 m) | Evita rutas desde el ISP |
+| **P1** | URCDP pendiente de revisión | Legal, no código |
+| **P2** | Fusión sensorial (Kalman / watch continuo) | GPS ya elige el círculo más chico; el resto pide app nativa |
+| **P2** | PWA offline: última posición + catálogo + línea recta | El ruteo OSRM sigue pidiendo red |
+| **P2** | Partir el formulario de alta fuera de `spend-map` | Clean Architecture, no el visitante |
+| **P3** | Sacar LRM del bundle | Peso en 3G |
+| **P3** | a11y captcha no visual, globo teclado | Igual que antes |
+
+**No reabrir:** sslip.io como canónica (el `.org` ya manda). Nginx. CMP de ads. Connect-wallet.
+
+---
 
 ## Estado 2 set 2026 (fases)
 

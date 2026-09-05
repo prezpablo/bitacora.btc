@@ -35,9 +35,11 @@ export type {
 export { eventIsLive } from "./entities";
 export type { ContinentId } from "./geo-regions";
 export { continentOf, continentFromLabel, isoFromCountryName } from "./geo-regions";
-export { pickBestFix, isPreciseFix, isUsefulFix } from "./geo-fix";
+export { pickBestFix, isPreciseFix, isUsefulFix, MIN_STREET_ACCURACY_M } from "./geo-fix";
 export type { CityFrame, GeoFix } from "./geo-frame";
 export { boxAround, frameFromFix } from "./geo-frame";
+export { addressIssues } from "./street-addr";
+export type { AddrIssue, StreetHit } from "./street-addr";
 export { syntheticCandles, syntheticDailyHistory } from "./synthetic";
 
 export {
@@ -81,6 +83,7 @@ export { communityTrust, listingTrust } from "./verify";
 export {
   addScore,
   dumpMapCsv,
+  hydrateMapCsv,
   hoursFromCsv,
   hoursToCsv,
   mergeMapRows,

@@ -3,22 +3,20 @@ import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { addScore, canRemove, dumpMapCsv, listingTrust, communityTrust, imgSrc, logoUrl, parseMapCsv, rowToCommunity, rowToLocal } from "@/domain";
+import { addScore, canRemove, dumpMapCsv, hydrateMapCsv, listingTrust, communityTrust, imgSrc, logoUrl } from "@/domain";
 import { dedupeCommunities, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
-import { getApproxFix, getCityFrame, getGuidePath, saveMapCsv } from "@/infrastructure/server-fns";
-import { formatGuideMeters, formatGuideStep, geodesicLine, kmBetween } from "@/domain/guide";
-import type { GuideStep } from "@/domain/guide";
+import { getCityFrame, saveMapCsv } from "@/infrastructure/server-fns";
+import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
-import { boxAround, type CityFrame } from "@/domain";
-import { locateBest, requestIpFix, startGpsFromGesture } from "@/infrastructure/geo";
-import { locateOnConsent } from "@/application/locate-user";
-import type { GeoFix } from "@/domain/geo-frame";
-import { guideMarker } from "@/infrastructure/leaflet-router";
+import { boxAround } from "@/domain";
+import { locateBest } from "@/infrastructure/geo";
+import { applyFix } from "./leaflet-fix";
+import { useMapGuide } from "./use-map-guide";
 import { useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
@@ -112,80 +110,34 @@ const EMPTY_FORM: CommForm = {
 const CSV_CACHE = "bitacora-map-csv-v1";
 
 function applyCsv(text: string) {
-  const rows = parseMapCsv(text);
-  const store: Record<string, MerchantLocal> = {};
-  const comms: Community[] = [];
-  for (const r of rows) {
-    if (r.tipo === "community") comms.push(rowToCommunity(r));
-    else store[r.id] = rowToLocal(r);
-  }
-  return { store, comms };
-}
-
-function applyFix(
-  L: typeof import("leaflet"),
-  map: import("leaflet").Map,
-  here: import("leaflet").LayerGroup | null,
-  lat: number,
-  lon: number,
-  accuracy: number,
-  city: CityFrame,
-) {
-  if (here) {
-    here.clearLayers();
-    L.circle([lat, lon], {
-      radius: Math.min(Math.max(accuracy, 80), 8000),
-      color: "#f7931a",
-      weight: 1,
-      fillColor: "#f7931a",
-      fillOpacity: 0.12,
-    }).addTo(here);
-    L.circleMarker([lat, lon], {
-      radius: 9,
-      color: "#fff",
-      weight: 2,
-      fillColor: "#f7931a",
-      fillOpacity: 1,
-    }).addTo(here);
-  }
-  const bounds = L.latLngBounds([city.south, city.west], [city.north, city.east]);
-  const fly = !prefersReducedMotion();
-  if (accuracy < 4000) {
-    const z = accuracy < 150 ? 16 : accuracy < 600 ? 15 : 14;
-    map.setView([lat, lon], z, { animate: fly });
-  } else if (bounds.isValid()) {
-    map.fitBounds(bounds, { padding: [28, 28], maxZoom: 13, animate: fly });
-  } else {
-    map.setView([city.lat, city.lon], 13, { animate: fly });
-  }
+  return hydrateMapCsv(text);
 }
 
 export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFocus; onWorld?: () => void; embedded?: boolean }) {
   const t = useT();
   const lang = useLocale((s) => s.lang);
+  const {
+    mapRef,
+    leafletRef,
+    userMark,
+    pickOriginRef,
+    onPickOrigin,
+    geo,
+    setGeo,
+    guideWait,
+    guideErr,
+    guideSteps,
+    pickOrigin,
+    clearRoute,
+    goToUser,
+    startGuide,
+  } = useMapGuide(lang, t);
   const { invalidate } = useMapStore();
   const onWorldRef = useRef(onWorld);
   onWorldRef.current = onWorld;
   const mapEl = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<import("leaflet").Map | null>(null);
   const marks = useRef<import("leaflet").LayerGroup | null>(null);
   const hitMark = useRef<import("leaflet").Layer | null>(null);
-  const userMark = useRef<import("leaflet").LayerGroup | null>(null);
-  const routeLine = useRef<import("leaflet").Polyline | null>(null);
-  const routingRef = useRef<{ remove: () => void } | null>(null);
-  const originMark = useRef<import("leaflet").Marker | null>(null);
-  const destMark = useRef<import("leaflet").Marker | null>(null);
-  const stepLayer = useRef<import("leaflet").LayerGroup | null>(null);
-  const pickOriginRef = useRef(false);
-  const guideToRef = useRef<{ lat: number; lon: number } | null>(null);
-  const onPickOrigin = useRef<(lat: number, lon: number) => void>(() => {});
-  const leafletRef = useRef<typeof import("leaflet") | null>(null);
-  const [geo, setGeo] = useState<"idle" | "wait" | "ok" | "denied">("idle");
-  const [userFix, setUserFix] = useState<{ lat: number; lon: number } | null>(null);
-  const [guideWait, setGuideWait] = useState(false);
-  const [guideErr, setGuideErr] = useState("");
-  const [guideSteps, setGuideSteps] = useState<GuideStep[]>([]);
-  const [pickOrigin, setPickOrigin] = useState(false);
   const [hit, setHit] = useState<SearchHit | null>(null);
   const [bbox, setBbox] = useState({ west: -56.35, south: -35.05, east: -55.95, north: -34.72 });
   const [zoom, setZoom] = useState(focus?.zoom ?? 4);
@@ -675,219 +627,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   useEffect(() => {
     clearRoute();
   }, [sel?.id, selComm?.id]);
-
-  async function goToUser(preferGps: boolean) {
-    setGeo("wait");
-    try {
-      if (preferGps) {
-        const session = startGpsFromGesture();
-        mapRef.current?.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
-        const { fix } = await locateOnConsent(session, { ip: async () => requestIpFix().catch(() => null) });
-        if (!fix) {
-          setGeo("denied");
-          return;
-        }
-        const city = boxAround(fix.lat, fix.lon, "acá", fix.source === "gps" ? 0.04 : 0.14);
-        const L = leafletRef.current;
-        const map = mapRef.current;
-        if (!L || !map) return;
-        applyFix(L, map, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
-        map.invalidateSize();
-        setUserFix({ lat: fix.lat, lon: fix.lon });
-        setGeo(fix.source === "gps" ? "ok" : "idle");
-        return;
-      }
-      const { fix, city } = await locateBest(false, (lat, lon, zoom) =>
-        getCityFrame({ data: { lat, lon, zoom } }).catch(() => boxAround(lat, lon)),
-      );
-      const L = leafletRef.current;
-      const map = mapRef.current;
-      if (!L || !map) return;
-      applyFix(L, map, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
-      map.invalidateSize();
-      setUserFix({ lat: fix.lat, lon: fix.lon });
-      setGeo("idle");
-    } catch {
-      setGeo("denied");
-    }
-  }
-
-  function clearRoute() {
-    const map = mapRef.current;
-    if (routeLine.current && map) {
-      map.removeLayer(routeLine.current);
-      routeLine.current = null;
-    }
-    if (originMark.current && map) {
-      map.removeLayer(originMark.current);
-      originMark.current = null;
-    }
-    if (destMark.current && map) {
-      map.removeLayer(destMark.current);
-      destMark.current = null;
-    }
-    if (stepLayer.current) {
-      stepLayer.current.clearLayers();
-    }
-    if (routingRef.current) {
-      try {
-        routingRef.current.remove();
-      } catch {
-        /* already off the map */
-      }
-      routingRef.current = null;
-    }
-    setGuideSteps([]);
-    setGuideErr("");
-    pickOriginRef.current = false;
-    setPickOrigin(false);
-    guideToRef.current = null;
-  }
-
-  function placeGuideEnds(from: { lat: number; lon: number }, to: { lat: number; lon: number }) {
-    const L = leafletRef.current;
-    const map = mapRef.current;
-    if (!L || !map) return;
-    if (originMark.current) originMark.current.setLatLng([from.lat, from.lon]);
-    else {
-      const m = guideMarker(L, 0, [from.lat, from.lon]);
-      m.on("dragend", () => {
-        const p = m.getLatLng();
-        const dest = guideToRef.current;
-        if (dest) void drawFrom({ lat: p.lat, lon: p.lng }, dest);
-      });
-      m.addTo(map);
-      originMark.current = m;
-    }
-    if (destMark.current) destMark.current.setLatLng([to.lat, to.lon]);
-    else {
-      const m = guideMarker(L, 1, [to.lat, to.lon]);
-      m.addTo(map);
-      destMark.current = m;
-    }
-  }
-
-  async function drawFrom(from: { lat: number; lon: number }, to: { lat: number; lon: number }) {
-    const L = leafletRef.current;
-    const map = mapRef.current;
-    if (!L || !map) return;
-    setUserFix(from);
-    guideToRef.current = to;
-    let path: { lat: number; lon: number }[] = [];
-    let steps: GuideStep[] = [];
-    try {
-      const res = await getGuidePath({
-        data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
-      });
-      path = res?.path || [];
-      steps = res?.steps || [];
-    } catch {
-      path = [];
-    }
-    const street = path.length >= 2;
-    if (!street) path = geodesicLine(from, to);
-    clearRoute();
-    placeGuideEnds(from, to);
-    const line = L.polyline(
-      path.map((p) => [p.lat, p.lon] as [number, number]),
-      { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
-    );
-    line.addTo(map);
-    routeLine.current = line;
-    if (!stepLayer.current) stepLayer.current = L.layerGroup().addTo(map);
-    const group = stepLayer.current;
-    group.clearLayers();
-    for (const s of steps) {
-      L.circleMarker([s.lat, s.lon], {
-        radius: 6,
-        color: "#fff",
-        weight: 2,
-        fillColor: "#f7931a",
-        fillOpacity: 1,
-      })
-        .bindTooltip(formatGuideStep(s, lang), { direction: "top", opacity: 0.95 })
-        .addTo(group);
-    }
-    map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
-    setGuideSteps(steps);
-    if (!street) setGuideErr(t("irFail"));
-    else if (!steps.length) setGuideErr(t("irFail"));
-    else setGuideErr("");
-  }
-
-  onPickOrigin.current = (lat, lon) => {
-    pickOriginRef.current = false;
-    setPickOrigin(false);
-    const dest = guideToRef.current;
-    if (!dest) return;
-    setGuideErr("");
-    const tap: GeoFix = { lat, lon, accuracy: 25, source: "tap" };
-    void drawFrom(tap, dest);
-  };
-
-  async function runGuide(to: { lat: number; lon: number }, session: ReturnType<typeof startGpsFromGesture>) {
-    setGuideWait(true);
-    setGuideErr("");
-    guideToRef.current = to;
-    try {
-      const { fix, refine } = await locateOnConsent(session, {
-        ip: async () => {
-          try {
-            return await requestIpFix();
-          } catch {
-            /* beacon */
-          }
-          try {
-            const a = await getApproxFix();
-            return a ? { lat: a.lat, lon: a.lon, accuracy: a.accuracy, source: "ip" as const } : null;
-          } catch {
-            return null;
-          }
-        },
-      });
-      if (fix && (fix.source === "gps" || fix.source === "tap" || kmBetween(fix, to) >= 0.08)) {
-        await drawFrom(fix, to);
-        setGeo(fix.source === "gps" ? "ok" : "idle");
-        if (fix.source !== "gps") setGuideErr(t("irApprox"));
-      } else {
-        pickOriginRef.current = true;
-        setPickOrigin(true);
-        setGuideErr(t("irTap"));
-        setGeo("denied");
-      }
-      void refine.then((better) => {
-        if (!better || better.source !== "gps") return;
-        if (fix && better.accuracy >= fix.accuracy - 20) return;
-        setGeo("ok");
-        pickOriginRef.current = false;
-        setPickOrigin(false);
-        void drawFrom(better, to);
-      });
-    } finally {
-      setGuideWait(false);
-    }
-  }
-
-  function startGuide(to: { lat: number; lon: number }) {
-    pickOriginRef.current = false;
-    setPickOrigin(false);
-    guideToRef.current = to;
-    const session = startGpsFromGesture();
-    const map = mapRef.current;
-    if (map) {
-      map.stopLocate();
-      map.once("locationfound", (e: { latlng: { lat: number; lng: number }; accuracy?: number }) => {
-        session.note({
-          lat: e.latlng.lat,
-          lon: e.latlng.lng,
-          accuracy: e.accuracy || 80,
-          source: "gps",
-        });
-      });
-      map.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
-    }
-    void runGuide(to, session);
-  }
 
   function flyTo(hit: SearchHit) {
     setHit(hit);

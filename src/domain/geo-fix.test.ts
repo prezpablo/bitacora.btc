@@ -18,8 +18,15 @@ test("among GPS samples the tighter circle wins", () => {
   assert.ok(isPreciseFix(best!));
 });
 
+test("150 m is the street cutoff", () => {
+  assert.equal(isPreciseFix(gps(150)), true);
+  assert.equal(isPreciseFix(gps(151)), false);
+  assert.equal(isPreciseFix(ip), false);
+});
+
 test("tap is better than IP, worse than GPS", () => {
   const tap: GeoFix = { lat: -34.47, lon: -57.84, accuracy: 30, source: "tap" };
   assert.equal(pickBestFix(tap, ip)?.source, "tap");
   assert.equal(pickBestFix(tap, gps(40))?.source, "gps");
 });
+
