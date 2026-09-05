@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, Radio } from "lucide-react";
 import type { NewsItem, PulsePayload } from "@/domain";
-import { translateNews } from "@/infrastructure/translate";
 import { formatAgo, useT } from "@/lib/i18n";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import { StaleStamp } from "./stale-stamp";
@@ -13,55 +12,28 @@ function headline(item: { title: string; sourceLang?: string }) {
   return lang ? `${item.title} (${lang})` : item.title;
 }
 
-export type PulseLang = AppLang;
-
-export function NewsCycle({ data }: { data: PulsePayload | null }) {
+export function NewsCycle({ data, fetching = false }: { data: PulsePayload | null; fetching?: boolean }) {
   const lang = useLocale((s) => s.lang) as AppLang;
   const setLang = useLocale((s) => s.setLang);
   const t = useT();
-  const source = data?.news ?? [];
+  const news: NewsItem[] = data?.news ?? [];
   const trends = data?.trends ?? [];
-  const [news, setNews] = useState<NewsItem[]>(source);
-  const [trStatus, setTrStatus] = useState<"ok" | "partial" | "off" | "loading">("loading");
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const reduceMotion = usePrefersReducedMotion();
   const n = news.length;
   const asOf = data?.asOf;
+  const trStatus = fetching ? "loading" : (data?.translate?.status ?? (n ? "ok" : "off"));
 
   useEffect(() => {
-    const src = data?.news ?? [];
-    setNews(src);
     setI(0);
-    if (!src.length) {
-      setTrStatus("off");
-      return;
-    }
-    const ctrl = new AbortController();
-    let alive = true;
-    setTrStatus("loading");
-    void translateNews(src, lang, ctrl.signal)
-      .then(({ rows, status }) => {
-        if (!alive) return;
-        setNews(rows);
-        setTrStatus(status);
-      })
-      .catch(() => {
-        if (!alive) return;
-        setNews(src);
-        setTrStatus("off");
-      });
-    return () => {
-      alive = false;
-      ctrl.abort();
-    };
-  }, [lang, asOf]);
+  }, [asOf, lang]);
 
   useEffect(() => {
     if (n < 2 || paused || reduceMotion) return;
     const id = window.setInterval(() => setI((v) => (v + 1) % n), 8_000);
     return () => window.clearInterval(id);
-  }, [n, data?.asOf, paused, reduceMotion]);
+  }, [n, asOf, paused, reduceMotion]);
 
   const featured = n ? news[i % n] : null;
   const rest = n ? news.filter((_, idx) => idx !== i % n).slice(0, 5) : [];

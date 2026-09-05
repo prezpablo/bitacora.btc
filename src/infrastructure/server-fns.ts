@@ -25,6 +25,7 @@ import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
 import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
 import { mergeLiveFees } from "@/domain/fees";
+import { localeOf, translateFeed, translateNews } from "./translate";
 
 export const getMarket = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange; liq: LiqRange }) => input)
@@ -78,7 +79,18 @@ export const getEtfFlows = createServerFn({ method: "POST" }).handler(async (): 
 export const getPulse = createServerFn({ method: "POST" })
   .validator((input: { lang?: string }) => input)
   .handler(async ({ data }): Promise<PulsePayload> => {
-    return await withLastKnown("pulse", () => fetchPulse(data?.lang), (d) => d.news.length > 0 || d.trends.length > 0);
+    const raw = await withLastKnown("pulse", () => fetchPulse(data?.lang), (d) => d.news.length > 0 || d.trends.length > 0);
+    const lang = localeOf(data?.lang);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12_000);
+    try {
+      const { rows, status } = await translateNews(raw.news, lang, ctrl.signal);
+      return { ...raw, news: rows, translate: { status } };
+    } catch {
+      return { ...raw, translate: { status: "off" } };
+    } finally {
+      clearTimeout(timer);
+    }
   });
 
 export const getGlobeStats = createServerFn({ method: "POST" }).handler(async (): Promise<GlobeStats> => {
@@ -111,9 +123,22 @@ export const searchMap = createServerFn({ method: "POST" })
     return { places, cities };
   });
 
-export const getCommunityFeed = createServerFn({ method: "POST" }).handler(async (): Promise<CommunityFeed> => {
-  return await fetchCommunityFeed();
-});
+export const getCommunityFeed = createServerFn({ method: "POST" })
+  .validator((input: { lang?: string } | undefined) => input ?? {})
+  .handler(async ({ data }): Promise<CommunityFeed> => {
+    const raw = await fetchCommunityFeed();
+    const lang = localeOf(data?.lang);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12_000);
+    try {
+      const { rows } = await translateFeed(raw.posts, lang, ctrl.signal);
+      return { ...raw, posts: rows };
+    } catch {
+      return raw;
+    } finally {
+      clearTimeout(timer);
+    }
+  });
 
 export const getNetworkEvents = createServerFn({ method: "POST" })
   .validator((input: EventBoardQuery | undefined) => input ?? {})

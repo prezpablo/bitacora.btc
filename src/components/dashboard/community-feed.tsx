@@ -2,14 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, Radio, RefreshCw, Zap } from "lucide-react";
 import { getCommunityFeed } from "@/infrastructure/server-fns";
 import { formatAgo, useT } from "@/lib/i18n";
+import { useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export function CommunityFeedPanel({ compact = false }: { compact?: boolean }) {
   const t = useT();
+  const lang = useLocale((s) => s.lang);
   const q = useQuery({
-    queryKey: ["community-feed"],
-    queryFn: () => getCommunityFeed(),
+    queryKey: ["community-feed", lang],
+    queryFn: () => getCommunityFeed({ data: { lang } }),
     refetchInterval: 120_000,
     staleTime: 60_000,
   });

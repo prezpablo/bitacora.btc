@@ -126,14 +126,13 @@ export function Desk() {
   });
 
   const pulse = useQuery({
-    queryKey: ["pulse"],
+    queryKey: ["pulse", uiLang],
     queryFn: () => getPulse({ data: { lang: uiLang } }),
     enabled: allowFetch && liveOk,
     staleTime: 90_000,
     refetchInterval: 120_000,
     refetchOnWindowFocus: true,
     retry: 2,
-    placeholderData: (prev) => prev,
   });
 
   const tick = useQuery({
@@ -247,7 +246,7 @@ export function Desk() {
       </section>
 
       <section id="pulso" className="scroll-mt-[var(--header-offset)]">
-        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
+        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} fetching={pulse.isFetching} />
       </section>
 
       <Suspense fallback={<Soft />}>

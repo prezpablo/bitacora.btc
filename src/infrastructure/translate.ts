@@ -42,12 +42,13 @@ export async function mapPool<T, R>(items: T[], n: number, fn: (item: T) => Prom
 }
 
 class ApiError extends Error {
-  constructor(
-    readonly kind: "http" | "abort" | "network" | "empty" | "quota",
-    readonly status = 0,
-  ) {
+  kind: "http" | "abort" | "network" | "empty" | "quota";
+  status: number;
+  constructor(kind: "http" | "abort" | "network" | "empty" | "quota", status = 0) {
     super(kind === "http" ? `http ${status}` : kind);
     this.name = "ApiError";
+    this.kind = kind;
+    this.status = status;
   }
 }
 
@@ -173,8 +174,8 @@ const PROVIDERS: {
   name: "mymemory" | "google" | "lingva";
   run: (text: string, from: string, to: string, signal: AbortSignal) => Promise<TranslateResult>;
 }[] = [
-  { name: "mymemory", run: myMemory },
   { name: "google", run: googleGtx },
+  { name: "mymemory", run: myMemory },
   { name: "lingva", run: lingva },
 ];
 
@@ -251,6 +252,31 @@ export async function translateNews(news: PulsePayload["news"], to: string, sign
       title: titleTr.text || originalTitle,
       summary: sumTr?.text || originalSummary,
       sourceLang: from.toUpperCase(),
+    };
+  });
+  const status = fail === 0 ? "ok" : ok === 0 ? "off" : "partial";
+  return { rows, status } as const;
+}
+
+export async function translateFeed(
+  posts: { id: string; title: string; body: string }[],
+  to: string,
+  signal: AbortSignal,
+) {
+  let ok = 0;
+  let fail = 0;
+  const rows = await mapPool(posts, 3, async (item) => {
+    const [titleTr, bodyTr] = await Promise.all([
+      translateAuto(item.title, to, signal),
+      item.body ? translateAuto(item.body, to, signal) : Promise.resolve(null),
+    ]);
+    const worked = titleTr.ok && (bodyTr ? bodyTr.ok : true);
+    if (worked) ok += 1;
+    else fail += 1;
+    return {
+      ...item,
+      title: titleTr.text || item.title,
+      body: bodyTr?.text || item.body,
     };
   });
   const status = fail === 0 ? "ok" : ok === 0 ? "off" : "partial";
