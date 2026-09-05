@@ -12,16 +12,17 @@ import { PayRow } from "./pay-row";
 import { SocialRow } from "./social-row";
 import { VerifiedStar } from "./verified-star";
 import { VerifyIgHow } from "./verify-ig-how";
-import { ListingPatchForm } from "./map-patch-form";
 
 export function CommunityCard({
   community,
   onVerified,
   onPatched,
+  onPatch,
 }: {
   community: Community;
   onVerified: () => void;
   onPatched?: () => void;
+  onPatch?: () => void;
 }) {
   const t = useT();
   const trust = communityTrust(community);
@@ -59,16 +60,13 @@ export function CommunityCard({
           {!trust.verified ? <p className="mt-1 text-xs text-muted-foreground">{t("verifyPending")}</p> : null}
         </div>
       </div>
+      {onPatch ? (
+        <Button type="button" size="sm" className="w-full" onClick={onPatch}>
+          {t("patchUpdate")}
+        </Button>
+      ) : null}
       {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
       <SocialRow links={community.links} />
-      <ListingPatchForm
-        listingId={community.id}
-        name={community.name}
-        description={community.description}
-        logo={community.logo}
-        isCommunity
-        onApplied={onPatched}
-      />
       {!trust.verified && community.verifyToken ? (
         <ScrapeVerifyBox
           id={community.id}
@@ -88,6 +86,7 @@ export function PlaceCard({
   onRemove,
   onVerified,
   onPatched,
+  onPatch,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
@@ -95,6 +94,7 @@ export function PlaceCard({
   onRemove: () => void;
   onVerified?: () => void;
   onPatched?: () => void;
+  onPatch?: () => void;
 }) {
   const t = useT();
   const g = gradeOf(local, Date.now());
@@ -116,6 +116,11 @@ export function PlaceCard({
           {trust.verified ? <VerifiedStar title={t("verified")} className="size-7" /> : null}
         </h3>
       </div>
+      {onPatch ? (
+        <Button type="button" size="sm" className="w-full" onClick={onPatch}>
+          {t("patchUpdate")}
+        </Button>
+      ) : null}
       {g ? (
         <div className="space-y-1">
           <StarMeter score={g.avg ?? 0} votes={g.count} />
@@ -143,15 +148,6 @@ export function PlaceCard({
       {local?.hours ? <HoursView hours={local.hours} /> : null}
       {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
       {local?.links?.length ? <SocialRow links={local.links} /> : null}
-      <ListingPatchForm
-        listingId={place.id}
-        name={place.name}
-        description={local?.description}
-        address={local?.address}
-        notes={local?.notes}
-        logo={local?.logo || place.logo}
-        onApplied={onPatched}
-      />
       {!trust.verified && local?.verifyToken && onVerified ? (
         <ScrapeVerifyBox
           id={place.id}

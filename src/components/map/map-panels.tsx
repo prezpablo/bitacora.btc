@@ -83,6 +83,7 @@ export function MapVotePanel({
   onDismiss,
   onGo,
   going,
+  onPatch,
 }: {
   open: boolean;
   captchaKey: string;
@@ -105,20 +106,30 @@ export function MapVotePanel({
   onDismiss: () => void;
   onGo?: () => void;
   going?: boolean;
+  onPatch?: () => void;
 }) {
   const t = useT();
   if (!open) {
     return (
       <div className="space-y-2">
-        <div className={onGo ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
+        <div className="grid grid-cols-3 gap-2">
           {onGo ? (
             <Button type="button" size="sm" disabled={going} onClick={onGo} title={going ? t("irWait") : t("ir")}>
               {going ? t("irWait") : t("ir")}
             </Button>
-          ) : null}
-          <Button type="button" size="sm" variant={onGo ? "outline" : "default"} onClick={onOpen} title={t("mapLoadVote")}>
+          ) : (
+            <span />
+          )}
+          <Button type="button" size="sm" variant="outline" onClick={onOpen} title={t("mapLoadVote")}>
             {t("mapLoadVoteShort")}
           </Button>
+          {onPatch ? (
+            <Button type="button" size="sm" variant="outline" onClick={onPatch}>
+              {t("patchUpdate")}
+            </Button>
+          ) : (
+            <span />
+          )}
         </div>
         <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={onDismiss}>
           {t("pinCancel")}
@@ -172,6 +183,11 @@ export function MapVotePanel({
       <Button type="button" variant="outline" className="w-full" onClick={onHide}>
         {t("pinCancel")}
       </Button>
+      {onPatch ? (
+        <button type="button" className="w-full text-center text-sm text-primary" onClick={onPatch}>
+          {t("patchUpdate")}
+        </button>
+      ) : null}
     </>
   );
 }

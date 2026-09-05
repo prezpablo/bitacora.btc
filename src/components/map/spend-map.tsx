@@ -26,6 +26,7 @@ import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark
 import { SiteShell } from "@/components/site-header";
 import { MapSearch, type SearchHit } from "./map-search";
 import { CommunityCard, PlaceCard } from "./map-listing-card";
+import { ListingPatchForm } from "./map-patch-form";
 import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
 import { EMPTY_COMM_FORM, MapComposeForm, type CommForm } from "./map-compose-form";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
@@ -131,6 +132,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [drop, setDrop] = useState<{ lat: number; lon: number } | null>(null);
   const [dropKind, setDropKind] = useState<"pick" | "comercio" | "comunidad">("pick");
   const [voteOpen, setVoteOpen] = useState(false);
+  const [patchOpen, setPatchOpen] = useState(false);
   const [mode, setMode] = useState<"comercio" | "comunidad">("comercio");
   const [form, setForm] = useState<CommForm>(EMPTY_COMM_FORM);
   const [formErr, setFormErr] = useState("");
@@ -857,6 +859,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setSel(null);
     setSelComm(null);
     setVoteOpen(false);
+    setPatchOpen(false);
     setFormErr("");
     setCaptchaOk(false);
     setPrivacyOk(false);
@@ -959,8 +962,26 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   persist(store, next);
                 }}
                 onPatched={() => void invalidate()}
+                onPatch={() => {
+                  setPatchOpen(true);
+                  setVoteOpen(false);
+                  setFormErr("");
+                }}
               />
               <StarMeter score={selComm.score ?? 0} votes={selComm.voteCount ?? selComm.votes?.length ?? 0} />
+              {patchOpen ? (
+                <ListingPatchForm
+                  listingId={selComm.id}
+                  name={selComm.name}
+                  description={selComm.description}
+                  logo={selComm.logo}
+                  lat={selComm.lat}
+                  lon={selComm.lon}
+                  isCommunity
+                  onApplied={() => void invalidate()}
+                  onClose={() => setPatchOpen(false)}
+                />
+              ) : (
               <MapVotePanel
                 open={voteOpen}
                 captchaKey={selComm.id}
@@ -978,13 +999,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onPublish={() => voteCommunity(selComm)}
                 onGo={() => startGuide({ lat: selComm.lat, lon: selComm.lon })}
                 going={guideWait}
+                onPatch={() => {
+                  setPatchOpen(true);
+                  setVoteOpen(false);
+                  setFormErr("");
+                }}
                 onOpen={() => {
                   setVoteOpen(true);
+                  setPatchOpen(false);
                   setFormErr("");
                 }}
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
+              )}
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
               {guideSteps.length ? (
                 <ol className="max-h-56 space-y-1 overflow-auto text-sm">
@@ -1018,7 +1046,26 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   commit(sel.id, { ...local, verifiedAt: Date.now() });
                 }}
                 onPatched={() => void invalidate()}
+                onPatch={() => {
+                  setPatchOpen(true);
+                  setVoteOpen(false);
+                  setFormErr("");
+                }}
               />
+              {patchOpen ? (
+                <ListingPatchForm
+                  listingId={sel.id}
+                  name={sel.name}
+                  description={local?.description}
+                  address={local?.address}
+                  notes={local?.notes}
+                  logo={local?.logo || sel.logo}
+                  lat={sel.lat}
+                  lon={sel.lon}
+                  onApplied={() => void invalidate()}
+                  onClose={() => setPatchOpen(false)}
+                />
+              ) : (
               <MapVotePanel
                 open={voteOpen}
                 captchaKey={sel.id}
@@ -1038,13 +1085,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onPublish={() => vote(sel)}
                 onGo={() => startGuide({ lat: sel.lat, lon: sel.lon })}
                 going={guideWait}
+                onPatch={() => {
+                  setPatchOpen(true);
+                  setVoteOpen(false);
+                  setFormErr("");
+                }}
                 onOpen={() => {
                   setVoteOpen(true);
+                  setPatchOpen(false);
                   setFormErr("");
                 }}
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
+              )}
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
               {guideSteps.length ? (
                 <ol className="max-h-56 space-y-1 overflow-auto text-sm">
