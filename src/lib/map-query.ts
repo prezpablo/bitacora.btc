@@ -53,7 +53,6 @@ export function useMapMerchants(bbox: MapBbox) {
     queryFn: () => getMerchants({ data: bbox }),
     staleTime: STALE.merchants,
   });
-  });
 }
 
 export function useMapCsv() {
