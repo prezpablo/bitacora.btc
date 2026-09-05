@@ -3,7 +3,7 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
 import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, SEO } from "@/lib/seo";
-import { langFromQuery, type AppLang } from "@/lib/locale";
+import { langFromLocation, langFromQuery, type AppLang } from "@/lib/locale";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
@@ -65,14 +65,19 @@ function headFor(lang: AppLang) {
 }
 
 export const Route = createRootRoute({
-  loader: ({ location }) => ({ lang: langOf(location.search) }),
+  validateSearch: (raw: Record<string, unknown>) => {
+    const lang = langFromQuery(raw);
+    return lang ? { lang } : {};
+  },
+  loader: ({ location }) => ({ lang: langFromLocation(location) }),
   head: (ctx: { loaderData?: { lang?: AppLang } }) => headFor(ctx.loaderData?.lang ?? "es"),
   component: RootDoc,
 });
 
 function RootDoc() {
-  const search = useRouterState({ select: (s) => s.location.search });
-  const lang = langOf(search);
+  const loaded = Route.useLoaderData();
+  const search = useRouterState({ select: (s) => s.location });
+  const lang = loaded?.lang || langFromLocation(search);
   const ld = JSON.stringify(jsonLd(lang, ORIGIN));
   return (
     <html lang={lang} className="antialiased" suppressHydrationWarning>

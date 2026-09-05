@@ -13,14 +13,26 @@ export function langFromQuery(raw?: unknown): AppLang | null {
   if (typeof raw === "string") {
     const s = raw.trim();
     if (s === "es" || s === "en" || s === "pt") return s;
-    const params = new URLSearchParams(s.startsWith("?") ? s : s.includes("=") ? s : "");
-    q = params.get("lang");
+    if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/")) {
+      try {
+        q = new URL(s, "https://bitacorabtc.org").searchParams.get("lang");
+      } catch {
+        q = null;
+      }
+    } else {
+      const params = new URLSearchParams(s.startsWith("?") ? s : s.includes("=") ? s : "");
+      q = params.get("lang");
+    }
   } else if (raw && typeof raw === "object" && "lang" in raw) {
     const v = (raw as { lang?: unknown }).lang;
     q = typeof v === "string" ? v : null;
   }
   const l = (q || "").slice(0, 2).toLowerCase();
   return l === "es" || l === "en" || l === "pt" ? l : null;
+}
+
+export function langFromLocation(location: { search?: unknown; searchStr?: string; href?: string }): AppLang {
+  return langFromQuery(location.search) || langFromQuery(location.searchStr) || langFromQuery(location.href) || "es";
 }
 
 function readLang(): AppLang {

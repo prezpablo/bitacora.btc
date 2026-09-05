@@ -1493,8 +1493,8 @@ export type CopyKey = keyof typeof es;
 
 export function useT() {
   const storeLang = useLocale((s) => s.lang);
-  const search = useRouterState({ select: (s) => s.location.search });
-  const lang = (langFromQuery(search) || storeLang) as AppLang;
+  const location = useRouterState({ select: (s) => s.location });
+  const lang = (langFromQuery(location.search) || langFromQuery(location.searchStr) || storeLang) as AppLang;
   return useCallback(
     (key: CopyKey, vars?: Record<string, string | number>) => {
       const table = COPY[lang] ?? COPY.es;
