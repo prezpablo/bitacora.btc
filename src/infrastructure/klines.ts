@@ -1,5 +1,5 @@
 import { TF_SPEC, resampleToTf, type Candle, type ChartRange } from "@/domain";
-import { fetchJson } from "./http";
+import { fetchBinanceSpot, fetchJson } from "./http";
 
 const ORIGIN = Date.UTC(2013, 3, 28);
 
@@ -17,23 +17,16 @@ function parseRow(row: unknown[]): Candle | null {
 }
 
 async function binancePage(interval: string, startTime: number, signal: AbortSignal): Promise<Candle[]> {
-  const q = `symbol=BTCUSDT&interval=${interval}&limit=1000&startTime=${startTime}`;
-  const urls = [
-    `https://fapi.binance.com/fapi/v1/klines?${q}`,
-    `https://api.binance.com/api/v3/klines?${q}`,
-  ];
-  let lastErr: unknown;
-  for (const url of urls) {
-    try {
-      const rows = await fetchJson<unknown[][]>(url, signal);
-      if (!Array.isArray(rows) || rows.length === 0) continue;
-      return rows.map(parseRow).filter((c): c is Candle => !!c);
-    } catch (err) {
-      lastErr = err;
-    }
+  const q = `/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=1000&startTime=${startTime}`;
+  try {
+    const rows = await fetchJson<unknown[][]>(`https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=${interval}&limit=1000&startTime=${startTime}`, signal);
+    if (Array.isArray(rows) && rows.length) return rows.map(parseRow).filter((c): c is Candle => !!c);
+  } catch {
+    /* spot vision */
   }
-  if (lastErr) throw lastErr;
-  return [];
+  const rows = await fetchBinanceSpot<unknown[][]>(q, signal);
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+  return rows.map(parseRow).filter((c): c is Candle => !!c);
 }
 
 export async function fetchBinanceTf(tf: ChartRange, signal: AbortSignal): Promise<Candle[]> {

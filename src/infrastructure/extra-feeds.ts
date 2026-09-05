@@ -69,6 +69,7 @@ async function fetchChart(name: string, signal: AbortSignal): Promise<SeriesPoin
 const MEMPOOL_APIS = [
   "https://mempool.space/api",
   "https://mempool.emzy.de/api",
+  "https://mempool.ninja/api",
 ] as const;
 
 async function fetchFirst<T>(urls: string[], parent: AbortSignal, ms = 4_000): Promise<T> {

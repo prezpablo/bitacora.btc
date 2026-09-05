@@ -1,5 +1,6 @@
-import { useLocale, type AppLang } from "./locale";
+import { useLocale, langFromQuery, type AppLang } from "./locale";
 import { useCallback } from "react";
+import { useRouterState } from "@tanstack/react-router";
 
 const es = {
   navMercado: "Mercado",
@@ -1491,7 +1492,9 @@ export const COPY: Record<AppLang, Record<keyof typeof es, string>> = { es, en, 
 export type CopyKey = keyof typeof es;
 
 export function useT() {
-  const lang = useLocale((s) => s.lang);
+  const storeLang = useLocale((s) => s.lang);
+  const search = useRouterState({ select: (s) => s.location.search });
+  const lang = (langFromQuery(search) || storeLang) as AppLang;
   return useCallback(
     (key: CopyKey, vars?: Record<string, string | number>) => {
       const table = COPY[lang] ?? COPY.es;

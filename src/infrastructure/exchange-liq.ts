@@ -1,6 +1,6 @@
 import { resampleToTf, type Candle, type ChartRange, type HeatBucket, type LiqCluster } from "@/domain";
 import { blendLiquidationMaps, buildLiquidationMap } from "@/domain";
-import { fetchJson } from "./http";
+import { fetchBinanceSpot, fetchJson } from "./http";
 
 type VenueTape = { name: string; candles: Candle[]; weight: number };
 
@@ -54,8 +54,8 @@ async function binance(ival: Ival, signal: AbortSignal): Promise<VenueTape> {
     `https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=${ival.bn}&limit=${ival.n}`,
     signal,
   ).catch(() =>
-    fetchJson<unknown[][]>(
-      `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${ival.bn}&limit=${ival.n}`,
+    fetchBinanceSpot<unknown[][]>(
+      `/api/v3/klines?symbol=BTCUSDT&interval=${ival.bn}&limit=${ival.n}`,
       signal,
     ),
   );

@@ -1,6 +1,6 @@
 import { DAY_MS, RANGE_SPEC, hydrateCloses, resampleToTf, stitchCandles, type Candle, type ChartRange } from "@/domain";
 import type { LiveTape, MarketFeed } from "@/application";
-import { fetchJson } from "./http";
+import { fetchBinanceSpot, fetchJson } from "./http";
 import { fetchBinanceTf, fetchOkxTf } from "./klines";
 
 const HL_INFO = "https://api.hyperliquid.xyz/info";
@@ -69,22 +69,22 @@ function parseKline(row: unknown[]): Candle {
 
 async function fetchKlines(interval: string, limit: number, signal: AbortSignal, startTime?: number) {
   const cap = Math.min(1000, Math.max(limit, 24));
-  let url = `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${cap}`;
-  if (startTime != null) url += `&startTime=${startTime}`;
-  const json = await fetchJson<unknown[]>(url, signal);
+  let path = `/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${cap}`;
+  if (startTime != null) path += `&startTime=${startTime}`;
+  const json = await fetchBinanceSpot<unknown[]>(path, signal);
   const rows = json.map((row) => parseKline(row as unknown[])).filter((c) => c.t > 0 && c.close > 0);
   if (rows.length < 24) throw new Error("bn klines short");
   return rows;
 }
 
 async function fetchTicker(signal: AbortSignal) {
-  const j = await fetchJson<{
+  const j = await fetchBinanceSpot<{
     lastPrice: string;
     priceChangePercent: string;
     highPrice: string;
     lowPrice: string;
     quoteVolume: string;
-  }>("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT", signal);
+  }>("/api/v3/ticker/24hr?symbol=BTCUSDT", signal);
   return {
     price: Number(j.lastPrice),
     change24h: Number(j.priceChangePercent),

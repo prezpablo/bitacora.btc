@@ -1,29 +1,28 @@
-import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet, Scripts, useRouterState } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
 import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, SEO } from "@/lib/seo";
+import { langFromQuery, type AppLang } from "@/lib/locale";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
-const TITLE = SEO.es.title;
-const DESC = SEO.es.description;
 const ORIGIN = PUBLIC_ORIGIN;
 const CANONICAL = `${ORIGIN}/`;
-const LD = JSON.stringify(jsonLd("es", ORIGIN));
 
-export const Route = createRootRoute({
-  head: () => ({
+function langOf(search: unknown): AppLang {
+  return langFromQuery(search) || "es";
+}
+
+function headFor(lang: AppLang) {
+  const seo = SEO[lang];
+  return {
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: TITLE },
-      { name: "description", content: DESC },
-      {
-        name: "keywords",
-        content:
-          "Bitcoin, mapa Bitcoin, comunidades Bitcoin, Latinoamérica, comercios Bitcoin, Lightning, autocustodia, Consciencia Bitcoin, Colonia del Sacramento, Uruguay",
-      },
+      { title: seo.title },
+      { name: "description", content: seo.description },
+      { name: "keywords", content: seo.keywords },
       { name: "author", content: "Consciencia Bitcoin" },
       { name: "google-site-verification", content: "w4NkiP98t6wqRqMRrpXgVAY4Q3n82dCclvOV4AVw9uc" },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1" },
@@ -34,20 +33,20 @@ export const Route = createRootRoute({
       { name: "ICBM", content: "-34.4717, -57.8443" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: APP_NAME },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
+      { property: "og:title", content: seo.title },
+      { property: "og:description", content: seo.description },
       { property: "og:url", content: CANONICAL },
       { property: "og:image", content: `${ORIGIN}${OG_IMAGE_PATH}` },
-      { property: "og:image:alt", content: TITLE },
+      { property: "og:image:alt", content: seo.title },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:type", content: "image/jpeg" },
-      { property: "og:locale", content: "es_UY" },
+      { property: "og:locale", content: seo.ogLocale },
       { property: "og:locale:alternate", content: "en_US" },
       { property: "og:locale:alternate", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: TITLE },
-      { name: "twitter:description", content: DESC },
+      { name: "twitter:title", content: seo.title },
+      { name: "twitter:description", content: seo.description },
       { name: "twitter:image", content: `${ORIGIN}${OG_IMAGE_PATH}` },
     ],
     links: [
@@ -62,12 +61,24 @@ export const Route = createRootRoute({
       { rel: "alternate", href: `${CANONICAL}?lang=en`, hrefLang: "en" },
       { rel: "alternate", href: CANONICAL, hrefLang: "x-default" },
     ],
-  }),
-  component: () => (
-    <html lang="es" className="antialiased" suppressHydrationWarning>
+  };
+}
+
+export const Route = createRootRoute({
+  loader: ({ location }) => ({ lang: langOf(location.search) }),
+  head: (ctx: { loaderData?: { lang?: AppLang } }) => headFor(ctx.loaderData?.lang ?? "es"),
+  component: RootDoc,
+});
+
+function RootDoc() {
+  const search = useRouterState({ select: (s) => s.location.search });
+  const lang = langOf(search);
+  const ld = JSON.stringify(jsonLd(lang, ORIGIN));
+  return (
+    <html lang={lang} className="antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: LD }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld }} />
       </head>
       <body>
         <PreviewHostBridge />
@@ -79,5 +90,5 @@ export const Route = createRootRoute({
         <Scripts />
       </body>
     </html>
-  ),
-});
+  );
+}

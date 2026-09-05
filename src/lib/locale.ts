@@ -8,11 +8,26 @@ export const LANGS = [
 
 export type AppLang = (typeof LANGS)[number]["value"];
 
+export function langFromQuery(raw?: unknown): AppLang | null {
+  let q: string | null = null;
+  if (typeof raw === "string") {
+    const s = raw.trim();
+    if (s === "es" || s === "en" || s === "pt") return s;
+    const params = new URLSearchParams(s.startsWith("?") ? s : s.includes("=") ? s : "");
+    q = params.get("lang");
+  } else if (raw && typeof raw === "object" && "lang" in raw) {
+    const v = (raw as { lang?: unknown }).lang;
+    q = typeof v === "string" ? v : null;
+  }
+  const l = (q || "").slice(0, 2).toLowerCase();
+  return l === "es" || l === "en" || l === "pt" ? l : null;
+}
+
 function readLang(): AppLang {
   if (typeof window === "undefined") return "es";
   try {
-    const q = new URLSearchParams(window.location.search).get("lang");
-    if (q === "es" || q === "en" || q === "pt") return q;
+    const q = langFromQuery(window.location.search);
+    if (q) return q;
   } catch {
     /* ignore */
   }

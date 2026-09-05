@@ -58,6 +58,19 @@ Tabla corta. Código ya bajado o deuda abierta.
 
 **No reabrir:** sslip.io como canónica (el `.org` ya manda). Nginx. CMP de ads. Connect-wallet.
 
+### Alertas 5 set (runner ≠ VPS)
+
+Verificadas. No son CAÍDA. UI no se tocó.
+
+| Código | ¿Cierto? | Qué hay | Qué se hizo |
+|---|---|---|---|
+| **D-MP-FEE / D-MP-TIP** | Sí: el runner no llega a mempool.space | Fees ya iban a emzy + blockstream + bitcoiner.live + last-known | Suma `mempool.ninja`. Tip sigue Esplora (`blockstream.info`) si mempool cae. Cache `mergeLiveFees`. Avisar sólo si se repite 2–3 días **y** el VPS también vacío. |
+| **P1-03** | Sí: `<html lang="es">` y title fijos en SSR | `hreflang` en sitemap sí; HTML no seguía `?lang=` | `html lang` + title/description/json-ld desde `?lang=`. `useT` lee el query en SSR. Selector ES/PT/EN igual. |
+| **D-BN** | Sí en el runner (451 geo). VPS a veces no | Mercado ya cae a OKX (`loadMarket`) | Spot vía `data-api.binance.vision` (docs oficiales) → `api.binance.com`. No alertar “mercado caído”. |
+| First-party 404 (30/08) | **Cerrado** | `ne-110m`, pins, shops/comms | Hoy 200. El VPS está más al día que esa deuda. |
+
+Próxima corrida runner: **06/09 08:30 -03**.
+
 ### Lighthouse (auditoría de código, 5 set)
 
 Sin run CI todavía. Lo que Lighthouse mobile va a marcar, y qué hay:
