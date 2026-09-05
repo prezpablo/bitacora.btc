@@ -1,5 +1,6 @@
-/** IP solo para el primer encuadre. Tras autorizar, GPS/Wi‑Fi del navegador (nunca IP). */
+/** IP solo para el primer encuadre. Tras el clic (consentimiento), GPS/Wi‑Fi del navegador. */
 
+import { pickBestFix, type GpsSession } from "@/domain/geo-fix";
 import { boxAround, frameFromFix, type CityFrame, type GeoFix } from "@/domain/geo-frame";
 
 export type { CityFrame, GeoFix };
@@ -10,63 +11,82 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** Call this inside the click handler — not after await — so the browser shows the GPS prompt. */
-export function requestGpsOnGesture(): Promise<GeoFix> {
-  return new Promise((resolve, reject) => {
+function fromPos(pos: GeolocationPosition): GeoFix {
+  return {
+    lat: pos.coords.latitude,
+    lon: pos.coords.longitude,
+    accuracy: pos.coords.accuracy || 80,
+    source: "gps",
+  };
+}
+
+/** Start inside the click handler so the browser shows the GPS prompt. */
+export function startGpsFromGesture(): GpsSession {
+  let best: GeoFix | null = null;
+  const notes: ((f: GeoFix) => void)[] = [];
+  const note = (fix: GeoFix) => {
+    best = pickBestFix(best, fix);
+    if (best) for (const n of notes) n(best);
+  };
+
+  const first = new Promise<GeoFix>((resolve, reject) => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       reject(new Error("no-geo"));
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        resolve({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          accuracy: pos.coords.accuracy || 80,
-          source: "gps",
-        }),
+      (pos) => {
+        const f = fromPos(pos);
+        note(f);
+        resolve(f);
+      },
       (err) => reject(err),
-      { enableHighAccuracy: true, timeout: 18_000, maximumAge: 15_000 },
+      { enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 },
     );
   });
-}
 
-export function requestGpsPrecise(): Promise<GeoFix> {
-  return new Promise((resolve, reject) => {
+  const bestP = new Promise<GeoFix>((resolve, reject) => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       reject(new Error("no-geo"));
       return;
     }
-    let best: GeolocationPosition | null = null;
-    let settled = false;
-    const finish = (watchId: number) => {
-      if (settled) return;
-      settled = true;
-      navigator.geolocation.clearWatch(watchId);
-      if (!best) {
-        reject(new Error("no-fix"));
-        return;
-      }
-      resolve({
-        lat: best.coords.latitude,
-        lon: best.coords.longitude,
-        accuracy: best.coords.accuracy || 80,
-        source: "gps",
-      });
-    };
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        if (!best || pos.coords.accuracy < best.coords.accuracy) best = pos;
-        if (pos.coords.accuracy <= 100) finish(watchId);
+        const f = fromPos(pos);
+        note(f);
+        if (f.accuracy <= 40 && best) {
+          navigator.geolocation.clearWatch(watchId);
+          resolve(best);
+        }
       },
       (err) => {
-        if (best) finish(watchId);
+        if (best) resolve(best);
         else reject(err);
       },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 15_000 },
     );
-    window.setTimeout(() => finish(watchId), 12_000);
+    notes.push((f) => {
+      if (f.accuracy <= 40) {
+        navigator.geolocation.clearWatch(watchId);
+        resolve(f);
+      }
+    });
+    window.setTimeout(() => {
+      navigator.geolocation.clearWatch(watchId);
+      if (best) resolve(best);
+      else reject(new Error("no-fix"));
+    }, 6_000);
   });
+
+  return { first, best: bestP, note };
+}
+
+export function requestGpsOnGesture(): Promise<GeoFix> {
+  return startGpsFromGesture().first;
+}
+
+export function requestGpsPrecise(): Promise<GeoFix> {
+  return startGpsFromGesture().best;
 }
 
 export async function requestBeaconFix(ip?: string): Promise<GeoFix> {

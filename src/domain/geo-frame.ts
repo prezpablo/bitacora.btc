@@ -7,7 +7,7 @@ export type GeoFix = {
   city?: string;
   country?: string;
   countryCode?: string;
-  source: "gps" | "ip";
+  source: "gps" | "ip" | "tap";
 };
 
 export type CityFrame = {

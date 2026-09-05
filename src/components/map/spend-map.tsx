@@ -15,7 +15,9 @@ import type { GuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
-import { locateBest, requestGpsOnGesture, requestIpFix } from "@/infrastructure/geo";
+import { locateBest, requestIpFix, startGpsFromGesture } from "@/infrastructure/geo";
+import { locateOnConsent } from "@/application/locate-user";
+import type { GeoFix } from "@/domain/geo-frame";
 import { guideMarker } from "@/infrastructure/leaflet-router";
 import { useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
@@ -677,7 +679,25 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   async function goToUser(preferGps: boolean) {
     setGeo("wait");
     try {
-      const { fix, city } = await locateBest(preferGps, (lat, lon, zoom) =>
+      if (preferGps) {
+        const session = startGpsFromGesture();
+        mapRef.current?.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
+        const { fix } = await locateOnConsent(session, { ip: async () => requestIpFix().catch(() => null) });
+        if (!fix) {
+          setGeo("denied");
+          return;
+        }
+        const city = boxAround(fix.lat, fix.lon, "acá", fix.source === "gps" ? 0.04 : 0.14);
+        const L = leafletRef.current;
+        const map = mapRef.current;
+        if (!L || !map) return;
+        applyFix(L, map, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
+        map.invalidateSize();
+        setUserFix({ lat: fix.lat, lon: fix.lon });
+        setGeo(fix.source === "gps" ? "ok" : "idle");
+        return;
+      }
+      const { fix, city } = await locateBest(false, (lat, lon, zoom) =>
         getCityFrame({ data: { lat, lon, zoom } }).catch(() => boxAround(lat, lon)),
       );
       const L = leafletRef.current;
@@ -686,7 +706,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       applyFix(L, map, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
       map.invalidateSize();
       setUserFix({ lat: fix.lat, lon: fix.lon });
-      setGeo("ok");
+      setGeo("idle");
     } catch {
       setGeo("denied");
     }
@@ -801,57 +821,50 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     const dest = guideToRef.current;
     if (!dest) return;
     setGuideErr("");
-    void drawFrom({ lat, lon }, dest);
+    const tap: GeoFix = { lat, lon, accuracy: 25, source: "tap" };
+    void drawFrom(tap, dest);
   };
 
-  async function goGuide(to: { lat: number; lon: number }, gps: Promise<{ lat: number; lon: number }>) {
+  async function runGuide(to: { lat: number; lon: number }, session: ReturnType<typeof startGpsFromGesture>) {
     setGuideWait(true);
     setGuideErr("");
     guideToRef.current = to;
-    const lateGps = gps
-      .then((fix) => {
-        setGeo("ok");
-        setPickOrigin(false);
-        pickOriginRef.current = false;
-        void drawFrom(fix, to);
-      })
-      .catch(() => setGeo("denied"));
     try {
-      const quick = await Promise.race([
-        gps.then(
-          (fix) => fix,
-          () => null,
-        ),
-        new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 900)),
-      ]);
-      let from = quick;
-      if (!from) {
-        try {
-          from = await requestIpFix();
-        } catch {
-          from = null;
-        }
-      }
-      if (!from) {
-        try {
-          const a = await getApproxFix();
-          if (a) from = { lat: a.lat, lon: a.lon };
-        } catch {
-          from = null;
-        }
-      }
-      if (from && kmBetween(from, to) >= 0.08) {
-        await drawFrom(from, to);
-        if (quick) setGuideErr("");
-        else setGuideErr(t("irApprox"));
+      const { fix, refine } = await locateOnConsent(session, {
+        ip: async () => {
+          try {
+            return await requestIpFix();
+          } catch {
+            /* beacon */
+          }
+          try {
+            const a = await getApproxFix();
+            return a ? { lat: a.lat, lon: a.lon, accuracy: a.accuracy, source: "ip" as const } : null;
+          } catch {
+            return null;
+          }
+        },
+      });
+      if (fix && (fix.source === "gps" || fix.source === "tap" || kmBetween(fix, to) >= 0.08)) {
+        await drawFrom(fix, to);
+        setGeo(fix.source === "gps" ? "ok" : "idle");
+        if (fix.source !== "gps") setGuideErr(t("irApprox"));
       } else {
         pickOriginRef.current = true;
         setPickOrigin(true);
         setGuideErr(t("irTap"));
+        setGeo("denied");
       }
+      void refine.then((better) => {
+        if (!better || better.source !== "gps") return;
+        if (fix && better.accuracy >= fix.accuracy - 20) return;
+        setGeo("ok");
+        pickOriginRef.current = false;
+        setPickOrigin(false);
+        void drawFrom(better, to);
+      });
     } finally {
       setGuideWait(false);
-      void lateGps;
     }
   }
 
@@ -859,19 +872,21 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     pickOriginRef.current = false;
     setPickOrigin(false);
     guideToRef.current = to;
-    const gps = requestGpsOnGesture();
+    const session = startGpsFromGesture();
     const map = mapRef.current;
     if (map) {
       map.stopLocate();
-      map.once("locationfound", (e: { latlng: { lat: number; lng: number } }) => {
-        pickOriginRef.current = false;
-        setPickOrigin(false);
-        setGeo("ok");
-        void drawFrom({ lat: e.latlng.lat, lon: e.latlng.lng }, to);
+      map.once("locationfound", (e: { latlng: { lat: number; lng: number }; accuracy?: number }) => {
+        session.note({
+          lat: e.latlng.lat,
+          lon: e.latlng.lng,
+          accuracy: e.accuracy || 80,
+          source: "gps",
+        });
       });
-      map.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 15_000 });
+      map.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
     }
-    void goGuide(to, gps);
+    void runGuide(to, session);
   }
 
   function flyTo(hit: SearchHit) {
