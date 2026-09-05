@@ -11,6 +11,7 @@ import { StarMeter } from "./map-panels";
 import { PayRow } from "./pay-row";
 import { SocialRow } from "./social-row";
 import { VerifiedStar } from "./verified-star";
+import { VerifyIgHow } from "./verify-ig-how";
 
 export function CommunityCard({
   community,
@@ -193,6 +194,7 @@ function ScrapeVerifyBox({
       <p>
         <code className="rounded bg-primary px-1.5 py-0.5 font-mono text-sm font-bold text-white">{token}</code>
       </p>
+      <VerifyIgHow />
       {!hasLinks ? <p className="text-primary">{t("verifyNeedLink")}</p> : null}
       {err ? <p className="text-primary">{err}</p> : null}
       <Button

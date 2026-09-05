@@ -13,6 +13,7 @@ import { HoursEditor } from "./hours-editor";
 import { LogoPicker } from "./logo-picker";
 import { PayPicker } from "./pay-row";
 import { SocialPicker } from "./social-row";
+import { VerifyIgHow } from "./verify-ig-how";
 
 export type CommForm = {
   slug: string;
@@ -136,6 +137,7 @@ export function MapComposeForm({
         <HoursEditor value={shopHours} onChange={onShopHours} />
         <PayPicker value={shopPays} onChange={onShopPays} />
         <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
+        <VerifyIgHow />
         <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
         <PrivacyAccept id="privacy-map-shop" checked={privacyOk} onChange={onPrivacy} />
         {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
@@ -170,6 +172,7 @@ export function MapComposeForm({
       />
       <LogoPicker value={form.logo} onChange={(logo) => onForm((f) => ({ ...f, logo }))} />
       <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
+      <VerifyIgHow />
       <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
       <PrivacyAccept id="privacy-map-comm" checked={privacyOk} onChange={onPrivacy} />
       {formErr ? <p className="text-sm text-short">{formErr}</p> : null}

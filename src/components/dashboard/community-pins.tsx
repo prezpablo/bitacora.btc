@@ -8,6 +8,7 @@ import { pinDaysLeft, pinPending, pinWeekPose, type CommunityPin } from "@/domai
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { VerifyIgHow } from "@/components/map/verify-ig-how";
 
 const PENDING_KEY = "bitacora-pin-pending";
 
@@ -248,6 +249,9 @@ export function CommunityPinsBoard() {
               <div>
                 <p className="text-sm font-medium text-foreground">{t("pinFormTitle")}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
+                <div className="mt-2">
+                  <VerifyIgHow />
+                </div>
               </div>
               <button
                 type="button"

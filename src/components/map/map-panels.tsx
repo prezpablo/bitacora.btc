@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
+import { VerifyIgHow } from "./verify-ig-how";
 
 export function StarMeter({ score, votes }: { score: number; votes: number }) {
   const avg = votes > 0 ? score : 0;
@@ -55,6 +56,7 @@ export function MapDropPick({
       <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={onCancel}>
         {t("pinCancel")}
       </button>
+      <VerifyIgHow />
     </div>
   );
 }
