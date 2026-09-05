@@ -128,7 +128,7 @@ export function Desk() {
   const pulse = useQuery({
     queryKey: ["pulse"],
     queryFn: () => getPulse({ data: { lang: uiLang } }),
-    enabled: allowFetch && liveOk && wantLive,
+    enabled: allowFetch && liveOk,
     staleTime: 90_000,
     refetchInterval: 120_000,
     refetchOnWindowFocus: true,
@@ -247,9 +247,7 @@ export function Desk() {
       </section>
 
       <section id="pulso" className="scroll-mt-[var(--header-offset)]">
-        <LazyMount fallback={<Soft />} minHeight="8rem">
-          <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
-        </LazyMount>
+        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} />
       </section>
 
       <Suspense fallback={<Soft />}>
