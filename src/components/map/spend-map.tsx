@@ -14,7 +14,7 @@ import { geodesicLine } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
-import { locateBest } from "@/infrastructure/geo";
+import { locateBest, requestGpsOnGesture } from "@/infrastructure/geo";
 import { useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
@@ -454,8 +454,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           if (dead || !mapRef.current || !leafletRef.current) return;
           applyFix(leafletRef.current, mapRef.current, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
           mapRef.current.invalidateSize();
-          setUserFix({ lat: fix.lat, lon: fix.lon });
-          setGeo("ok");
+          setGeo(fix.source === "gps" ? "ok" : "idle");
         })
         .catch(() => setGeo("denied"));
     });
@@ -686,26 +685,22 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     }
   }
 
-  async function goGuide(to: { lat: number; lon: number }) {
+  async function goGuide(to: { lat: number; lon: number }, gps: Promise<{ lat: number; lon: number }>) {
     setGuideWait(true);
     setGuideErr("");
     try {
-      let from = userFix;
-      if (!from) {
-        try {
-          const { fix, city } = await locateBest(true, (lat, lon, zoom) =>
-            getCityFrame({ data: { lat, lon, zoom } }).catch(() => boxAround(lat, lon)),
-          );
-          from = { lat: fix.lat, lon: fix.lon };
-          setUserFix(from);
-          const L0 = leafletRef.current;
-          const map0 = mapRef.current;
-          if (L0 && map0) applyFix(L0, map0, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
-          setGeo("ok");
-        } catch {
-          from = null;
-          setGeo("denied");
-        }
+      let from: { lat: number; lon: number } | null = null;
+      try {
+        const fix = await gps;
+        from = { lat: fix.lat, lon: fix.lon };
+        setUserFix(from);
+        const L0 = leafletRef.current;
+        const map0 = mapRef.current;
+        if (L0 && map0) applyFix(L0, map0, userMark.current, fix.lat, fix.lon, 80, boxAround(fix.lat, fix.lon));
+        setGeo("ok");
+      } catch {
+        from = null;
+        setGeo("denied");
       }
       const L = leafletRef.current;
       const map = mapRef.current;
@@ -738,6 +733,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     } finally {
       setGuideWait(false);
     }
+  }
+
+  function startGuide(to: { lat: number; lon: number }) {
+    const gps = requestGpsOnGesture();
+    void goGuide(to, gps);
   }
 
   function flyTo(hit: SearchHit) {
@@ -1112,7 +1112,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <CommunityCard
                 community={selComm}
                 going={guideWait}
-                onGo={() => void goGuide({ lat: selComm.lat, lon: selComm.lon })}
+                onGo={() => startGuide({ lat: selComm.lat, lon: selComm.lon })}
                 onVerified={() => {
                   const next = comms.map((c) => (c.id === selComm.id ? { ...c, verifiedAt: Date.now() } : c));
                   setComms(next);
@@ -1151,7 +1151,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 local={local}
                 removable={removable}
                 going={guideWait}
-                onGo={() => void goGuide({ lat: sel.lat, lon: sel.lon })}
+                onGo={() => startGuide({ lat: sel.lat, lon: sel.lon })}
                 onRemove={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
               />
               <MapVotePanel

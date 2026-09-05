@@ -10,6 +10,27 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Call this inside the click handler — not after await — so the browser shows the GPS prompt. */
+export function requestGpsOnGesture(): Promise<GeoFix> {
+  return new Promise((resolve, reject) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      reject(new Error("no-geo"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          accuracy: pos.coords.accuracy || 80,
+          source: "gps",
+        }),
+      (err) => reject(err),
+      { enableHighAccuracy: true, timeout: 18_000, maximumAge: 15_000 },
+    );
+  });
+}
+
 export function requestGpsPrecise(): Promise<GeoFix> {
   return new Promise((resolve, reject) => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
