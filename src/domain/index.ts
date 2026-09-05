@@ -81,6 +81,7 @@ export { SOCIAL_KEYS, SOCIALS, linksFromPicked, urlFor, keyFromUrl } from "./soc
 export { DAYS, EMPTY_HOURS, formatHours, isOpenNow, daySlots } from "./hours";
 export { PAY_KEYS, PAYS } from "./pays";
 export { communityTrust, listingTrust, hasScrapeLink, shopIsPublic, communityIsPublic } from "./verify";
+export { feesFromMempool, feesFromEsplora, feesFromBitcoiner, mergeLiveFees, quoteReady } from "./fees";
 export {
   addScore,
   dumpMapCsv,

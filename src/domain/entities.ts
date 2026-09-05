@@ -86,6 +86,7 @@ export type OnchainPayload = {
   asOf: number;
   feeFast?: number;
   feeHour?: number;
+  feeStale?: boolean;
   mempoolTx?: number;
   mempoolVsize?: number;
   diffAdjPct?: number;

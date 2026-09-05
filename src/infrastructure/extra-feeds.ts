@@ -1,4 +1,5 @@
 import { homeLookback, liquidityScore } from "@/domain";
+import { feesFromBitcoiner, feesFromEsplora, feesFromMempool, quoteReady, type FeeQuote } from "@/domain/fees";
 import type {
   ChartRange,
   ClarityPayload,
@@ -47,7 +48,14 @@ function sliceSeries(series: SeriesPoint[], from: number): SeriesPoint[] {
 
 async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
   const u = url.includes("?") ? `${url}&_=${Date.now()}` : `${url}?_=${Date.now()}`;
-  const res = await fetch(u, { signal, cache: "no-store" });
+  const res = await fetch(u, {
+    signal,
+    cache: "no-store",
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "Mozilla/5.0 (compatible; bitacora.btc/1.0; +https://bitacorabtc.org)",
+    },
+  });
   if (!res.ok) throw new Error(`${res.status}`);
   return (await res.json()) as T;
 }
@@ -58,26 +66,98 @@ async function fetchChart(name: string, signal: AbortSignal): Promise<SeriesPoin
   return (j.values ?? []).map((p) => ({ t: p.x * 1000, v: p.y }));
 }
 
-const MEMPOOL_APIS = ["https://mempool.space/api", "https://mempool.emzy.de/api"] as const;
+const MEMPOOL_APIS = [
+  "https://mempool.space/api",
+  "https://mempool.emzy.de/api",
+  "https://mempool.bisq.services/api",
+] as const;
+
+async function fetchFirst<T>(urls: string[], parent: AbortSignal, ms = 4_000): Promise<T> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  const onAbort = () => ctrl.abort();
+  if (parent.aborted) ctrl.abort();
+  else parent.addEventListener("abort", onAbort, { once: true });
+  try {
+    return await new Promise<T>((resolve, reject) => {
+      let left = urls.length;
+      let last: unknown = new Error("empty");
+      if (!left) {
+        reject(last);
+        return;
+      }
+      for (const url of urls) {
+        void fetchJson<T>(url, ctrl.signal).then(
+          (v) => resolve(v),
+          (e) => {
+            last = e;
+            if (--left === 0) reject(last instanceof Error ? last : new Error("down"));
+          },
+        );
+      }
+    });
+  } finally {
+    clearTimeout(timer);
+    parent.removeEventListener("abort", onAbort);
+  }
+}
 
 async function fetchMempoolJson<T>(path: string, parent: AbortSignal): Promise<T> {
-  let last: unknown;
-  for (const base of MEMPOOL_APIS) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 4_500);
-    const onAbort = () => ctrl.abort();
-    if (parent.aborted) ctrl.abort();
-    else parent.addEventListener("abort", onAbort, { once: true });
-    try {
-      return await fetchJson<T>(`${base}${path}`, ctrl.signal);
-    } catch (e) {
-      last = e;
-    } finally {
-      clearTimeout(timer);
-      parent.removeEventListener("abort", onAbort);
-    }
+  return fetchFirst(
+    MEMPOOL_APIS.map((base) => `${base}${path}`),
+    parent,
+    4_500,
+  );
+}
+
+async function fetchRecommendedFees(parent: AbortSignal): Promise<FeeQuote> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 6_000);
+  const onAbort = () => ctrl.abort();
+  if (parent.aborted) ctrl.abort();
+  else parent.addEventListener("abort", onAbort, { once: true });
+  const signal = ctrl.signal;
+  const jobs: Promise<FeeQuote>[] = [
+    ...MEMPOOL_APIS.map((base) =>
+      fetchJson<{ fastestFee?: number; hourFee?: number }>(`${base}/v1/fees/recommended`, signal).then(feesFromMempool),
+    ),
+    fetchJson<Record<string, number>>("https://blockstream.info/api/fee-estimates", signal).then(feesFromEsplora),
+    fetchJson<{ estimates?: Record<string, { sat_per_vbyte?: number } | number> }>(
+      "https://bitcoiner.live/api/fees/estimates/latest",
+      signal,
+    ).then(feesFromBitcoiner),
+  ];
+  try {
+    return await new Promise<FeeQuote>((resolve, reject) => {
+      let left = jobs.length;
+      let last: unknown = new Error("fees down");
+      for (const job of jobs) {
+        void job.then(
+          (q) => {
+            if (quoteReady(q)) {
+              resolve(q);
+              ctrl.abort();
+              return;
+            }
+            if (--left === 0) reject(last instanceof Error ? last : new Error("fees empty"));
+          },
+          (e) => {
+            last = e;
+            if (--left === 0) reject(last instanceof Error ? last : new Error("fees down"));
+          },
+        );
+      }
+    });
+  } catch {
+    return {};
+  } finally {
+    clearTimeout(timer);
+    parent.removeEventListener("abort", onAbort);
   }
-  throw last instanceof Error ? last : new Error("mempool down");
+}
+
+function settled<T>(row: PromiseSettledResult<T>): T | undefined {
+  return row.status === "fulfilled" ? row.value : undefined;
 }
 
 async function fetchOnchainFallback(signal: AbortSignal): Promise<Partial<OnchainPayload>> {
@@ -88,18 +168,14 @@ async function fetchOnchainFallback(signal: AbortSignal): Promise<Partial<Onchai
     fetchJson<number>("https://api.blockchain.info/q/hashrate", signal).catch(() => 0),
     fetchJson<number>("https://blockchain.info/q/getdifficulty", signal).catch(() => 0),
     fetchJson<number>("https://blockchain.info/q/unconfirmedcount", signal).catch(() => undefined),
-    fetchJson<Record<string, number>>("https://blockstream.info/api/fee-estimates", signal).catch(
-      () => ({}) as Record<string, number>,
-    ),
+    fetchRecommendedFees(signal),
   ]);
-  const feeFast = fees["1"] ?? fees["2"];
-  const feeHour = fees["6"] ?? fees["10"];
   return {
     height: Number(heightRaw) || 0,
     hashrateEh: Number(hashRaw) > 0 ? Number(hashRaw) / 1e9 : undefined,
     difficulty: Number(diffRaw) || undefined,
-    feeFast: feeFast != null ? Math.round(feeFast) : undefined,
-    feeHour: feeHour != null ? Math.round(feeHour) : undefined,
+    feeFast: fees.feeFast,
+    feeHour: fees.feeHour,
     mempoolTx: unconf,
     asOf: Date.now(),
   };
@@ -108,32 +184,36 @@ async function fetchOnchainFallback(signal: AbortSignal): Promise<Partial<Onchai
 export async function fetchOnchainLive(signal?: AbortSignal): Promise<Partial<OnchainPayload>> {
   const ctrl = signal ?? new AbortController().signal;
   try {
-    const [fees, pool, heightRaw, mining, adj] = await Promise.all([
-      fetchMempoolJson<{ fastestFee?: number; hourFee?: number }>("/v1/fees/recommended", ctrl),
+    const [feesR, poolR, heightR, miningR, adjR] = await Promise.allSettled([
+      fetchRecommendedFees(ctrl),
       fetchMempoolJson<{ count?: number; vsize?: number }>("/mempool", ctrl),
       fetchMempoolJson<number>("/blocks/tip/height", ctrl),
-      fetchMempoolJson<{ currentHashrate?: number; currentDifficulty?: number }>(
-        "/v1/mining/hashrate/3d",
-        ctrl,
-      ),
+      fetchMempoolJson<{ currentHashrate?: number; currentDifficulty?: number }>("/v1/mining/hashrate/3d", ctrl),
       fetchMempoolJson<{
         difficultyChange?: number;
         remainingBlocks?: number;
         progressPercent?: number;
       }>("/v1/difficulty-adjustment", ctrl),
     ]);
-    const hashEh = mining.currentHashrate ? mining.currentHashrate / 1e18 : undefined;
+    const fees = settled(feesR);
+    const pool = settled(poolR);
+    const heightRaw = settled(heightR);
+    const mining = settled(miningR);
+    const adj = settled(adjR);
+    const height = Number(heightRaw) || 0;
+    if (!height && fees?.feeFast == null) return await fetchOnchainFallback(ctrl);
+    const hashEh = mining?.currentHashrate ? mining.currentHashrate / 1e18 : undefined;
     return {
-      height: Number(heightRaw) || 0,
+      height,
       hashrateEh: hashEh,
-      difficulty: mining.currentDifficulty,
-      feeFast: fees.fastestFee,
-      feeHour: fees.hourFee,
-      mempoolTx: pool.count,
-      mempoolVsize: pool.vsize,
-      diffAdjPct: adj.difficultyChange,
-      blocksToAdj: adj.remainingBlocks,
-      adjProgress: adj.progressPercent,
+      difficulty: mining?.currentDifficulty,
+      feeFast: fees?.feeFast,
+      feeHour: fees?.feeHour,
+      mempoolTx: pool?.count,
+      mempoolVsize: pool?.vsize,
+      diffAdjPct: adj?.difficultyChange,
+      blocksToAdj: adj?.remainingBlocks,
+      adjProgress: adj?.progressPercent,
       asOf: Date.now(),
     };
   } catch {

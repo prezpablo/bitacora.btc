@@ -3,7 +3,7 @@ import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, 
 import type { GlobeStats } from "@/domain/globe";
 import { fetchLiveMarket, fetchTick } from "./compose";
 import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
-import { withLastKnown } from "./last-known.server";
+import { withLastKnown, readLast } from "./last-known.server";
 import { fetchBtcCommunities, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";
@@ -23,6 +23,7 @@ import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
 import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
+import { mergeLiveFees } from "@/domain/fees";
 
 export const getMarket = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange; liq: LiqRange }) => input)
@@ -34,9 +35,14 @@ export const getDeskExtras = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange }) => input)
   .handler(async ({ data }): Promise<DeskExtras> => {
     const [onchain, clarity, fearGreed, liquidity, pulse] = await Promise.all([
-      withLastKnown("onchain", () => fetchOnchain(data.range), (d) => d.height > 0 || d.hashSeries.length > 0).catch(
-        () => null,
-      ),
+      withLastKnown(
+        "onchain",
+        async () => {
+          const d = await fetchOnchain(data.range);
+          return mergeLiveFees(d, readLast<OnchainPayload>("onchain")?.data);
+        },
+        (d) => d.height > 0 || d.hashSeries.length > 0,
+      ).catch(() => null),
       withLastKnown("clarity", fetchClarity, (d) => Number.isFinite(d.yes)).catch(() => null),
       withLastKnown("fear-greed", fetchFearGreed, (d) => Number.isFinite(d.value)).catch(() => null),
       withLastKnown("liquidity", fetchLiquidity, (d) => d.price > 0).catch(() => null),
@@ -50,7 +56,14 @@ export const getTick = createServerFn({ method: "POST" }).handler(async (): Prom
 });
 
 export const getOnchainLive = createServerFn({ method: "POST" }).handler(async (): Promise<Partial<OnchainPayload>> => {
-  return await withLastKnown("onchain-live", () => fetchOnchainLive(), (d) => Boolean(d.height));
+  return await withLastKnown(
+    "onchain-live",
+    async () => {
+      const live = await fetchOnchainLive();
+      return mergeLiveFees(live, readLast<Partial<OnchainPayload>>("onchain-live")?.data);
+    },
+    (d) => Boolean(d.height) || d.feeFast != null,
+  );
 });
 
 export const getEtfFlows = createServerFn({ method: "POST" }).handler(async (): Promise<EtfFlowPayload | null> => {

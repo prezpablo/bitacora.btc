@@ -110,8 +110,14 @@ export function OnchainPanel({
         />
         <Metric
           label={t("ocFee")}
-          value={data?.feeFast != null ? `${data.feeFast} sat/vB` : "—"}
-          hint={data?.feeHour != null ? `${data.feeHour} sat/vB 1h` : ""}
+          value={data?.feeFast != null ? `${data.feeFast} sat/vB` : t("liveFeeDown")}
+          hint={
+            data?.feeStale
+              ? t("liveFeeStale")
+              : data?.feeHour != null
+                ? `${data.feeHour} sat/vB 1h`
+                : ""
+          }
         />
         <Metric
           label={t("ocMempool")}

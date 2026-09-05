@@ -27,7 +27,8 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
     },
     {
       label: t("liveFee"),
-      value: data.feeFast != null ? `${data.feeFast} ${t("liveSats")}` : "—",
+      value: data.feeFast != null ? `${data.feeFast} ${t("liveSats")}` : t("liveFeeDown"),
+      warn: Boolean(data.feeStale) || data.feeFast == null,
     },
     {
       label: t("liveMempool"),
@@ -54,6 +55,11 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
         <h2 className="text-xs font-semibold tracking-wide text-primary uppercase">{t("liveOn")}</h2>
         <span className="text-xs text-muted-foreground">mempool</span>
         <StaleStamp asOf={data.asOf} />
+        {data.feeStale || data.feeFast == null ? (
+          <a href="/legal#contacto" className="ml-auto text-[11px] text-primary underline-offset-2 hover:underline">
+            {t("liveFeeStale")}
+          </a>
+        ) : null}
       </div>
       <table className="w-full table-fixed text-sm">
         <thead>
@@ -72,7 +78,10 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
         <tbody>
           <tr>
             {rows.map((r) => (
-              <td key={r.label} className="px-3 py-2 font-mono text-[13px] tabular-nums text-foreground">
+              <td
+                key={r.label}
+                className={`px-3 py-2 font-mono text-[13px] tabular-nums ${r.warn ? "text-primary" : "text-foreground"}`}
+              >
                 {r.value}
               </td>
             ))}
