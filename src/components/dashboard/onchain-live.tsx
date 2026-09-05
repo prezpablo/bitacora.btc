@@ -20,10 +20,12 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
     {
       label: t("liveBlock"),
       value: data.height ? data.height.toLocaleString(localeTag(lang)) : "—",
+      warn: false,
     },
     {
       label: t("liveHash"),
       value: data.hashrateEh ? ehLabel(data.hashrateEh) : "—",
+      warn: false,
     },
     {
       label: t("liveFee"),
@@ -36,6 +38,7 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
         data.mempoolTx != null
           ? `${formatCompact(data.mempoolTx)}${mb != null ? ` · ${mb.toFixed(1)} vMB` : ""}`
           : "—",
+      warn: false,
     },
     {
       label: t("liveRetarget"),
@@ -45,6 +48,7 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
               data.blocksToAdj != null ? ` · ${data.blocksToAdj}` : ""
             }`
           : "—",
+      warn: false,
     },
   ];
 
