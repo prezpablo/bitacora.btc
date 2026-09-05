@@ -15,6 +15,7 @@ import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
 import { locateBest, requestGpsOnGesture, requestIpFix } from "@/infrastructure/geo";
+import { bitacoraRouter, guideMarker, loadLeafletRouting, type RoutingCtrl } from "@/infrastructure/leaflet-router";
 import { useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
@@ -168,6 +169,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const hitMark = useRef<import("leaflet").Layer | null>(null);
   const userMark = useRef<import("leaflet").LayerGroup | null>(null);
   const routeLine = useRef<import("leaflet").Polyline | null>(null);
+  const routingRef = useRef<RoutingCtrl | null>(null);
   const originMark = useRef<import("leaflet").Marker | null>(null);
   const pickOriginRef = useRef(false);
   const guideToRef = useRef<{ lat: number; lon: number } | null>(null);
@@ -692,6 +694,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       map.removeLayer(routeLine.current);
       routeLine.current = null;
     }
+    if (routingRef.current) {
+      try {
+        routingRef.current.remove();
+      } catch {
+        /* already off the map */
+      }
+      routingRef.current = null;
+    }
   }
 
   function placeOriginDot(from: { lat: number; lon: number }) {
@@ -702,7 +712,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       originMark.current.setLatLng([from.lat, from.lon]);
       return;
     }
-    const m = L.marker([from.lat, from.lon], { draggable: true, zIndexOffset: 900, title: t("irDrag") });
+    const m = guideMarker(L, 0, [from.lat, from.lon]);
     m.on("dragend", () => {
       const p = m.getLatLng();
       const dest = guideToRef.current;
@@ -717,27 +727,52 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     const map = mapRef.current;
     if (!L || !map) return;
     setUserFix(from);
-    placeOriginDot(from);
-    let path: { lat: number; lon: number }[] = [];
+    guideToRef.current = to;
+    const start = L.latLng(from.lat, from.lon);
+    const end = L.latLng(to.lat, to.lon);
     try {
-      const res = await getGuidePath({
-        data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
+      const Routing = await loadLeafletRouting(L);
+      if (routingRef.current) {
+        routingRef.current.setWaypoints([start, end]);
+        return;
+      }
+      const ctrl = Routing.control({
+        waypoints: [start, end],
+        router: bitacoraRouter(L),
+        addWaypoints: false,
+        draggableWaypoints: true,
+        fitSelectedRoutes: true,
+        show: false,
+        collapsible: true,
+        routeWhileDragging: false,
+        lineOptions: { styles: [{ color: "#f7931a", opacity: 0.92, weight: 5 }] },
+        createMarker: (i: number, wp: { latLng: import("leaflet").LatLng }) => guideMarker(L, i, wp.latLng),
       });
-      path = res?.path || [];
+      ctrl.addTo(map);
+      routingRef.current = ctrl;
     } catch {
-      path = [];
+      placeOriginDot(from);
+      let path: { lat: number; lon: number }[] = [];
+      try {
+        const res = await getGuidePath({
+          data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
+        });
+        path = res?.path || [];
+      } catch {
+        path = [];
+      }
+      const street = path.length >= 2;
+      if (!street) path = geodesicLine(from, to);
+      clearRoute();
+      const line = L.polyline(
+        path.map((p) => [p.lat, p.lon] as [number, number]),
+        { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
+      );
+      line.addTo(map);
+      routeLine.current = line;
+      map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
+      if (!street) setGuideErr(t("irFail"));
     }
-    const street = path.length >= 2;
-    if (!street) path = geodesicLine(from, to);
-    clearRoute();
-    const line = L.polyline(
-      path.map((p) => [p.lat, p.lon] as [number, number]),
-      { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
-    );
-    line.addTo(map);
-    routeLine.current = line;
-    map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
-    if (!street) setGuideErr(t("irFail"));
   }
 
   onPickOrigin.current = (lat, lon) => {
@@ -803,7 +838,19 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   function startGuide(to: { lat: number; lon: number }) {
     pickOriginRef.current = false;
     setPickOrigin(false);
+    guideToRef.current = to;
     const gps = requestGpsOnGesture();
+    const map = mapRef.current;
+    if (map) {
+      map.stopLocate();
+      map.once("locationfound", (e: { latlng: { lat: number; lng: number } }) => {
+        pickOriginRef.current = false;
+        setPickOrigin(false);
+        setGeo("ok");
+        void drawFrom({ lat: e.latlng.lat, lon: e.latlng.lng }, to);
+      });
+      map.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 15_000 });
+    }
     void goGuide(to, gps);
   }
 

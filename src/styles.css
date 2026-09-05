@@ -234,3 +234,7 @@ main#contenido h2.font-display {
     transition-duration: 0.01ms !important;
   }
 }
+
+.leaflet-routing-container {
+  display: none !important;
+}
