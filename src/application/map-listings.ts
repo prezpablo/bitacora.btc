@@ -10,6 +10,14 @@ import {
   type ComposeErr,
   type ShopDraft,
 } from "@/domain/map-compose";
+import {
+  applyPatchToRow,
+  proposePatch,
+  type ListingPatch,
+  type ListingPatchFields,
+  type PatchErr,
+} from "@/domain/listing-patch";
+import type { MapCsvRow } from "@/domain/map-csv";
 
 export type ListingBundle = {
   store: Record<string, MerchantLocal>;
@@ -79,4 +87,18 @@ export function rateCommunityListing(
     ? bundle.comms.map((x) => (x.id === community.id ? row : x))
     : [...bundle.comms, row];
   return { bundle: { ...bundle, comms }, row };
+}
+
+export function proposeListingPatch(
+  row: MapCsvRow,
+  fields: ListingPatchFields,
+  proof: string,
+): { ok: true; patch: ListingPatch } | { ok: false; error: PatchErr } {
+  const made = proposePatch(row, fields, proof);
+  if ("error" in made) return { ok: false, error: made.error };
+  return { ok: true, patch: made.patch };
+}
+
+export function applyListingPatch(rows: MapCsvRow[], patch: ListingPatch, now = Date.now()): MapCsvRow[] {
+  return rows.map((r) => (r.id === patch.listingId ? applyPatchToRow(r, patch, now) : r));
 }

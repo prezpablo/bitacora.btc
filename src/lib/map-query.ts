@@ -100,6 +100,7 @@ export function prefetchMapStore(qc: QueryClient) {
 export function invalidateMapWrite(qc: QueryClient, csv?: string) {
   if (csv) qc.setQueryData(mapKeys.csv, csv);
   return Promise.all([
+    qc.invalidateQueries({ queryKey: mapKeys.csv }),
     qc.invalidateQueries({ queryKey: mapKeys.globe }),
     qc.invalidateQueries({ queryKey: mapKeys.merchantsRoot }),
     qc.invalidateQueries({ queryKey: mapKeys.communities }),

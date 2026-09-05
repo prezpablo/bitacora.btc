@@ -76,12 +76,35 @@ CREATE TABLE IF NOT EXISTS catalog (
   created INTEGER NOT NULL DEFAULT 0,
   source TEXT NOT NULL DEFAULT 'btcmap'
 );
+CREATE TABLE IF NOT EXISTS listing_patches (
+  id TEXT PRIMARY KEY,
+  listing_id TEXT NOT NULL,
+  tipo TEXT NOT NULL,
+  token TEXT NOT NULL,
+  proof TEXT NOT NULL,
+  fields TEXT NOT NULL DEFAULT '{}',
+  created INTEGER NOT NULL,
+  verified INTEGER NOT NULL DEFAULT 0,
+  verified_at INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS contact_tickets (
+  id TEXT PRIMARY KEY,
+  topic TEXT NOT NULL,
+  listing_id TEXT NOT NULL DEFAULT '',
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open'
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
 CREATE INDEX IF NOT EXISTS catalog_tipo ON catalog (tipo);
 CREATE INDEX IF NOT EXISTS catalog_geo ON catalog (lat, lon);
 CREATE INDEX IF NOT EXISTS rate_hits_kt ON rate_hits (k, t);
 CREATE INDEX IF NOT EXISTS captcha_created ON captcha (created);
+CREATE INDEX IF NOT EXISTS patch_listing ON listing_patches (listing_id);
+CREATE INDEX IF NOT EXISTS ticket_created ON contact_tickets (created);
 `;
 
 function dbPath() {

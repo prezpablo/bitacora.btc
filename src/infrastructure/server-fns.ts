@@ -15,6 +15,7 @@ import { pickGuideMode, type GuideMode, type GuideStep } from "@/domain/guide";
 import { buildEventBoard } from "@/domain/event-board";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
+import { loadPatches, savePatch, replacePatches, countPendingPatches, saveContactTicket } from "./patches-io";
 import { scrapeShowsToken } from "./pin-verify";
 import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
@@ -23,6 +24,8 @@ import { getRequest } from "@tanstack/react-start/server";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
+import { applyListingPatch, proposeListingPatch } from "@/application/map-listings";
+import { makeContactTicket, PATCH_TTL_MS, patchAlive } from "@/domain/listing-patch";
 import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
 import { mergeLiveFees } from "@/domain/fees";
 import { localeOf, translateFeed, translateNews } from "./translate";
@@ -339,18 +342,121 @@ export const verifyMapListing = createServerFn({ method: "POST" })
     return { ok: true, token: row.token };
   });
 
+export const submitListingPatch = createServerFn({ method: "POST" })
+  .validator((input: {
+    listingId: string;
+    name?: string;
+    description?: string;
+    address?: string;
+    notes?: string;
+    logo?: string;
+    proof: string;
+    captchaId?: string;
+    captcha?: string;
+    captchaNonce?: string;
+    hp?: string;
+  }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
+    if ((data.hp || "").trim()) return { ok: true };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
+      return { ok: false, error: "captcha" };
+    }
+    if (tooMany(clientKey("patch"), 6, 60 * 60_000)) return { ok: false, error: "rate" };
+    if (tooMany("patch:global", 24, 60 * 60_000)) return { ok: false, error: "rate" };
+    if ((await countPendingPatches()) >= 80) return { ok: false, error: "rate" };
+    const proof = safeHttp(data.proof);
+    if (!proof || !isPublicHttp(proof)) return { ok: false, error: "links" };
+    const rows = parseMapCsv(await loadMapCsvText());
+    const row = rows.find((r) => r.id === data.listingId);
+    if (!row) return { ok: false, error: "notours" };
+    const made = proposeListingPatch(
+      row,
+      {
+        name: data.name,
+        description: data.description,
+        address: data.address,
+        notes: data.notes,
+        logo: data.logo,
+      },
+      proof,
+    );
+    if (!made.ok) return { ok: false, error: made.error };
+    await savePatch(made.patch);
+    return { ok: true, token: made.patch.token, id: made.patch.id };
+  });
+
+export const verifyListingPatch = createServerFn({ method: "POST" })
+  .validator((input: { id: string; token?: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    if (tooMany(clientKey("patch-verify-burst"), 5, 5_000)) return { ok: false, error: "rate" };
+    if (tooMany(clientKey("patch-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
+    const patches = await loadPatches();
+    const patch = patches.find((p) => p.id === data.id);
+    if (!patch || !patchAlive(patch)) return { ok: false, error: "missing" };
+    if (data.token && data.token !== patch.token) return { ok: false, error: "token" };
+    const extra = socialsFromCsv(parseMapCsv(await loadMapCsvText()).find((r) => r.id === patch.listingId)?.socials || "")
+      .map((l) => l.url)
+      .filter(Boolean);
+    const hit = await scrapeShowsToken(patch.proof, patch.token, extra);
+    if (!hit) return { ok: false, error: "proof" };
+    patch.verified = true;
+    patch.verifiedAt = Date.now();
+    await savePatch(patch);
+    const rows = parseMapCsv(await loadMapCsvText());
+    const next = applyListingPatch(rows, patch);
+    await saveMapCsvText(stringifyMapCsv(next));
+    clearGlobeStatsCache();
+    return { ok: true };
+  });
+
+export const cancelListingPatch = createServerFn({ method: "POST" })
+  .validator((input: { id: string; token: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const token = (data.token || "").trim();
+    if (!token) return { ok: false, error: "token" };
+    const patches = await loadPatches();
+    const patch = patches.find((p) => p.id === data.id);
+    if (!patch) return { ok: true };
+    if (patch.verified) return { ok: false, error: "live" };
+    if (patch.token !== token) return { ok: false, error: "token" };
+    await replacePatches(patches.filter((p) => p.id !== data.id && Date.now() - p.created < 40 * PATCH_TTL_MS));
+    return { ok: true };
+  });
+
 const contactHits = new Map<string, number>();
 
 export const sendContact = createServerFn({ method: "POST" })
-  .validator((input: { name: string; email: string; message: string; topic?: string; auto?: string; hp?: string; captchaId?: string; captcha?: string; captchaNonce?: string }) => input)
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; relay?: string; ack?: string; subject?: string; activate?: boolean }> => {
+  .validator((input: {
+    name: string;
+    email: string;
+    message: string;
+    topic?: string;
+    auto?: string;
+    listingId?: string;
+    hp?: string;
+    captchaId?: string;
+    captcha?: string;
+    captchaNonce?: string;
+  }) => input)
+  .handler(async ({ data }): Promise<{
+    ok: boolean;
+    error?: string;
+    relay?: string;
+    ack?: string;
+    subject?: string;
+    activate?: boolean;
+    ticket?: string;
+  }> => {
     if ((data.hp || "").trim()) return { ok: true };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = (data.name || "").trim().slice(0, 80);
     const email = (data.email || "").trim().toLowerCase().slice(0, 120);
     const message = (data.message || "").trim().slice(0, 2000);
     const topic = (data.topic || "general").slice(0, 24);
-    const auto = (data.auto || "").trim().slice(0, 2000);
+    const listingId = (data.listingId || "").trim().slice(0, 80);
+    const ticket = makeContactTicket();
+    const autoRaw = (data.auto || "").trim().slice(0, 2000);
+    const auto = autoRaw.replaceAll("{ticket}", ticket).replaceAll("{listing}", listingId || "—");
     if (name.length < 2 || message.length < 2) return { ok: false, error: "need" };
     if (!MAIL_RE.test(email)) return { ok: false, error: "email" };
     if (!(await mailboxDomainOk(email))) return { ok: false, error: "email" };
@@ -358,19 +464,21 @@ export const sendContact = createServerFn({ method: "POST" })
     const stamp = contactHits.get(email) || 0;
     if (now - stamp < 12_000) return { ok: false, error: "rate" };
     if (tooMany(clientKey(`mail:${email}`), 5, 60 * 60_000)) return { ok: false, error: "rate" };
-    await persistContact({ name, email, message, topic, auto });
+    await persistContact({ name, email, message, topic, auto, ticket, listingId });
+    saveContactTicket({ id: ticket, topic, listingId, name, email, message, created: now });
     contactHits.set(email, now);
-    const payload = { name, email, message, topic, auto };
+    const payload = { name, email, message, topic, auto, ticket, listingId };
     const [sent, ack] = await Promise.all([forwardFormSubmit(payload), forwardAck(payload)]);
     const relay = contactRelay();
     const ackUrl = ackRelay(email).url;
     const activate = sent === "activate" || ack === "activate";
-    if (sent === "ok" && ack === "ok") return { ok: true, subject: `${relay.subject} · ${topic}`, activate };
+    if (sent === "ok" && ack === "ok") return { ok: true, subject: `${relay.subject} · ${topic} · ${ticket}`, activate, ticket };
     return {
       ok: true,
       relay: sent === "ok" ? undefined : relay.url,
       ack: ack === "ok" ? undefined : ackUrl,
-      subject: `${relay.subject} · ${topic}`,
+      subject: `${relay.subject} · ${topic} · ${ticket}`,
       activate,
+      ticket,
     };
   });

@@ -20,7 +20,15 @@ export async function mailboxDomainOk(email: string) {
   }
 }
 
-export type ContactPayload = { name: string; email: string; message: string; topic?: string; auto?: string };
+export type ContactPayload = {
+  name: string;
+  email: string;
+  message: string;
+  topic?: string;
+  auto?: string;
+  ticket?: string;
+  listingId?: string;
+};
 
 export async function persistContact(p: ContactPayload) {
   try {
@@ -75,7 +83,9 @@ export function forwardFormSubmit(p: ContactPayload) {
     email: p.email,
     message: p.message,
     topic: p.topic || "general",
-    _subject: `${SUBJECT}${p.topic ? ` · ${p.topic}` : ""}`,
+    ticket: p.ticket || "",
+    listing: p.listingId || "",
+    _subject: `${SUBJECT}${p.topic ? ` · ${p.topic}` : ""}${p.ticket ? ` · ${p.ticket}` : ""}`,
     _replyto: p.email,
   });
 }
