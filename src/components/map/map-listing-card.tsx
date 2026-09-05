@@ -12,13 +12,16 @@ import { PayRow } from "./pay-row";
 import { SocialRow } from "./social-row";
 import { VerifiedStar } from "./verified-star";
 import { VerifyIgHow } from "./verify-ig-how";
+import { ListingPatchForm } from "./map-patch-form";
 
 export function CommunityCard({
   community,
   onVerified,
+  onPatched,
 }: {
   community: Community;
   onVerified: () => void;
+  onPatched?: () => void;
 }) {
   const t = useT();
   const trust = communityTrust(community);
@@ -58,6 +61,14 @@ export function CommunityCard({
       </div>
       {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
       <SocialRow links={community.links} />
+      <ListingPatchForm
+        listingId={community.id}
+        name={community.name}
+        description={community.description}
+        logo={community.logo}
+        isCommunity
+        onApplied={onPatched}
+      />
       {!trust.verified && community.verifyToken ? (
         <ScrapeVerifyBox
           id={community.id}
@@ -76,12 +87,14 @@ export function PlaceCard({
   removable,
   onRemove,
   onVerified,
+  onPatched,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
   removable: boolean;
   onRemove: () => void;
   onVerified?: () => void;
+  onPatched?: () => void;
 }) {
   const t = useT();
   const g = gradeOf(local, Date.now());
@@ -130,6 +143,15 @@ export function PlaceCard({
       {local?.hours ? <HoursView hours={local.hours} /> : null}
       {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
       {local?.links?.length ? <SocialRow links={local.links} /> : null}
+      <ListingPatchForm
+        listingId={place.id}
+        name={place.name}
+        description={local?.description}
+        address={local?.address}
+        notes={local?.notes}
+        logo={local?.logo || place.logo}
+        onApplied={onPatched}
+      />
       {!trust.verified && local?.verifyToken && onVerified ? (
         <ScrapeVerifyBox
           id={place.id}

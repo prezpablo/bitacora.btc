@@ -958,6 +958,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   setComms(next);
                   persist(store, next);
                 }}
+                onPatched={() => void invalidate()}
               />
               <StarMeter score={selComm.score ?? 0} votes={selComm.voteCount ?? selComm.votes?.length ?? 0} />
               <MapVotePanel
@@ -1016,6 +1017,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   if (!local) return;
                   commit(sel.id, { ...local, verifiedAt: Date.now() });
                 }}
+                onPatched={() => void invalidate()}
               />
               <MapVotePanel
                 open={voteOpen}

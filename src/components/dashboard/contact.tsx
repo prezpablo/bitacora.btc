@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ContributeQr } from "@/components/contribute-qr";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
@@ -8,6 +8,7 @@ import { useT, type CopyKey } from "@/lib/i18n";
 const TOPICS = [
   { id: "general", label: "contactTopicGeneral", auto: "contactAutoGeneral" },
   { id: "map", label: "contactTopicMap", auto: "contactAutoMap" },
+  { id: "dispute", label: "contactTopicDispute", auto: "contactAutoDispute" },
   { id: "events", label: "contactTopicEvents", auto: "contactAutoEvents" },
   { id: "collab", label: "contactTopicCollab", auto: "contactAutoCollab" },
 ] as const;
@@ -63,6 +64,7 @@ export function ContactBlock() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [topic, setTopic] = useState<(typeof TOPICS)[number]["id"]>("general");
+  const [listingId, setListingId] = useState("");
   const [hp, setHp] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
@@ -70,8 +72,21 @@ export function ContactBlock() {
   const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState(false);
   const [thanksName, setThanksName] = useState("");
+  const [caseId, setCaseId] = useState("");
   const [err, setErr] = useState("");
   const [hint, setHint] = useState("");
+
+  useEffect(() => {
+    try {
+      const s = new URLSearchParams(window.location.search);
+      const tp = s.get("topic");
+      if (tp === "dispute" || tp === "map" || tp === "events" || tp === "collab" || tp === "general") setTopic(tp);
+      const listing = s.get("listing") || "";
+      if (listing) setListingId(listing.slice(0, 80));
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -89,8 +104,21 @@ export function ContactBlock() {
     setBusy(true);
     try {
       const autoKey = (TOPICS.find((x) => x.id === topic) ?? TOPICS[0]).auto;
-      const auto = t(autoKey, { name: name.trim() });
-      const res = await sendContact({ data: { name, email, message, topic, auto, hp, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce } });
+      const auto = t(autoKey, { name: name.trim(), listing: listingId.trim() || "—" });
+      const res = await sendContact({
+        data: {
+          name,
+          email,
+          message,
+          topic,
+          auto,
+          listingId: listingId.trim(),
+          hp,
+          captchaId: ticket?.id,
+          captcha: ticket?.answer,
+          captchaNonce: ticket?.nonce,
+        },
+      });
       if (!res.ok) {
         if (res.error === "email") setErr(t("contactEmailBad"));
         else if (res.error === "need") setErr(t("contactNeed"));
@@ -133,9 +161,11 @@ export function ContactBlock() {
       else setHint(t("contactAckHint"));
       setOk(true);
       setThanksName(name.trim());
+      setCaseId(res.ticket || "");
       setName("");
       setEmail("");
       setMessage("");
+      if (topic !== "dispute") setListingId("");
       setCaptchaOk(false);
       setPrivacyOk(false);
     } catch {
@@ -206,6 +236,17 @@ export function ContactBlock() {
             ))}
           </select>
         </label>
+        {topic === "dispute" || topic === "map" ? (
+          <label className="block text-sm sm:col-span-2">
+            {t("contactListing")}
+            <input
+              className="mt-1 h-10 w-full rounded-md bg-elevated px-3 font-mono text-sm shadow-[var(--shadow-border)]"
+              value={listingId}
+              onChange={(e) => setListingId(e.target.value.slice(0, 80))}
+              placeholder={t("contactPhListing")}
+            />
+          </label>
+        ) : null}
         <label className="block text-sm sm:col-span-2">
           {t("contactMsg")}
           <textarea
@@ -234,6 +275,7 @@ export function ContactBlock() {
         {ok ? (
           <p role="status" aria-live="polite" className="text-sm font-medium text-long sm:col-span-2">
             {t("contactOk", { name: thanksName })}
+            {caseId ? ` ${t("contactTicketLine", { ticket: caseId })}` : ""}
           </p>
         ) : null}
         {hint ? <p className="text-xs text-muted-foreground sm:col-span-2">{hint}</p> : null}
