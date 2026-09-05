@@ -69,6 +69,26 @@ export function requestGpsPrecise(): Promise<GeoFix> {
   });
 }
 
+export async function requestBeaconFix(ip?: string): Promise<GeoFix> {
+  const res = await fetch("https://api.beacondb.net/v1/geolocate", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "bitacora.btc/1.0 (https://bitacorabtc.org)",
+      ...(ip ? { "X-Forwarded-For": ip } : {}),
+    },
+    body: JSON.stringify({ considerIp: true, fallbacks: { ipf: true } }),
+    signal: AbortSignal.timeout(5_000),
+  });
+  if (!res.ok) throw new Error(`beacon ${res.status}`);
+  const j = (await res.json()) as { location?: { lat?: number; lng?: number }; accuracy?: number };
+  const lat = num(j.location?.lat);
+  const lon = num(j.location?.lng);
+  if (lat == null || lon == null) throw new Error("beacon");
+  return { lat, lon, accuracy: Number(j.accuracy) || 8_000, source: "ip" };
+}
+
 async function ipFrom(url: string, pick: (j: Record<string, unknown>) => GeoFix | null): Promise<GeoFix> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 5_000);

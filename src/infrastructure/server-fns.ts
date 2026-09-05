@@ -8,7 +8,7 @@ import { fetchBtcCommunities, fetchMerchants, searchCities, searchMerchants } fr
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
-import { nominatimCity, type CityFrame } from "./geo";
+import { nominatimCity, requestBeaconFix, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
 import { fetchGuidePath, type GuidePath } from "./osrm";
 import { pickGuideMode, type GuideMode } from "@/domain/guide";
@@ -17,7 +17,8 @@ import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
 import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
-import { clientKey, tooMany } from "./rate-limit";
+import { clientKey, peerFromHeaders, tooMany } from "./rate-limit";
+import { getRequest } from "@tanstack/react-start/server";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinOnBoard, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
@@ -131,6 +132,22 @@ export const getGuidePath = createServerFn({ method: "POST" })
     const path = await fetchGuidePath(from, to, mode);
     return { path: path.length >= 2 ? path : [from, to], mode };
   });
+
+export const getApproxFix = createServerFn({ method: "POST" }).handler(async (): Promise<{ lat: number; lon: number; accuracy: number } | null> => {
+  if (tooMany(clientKey("fix"), 40, 60 * 60_000) || tooMany("fix:global", 240, 60 * 60_000)) return null;
+  let ip = "";
+  try {
+    ip = peerFromHeaders(getRequest().headers);
+  } catch {
+    ip = "";
+  }
+  try {
+    const f = await requestBeaconFix(ip && ip !== "anon" ? ip : undefined);
+    return { lat: f.lat, lon: f.lon, accuracy: f.accuracy };
+  } catch {
+    return null;
+  }
+});
 
 export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Promise<string> => {
   const text = await loadMapCsvText();

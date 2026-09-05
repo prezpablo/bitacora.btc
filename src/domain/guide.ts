@@ -1,11 +1,14 @@
 export type GuideMode = "foot" | "car";
 export type GuidePt = { lat: number; lon: number };
 
+export function kmBetween(a: GuidePt, b: GuidePt) {
+  const dlat = (b.lat - a.lat) * 111.32;
+  const dlon = (b.lon - a.lon) * 111.32 * Math.cos((a.lat * Math.PI) / 180);
+  return Math.hypot(dlat, dlon);
+}
+
 export function pickGuideMode(from: GuidePt, to: GuidePt): GuideMode {
-  const dlat = (to.lat - from.lat) * 111.32;
-  const dlon = (to.lon - from.lon) * 111.32 * Math.cos((from.lat * Math.PI) / 180);
-  const km = Math.hypot(dlat, dlon);
-  return km > 8 ? "car" : "foot";
+  return kmBetween(from, to) > 8 ? "car" : "foot";
 }
 
 /** Always-on fallback: stay on Bitácora's map, never OSM.org. */

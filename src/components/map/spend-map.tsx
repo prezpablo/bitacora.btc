@@ -9,12 +9,12 @@ import { makePinToken } from "@/domain/community-pins";
 import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
-import { getCityFrame, getGuidePath, saveMapCsv } from "@/infrastructure/server-fns";
-import { geodesicLine } from "@/domain/guide";
+import { getApproxFix, getCityFrame, getGuidePath, saveMapCsv } from "@/infrastructure/server-fns";
+import { geodesicLine, kmBetween } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
-import { locateBest, requestGpsOnGesture } from "@/infrastructure/geo";
+import { locateBest, requestGpsOnGesture, requestIpFix } from "@/infrastructure/geo";
 import { useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
@@ -168,11 +168,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const hitMark = useRef<import("leaflet").Layer | null>(null);
   const userMark = useRef<import("leaflet").LayerGroup | null>(null);
   const routeLine = useRef<import("leaflet").Polyline | null>(null);
+  const originMark = useRef<import("leaflet").Marker | null>(null);
+  const pickOriginRef = useRef(false);
+  const guideToRef = useRef<{ lat: number; lon: number } | null>(null);
+  const onPickOrigin = useRef<(lat: number, lon: number) => void>(() => {});
   const leafletRef = useRef<typeof import("leaflet") | null>(null);
   const [geo, setGeo] = useState<"idle" | "wait" | "ok" | "denied">("idle");
   const [userFix, setUserFix] = useState<{ lat: number; lon: number } | null>(null);
   const [guideWait, setGuideWait] = useState(false);
   const [guideErr, setGuideErr] = useState("");
+  const [pickOrigin, setPickOrigin] = useState(false);
   const [hit, setHit] = useState<SearchHit | null>(null);
   const [bbox, setBbox] = useState({ west: -56.35, south: -35.05, east: -55.95, north: -34.72 });
   const [zoom, setZoom] = useState(focus?.zoom ?? 4);
@@ -429,6 +434,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         if (map.getZoom() <= 2) onWorldRef.current?.();
       });
       map.on("click", (ev: { latlng: { lat: number; lng: number } }) => {
+        if (pickOriginRef.current) {
+          onPickOrigin.current(ev.latlng.lat, ev.latlng.lng);
+          return;
+        }
         setDrop({ lat: ev.latlng.lat, lon: ev.latlng.lng });
         setDropKind("pick");
         setSel(null);
@@ -685,57 +694,115 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     }
   }
 
+  function placeOriginDot(from: { lat: number; lon: number }) {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (originMark.current) {
+      originMark.current.setLatLng([from.lat, from.lon]);
+      return;
+    }
+    const m = L.marker([from.lat, from.lon], { draggable: true, zIndexOffset: 900, title: t("irDrag") });
+    m.on("dragend", () => {
+      const p = m.getLatLng();
+      const dest = guideToRef.current;
+      if (dest) void drawFrom({ lat: p.lat, lon: p.lng }, dest);
+    });
+    m.addTo(map);
+    originMark.current = m;
+  }
+
+  async function drawFrom(from: { lat: number; lon: number }, to: { lat: number; lon: number }) {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    setUserFix(from);
+    placeOriginDot(from);
+    let path: { lat: number; lon: number }[] = [];
+    try {
+      const res = await getGuidePath({
+        data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
+      });
+      path = res?.path || [];
+    } catch {
+      path = [];
+    }
+    const street = path.length >= 2;
+    if (!street) path = geodesicLine(from, to);
+    clearRoute();
+    const line = L.polyline(
+      path.map((p) => [p.lat, p.lon] as [number, number]),
+      { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
+    );
+    line.addTo(map);
+    routeLine.current = line;
+    map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
+    if (!street) setGuideErr(t("irFail"));
+  }
+
+  onPickOrigin.current = (lat, lon) => {
+    pickOriginRef.current = false;
+    setPickOrigin(false);
+    const dest = guideToRef.current;
+    if (!dest) return;
+    setGuideErr("");
+    void drawFrom({ lat, lon }, dest);
+  };
+
   async function goGuide(to: { lat: number; lon: number }, gps: Promise<{ lat: number; lon: number }>) {
     setGuideWait(true);
     setGuideErr("");
-    try {
-      let from: { lat: number; lon: number } | null = null;
-      try {
-        const fix = await gps;
-        from = { lat: fix.lat, lon: fix.lon };
-        setUserFix(from);
-        const L0 = leafletRef.current;
-        const map0 = mapRef.current;
-        if (L0 && map0) applyFix(L0, map0, userMark.current, fix.lat, fix.lon, 80, boxAround(fix.lat, fix.lon));
+    guideToRef.current = to;
+    const lateGps = gps
+      .then((fix) => {
         setGeo("ok");
-      } catch {
-        from = null;
-        setGeo("denied");
-      }
-      const L = leafletRef.current;
-      const map = mapRef.current;
-      if (!L || !map) return;
+        setPickOrigin(false);
+        pickOriginRef.current = false;
+        void drawFrom(fix, to);
+      })
+      .catch(() => setGeo("denied"));
+    try {
+      const quick = await Promise.race([
+        gps.then(
+          (fix) => fix,
+          () => null,
+        ),
+        new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 900)),
+      ]);
+      let from = quick;
       if (!from) {
-        map.setView([to.lat, to.lon], 16, { animate: !prefersReducedMotion() });
-        setGuideErr(t("irNeedGeo"));
-        return;
+        try {
+          from = await requestIpFix();
+        } catch {
+          from = null;
+        }
       }
-      let path: { lat: number; lon: number }[] = [];
-      try {
-        const res = await getGuidePath({
-          data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
-        });
-        path = res?.path || [];
-      } catch {
-        path = [];
+      if (!from) {
+        try {
+          const a = await getApproxFix();
+          if (a) from = { lat: a.lat, lon: a.lon };
+        } catch {
+          from = null;
+        }
       }
-      const street = path.length >= 2;
-      if (!street) path = geodesicLine(from, to);
-      clearRoute();
-      const line = L.polyline(
-        path.map((p) => [p.lat, p.lon] as [number, number]),
-        { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
-      );
-      line.addTo(map);
-      routeLine.current = line;
-      map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
-      if (!street) setGuideErr(t("irFail"));
+      if (from && kmBetween(from, to) >= 0.08) {
+        await drawFrom(from, to);
+        if (quick) setGuideErr("");
+        else setGuideErr(t("irApprox"));
+      } else {
+        pickOriginRef.current = true;
+        setPickOrigin(true);
+        setGuideErr(t("irTap"));
+      }
     } finally {
       setGuideWait(false);
+      void lateGps;
     }
   }
 
   function startGuide(to: { lat: number; lon: number }) {
+    pickOriginRef.current = false;
+    setPickOrigin(false);
     const gps = requestGpsOnGesture();
     void goGuide(to, gps);
   }
