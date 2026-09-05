@@ -11,7 +11,7 @@ import { fetchNetworkEvents } from "./events";
 import { nominatimCity, requestBeaconFix, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
 import { fetchGuidePath, type GuidePath } from "./osrm";
-import { pickGuideMode, type GuideMode } from "@/domain/guide";
+import { pickGuideMode, type GuideMode, type GuideStep } from "@/domain/guide";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
@@ -123,14 +123,20 @@ export const searchAddress = createServerFn({ method: "POST" })
 
 export const getGuidePath = createServerFn({ method: "POST" })
   .validator((input: { fromLat: number; fromLon: number; toLat: number; toLon: number }) => input)
-  .handler(async ({ data }): Promise<{ path: GuidePath; mode: GuideMode } | null> => {
+  .handler(async ({ data }): Promise<{ path: GuidePath; mode: GuideMode; steps: GuideStep[]; distance: number; duration: number } | null> => {
     if (tooMany(clientKey("route"), 30, 60 * 60_000) || tooMany("route:global", 200, 60 * 60_000)) return null;
     const from = { lat: data.fromLat, lon: data.fromLon };
     const to = { lat: data.toLat, lon: data.toLon };
     if (![from.lat, from.lon, to.lat, to.lon].every(Number.isFinite)) return null;
     const mode = pickGuideMode(from, to);
-    const path = await fetchGuidePath(from, to, mode);
-    return { path: path.length >= 2 ? path : [from, to], mode };
+    const route = await fetchGuidePath(from, to, mode);
+    return {
+      path: route.path.length >= 2 ? route.path : [from, to],
+      mode: route.mode,
+      steps: route.steps,
+      distance: route.distance,
+      duration: route.duration,
+    };
   });
 
 export const getApproxFix = createServerFn({ method: "POST" }).handler(async (): Promise<{ lat: number; lon: number; accuracy: number } | null> => {

@@ -10,12 +10,13 @@ import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
 import { getApproxFix, getCityFrame, getGuidePath, saveMapCsv } from "@/infrastructure/server-fns";
-import { geodesicLine, kmBetween } from "@/domain/guide";
+import { formatGuideMeters, formatGuideStep, geodesicLine, kmBetween } from "@/domain/guide";
+import type { GuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
 import { locateBest, requestGpsOnGesture, requestIpFix } from "@/infrastructure/geo";
-import { bitacoraRouter, guideMarker, loadLeafletRouting, type RoutingCtrl } from "@/infrastructure/leaflet-router";
+import { guideMarker } from "@/infrastructure/leaflet-router";
 import { useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
@@ -169,8 +170,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const hitMark = useRef<import("leaflet").Layer | null>(null);
   const userMark = useRef<import("leaflet").LayerGroup | null>(null);
   const routeLine = useRef<import("leaflet").Polyline | null>(null);
-  const routingRef = useRef<RoutingCtrl | null>(null);
+  const routingRef = useRef<{ remove: () => void } | null>(null);
   const originMark = useRef<import("leaflet").Marker | null>(null);
+  const destMark = useRef<import("leaflet").Marker | null>(null);
+  const stepLayer = useRef<import("leaflet").LayerGroup | null>(null);
   const pickOriginRef = useRef(false);
   const guideToRef = useRef<{ lat: number; lon: number } | null>(null);
   const onPickOrigin = useRef<(lat: number, lon: number) => void>(() => {});
@@ -179,6 +182,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [userFix, setUserFix] = useState<{ lat: number; lon: number } | null>(null);
   const [guideWait, setGuideWait] = useState(false);
   const [guideErr, setGuideErr] = useState("");
+  const [guideSteps, setGuideSteps] = useState<GuideStep[]>([]);
   const [pickOrigin, setPickOrigin] = useState(false);
   const [hit, setHit] = useState<SearchHit | null>(null);
   const [bbox, setBbox] = useState({ west: -56.35, south: -35.05, east: -55.95, north: -34.72 });
@@ -694,6 +698,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       map.removeLayer(routeLine.current);
       routeLine.current = null;
     }
+    if (originMark.current && map) {
+      map.removeLayer(originMark.current);
+      originMark.current = null;
+    }
+    if (destMark.current && map) {
+      map.removeLayer(destMark.current);
+      destMark.current = null;
+    }
+    if (stepLayer.current) {
+      stepLayer.current.clearLayers();
+    }
     if (routingRef.current) {
       try {
         routingRef.current.remove();
@@ -704,22 +719,27 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     }
   }
 
-  function placeOriginDot(from: { lat: number; lon: number }) {
+  function placeGuideEnds(from: { lat: number; lon: number }, to: { lat: number; lon: number }) {
     const L = leafletRef.current;
     const map = mapRef.current;
     if (!L || !map) return;
-    if (originMark.current) {
-      originMark.current.setLatLng([from.lat, from.lon]);
-      return;
+    if (originMark.current) originMark.current.setLatLng([from.lat, from.lon]);
+    else {
+      const m = guideMarker(L, 0, [from.lat, from.lon]);
+      m.on("dragend", () => {
+        const p = m.getLatLng();
+        const dest = guideToRef.current;
+        if (dest) void drawFrom({ lat: p.lat, lon: p.lng }, dest);
+      });
+      m.addTo(map);
+      originMark.current = m;
     }
-    const m = guideMarker(L, 0, [from.lat, from.lon]);
-    m.on("dragend", () => {
-      const p = m.getLatLng();
-      const dest = guideToRef.current;
-      if (dest) void drawFrom({ lat: p.lat, lon: p.lng }, dest);
-    });
-    m.addTo(map);
-    originMark.current = m;
+    if (destMark.current) destMark.current.setLatLng([to.lat, to.lon]);
+    else {
+      const m = guideMarker(L, 1, [to.lat, to.lon]);
+      m.addTo(map);
+      destMark.current = m;
+    }
   }
 
   async function drawFrom(from: { lat: number; lon: number }, to: { lat: number; lon: number }) {
@@ -728,51 +748,46 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (!L || !map) return;
     setUserFix(from);
     guideToRef.current = to;
-    const start = L.latLng(from.lat, from.lon);
-    const end = L.latLng(to.lat, to.lon);
+    let path: { lat: number; lon: number }[] = [];
+    let steps: GuideStep[] = [];
     try {
-      const Routing = await loadLeafletRouting(L);
-      if (routingRef.current) {
-        routingRef.current.setWaypoints([start, end]);
-        return;
-      }
-      const ctrl = Routing.control({
-        waypoints: [start, end],
-        router: bitacoraRouter(L),
-        addWaypoints: false,
-        draggableWaypoints: true,
-        fitSelectedRoutes: true,
-        show: false,
-        collapsible: true,
-        routeWhileDragging: false,
-        lineOptions: { styles: [{ color: "#f7931a", opacity: 0.92, weight: 5 }] },
-        createMarker: (i: number, wp: { latLng: import("leaflet").LatLng }) => guideMarker(L, i, wp.latLng),
+      const res = await getGuidePath({
+        data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
       });
-      ctrl.addTo(map);
-      routingRef.current = ctrl;
+      path = res?.path || [];
+      steps = res?.steps || [];
     } catch {
-      placeOriginDot(from);
-      let path: { lat: number; lon: number }[] = [];
-      try {
-        const res = await getGuidePath({
-          data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
-        });
-        path = res?.path || [];
-      } catch {
-        path = [];
-      }
-      const street = path.length >= 2;
-      if (!street) path = geodesicLine(from, to);
-      clearRoute();
-      const line = L.polyline(
-        path.map((p) => [p.lat, p.lon] as [number, number]),
-        { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
-      );
-      line.addTo(map);
-      routeLine.current = line;
-      map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
-      if (!street) setGuideErr(t("irFail"));
+      path = [];
     }
+    const street = path.length >= 2;
+    if (!street) path = geodesicLine(from, to);
+    clearRoute();
+    placeGuideEnds(from, to);
+    const line = L.polyline(
+      path.map((p) => [p.lat, p.lon] as [number, number]),
+      { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
+    );
+    line.addTo(map);
+    routeLine.current = line;
+    if (!stepLayer.current) stepLayer.current = L.layerGroup().addTo(map);
+    const group = stepLayer.current;
+    group.clearLayers();
+    for (const s of steps) {
+      L.circleMarker([s.lat, s.lon], {
+        radius: 6,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#f7931a",
+        fillOpacity: 1,
+      })
+        .bindTooltip(formatGuideStep(s, lang), { direction: "top", opacity: 0.95 })
+        .addTo(group);
+    }
+    map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
+    setGuideSteps(steps);
+    if (!street) setGuideErr(t("irFail"));
+    else if (!steps.length) setGuideErr(t("irFail"));
+    else setGuideErr("");
   }
 
   onPickOrigin.current = (lat, lon) => {
@@ -1257,6 +1272,25 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onDismiss={cancelSel}
               />
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
+              {guideSteps.length ? (
+                <ol className="max-h-56 space-y-1 overflow-auto text-sm">
+                  <li className="font-medium text-foreground">{t("irSteps")}</li>
+                  {guideSteps.map((s, i) => (
+                    <li key={`${s.lat}-${s.lon}-${i}`}>
+                      <button
+                        type="button"
+                        className="w-full rounded-md px-1 py-1 text-left text-pretty hover:bg-elevated"
+                        onClick={() => mapRef.current?.setView([s.lat, s.lon], 17, { animate: !prefersReducedMotion() })}
+                      >
+                        <span>{formatGuideStep(s, lang)}</span>
+                        {s.distance > 0 ? (
+                          <span className="text-muted-foreground"> · {formatGuideMeters(s.distance, lang)}</span>
+                        ) : null}
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
             </div>
           ) : sel ? (
             <div className="space-y-3">
@@ -1293,6 +1327,25 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onDismiss={cancelSel}
               />
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
+              {guideSteps.length ? (
+                <ol className="max-h-56 space-y-1 overflow-auto text-sm">
+                  <li className="font-medium text-foreground">{t("irSteps")}</li>
+                  {guideSteps.map((s, i) => (
+                    <li key={`${s.lat}-${s.lon}-${i}`}>
+                      <button
+                        type="button"
+                        className="w-full rounded-md px-1 py-1 text-left text-pretty hover:bg-elevated"
+                        onClick={() => mapRef.current?.setView([s.lat, s.lon], 17, { animate: !prefersReducedMotion() })}
+                      >
+                        <span>{formatGuideStep(s, lang)}</span>
+                        {s.distance > 0 ? (
+                          <span className="text-muted-foreground"> · {formatGuideMeters(s.distance, lang)}</span>
+                        ) : null}
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
             </div>
           ) : drop && dropKind === "pick" ? (
             <MapDropPick

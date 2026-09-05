@@ -1,5 +1,4 @@
-import type { GuidePt } from "@/domain/guide";
-import { geodesicLine, kmBetween } from "@/domain/guide";
+import { formatGuideStep, geodesicLine, kmBetween, type GuidePt } from "@/domain/guide";
 import { getGuidePath } from "./server-fns";
 
 type LMod = typeof import("leaflet");
@@ -37,13 +36,21 @@ export function bitacoraRouter(L: LMod) {
         .then((res) => {
           const pts = res?.path && res.path.length >= 2 ? res.path : geodesicLine(from, to);
           const coordinates = pts.map((p) => L.latLng(p.lat, p.lon));
-          const km = kmBetween(from, to);
+          const instructions = (res?.steps || []).map((s, i) => ({
+            type: s.type || "Continue",
+            distance: s.distance,
+            time: s.time,
+            road: s.road,
+            text: formatGuideStep(s),
+            index: Math.min(i * 4, Math.max(0, coordinates.length - 1)),
+          }));
+          const km = (res?.distance || 0) / 1000 || kmBetween(from, to);
           callback(null, [
             {
               name: "",
               coordinates,
-              instructions: [],
-              summary: { totalDistance: km * 1000, totalTime: (km / 4.5) * 3600 },
+              instructions,
+              summary: { totalDistance: km * 1000, totalTime: res?.duration || (km / 4.5) * 3600 },
               inputWaypoints: waypoints,
               waypoints,
             },
