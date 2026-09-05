@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, EventsPayload, LiqRange, MarketPayload, MarketTick, MerchantPlace, OnchainPayload, PulsePayload } from "@/domain";
+import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, EventBoardPage, EventBoardQuery, LiqRange, MarketPayload, MarketTick, MerchantPlace, OnchainPayload, PulsePayload } from "@/domain";
 import type { GlobeStats } from "@/domain/globe";
 import { fetchLiveMarket, fetchTick } from "./compose";
 import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
@@ -12,6 +12,7 @@ import { nominatimCity, requestBeaconFix, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
 import { fetchGuidePath, type GuidePath } from "./osrm";
 import { pickGuideMode, type GuideMode, type GuideStep } from "@/domain/guide";
+import { buildEventBoard } from "@/domain/event-board";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { scrapeShowsToken } from "./pin-verify";
@@ -114,9 +115,12 @@ export const getCommunityFeed = createServerFn({ method: "POST" }).handler(async
   return await fetchCommunityFeed();
 });
 
-export const getNetworkEvents = createServerFn({ method: "POST" }).handler(async (): Promise<EventsPayload> => {
-  return await withLastKnown("events", fetchNetworkEvents, (d) => d.events.length > 0);
-});
+export const getNetworkEvents = createServerFn({ method: "POST" })
+  .validator((input: EventBoardQuery | undefined) => input ?? {})
+  .handler(async ({ data }): Promise<EventBoardPage> => {
+    const raw = await withLastKnown("events", fetchNetworkEvents, (d) => d.events.length > 0);
+    return buildEventBoard(raw.events, data, { asOf: raw.asOf, sources: raw.sources });
+  });
 
 export const getCityFrame = createServerFn({ method: "POST" })
   .validator((input: { lat: number; lon: number; zoom?: number }) => input)

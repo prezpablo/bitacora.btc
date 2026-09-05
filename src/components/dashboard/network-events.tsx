@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
-import type { ContinentId, EventKind, NetworkEvent } from "@/domain";
-import { continentOf, EVENT_PAGE, eventIsLive, pageEvents, sortEventsByDate } from "@/domain";
+import type { ContinentId, EventBoardQuery, EventKind, NetworkEvent } from "@/domain";
+import { applyEventQuery, continentOf, eventQueryFromSearch } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
-import { useMapEvents } from "@/lib/map-query";
+import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
 import { locateBest } from "@/infrastructure/geo";
 import { countryName as namedCountry, localeTag } from "@/lib/display";
 import { useLocale, type AppLang } from "@/lib/locale";
@@ -11,6 +11,7 @@ import { useT, type CopyKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { StaleStamp } from "./stale-stamp";
+import { useQueryClient } from "@tanstack/react-query";
 
 const KIND_COPY: { key: EventKind; label: CopyKey }[] = [
   { key: "meetup", label: "netKindMeetup" },
@@ -29,19 +30,6 @@ const CONTINENTS: { key: ContinentId; label: CopyKey }[] = [
   { key: "oceania", label: "netOc" },
   { key: "online", label: "netOnlineCont" },
 ];
-
-function eventContinent(e: NetworkEvent): ContinentId | "" {
-  if (e.kind === "online") return "online";
-  return e.continent || continentOf(e.countryCode);
-}
-
-function sameCountry(e: NetworkEvent, code: string, name?: string) {
-  const want = code.toUpperCase();
-  const got = (e.countryCode || "").toUpperCase();
-  if (want && got && got === want) return true;
-  if (name && e.country && e.country.toLowerCase() === name.toLowerCase()) return true;
-  return false;
-}
 
 function fmtDate(ts: number, tz?: string) {
   try {
@@ -243,41 +231,48 @@ function GeoMenu({
 export function NetworkEvents() {
   const t = useT();
   const lang = useLocale((s) => s.lang);
-  const q = useMapEvents();
-  const [country, setCountry] = useState("");
-  const [continent, setContinent] = useState<ContinentId | "">("");
-  const [platform, setPlatform] = useState("");
-  const [kind, setKind] = useState<EventKind | "">("");
+  const qc = useQueryClient();
+  const boot = typeof window === "undefined" ? {} : eventQueryFromSearch(window.location.search);
+  const [country, setCountry] = useState(boot.country || "");
+  const [continent, setContinent] = useState<ContinentId | "">(boot.continent || "");
+  const [platform, setPlatform] = useState(boot.platform || "");
+  const [kind, setKind] = useState<EventKind | "">(boot.kind || "");
   const [near, setNear] = useState(false);
   const [countryName, setCountryName] = useState("");
   const [locating, setLocating] = useState(false);
   const [geoErr, setGeoErr] = useState("");
-  const [now, setNow] = useState(() => Date.now());
-  const [dateDir, setDateDir] = useState<"asc" | "desc">("asc");
-  const [page, setPage] = useState(1);
+  const [dateDir, setDateDir] = useState<"asc" | "desc">(boot.dir === "desc" ? "desc" : "asc");
+  const [page, setPage] = useState(boot.page || 1);
 
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 60_000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const all = useMemo(
-    () => (q.data?.events ?? []).filter((e) => eventIsLive(e, now)),
-    [q.data, now],
-  );
+  const query: EventBoardQuery = {
+    page,
+    dir: dateDir,
+    continent,
+    country,
+    countryName,
+    platform,
+    kind,
+  };
+  const q = useMapEvents(query);
+  const board = q.data;
+  const rows = board?.events ?? [];
+  const total = board?.total ?? 0;
+  const pages = board?.pages ?? 1;
+  const pageNow = board?.page ?? page;
+  const facets = board?.facets;
+  const kindCounts = facets?.kinds ?? {};
+  const platforms = facets?.platforms ?? [];
+  const emptyCountry = Boolean(country) && total === 0 && (facets?.live ?? 0) > 0;
 
   const countriesByContinent = useMemo(() => {
     const map = new Map<ContinentId, Map<string, string>>();
-    for (const e of all) {
-      const cont = eventContinent(e);
-      if (!cont || !e.countryCode) continue;
-      if (cont === "online") continue;
-      let inner = map.get(cont);
+    for (const c of facets?.countries ?? []) {
+      let inner = map.get(c.continent);
       if (!inner) {
         inner = new Map();
-        map.set(cont, inner);
+        map.set(c.continent, inner);
       }
-      inner.set(e.countryCode, namedCountry(e.countryCode, lang, e.country || e.countryCode));
+      inner.set(c.code, namedCountry(c.code, lang, c.name));
     }
     return CONTINENTS.map((c) => {
       const inner = map.get(c.key);
@@ -286,38 +281,8 @@ export function NetworkEvents() {
         : [];
       return { ...c, countries: list };
     });
-  }, [all, lang]);
+  }, [facets?.countries, lang]);
 
-  const platforms = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const e of all) {
-      if (continent && eventContinent(e) !== continent) continue;
-      if (country && !sameCountry(e, country, countryName)) continue;
-      map.set(e.platform, (map.get(e.platform) || 0) + 1);
-    }
-    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], lang));
-  }, [all, continent, country, countryName, lang]);
-
-  const scoped = useMemo(() => {
-    return all.filter((e) => {
-      if (continent && eventContinent(e) !== continent) return false;
-      if (country && !sameCountry(e, country, countryName)) return false;
-      if (platform && e.platform !== platform) return false;
-      return true;
-    });
-  }, [all, continent, country, countryName, platform]);
-
-  const kindCounts = useMemo(() => {
-    const c: Partial<Record<EventKind, number>> = {};
-    for (const e of scoped) c[e.kind] = (c[e.kind] || 0) + 1;
-    return c;
-  }, [scoped]);
-
-  const local = kind ? scoped.filter((e) => e.kind === kind) : scoped;
-  const ordered = useMemo(() => sortEventsByDate(local, dateDir), [local, dateDir]);
-  const board = useMemo(() => pageEvents(ordered, page, EVENT_PAGE), [ordered, page]);
-  const rows = board.slice;
-  const emptyCountry = Boolean(country) && scoped.length === 0 && all.length > 0;
   const countryLabel = country
     ? namedCountry(
         country,
@@ -327,6 +292,35 @@ export function NetworkEvents() {
           country,
       )
     : "";
+
+  const skipPageReset = useRef(true);
+
+  useEffect(() => {
+    if (skipPageReset.current) {
+      skipPageReset.current = false;
+      return;
+    }
+    setPage(1);
+  }, [country, continent, platform, kind, near, dateDir]);
+
+  useEffect(() => {
+    if (q.isFetching || !board) return;
+    if (board.page !== page) setPage(board.page);
+  }, [board, page, q.isFetching]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    applyEventQuery(url.searchParams, query);
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next !== cur) window.history.replaceState(null, "", next);
+  }, [page, dateDir, kind, platform, country, continent]);
+
+  useEffect(() => {
+    if (!board || pageNow >= pages) return;
+    void prefetchEventPage(qc, { ...query, page: pageNow + 1 });
+  }, [pageNow, pages, dateDir, kind, platform, country, continent, countryName]);
 
   async function nearYou() {
     if (near) {
@@ -392,14 +386,6 @@ export function NetworkEvents() {
   }
 
   const dirty = Boolean(country || kind || near || continent || platform || dateDir !== "asc");
-
-  useEffect(() => {
-    setPage(1);
-  }, [country, continent, platform, kind, near, dateDir]);
-
-  useEffect(() => {
-    if (board.page !== page) setPage(board.page);
-  }, [board.page, page]);
 
   return (
     <section className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
@@ -498,7 +484,7 @@ export function NetworkEvents() {
           </button>
         ))}
         <span className="ml-auto self-center text-xs text-muted-foreground">
-          {ordered.length === 1 ? t("netCount1") : t("netCount", { n: ordered.length })}
+          {total === 1 ? t("netCount1") : t("netCount", { n: total })}
         </span>
       </div>
 
@@ -509,36 +495,38 @@ export function NetworkEvents() {
 
       {q.isError ? (
         <p className="mt-4 text-sm text-short">{t("netFail")}</p>
-      ) : ordered.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">{q.isFetching ? t("netLoading") : t("netEmpty")}</p>
+      ) : total === 0 && !q.isFetching && !rows.length ? (
+        <p className="mt-4 text-sm text-muted-foreground">{q.isPending ? t("netLoading") : t("netEmpty")}</p>
+      ) : rows.length === 0 && q.isPending ? (
+        <p className="mt-4 text-sm text-muted-foreground">{t("netLoading")}</p>
       ) : (
         <>
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className={cn("mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3", q.isFetching && "opacity-70")}>
             {rows.map((ev) => (
               <EventCard key={ev.id} ev={ev} lang={lang} />
             ))}
           </div>
-          {board.pages > 1 ? (
+          {pages > 1 ? (
             <div className="mt-3 flex items-center justify-center gap-2">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 className="gap-1"
-                disabled={board.page <= 1}
+                disabled={pageNow <= 1 || q.isFetching}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
                 <ChevronLeft className="size-4" />
                 {t("netPrev")}
               </Button>
               <span className="font-mono text-xs text-muted-foreground">
-                {t("netPageOf", { p: board.page, n: board.pages })}
+                {t("netPageOf", { p: pageNow, n: pages })}
               </span>
               <Button
                 type="button"
                 size="sm"
                 className="gap-1"
-                disabled={board.page >= board.pages}
+                disabled={pageNow >= pages || q.isFetching}
                 onClick={() => setPage((p) => p + 1)}
               >
                 {t("netNext")}

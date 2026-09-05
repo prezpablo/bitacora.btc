@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, keepPreviousData, type QueryClient } from "@tanstack/react-query";
 import type { GlobeStats } from "@/domain/globe";
+import type { EventBoardQuery } from "@/domain";
 import {
   getBtcCommunities,
   getGlobeStats,
@@ -19,7 +20,9 @@ export const mapKeys = {
     ["map", "merchants", b.west.toFixed(3), b.south.toFixed(3), b.east.toFixed(3), b.north.toFixed(3)] as const,
   communities: ["map", "communities"] as const,
   csv: ["map", "csv"] as const,
-  events: ["map", "events"] as const,
+  eventsRoot: ["map", "events"] as const,
+  events: (q: EventBoardQuery = {}) =>
+    ["map", "events", q.page ?? 1, q.dir ?? "asc", q.continent ?? "", q.country ?? "", q.countryName ?? "", q.platform ?? "", q.kind ?? ""] as const,
 };
 
 const STALE = {
@@ -63,12 +66,13 @@ export function useMapCsv() {
   });
 }
 
-export function useMapEvents() {
+export function useMapEvents(query: EventBoardQuery = {}) {
   return useQuery({
-    queryKey: mapKeys.events,
-    queryFn: () => getNetworkEvents(),
+    queryKey: mapKeys.events(query),
+    queryFn: () => getNetworkEvents({ data: query }),
     staleTime: STALE.events,
     refetchInterval: 5 * 60_000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -76,12 +80,20 @@ export function prefetchGlobe(qc: QueryClient) {
   return qc.prefetchQuery({ queryKey: mapKeys.globe, queryFn: () => getGlobeStats(), staleTime: STALE.globe });
 }
 
+export function prefetchEventPage(qc: QueryClient, query: EventBoardQuery = {}) {
+  return qc.prefetchQuery({
+    queryKey: mapKeys.events(query),
+    queryFn: () => getNetworkEvents({ data: query }),
+    staleTime: STALE.events,
+  });
+}
+
 export function prefetchMapStore(qc: QueryClient) {
   return Promise.all([
     prefetchGlobe(qc),
     qc.prefetchQuery({ queryKey: mapKeys.communities, queryFn: () => getBtcCommunities(), staleTime: STALE.communities }),
     qc.prefetchQuery({ queryKey: mapKeys.csv, queryFn: () => getMapCsv(), staleTime: STALE.csv }),
-    qc.prefetchQuery({ queryKey: mapKeys.events, queryFn: () => getNetworkEvents(), staleTime: STALE.events }),
+    prefetchEventPage(qc),
   ]);
 }
 
