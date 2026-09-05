@@ -21,7 +21,7 @@ import { clientKey, peerFromHeaders, tooMany } from "./rate-limit";
 import { getRequest } from "@tanstack/react-start/server";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
-import { makePinToken, pinOnBoard, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
+import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
 import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
 
 export const getMarket = createServerFn({ method: "POST" })
@@ -202,7 +202,7 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
     const rows = await loadPins();
     enqueuePendingPins(rows.filter((p) => !p.verified && Date.now() - p.created < PIN_TTL_MS).map((p) => p.id));
     return rows
-      .filter((p) => pinOnBoard(p))
+      .filter((p) => pinAlive(p))
       .slice(0, 48)
       .map((p) => ({ ...p, token: "" }));
   } catch {

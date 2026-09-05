@@ -5,6 +5,7 @@ import {
   makePinToken,
   mergePins,
   parsePinsCsv,
+  pinAlive,
   pinOnBoard,
   pinPending,
   stringifyPinsCsv,
@@ -32,11 +33,12 @@ test("makePinToken is CARGA- plus 6 chars", () => {
   assert.match(t, /^CARGA-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
 });
 
-test("pending pin is on the board; expired is not", () => {
+test("pending pin is not public; verified is", () => {
   const now = 1_000_000;
   assert.equal(pinPending(pin({ created: now - 1000 }), now), true);
+  assert.equal(pinAlive(pin({ created: now - 1000 }), now), false);
   assert.equal(pinOnBoard(pin({ created: now - PIN_TTL_MS - 1 }), now), false);
-  assert.equal(pinOnBoard(pin({ verified: true, verifiedAt: now - 1000, created: now - 2000 }), now), true);
+  assert.equal(pinAlive(pin({ verified: true, verifiedAt: now - 1000, created: now - 2000 }), now), true);
 });
 
 test("CSV round-trip keeps token and links", () => {

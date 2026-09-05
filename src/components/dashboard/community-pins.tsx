@@ -140,7 +140,7 @@ export function CommunityPinsBoard() {
       setErr(t("pinNeed"));
       return;
     }
-    if (/instagram\.com/i.test(proofUrl)) {
+    if (/instagram\.com/i.test(proofUrl) && !/instagram\.com\/(p|reel|reels|tv)\//i.test(proofUrl)) {
       setErr(t("pinNoIg"));
       return;
     }

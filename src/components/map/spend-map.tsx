@@ -3,7 +3,7 @@ import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { canRemove, communityTrust, dumpMapCsv, hasScrapeLink, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
+import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hasScrapeLink, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
 import { dedupeCommunities, dedupeShops, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
@@ -293,6 +293,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     };
     const box = focus?.iso ? isoBox[focus.iso.toUpperCase()] : null;
     const rows = allComms.filter((c) => {
+      const mine = selComm?.id === c.id || selComm?.slug === c.slug;
+      if (!communityIsPublic(c) && !mine) return false;
       const founding = c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug;
       const pad = founding ? 2.6 : 0.6;
       if (c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad) return true;
@@ -300,7 +302,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       return false;
     });
     return rows;
-  }, [allComms, bbox, filter, focus?.iso]);
+  }, [allComms, bbox, filter, focus?.iso, selComm?.id, selComm?.slug]);
 
   useEffect(() => {
     if (!focus?.id) return;

@@ -237,7 +237,11 @@ export function stringifyMapCsv(rows: MapCsvRow[]): string {
 export function stringifyMapCsvPublic(rows: MapCsvRow[]): string {
   return stringifyMapCsv(
     rows
-      .filter((r) => r.tipo !== "shop" || !r.id.startsWith("local:") || r.verifiedAt > 0)
+      .filter((r) => {
+        if (r.tipo === "shop" && r.id.startsWith("local:")) return r.verifiedAt > 0;
+        if (r.tipo === "community" && r.id.startsWith("c:") && r.id !== "c:cc-btc") return r.verifiedAt > 0;
+        return true;
+      })
       .map((r) => ({ ...r, token: "" })),
   );
 }

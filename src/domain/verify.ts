@@ -1,5 +1,5 @@
-import { averageStars } from "./merchant-grade";
-import { keyFromUrl } from "./socials";
+import { averageStars } from "./merchant-grade.ts";
+import { keyFromUrl } from "./socials.ts";
 import type { Community, CommunityLink } from "./entities";
 
 const ID_KEYS = new Set(["web", "x", "nostr", "telegram", "github"]);
@@ -47,6 +47,16 @@ export function hasScrapeLink(links: { key?: string; url: string }[] | undefined
 }
 
 export function shopIsPublic(id: string, verifiedAt?: number) {
+  if (id.startsWith("btcmap:") || id.startsWith("node:") || id.startsWith("osm:")) return true;
   if (!id.startsWith("local:")) return true;
   return (verifiedAt ?? 0) > 0;
+}
+
+/** User-submitted community (`c:`) stays off the map until CARGA is scraped. Catalog/founding stay. */
+export function communityIsPublic(c: { id?: string; slug?: string; verifiedAt?: number }) {
+  if (isFounding(c)) return true;
+  const id = c.id || "";
+  if (id.startsWith("btcmap:")) return true;
+  if (id.startsWith("c:")) return (c.verifiedAt ?? 0) > 0;
+  return (c.verifiedAt ?? 0) > 0 || !id.startsWith("c:");
 }
