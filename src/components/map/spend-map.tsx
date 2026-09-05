@@ -1240,8 +1240,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <div className="space-y-3">
               <CommunityCard
                 community={selComm}
-                going={guideWait}
-                onGo={() => startGuide({ lat: selComm.lat, lon: selComm.lon })}
                 onVerified={() => {
                   const next = comms.map((c) => (c.id === selComm.id ? { ...c, verifiedAt: Date.now() } : c));
                   setComms(next);
@@ -1264,6 +1262,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onPrivacy={setPrivacyOk}
                 err={formErr}
                 onPublish={() => voteCommunity(selComm)}
+                onGo={() => startGuide({ lat: selComm.lat, lon: selComm.lon })}
+                going={guideWait}
                 onOpen={() => {
                   setVoteOpen(true);
                   setFormErr("");
@@ -1298,8 +1298,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 place={sel}
                 local={local}
                 removable={removable}
-                going={guideWait}
-                onGo={() => startGuide({ lat: sel.lat, lon: sel.lon })}
                 onRemove={() => commit(sel.id, { ...(local as MerchantLocal), removed: true })}
               />
               <MapVotePanel
@@ -1319,6 +1317,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onPrivacy={setPrivacyOk}
                 err={formErr}
                 onPublish={() => vote(sel)}
+                onGo={() => startGuide({ lat: sel.lat, lon: sel.lon })}
+                going={guideWait}
                 onOpen={() => {
                   setVoteOpen(true);
                   setFormErr("");

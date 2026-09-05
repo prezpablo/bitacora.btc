@@ -44,15 +44,17 @@ export function MapDropPick({
   return (
     <div className="space-y-2">
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("newPoint")}</p>
-      <Button type="button" className="w-full" onClick={onShop}>
-        {t("mapLoadShop")}
-      </Button>
-      <Button type="button" className="w-full" onClick={onComm}>
-        {t("mapLoadComm")}
-      </Button>
-      <Button type="button" variant="outline" className="w-full" onClick={onCancel}>
+      <div className="grid grid-cols-2 gap-2">
+        <Button type="button" size="sm" onClick={onShop}>
+          {t("mapLoadShop")}
+        </Button>
+        <Button type="button" size="sm" variant="outline" onClick={onComm}>
+          {t("mapLoadComm")}
+        </Button>
+      </div>
+      <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={onCancel}>
         {t("pinCancel")}
-      </Button>
+      </button>
     </div>
   );
 }
@@ -77,6 +79,8 @@ export function MapVotePanel({
   onOpen,
   onHide,
   onDismiss,
+  onGo,
+  going,
 }: {
   open: boolean;
   captchaKey: string;
@@ -97,17 +101,26 @@ export function MapVotePanel({
   onOpen: () => void;
   onHide: () => void;
   onDismiss: () => void;
+  onGo?: () => void;
+  going?: boolean;
 }) {
   const t = useT();
   if (!open) {
     return (
-      <div className="flex flex-col gap-2">
-        <Button type="button" className="w-full" onClick={onOpen}>
-          {t("mapLoadVote")}
-        </Button>
-        <Button type="button" variant="outline" className="w-full" onClick={onDismiss}>
+      <div className="space-y-2">
+        <div className={onGo ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
+          {onGo ? (
+            <Button type="button" size="sm" disabled={going} onClick={onGo} title={going ? t("irWait") : t("ir")}>
+              {going ? t("irWait") : t("ir")}
+            </Button>
+          ) : null}
+          <Button type="button" size="sm" variant={onGo ? "outline" : "default"} onClick={onOpen} title={t("mapLoadVote")}>
+            {t("mapLoadVoteShort")}
+          </Button>
+        </div>
+        <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={onDismiss}>
           {t("pinCancel")}
-        </Button>
+        </button>
       </div>
     );
   }

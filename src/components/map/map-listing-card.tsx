@@ -15,13 +15,9 @@ import { VerifiedStar } from "./verified-star";
 export function CommunityCard({
   community,
   onVerified,
-  onGo,
-  going,
 }: {
   community: Community;
   onVerified: () => void;
-  onGo?: () => void;
-  going?: boolean;
 }) {
   const t = useT();
   const trust = communityTrust(community);
@@ -60,11 +56,6 @@ export function CommunityCard({
         </div>
       </div>
       {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
-      {onGo ? (
-        <Button className="w-full" disabled={going} onClick={onGo}>
-          {going ? t("irWait") : t("ir")}
-        </Button>
-      ) : null}
       <SocialRow links={community.links} />
       {!trust.verified && community.verifyToken ? (
         <ScrapeVerifyBox
@@ -83,15 +74,11 @@ export function PlaceCard({
   local,
   removable,
   onRemove,
-  onGo,
-  going,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
   removable: boolean;
   onRemove: () => void;
-  onGo?: () => void;
-  going?: boolean;
 }) {
   const t = useT();
   const g = gradeOf(local, Date.now());
@@ -140,11 +127,6 @@ export function PlaceCard({
       {local?.hours ? <HoursView hours={local.hours} /> : null}
       {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
       {local?.links?.length ? <SocialRow links={local.links} /> : null}
-      {onGo ? (
-        <Button className="w-full" disabled={going} onClick={onGo}>
-          {going ? t("irWait") : t("ir")}
-        </Button>
-      ) : null}
       {removable ? (
         <Button variant="outline" className="w-full" onClick={onRemove}>
           {t("removeLow")}
