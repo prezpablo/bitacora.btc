@@ -3,5 +3,7 @@ export { buildModelMarket } from "./build-model-market";
 export { loadMarket } from "./load-market";
 export { loadExtras } from "./load-extras";
 export { locateOnConsent } from "./locate-user";
+export { publishCommunity, publishShop, rateCommunityListing, rateShopListing } from "./map-listings";
+export type { ListingBundle } from "./map-listings";
 export type { ExtrasFeed, HistoryFeed, LiqBlend, LiveTape, LoadLiqBlend, MarketFeed, ModelMarket, Quote } from "./ports";
 export type { GpsSession } from "./locate-user";

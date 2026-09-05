@@ -1,0 +1,184 @@
+import { PrivacyAccept } from "@/components/privacy-accept";
+import { Button } from "@/components/ui/button";
+import { addressIssues } from "@/domain/street-addr";
+import type { WeekHours } from "@/domain/hours";
+import type { PayKey } from "@/domain/pays";
+import type { SocialKey } from "@/domain/socials";
+import { formatStreet, type StreetHit } from "@/infrastructure/address";
+import type { AppLang } from "@/lib/locale";
+import { useT } from "@/lib/i18n";
+import { AddressSearch } from "./address-search";
+import { CaptchaBox, type CaptchaTicket } from "./captcha";
+import { HoursEditor } from "./hours-editor";
+import { LogoPicker } from "./logo-picker";
+import { PayPicker } from "./pay-row";
+import { SocialPicker } from "./social-row";
+
+export type CommForm = {
+  slug: string;
+  name: string;
+  description: string;
+  logo: string;
+};
+
+export const EMPTY_COMM_FORM: CommForm = { slug: "", name: "", description: "", logo: "" };
+
+export function MapComposeForm({
+  kind,
+  lang,
+  shopName,
+  shopDesc,
+  shopNotes,
+  shopHours,
+  shopPays,
+  shopAddr,
+  addrHit,
+  shopLogo,
+  form,
+  picked,
+  handles,
+  captchaOk,
+  privacyOk,
+  formErr,
+  onShopName,
+  onShopDesc,
+  onShopNotes,
+  onShopHours,
+  onShopPays,
+  onShopAddr,
+  onAddrHit,
+  onShopLogo,
+  onForm,
+  onToggleSocial,
+  onHandle,
+  onCaptcha,
+  onTicket,
+  onPrivacy,
+  onPickAddress,
+  onPublish,
+  onCancel,
+}: {
+  kind: "comercio" | "comunidad";
+  lang: AppLang;
+  shopName: string;
+  shopDesc: string;
+  shopNotes: string;
+  shopHours: WeekHours;
+  shopPays: PayKey[];
+  shopAddr: string;
+  addrHit: StreetHit | null;
+  shopLogo: string;
+  form: CommForm;
+  picked: SocialKey[];
+  handles: Partial<Record<SocialKey, string>>;
+  captchaOk: boolean;
+  privacyOk: boolean;
+  formErr: string;
+  onShopName: (v: string) => void;
+  onShopDesc: (v: string) => void;
+  onShopNotes: (v: string) => void;
+  onShopHours: (v: WeekHours) => void;
+  onShopPays: (v: PayKey[]) => void;
+  onShopAddr: (v: string) => void;
+  onAddrHit: (v: StreetHit | null) => void;
+  onShopLogo: (v: string) => void;
+  onForm: (fn: (f: CommForm) => CommForm) => void;
+  onToggleSocial: (k: SocialKey) => void;
+  onHandle: (k: SocialKey, v: string) => void;
+  onCaptcha: (ok: boolean) => void;
+  onTicket: (t: CaptchaTicket | null) => void;
+  onPrivacy: (ok: boolean) => void;
+  onPickAddress: (hit: StreetHit) => void;
+  onPublish: () => void;
+  onCancel: () => void;
+}) {
+  const t = useT();
+  if (kind === "comercio") {
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm">
+          {t("fldName")}
+          <input
+            className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]"
+            value={shopName}
+            onChange={(e) => onShopName(e.target.value)}
+            placeholder={t("phName")}
+          />
+        </label>
+        <label className="block text-sm">
+          {t("fldDesc")}
+          <textarea
+            className="mt-1 min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]"
+            value={shopDesc}
+            onChange={(e) => onShopDesc(e.target.value)}
+            placeholder={t("phDesc")}
+          />
+        </label>
+        <label className="block text-sm">
+          {t("fldNotes")}
+          <textarea
+            className="mt-1 min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]"
+            value={shopNotes}
+            onChange={(e) => onShopNotes(e.target.value)}
+            placeholder={t("phNotes")}
+          />
+        </label>
+        <AddressSearch
+          value={shopAddr}
+          hit={addrHit}
+          onChange={(v) => {
+            onShopAddr(v);
+            if (!addrHit || v.trim() !== formatStreet(addrHit, lang)) onAddrHit(null);
+          }}
+          onPick={onPickAddress}
+        />
+        <LogoPicker value={shopLogo} onChange={onShopLogo} />
+        <HoursEditor value={shopHours} onChange={onShopHours} />
+        <PayPicker value={shopPays} onChange={onShopPays} />
+        <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
+        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
+        <PrivacyAccept id="privacy-map-shop" checked={privacyOk} onChange={onPrivacy} />
+        {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
+        <Button className="w-full" onClick={onPublish} disabled={!captchaOk || !privacyOk || addressIssues(addrHit).length > 0}>
+          {t("proposeShop")}
+        </Button>
+        <Button type="button" variant="outline" className="w-full" onClick={onCancel}>
+          {t("pinCancel")}
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      <input
+        className="h-10 w-full rounded-md bg-elevated px-3 text-sm"
+        placeholder={t("phCommName")}
+        value={form.name}
+        onChange={(e) => onForm((f) => ({ ...f, name: e.target.value }))}
+      />
+      <input
+        className="h-10 w-full rounded-md bg-elevated px-3 text-sm"
+        placeholder={t("phSlug")}
+        value={form.slug}
+        onChange={(e) => onForm((f) => ({ ...f, slug: e.target.value }))}
+      />
+      <textarea
+        className="min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm"
+        placeholder={t("phCommDesc")}
+        value={form.description}
+        onChange={(e) => onForm((f) => ({ ...f, description: e.target.value }))}
+      />
+      <LogoPicker value={form.logo} onChange={(logo) => onForm((f) => ({ ...f, logo }))} />
+      <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
+      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
+      <PrivacyAccept id="privacy-map-comm" checked={privacyOk} onChange={onPrivacy} />
+      {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
+      <Button className="w-full" onClick={onPublish} disabled={!captchaOk || !privacyOk}>
+        {t("publishComm")}
+      </Button>
+      <Button type="button" variant="outline" className="w-full" onClick={onCancel}>
+        {t("pinCancel")}
+      </Button>
+    </div>
+  );
+}

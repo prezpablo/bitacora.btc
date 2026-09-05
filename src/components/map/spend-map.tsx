@@ -3,12 +3,11 @@ import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { addScore, canRemove, dumpMapCsv, hydrateMapCsv, listingTrust, communityTrust, imgSrc, logoUrl } from "@/domain";
+import { canRemove, dumpMapCsv, hydrateMapCsv, imgSrc } from "@/domain";
 import { dedupeCommunities, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
-import { makePinToken } from "@/domain/community-pins";
-import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
+import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } from "@/application/map-listings";
 import { getCityFrame, saveMapCsv } from "@/infrastructure/server-fns";
 import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
@@ -22,21 +21,16 @@ import { prefersReducedMotion } from "@/lib/motion";
 import { useLocale } from "@/lib/locale";
 import { cn, escapeHtml } from "@/lib/utils";
 import { extrasAllowed, readExtra, writeExtra } from "@/lib/storage-consent";
-import { PrivacyAccept } from "@/components/privacy-accept";
 import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
 import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { SiteShell } from "@/components/site-header";
-import { Button } from "@/components/ui/button";
 import { MapSearch, type SearchHit } from "./map-search";
 import { CommunityCard, PlaceCard } from "./map-listing-card";
 import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
+import { EMPTY_COMM_FORM, MapComposeForm, type CommForm } from "./map-compose-form";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
 import type { PayKey } from "@/domain/pays";
-import { HoursEditor } from "./hours-editor";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
-import { PayPicker } from "./pay-row";
-import { AddressSearch } from "./address-search";
-import { SocialPicker } from "./social-row";
 import { addressIssues, formatStreet, type StreetHit } from "@/infrastructure/address";
 import {
   firebaseConfigured,
@@ -82,30 +76,6 @@ function coinFaceHtml(logo: string, size: number) {
   }
   return `<span style="display:block;width:${size}px;height:${size}px">${BITCOIN_MARK_SVG}</span>`;
 }
-
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 32);
-}
-
-type CommForm = {
-  slug: string;
-  name: string;
-  description: string;
-  logo: string;
-};
-
-const EMPTY_FORM: CommForm = {
-  slug: "",
-  name: "",
-  description: "",
-  logo: "",
-};
 
 const CSV_CACHE = "bitacora-map-csv-v1";
 
@@ -162,7 +132,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [dropKind, setDropKind] = useState<"pick" | "comercio" | "comunidad">("pick");
   const [voteOpen, setVoteOpen] = useState(false);
   const [mode, setMode] = useState<"comercio" | "comunidad">("comercio");
-  const [form, setForm] = useState<CommForm>(EMPTY_FORM);
+  const [form, setForm] = useState<CommForm>(EMPTY_COMM_FORM);
   const [formErr, setFormErr] = useState("");
   const [privacyOk, setPrivacyOk] = useState(false);
   const [picked, setPicked] = useState<SocialKey[]>([]);
@@ -687,26 +657,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("captchaNeed"));
       return;
     }
-    const prev = store[place.id] ?? { description: "", votes: [], listedAt: place.createdAt };
     const by = nick.trim() || "colaborador";
     writeExtra("bitacora-nick", by);
-    const tally = addScore(prev.score ?? 0, prev.voteCount ?? prev.votes.length, stars);
-    const next = {
-      ...prev,
-      description: draft.trim() || prev.description,
-      votes: [...prev.votes, { stars, at: Date.now(), by }],
-      listedAt: prev.listedAt || place.createdAt,
-      updatedAt: Date.now(),
-      score: tally.score,
-      voteCount: tally.votes,
-      lat: prev.lat ?? place.lat,
-      lon: prev.lon ?? place.lon,
-      name: prev.name || place.name,
-      category: prev.category || place.category,
-    };
-    const data = { ...store, [place.id]: next };
-    setStore(data);
-    void persist(data, comms).then((ok) => {
+    const next = rateShopListing({ store, comms }, place, stars, nick, draft);
+    setStore(next.store);
+    void persist(next.store, next.comms).then((ok) => {
       if (!ok) setFormErr(t("voteSaveFail"));
       else {
         setFormErr("");
@@ -732,37 +687,35 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("captchaNeed"));
       return;
     }
-    const id = `local:${drop.lat.toFixed(5)},${drop.lon.toFixed(5)}`;
-    const place: MerchantPlace = {
-      id,
-      lat: drop.lat,
-      lon: drop.lon,
-      name: shopName.trim().slice(0, 80),
-      category: "propuesta",
-      createdAt: Date.now(),
-      description: shopDesc.trim() || undefined,
-    };
-    const tally = addScore(0, 0, stars);
-    commit(id, {
-      description: shopDesc.trim(),
-      notes: shopNotes.trim(),
-      votes: [{ stars, at: Date.now(), by: nick.trim() || "colaborador" }],
-      listedAt: Date.now(),
-      updatedAt: Date.now(),
-      score: tally.score,
-      voteCount: tally.votes,
-      links: linksFromPicked(picked, handles),
-      hours: shopHours,
-      pays: shopPays,
-      address: shopAddr.trim(),
-      logo: logoUrl(shopLogo) || undefined,
-      lat: drop.lat,
-      lon: drop.lon,
-      name: shopName.trim().slice(0, 80),
-      category: "propuesta",
-      verifyToken: makePinToken(),
-    });
-    setSel(place);
+    const out = publishShop(
+      { store, comms },
+      drop,
+      {
+        name: shopName,
+        description: shopDesc,
+        notes: shopNotes,
+        hours: shopHours,
+        pays: shopPays,
+        address: shopAddr,
+        logo: shopLogo,
+        links: linksFromPicked(picked, handles),
+        stars,
+        nick,
+      },
+    );
+    if (!out.ok) {
+      setFormErr(t("fldName"));
+      return;
+    }
+    setStore(out.bundle.store);
+    persist(out.bundle.store, out.bundle.comms);
+    void upsertPlace(out.place.id, out.local).then(
+      (ok) => {
+        if (ok) setSync("on");
+      },
+      () => setSync("fail"),
+    );
+    setSel(out.place);
     setDrop(null);
     setDropKind("pick");
     setVoteOpen(false);
@@ -791,17 +744,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     }
     const by = nick.trim() || "colaborador";
     writeExtra("bitacora-nick", by);
-    const tally = addScore(c.score ?? 0, c.voteCount ?? c.votes?.length ?? 0, stars);
-    const row: Community = {
-      ...c,
-      votes: [...(c.votes ?? []), { stars, at: Date.now(), by }],
-      score: tally.score,
-      voteCount: tally.votes,
-    };
-    const next = comms.some((x) => x.id === c.id) ? comms.map((x) => (x.id === c.id ? row : x)) : [...comms, row];
-    setComms(next);
-    setSelComm(row);
-    void persist(store, next).then((ok) => {
+    const out = rateCommunityListing({ store, comms }, c, stars, nick);
+    setComms(out.bundle.comms);
+    setSelComm(out.row);
+    void persist(out.bundle.store, out.bundle.comms).then((ok) => {
       if (!ok) setFormErr(t("voteSaveFail"));
       else {
         setFormErr("");
@@ -809,7 +755,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         setVoteOpen(false);
       }
     });
-    void upsertCommunity(row).then(
+    void upsertCommunity(out.row).then(
       (ok) => {
         if (ok) setSync("on");
       },
@@ -836,41 +782,33 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("captchaNeed"));
       return;
     }
-    const slug = slugify(form.slug || form.name);
-    if (!slug) {
-      setFormErr(t("needSlug"));
+    const out = publishCommunity(
+      { store, comms },
+      drop,
+      {
+        slug: form.slug,
+        name: form.name,
+        description: form.description,
+        logo: form.logo,
+        links: linksFromPicked(picked, handles),
+      },
+    );
+    if (!out.ok) {
+      setFormErr(out.error === "slugTaken" ? t("slugTaken") : t("needSlug"));
       return;
     }
-    if (comms.some((c) => c.slug === slug)) {
-      setFormErr(t("slugTaken"));
-      return;
-    }
-    const row: Community = {
-      id: `c:${slug}`,
-      slug,
-      name: form.name.trim() || slug,
-      lat: drop.lat,
-      lon: drop.lon,
-      logo: logoUrl(form.logo) || form.logo,
-      description: form.description.trim(),
-      links: linksFromPicked(picked, handles),
-      createdAt: Date.now(),
-      votes: [],
-      verifyToken: makePinToken(),
-    };
-    const next = [...comms, row];
-    setComms(next);
-    persist(store, next);
-    setSelComm(row);
+    setComms(out.bundle.comms);
+    persist(out.bundle.store, out.bundle.comms);
+    setSelComm(out.row);
     setDrop(null);
     setDropKind("pick");
     setVoteOpen(false);
-    setForm(EMPTY_FORM);
+    setForm(EMPTY_COMM_FORM);
     setFormErr("");
     setPicked([]);
     setHandles({});
     setCaptchaOk(false);
-    void upsertCommunity(row).then(
+    void upsertCommunity(out.row).then(
       (ok) => {
         if (ok) setSync("on");
       },
@@ -896,7 +834,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setShopAddr("");
     setAddrHit(null);
     setShopLogo("");
-    setForm(EMPTY_FORM);
+    setForm(EMPTY_COMM_FORM);
     setPicked([]);
     setHandles({});
   }
@@ -1128,108 +1066,41 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <p className="text-xs tracking-wide text-muted-foreground uppercase">
                 {dropKind === "comunidad" || mode === "comunidad" ? t("mapLoadComm") : t("mapLoadShop")}
               </p>
-              {mode === "comercio" ? (
-                <div className="space-y-2">
-                  <label className="block text-sm">
-                    {t("fldName")}
-                    <input
-                      className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]"
-                      value={shopName}
-                      onChange={(e) => setShopName(e.target.value)}
-                      placeholder={t("phName")}
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    {t("fldDesc")}
-                    <textarea
-                      className="mt-1 min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]"
-                      value={shopDesc}
-                      onChange={(e) => setShopDesc(e.target.value)}
-                      placeholder={t("phDesc")}
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    {t("fldNotes")}
-                    <textarea
-                      className="mt-1 min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]"
-                      value={shopNotes}
-                      onChange={(e) => setShopNotes(e.target.value)}
-                      placeholder={t("phNotes")}
-                    />
-                  </label>
-                  <AddressSearch
-                    value={shopAddr}
-                    hit={addrHit}
-                    onChange={(v) => {
-                      setShopAddr(v);
-                      if (!addrHit || v.trim() !== formatStreet(addrHit, lang)) setAddrHit(null);
-                    }}
-                    onPick={pinFromAddress}
-                  />
-                  <LogoPicker value={shopLogo} onChange={setShopLogo} />
-                  <HoursEditor value={shopHours} onChange={setShopHours} />
-                  <PayPicker value={shopPays} onChange={setShopPays} />
-                  <SocialPicker
-                    picked={picked}
-                    handles={handles}
-                    onToggle={toggleSocial}
-                    onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
-                  />
-                  <CaptchaBox key="shop" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
-                  <PrivacyAccept id="privacy-map-shop" checked={privacyOk} onChange={setPrivacyOk} />
-                  {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-                  <Button
-                    className="w-full"
-                    onClick={propose}
-                    disabled={!captchaOk || !privacyOk || addressIssues(addrHit).length > 0}
-                  >
-                    {t("proposeShop")}
-                  </Button>
-                  <Button type="button" variant="outline" className="w-full" onClick={cancelDrop}>
-                    {t("pinCancel")}
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <input
-                    className="h-10 w-full rounded-md bg-elevated px-3 text-sm"
-                    placeholder={t("phCommName")}
-                    value={form.name}
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  />
-                  <input
-                    className="h-10 w-full rounded-md bg-elevated px-3 text-sm"
-                    placeholder={t("phSlug")}
-                    value={form.slug}
-                    onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                  />
-                  <textarea
-                    className="min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm"
-                    placeholder={t("phCommDesc")}
-                    value={form.description}
-                    onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  />
-                  <LogoPicker
-                    value={form.logo}
-                    onChange={(logo) => setForm((f) => ({ ...f, logo }))}
-                  />
-                  <SocialPicker
-                    picked={picked}
-                    handles={handles}
-                    onToggle={toggleSocial}
-                    onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
-                  />
-                  <CaptchaBox key="comm" ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
-                  <PrivacyAccept id="privacy-map-comm" checked={privacyOk} onChange={setPrivacyOk} />
-                  {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-                  <Button className="w-full" onClick={saveCommunity} disabled={!captchaOk || !privacyOk}>
-                    {t("publishComm")}
-                  </Button>
-                  <Button type="button" variant="outline" className="w-full" onClick={cancelDrop}>
-                    {t("pinCancel")}
-                  </Button>
-                </div>
-              )}
+              <MapComposeForm
+                kind={dropKind === "comunidad" || mode === "comunidad" ? "comunidad" : "comercio"}
+                lang={lang}
+                shopName={shopName}
+                shopDesc={shopDesc}
+                shopNotes={shopNotes}
+                shopHours={shopHours}
+                shopPays={shopPays}
+                shopAddr={shopAddr}
+                addrHit={addrHit}
+                shopLogo={shopLogo}
+                form={form}
+                picked={picked}
+                handles={handles}
+                captchaOk={captchaOk}
+                privacyOk={privacyOk}
+                formErr={formErr}
+                onShopName={setShopName}
+                onShopDesc={setShopDesc}
+                onShopNotes={setShopNotes}
+                onShopHours={setShopHours}
+                onShopPays={setShopPays}
+                onShopAddr={setShopAddr}
+                onAddrHit={setAddrHit}
+                onShopLogo={setShopLogo}
+                onForm={setForm}
+                onToggleSocial={toggleSocial}
+                onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
+                onCaptcha={setCaptchaOk}
+                onTicket={setTicket}
+                onPrivacy={setPrivacyOk}
+                onPickAddress={pinFromAddress}
+                onPublish={dropKind === "comunidad" || mode === "comunidad" ? saveCommunity : propose}
+                onCancel={cancelDrop}
+              />
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">{t("pickSpot")}</p>

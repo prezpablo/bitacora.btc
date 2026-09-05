@@ -38,6 +38,7 @@ export { continentOf, continentFromLabel, isoFromCountryName } from "./geo-regio
 export { pickBestFix, isPreciseFix, isUsefulFix, MIN_STREET_ACCURACY_M } from "./geo-fix";
 export type { CityFrame, GeoFix } from "./geo-frame";
 export { boxAround, frameFromFix } from "./geo-frame";
+export { slugifyName, localShopId, draftShop, draftCommunity, rateLocal, rateCommunity } from "./map-compose";
 export { addressIssues } from "./street-addr";
 export type { AddrIssue, StreetHit } from "./street-addr";
 export { syntheticCandles, syntheticDailyHistory } from "./synthetic";

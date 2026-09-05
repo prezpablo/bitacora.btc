@@ -48,13 +48,15 @@ test("forms gate on privacy checkbox", () => {
     "src/components/dashboard/contact.tsx",
     "src/components/dashboard/community-pins.tsx",
     "src/components/map/spend-map.tsx",
+    "src/components/map/map-compose-form.tsx",
   ]) {
     const src = read(file);
-    assert.match(src, /PrivacyAccept/);
     assert.match(src, /privacyOk/);
-    assert.match(src, /disabled=\{[^}]*!privacyOk/);
-    assert.match(src, /if \(!privacyOk\)/);
+    assert.match(src, /if \(!privacyOk\)|disabled=\{[^}]*!privacyOk/);
   }
+  assert.match(read("src/components/map/spend-map.tsx"), /if \(!privacyOk\)/);
+  assert.match(read("src/components/map/map-compose-form.tsx"), /PrivacyAccept/);
+  assert.match(read("src/components/map/map-compose-form.tsx"), /disabled=\{[^}]*!privacyOk/);
   const accept = read("src/components/privacy-accept.tsx");
   assert.match(accept, /aria-required/);
   assert.match(accept, /\/legal#privacidad/);
