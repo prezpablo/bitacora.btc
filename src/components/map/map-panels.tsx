@@ -61,6 +61,72 @@ export function MapDropPick({
   );
 }
 
+export function MapPlaceActions({
+  onGo,
+  going,
+  onOpen,
+  onPatch,
+  onDismiss,
+}: {
+  onGo?: () => void;
+  going?: boolean;
+  onOpen: () => void;
+  onPatch?: () => void;
+  onDismiss: () => void;
+}) {
+  const t = useT();
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {onGo ? (
+        <Button
+          type="button"
+          size="sm"
+          className="min-h-11 w-full whitespace-normal px-2 text-xs sm:min-h-9"
+          disabled={going}
+          onClick={onGo}
+          title={going ? t("irWait") : t("ir")}
+        >
+          {going ? t("irWait") : t("ir")}
+        </Button>
+      ) : (
+        <span />
+      )}
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        className="border-border min-h-11 w-full whitespace-normal px-2 text-xs sm:min-h-9"
+        onClick={onOpen}
+        title={t("mapLoadVote")}
+      >
+        {t("mapLoadVoteShort")}
+      </Button>
+      {onPatch ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="border-border min-h-11 w-full whitespace-normal px-2 text-xs sm:min-h-9"
+          onClick={onPatch}
+        >
+          {t("patchUpdate")}
+        </Button>
+      ) : (
+        <span />
+      )}
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        className="border-border min-h-11 w-full whitespace-normal px-2 text-xs sm:min-h-9"
+        onClick={onDismiss}
+      >
+        {t("pinCancel")}
+      </Button>
+    </div>
+  );
+}
+
 export function MapVotePanel({
   open,
   captchaKey,
@@ -110,30 +176,7 @@ export function MapVotePanel({
 }) {
   const t = useT();
   if (!open) {
-    return (
-      <div className="grid grid-cols-4 gap-1.5">
-        {onGo ? (
-          <Button type="button" size="sm" className="px-1.5 text-xs" disabled={going} onClick={onGo} title={going ? t("irWait") : t("ir")}>
-            {going ? t("irWait") : t("ir")}
-          </Button>
-        ) : (
-          <span />
-        )}
-        <Button type="button" size="sm" variant="outline" className="border-border px-1.5 text-xs" onClick={onOpen} title={t("mapLoadVote")}>
-          {t("mapLoadVoteShort")}
-        </Button>
-        {onPatch ? (
-          <Button type="button" size="sm" variant="outline" className="border-border px-1.5 text-xs" onClick={onPatch}>
-            {t("patchUpdate")}
-          </Button>
-        ) : (
-          <span />
-        )}
-        <Button type="button" size="sm" variant="outline" className="border-border px-1.5 text-xs" onClick={onDismiss}>
-          {t("pinCancel")}
-        </Button>
-      </div>
-    );
+    return <MapPlaceActions onGo={onGo} going={going} onOpen={onOpen} onPatch={onPatch} onDismiss={onDismiss} />;
   }
   return (
     <>

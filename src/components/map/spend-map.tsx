@@ -27,7 +27,7 @@ import { SiteShell } from "@/components/site-header";
 import { MapSearch, type SearchHit } from "./map-search";
 import { CommunityCard, PlaceCard } from "./map-listing-card";
 import { ListingPatchForm } from "./map-patch-form";
-import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
+import { MapDropPick, MapPlaceActions, MapVotePanel, StarMeter } from "./map-panels";
 import { EMPTY_COMM_FORM, MapComposeForm, type CommForm } from "./map-compose-form";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
 import type { PayKey } from "@/domain/pays";
@@ -871,6 +871,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const local = sel ? store[sel.id] : undefined;
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
+  const picked = Boolean(sel || selComm);
+  const showMapActions = picked && !voteOpen && !patchOpen;
+  const pickedLat = selComm?.lat ?? sel?.lat;
+  const pickedLon = selComm?.lon ?? sel?.lon;
 
   const body = (
     <>
@@ -922,13 +926,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       </section>
 
       <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[1fr_320px]">
-        <div className="relative min-h-[420px] lg:min-h-[560px]">
+        <div className={cn("relative min-h-[280px] lg:min-h-[560px]", picked ? "min-h-[280px]" : "min-h-[420px]")}>
           <div className="absolute top-3 right-3 left-3 z-[1500] max-w-lg">
             <MapSearch communities={allComms} places={places} onPick={flyTo} />
           </div>
           <div
             ref={mapEl}
-            className="h-full min-h-[420px] overflow-hidden rounded-lg shadow-[var(--shadow-border)] lg:min-h-[560px]"
+            className={cn(
+              "h-full overflow-hidden rounded-lg shadow-[var(--shadow-border)] lg:min-h-[560px]",
+              picked ? "min-h-[280px]" : "min-h-[420px]",
+            )}
           />
           <div className="pointer-events-none absolute bottom-4 left-3 z-[2000]">
             {geo === "wait" || geo === "denied" ? (
@@ -949,6 +956,27 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <Locate className="size-5 text-white" strokeWidth={2.4} />
             </button>
           </div>
+          {showMapActions && pickedLat != null && pickedLon != null ? (
+            <div className="absolute right-3 bottom-4 left-16 z-[2100] lg:hidden">
+              <div className="rounded-md bg-card p-2 shadow-md">
+                <MapPlaceActions
+                  onGo={() => startGuide({ lat: pickedLat, lon: pickedLon })}
+                  going={guideWait}
+                  onOpen={() => {
+                    setVoteOpen(true);
+                    setPatchOpen(false);
+                    setFormErr("");
+                  }}
+                  onPatch={() => {
+                    setPatchOpen(true);
+                    setVoteOpen(false);
+                    setFormErr("");
+                  }}
+                  onDismiss={cancelSel}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <aside className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
@@ -977,6 +1005,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   onClose={() => setPatchOpen(false)}
                 />
               ) : (
+              <div className={cn(!voteOpen && "hidden lg:block")}>
               <MapVotePanel
                 open={voteOpen}
                 captchaKey={selComm.id}
@@ -1007,6 +1036,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
+              </div>
               )}
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
               {guideSteps.length ? (
@@ -1056,6 +1086,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   onClose={() => setPatchOpen(false)}
                 />
               ) : (
+              <div className={cn(!voteOpen && "hidden lg:block")}>
               <MapVotePanel
                 open={voteOpen}
                 captchaKey={sel.id}
@@ -1088,6 +1119,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
+              </div>
               )}
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
               {guideSteps.length ? (
