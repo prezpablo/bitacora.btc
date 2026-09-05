@@ -962,11 +962,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   persist(store, next);
                 }}
                 onPatched={() => void invalidate()}
-                onPatch={() => {
-                  setPatchOpen(true);
-                  setVoteOpen(false);
-                  setFormErr("");
-                }}
               />
               <StarMeter score={selComm.score ?? 0} votes={selComm.voteCount ?? selComm.votes?.length ?? 0} />
               {patchOpen ? (
@@ -1046,11 +1041,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   commit(sel.id, { ...local, verifiedAt: Date.now() });
                 }}
                 onPatched={() => void invalidate()}
-                onPatch={() => {
-                  setPatchOpen(true);
-                  setVoteOpen(false);
-                  setFormErr("");
-                }}
               />
               {patchOpen ? (
                 <ListingPatchForm

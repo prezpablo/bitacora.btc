@@ -17,12 +17,10 @@ export function CommunityCard({
   community,
   onVerified,
   onPatched,
-  onPatch,
 }: {
   community: Community;
   onVerified: () => void;
   onPatched?: () => void;
-  onPatch?: () => void;
 }) {
   const t = useT();
   const trust = communityTrust(community);
@@ -60,11 +58,6 @@ export function CommunityCard({
           {!trust.verified ? <p className="mt-1 text-xs text-muted-foreground">{t("verifyPending")}</p> : null}
         </div>
       </div>
-      {onPatch ? (
-        <Button type="button" size="sm" className="w-full" onClick={onPatch}>
-          {t("patchUpdate")}
-        </Button>
-      ) : null}
       {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
       <SocialRow links={community.links} />
       {!trust.verified && community.verifyToken ? (
@@ -86,7 +79,6 @@ export function PlaceCard({
   onRemove,
   onVerified,
   onPatched,
-  onPatch,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
@@ -94,7 +86,6 @@ export function PlaceCard({
   onRemove: () => void;
   onVerified?: () => void;
   onPatched?: () => void;
-  onPatch?: () => void;
 }) {
   const t = useT();
   const g = gradeOf(local, Date.now());
@@ -116,11 +107,6 @@ export function PlaceCard({
           {trust.verified ? <VerifiedStar title={t("verified")} className="size-7" /> : null}
         </h3>
       </div>
-      {onPatch ? (
-        <Button type="button" size="sm" className="w-full" onClick={onPatch}>
-          {t("patchUpdate")}
-        </Button>
-      ) : null}
       {g ? (
         <div className="space-y-1">
           <StarMeter score={g.avg ?? 0} votes={g.count} />

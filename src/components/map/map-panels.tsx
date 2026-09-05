@@ -111,29 +111,27 @@ export function MapVotePanel({
   const t = useT();
   if (!open) {
     return (
-      <div className="space-y-2">
-        <div className="grid grid-cols-3 gap-2">
-          {onGo ? (
-            <Button type="button" size="sm" disabled={going} onClick={onGo} title={going ? t("irWait") : t("ir")}>
-              {going ? t("irWait") : t("ir")}
-            </Button>
-          ) : (
-            <span />
-          )}
-          <Button type="button" size="sm" variant="outline" onClick={onOpen} title={t("mapLoadVote")}>
-            {t("mapLoadVoteShort")}
+      <div className="grid grid-cols-4 gap-1.5">
+        {onGo ? (
+          <Button type="button" size="sm" className="px-1.5 text-xs" disabled={going} onClick={onGo} title={going ? t("irWait") : t("ir")}>
+            {going ? t("irWait") : t("ir")}
           </Button>
-          {onPatch ? (
-            <Button type="button" size="sm" variant="outline" onClick={onPatch}>
-              {t("patchUpdate")}
-            </Button>
-          ) : (
-            <span />
-          )}
-        </div>
-        <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={onDismiss}>
+        ) : (
+          <span />
+        )}
+        <Button type="button" size="sm" variant="outline" className="border-border px-1.5 text-xs" onClick={onOpen} title={t("mapLoadVote")}>
+          {t("mapLoadVoteShort")}
+        </Button>
+        {onPatch ? (
+          <Button type="button" size="sm" variant="outline" className="border-border px-1.5 text-xs" onClick={onPatch}>
+            {t("patchUpdate")}
+          </Button>
+        ) : (
+          <span />
+        )}
+        <Button type="button" size="sm" variant="outline" className="border-border px-1.5 text-xs" onClick={onDismiss}>
           {t("pinCancel")}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -183,11 +181,6 @@ export function MapVotePanel({
       <Button type="button" variant="outline" className="w-full" onClick={onHide}>
         {t("pinCancel")}
       </Button>
-      {onPatch ? (
-        <button type="button" className="w-full text-center text-sm text-primary" onClick={onPatch}>
-          {t("patchUpdate")}
-        </button>
-      ) : null}
     </>
   );
 }
