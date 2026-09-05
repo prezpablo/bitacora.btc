@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Calendar, ChevronDown, Locate, MapPin } from "lucide-react";
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
 import type { ContinentId, EventKind, NetworkEvent } from "@/domain";
-import { continentOf, eventIsLive } from "@/domain";
+import { continentOf, EVENT_PAGE, eventIsLive, pageEvents, sortEventsByDate } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { useMapEvents } from "@/lib/map-query";
 import { locateBest } from "@/infrastructure/geo";
@@ -91,20 +91,20 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
   const eventTz = fmtRange(ev.startAt, ev.endAt, ev.timezone, lang);
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-elevated shadow-[var(--shadow-border)]">
-      <div className="relative aspect-[16/9] bg-plot">
+      <div className="relative aspect-[16/10] bg-plot">
         {ev.image ? (
           <img src={ev.image} alt={ev.title} className="size-full object-cover" />
         ) : (
-          <span className="flex size-full items-center justify-center text-4xl text-primary">₿</span>
+          <span className="flex size-full items-center justify-center text-3xl text-primary">₿</span>
         )}
-        <span className="absolute top-2 left-2 rounded-md bg-primary px-2 py-0.5 text-[11px] font-semibold tracking-wide text-white uppercase">
+        <span className="absolute top-1.5 left-1.5 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
           {ev.platform}
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <h3 className="text-base font-medium text-pretty text-foreground">{ev.title}</h3>
-        {ev.description ? <p className="text-sm text-pretty text-muted-foreground">{ev.description}</p> : null}
-        <ul className="mt-auto space-y-0.5 font-mono text-xs text-muted-foreground">
+      <div className="flex flex-1 flex-col gap-1.5 p-2.5">
+        <h3 className="line-clamp-2 text-sm font-medium text-pretty text-foreground">{ev.title}</h3>
+        {ev.description ? <p className="line-clamp-2 text-xs text-pretty text-muted-foreground">{ev.description}</p> : null}
+        <ul className="mt-auto space-y-0.5 font-mono text-[11px] text-muted-foreground">
           <li>
             {t("netDate")}: {fmtDate(ev.startAt, online ? "UTC" : ev.timezone)}
           </li>
@@ -133,7 +133,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
           href={ev.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1 inline-flex h-10 items-center justify-center rounded-md bg-primary text-sm font-medium text-white no-underline"
+          className="mt-1 inline-flex h-8 items-center justify-center rounded-md bg-primary text-xs font-medium text-white no-underline"
         >
           {t("netEnter")}
         </a>
@@ -253,6 +253,8 @@ export function NetworkEvents() {
   const [locating, setLocating] = useState(false);
   const [geoErr, setGeoErr] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const [dateDir, setDateDir] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 60_000);
@@ -312,7 +314,9 @@ export function NetworkEvents() {
   }, [scoped]);
 
   const local = kind ? scoped.filter((e) => e.kind === kind) : scoped;
-  const rows = local;
+  const ordered = useMemo(() => sortEventsByDate(local, dateDir), [local, dateDir]);
+  const board = useMemo(() => pageEvents(ordered, page, EVENT_PAGE), [ordered, page]);
+  const rows = board.slice;
   const emptyCountry = Boolean(country) && scoped.length === 0 && all.length > 0;
   const countryLabel = country
     ? namedCountry(
@@ -387,7 +391,15 @@ export function NetworkEvents() {
     setGeoErr("");
   }
 
-  const dirty = Boolean(country || kind || near || continent || platform);
+  const dirty = Boolean(country || kind || near || continent || platform || dateDir !== "asc");
+
+  useEffect(() => {
+    setPage(1);
+  }, [country, continent, platform, kind, near, dateDir]);
+
+  useEffect(() => {
+    if (board.page !== page) setPage(board.page);
+  }, [board.page, page]);
 
   return (
     <section className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
@@ -426,6 +438,15 @@ export function NetworkEvents() {
             <span className="font-mono text-xs text-white">{n}</span>
           </Button>
         ))}
+        <select
+          className={selectClass}
+          value={dateDir}
+          onChange={(e) => setDateDir(e.target.value === "desc" ? "desc" : "asc")}
+          aria-label={t("netDate")}
+        >
+          <option value="asc">{t("netSoon")}</option>
+          <option value="desc">{t("netLate")}</option>
+        </select>
         <GeoMenu
           label={countryLabel || (continent ? t(CONTINENTS.find((c) => c.key === continent)?.label || "netContinentAll") : t("netCountryAll"))}
           allLabel={t("netCountryAll")}
@@ -453,6 +474,8 @@ export function NetworkEvents() {
               setNear(false);
               setCountryName("");
               setGeoErr("");
+              setDateDir("asc");
+              setPage(1);
             }}
           >
             {t("netClear")}
@@ -475,7 +498,7 @@ export function NetworkEvents() {
           </button>
         ))}
         <span className="ml-auto self-center text-xs text-muted-foreground">
-          {rows.length === 1 ? t("netCount1") : t("netCount", { n: rows.length })}
+          {ordered.length === 1 ? t("netCount1") : t("netCount", { n: ordered.length })}
         </span>
       </div>
 
@@ -486,14 +509,44 @@ export function NetworkEvents() {
 
       {q.isError ? (
         <p className="mt-4 text-sm text-short">{t("netFail")}</p>
-      ) : rows.length === 0 ? (
+      ) : ordered.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">{q.isFetching ? t("netLoading") : t("netEmpty")}</p>
       ) : (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {rows.map((ev) => (
-            <EventCard key={ev.id} ev={ev} lang={lang} />
-          ))}
-        </div>
+        <>
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            {rows.map((ev) => (
+              <EventCard key={ev.id} ev={ev} lang={lang} />
+            ))}
+          </div>
+          {board.pages > 1 ? (
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={board.page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                <ChevronLeft className="size-4" />
+                {t("netPrev")}
+              </Button>
+              <span className="font-mono text-xs text-muted-foreground">
+                {t("netPageOf", { p: board.page, n: board.pages })}
+              </span>
+              <Button
+                type="button"
+                size="sm"
+                className="gap-1"
+                disabled={board.page >= board.pages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                {t("netNext")}
+                <ChevronRight className="size-4" />
+              </Button>
+            </div>
+          ) : null}
+        </>
       )}
       <p className="mt-4 flex items-center gap-1 text-xs text-muted-foreground">
         <MapPin className="size-3.5" />

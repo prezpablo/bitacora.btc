@@ -33,6 +33,7 @@ export type {
 } from "./entities";
 
 export { eventIsLive } from "./entities";
+export { EVENT_PAGE, pageEvents, sortEventsByDate } from "./event-board";
 export type { ContinentId } from "./geo-regions";
 export { continentOf, continentFromLabel, isoFromCountryName } from "./geo-regions";
 export { pickBestFix, isPreciseFix, isUsefulFix, MIN_STREET_ACCURACY_M } from "./geo-fix";
