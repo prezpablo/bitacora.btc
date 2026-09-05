@@ -10,7 +10,7 @@ import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
 import { nominatimCity, type CityFrame } from "./geo";
 import { searchStreets, type StreetHit } from "./address";
-import { fetchOsrmPath, type GuidePath } from "./osrm";
+import { fetchGuidePath, type GuidePath } from "./osrm";
 import { pickGuideMode, type GuideMode } from "@/domain/guide";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
@@ -128,12 +128,8 @@ export const getGuidePath = createServerFn({ method: "POST" })
     const to = { lat: data.toLat, lon: data.toLon };
     if (![from.lat, from.lon, to.lat, to.lon].every(Number.isFinite)) return null;
     const mode = pickGuideMode(from, to);
-    try {
-      const path = await fetchOsrmPath(from, to, mode);
-      return path.length ? { path, mode } : null;
-    } catch {
-      return null;
-    }
+    const path = await fetchGuidePath(from, to, mode);
+    return { path: path.length >= 2 ? path : [from, to], mode };
   });
 
 export const getMapCsv = createServerFn({ method: "POST" }).handler(async (): Promise<string> => {

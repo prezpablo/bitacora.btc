@@ -10,7 +10,7 @@ import { LogoPicker } from "./logo-picker";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
 import { getCityFrame, getGuidePath, saveMapCsv } from "@/infrastructure/server-fns";
-import { osmDirectionsUrl, pickGuideMode } from "@/domain/guide";
+import { geodesicLine } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround, type CityFrame } from "@/domain";
@@ -172,6 +172,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [geo, setGeo] = useState<"idle" | "wait" | "ok" | "denied">("idle");
   const [userFix, setUserFix] = useState<{ lat: number; lon: number } | null>(null);
   const [guideWait, setGuideWait] = useState(false);
+  const [guideErr, setGuideErr] = useState("");
   const [hit, setHit] = useState<SearchHit | null>(null);
   const [bbox, setBbox] = useState({ west: -56.35, south: -35.05, east: -55.95, north: -34.72 });
   const [zoom, setZoom] = useState(focus?.zoom ?? 4);
@@ -687,6 +688,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   async function goGuide(to: { lat: number; lon: number }) {
     setGuideWait(true);
+    setGuideErr("");
     try {
       let from = userFix;
       if (!from) {
@@ -705,27 +707,34 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           setGeo("denied");
         }
       }
-      if (!from) {
-        window.open(osmDirectionsUrl(to), "_blank", "noopener,noreferrer");
-        return;
-      }
-      const res = await getGuidePath({
-        data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
-      });
       const L = leafletRef.current;
       const map = mapRef.current;
-      if (!res?.path.length || !L || !map) {
-        window.open(osmDirectionsUrl(to, from, pickGuideMode(from, to)), "_blank", "noopener,noreferrer");
+      if (!L || !map) return;
+      if (!from) {
+        map.setView([to.lat, to.lon], 16, { animate: !prefersReducedMotion() });
+        setGuideErr(t("irNeedGeo"));
         return;
       }
+      let path: { lat: number; lon: number }[] = [];
+      try {
+        const res = await getGuidePath({
+          data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
+        });
+        path = res?.path || [];
+      } catch {
+        path = [];
+      }
+      const street = path.length >= 2;
+      if (!street) path = geodesicLine(from, to);
       clearRoute();
       const line = L.polyline(
-        res.path.map((p) => [p.lat, p.lon] as [number, number]),
-        { color: "#f7931a", weight: 5, opacity: 0.92 },
+        path.map((p) => [p.lat, p.lon] as [number, number]),
+        { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
       );
       line.addTo(map);
       routeLine.current = line;
       map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
+      if (!street) setGuideErr(t("irFail"));
     } finally {
       setGuideWait(false);
     }
@@ -1133,6 +1142,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
+              {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
             </div>
           ) : sel ? (
             <div className="space-y-3">
@@ -1168,6 +1178,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
+              {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
             </div>
           ) : drop && dropKind === "pick" ? (
             <MapDropPick
