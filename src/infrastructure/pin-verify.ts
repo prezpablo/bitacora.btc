@@ -1,6 +1,6 @@
-import type { CommunityPin } from "@/domain/community-pins";
-import { PIN_TTL_MS } from "@/domain/community-pins";
-import { fetchPublic, isPublicHttp } from "./safe-fetch";
+import type { CommunityPin } from "../domain/community-pins.ts";
+import { PIN_TTL_MS } from "../domain/community-pins.ts";
+import { fetchPublic, isPublicHttp } from "./safe-fetch.ts";
 
 const TOKEN_RE = /^(CARGA|BIT)-[A-Z0-9]{6}$/;
 
@@ -51,14 +51,26 @@ export function scrapeMirrors(url: string): string[] {
     push(`https://r.jina.ai/https://x.com${rest}`);
     return out;
   }
-  if (host === "instagram.com") {
-    const user = path.split("/").filter(Boolean)[0] || "";
-    push(`https://r.jina.ai/${href}`);
-    push(`https://www.instagram.com/${user}/embed/`);
-    if (user) {
-      push(`https://api.fxtwitter.com/${user}`);
-      push(`https://r.jina.ai/https://x.com/${user}`);
-      push(`https://r.jina.ai/https://ink.bio/${user}`);
+  if (host === "instagram.com" || host === "instagramez.com" || host === "ddinstagram.com" || host === "kkinstagram.com") {
+    const rest = path.replace(/\/+$/, "") || "/";
+    const parts = rest.split("/").filter(Boolean);
+    const isPost = parts[0] === "p" || parts[0] === "reel" || parts[0] === "reels" || parts[0] === "tv";
+    push(`https://www.ddinstagram.com${rest}/`);
+    push(`https://www.instagramez.com${rest}/`);
+    push(`https://r.jina.ai/https://www.ddinstagram.com${rest}/`);
+    if (isPost) {
+      const code = parts[1] || "";
+      if (code) {
+        push(`https://www.instagram.com/${parts[0]}/${code}/embed/captioned/`);
+        push(`https://www.ddinstagram.com/${parts[0]}/${code}/`);
+      }
+    } else {
+      const user = parts[0] || "";
+      if (user) {
+        push(`https://www.ddinstagram.com/${user}/`);
+        push(`https://r.jina.ai/https://www.ddinstagram.com/${user}/`);
+        push(`https://r.jina.ai/https://ink.bio/${user}`);
+      }
     }
     return out.slice(0, 6);
   }

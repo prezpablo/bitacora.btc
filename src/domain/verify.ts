@@ -42,9 +42,7 @@ export function communityTrust(c: Community) {
 export function hasScrapeLink(links: { key?: string; url: string }[] | undefined) {
   return (links ?? []).some((l) => {
     const u = (l.url || "").trim();
-    if (!/^https?:\/\//i.test(u)) return false;
-    if (/instagram\.com/i.test(u)) return false;
-    return true;
+    return /^https?:\/\//i.test(u);
   });
 }
 
