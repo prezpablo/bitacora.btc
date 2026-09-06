@@ -46,7 +46,8 @@ export {
 export type { EventBoardPage, EventBoardQuery, EventFacets } from "./event-board";
 export type { ContinentId } from "./geo-regions";
 export { continentOf, continentFromLabel, isoFromCountryName } from "./geo-regions";
-export { pickBestFix, isPreciseFix, isUsefulFix, MIN_STREET_ACCURACY_M } from "./geo-fix";
+export { pickBestFix, isPreciseFix, isUsefulFix, gpsFailOf, geoBannerKey, irFailKey, MIN_STREET_ACCURACY_M } from "./geo-fix";
+export type { GpsFail, GpsSession, GeoCause } from "./geo-fix";
 export type { CityFrame, GeoFix } from "./geo-frame";
 export { boxAround, frameFromFix } from "./geo-frame";
 export { slugifyName, localShopId, draftShop, draftCommunity, rateLocal, rateCommunity } from "./map-compose";

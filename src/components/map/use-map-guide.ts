@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { locateOnConsent } from "@/application/locate-user";
 import type { GeoFix } from "@/domain/geo-frame";
 import { boxAround } from "@/domain/geo-frame";
-import { isPreciseFix } from "@/domain/geo-fix";
+import { gpsFailOf, irFailKey, isPreciseFix, type GeoCause } from "@/domain/geo-fix";
 import { formatGuideStep, geodesicLine, kmBetween, type GuideStep } from "@/domain/guide";
 import { getApproxFix, getCityFrame, getGuidePath } from "@/infrastructure/server-fns";
 import { locateBest, requestIpFix, startGpsFromGesture } from "@/infrastructure/geo";
@@ -27,7 +27,7 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
   const guideToRef = useRef<{ lat: number; lon: number } | null>(null);
   const onPickOrigin = useRef<(lat: number, lon: number) => void>(() => {});
 
-  const [geo, setGeo] = useState<"idle" | "wait" | "ok" | "denied">("idle");
+  const [geo, setGeo] = useState<GeoCause>("idle");
   const [userFix, setUserFix] = useState<{ lat: number; lon: number } | null>(null);
   const [guideWait, setGuideWait] = useState(false);
   const [guideErr, setGuideErr] = useState("");
@@ -104,6 +104,7 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
     line.addTo(map);
     routeLine.current = line;
     map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
+    setGuideWait(false);
   }
 
   async function drawFrom(from: GeoFix | { lat: number; lon: number }, to: { lat: number; lon: number }) {
@@ -173,9 +174,9 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
       if (preferGps) {
         const session = startGpsFromGesture();
         mapRef.current?.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
-        const { fix } = await locateOnConsent(session, { ip: async () => requestIpFix().catch(() => null) });
+        const { fix, gpsFail } = await locateOnConsent(session, { ip: async () => requestIpFix().catch(() => null) });
         if (!fix) {
-          setGeo("denied");
+          setGeo(gpsFail || "timeout");
           return;
         }
         const city = boxAround(fix.lat, fix.lon, "acá", fix.source === "gps" ? 0.04 : 0.14);
@@ -185,7 +186,7 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
         applyFix(L, map, userMark.current, fix.lat, fix.lon, fix.accuracy, city);
         map.invalidateSize();
         setUserFix({ lat: fix.lat, lon: fix.lon });
-        setGeo(fix.source === "gps" ? "ok" : "idle");
+        setGeo(fix.source === "gps" ? "ok" : gpsFail || "idle");
         return;
       }
       const { fix, city } = await locateBest(false, (lat, lon, zoom) =>
@@ -198,17 +199,15 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
       map.invalidateSize();
       setUserFix({ lat: fix.lat, lon: fix.lon });
       setGeo("idle");
-    } catch {
-      setGeo("denied");
+    } catch (err) {
+      setGeo(gpsFailOf(err));
     }
   }
 
   async function runGuide(to: { lat: number; lon: number }, session: ReturnType<typeof startGpsFromGesture>) {
-    setGuideWait(true);
-    setGuideErr("");
     guideToRef.current = to;
     try {
-      const { fix, refine } = await locateOnConsent(session, {
+      const { fix, refine, gpsFail } = await locateOnConsent(session, {
         ip: async () => {
           try {
             return await requestIpFix();
@@ -225,12 +224,13 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
       });
       if (fix && (fix.source === "gps" || fix.source === "tap" || kmBetween(fix, to) >= 0.08)) {
         await drawFrom(fix, to);
-        setGeo(fix.source === "gps" ? "ok" : "idle");
+        setGeo(fix.source === "gps" ? "ok" : gpsFail || "idle");
+        if (gpsFail && fix.source !== "gps") setGuideErr(t(irFailKey(gpsFail)));
       } else {
         pickOriginRef.current = true;
         setPickOrigin(true);
-        setGuideErr(t("irTap"));
-        setGeo("denied");
+        setGuideErr(t(irFailKey(gpsFail)));
+        setGeo(gpsFail || "timeout");
       }
       void refine.then((better) => {
         if (!better || better.source !== "gps") return;

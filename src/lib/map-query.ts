@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { useQuery, useQueryClient, keepPreviousData, type QueryClient } from "@tanstack/react-query";
 import type { GlobeStats } from "@/domain/globe";
 import type { EventBoardQuery } from "@/domain";
+import { quantizeBox, rememberShopBox, shopsFromCache, shopsInView, type ShopBoxCache } from "@/domain/shop-cache";
 import {
   getBtcCommunities,
   getGlobeStats,
@@ -34,6 +36,8 @@ const STALE = {
   events: 10 * 60_000,
 };
 
+let shopMem: ShopBoxCache[] = [];
+
 export function useGlobeStats() {
   return useQuery({
     queryKey: mapKeys.globe,
@@ -51,12 +55,28 @@ export function useMapCommunities() {
 }
 
 export function useMapMerchants(bbox: MapBbox) {
-  return useQuery({
-    queryKey: mapKeys.merchants(bbox),
-    queryFn: () => getMerchants({ data: bbox }),
+  const qBox = useMemo(
+    () => quantizeBox(bbox),
+    [bbox.west, bbox.south, bbox.east, bbox.north],
+  );
+  const cached = shopsFromCache(shopMem, bbox, Date.now());
+  const query = useQuery({
+    queryKey: mapKeys.merchants(qBox),
+    queryFn: async () => {
+      const shops = await getMerchants({ data: qBox });
+      shopMem = rememberShopBox(shopMem, qBox, shops, Date.now());
+      return shops;
+    },
     staleTime: STALE.merchants,
     placeholderData: keepPreviousData,
+    enabled: cached == null,
   });
+  const data = useMemo(() => {
+    const hit = shopsFromCache(shopMem, bbox, Date.now());
+    if (hit) return hit;
+    return shopsInView(query.data ?? [], bbox);
+  }, [bbox.west, bbox.south, bbox.east, bbox.north, query.data, query.dataUpdatedAt]);
+  return { ...query, data };
 }
 
 export function useMapCsv() {

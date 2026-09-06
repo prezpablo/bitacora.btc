@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isPreciseFix, pickBestFix } from "./geo-fix.ts";
+import { geoBannerKey, gpsFailOf, irFailKey, isPreciseFix, pickBestFix } from "./geo-fix.ts";
 import type { GeoFix } from "./geo-frame.ts";
 
 const gps = (accuracy: number): GeoFix => ({ lat: -34.47, lon: -57.84, accuracy, source: "gps" });
@@ -30,3 +30,20 @@ test("tap is better than IP, worse than GPS", () => {
   assert.equal(pickBestFix(tap, gps(40))?.source, "gps");
 });
 
+test("gpsFailOf maps permission, timeout and missing hardware", () => {
+  assert.equal(gpsFailOf({ code: 1, message: "User denied" }), "denied");
+  assert.equal(gpsFailOf({ code: 3, message: "Timeout" }), "timeout");
+  assert.equal(gpsFailOf({ code: 2, message: "unavailable" }), "unavailable");
+  assert.equal(gpsFailOf(new Error("no-geo")), "unavailable");
+  assert.equal(gpsFailOf(new Error("no-fix")), "timeout");
+  assert.equal(gpsFailOf(new Error("permission denied")), "denied");
+});
+
+test("banner and Ir keys do not treat timeout as denied", () => {
+  assert.equal(geoBannerKey("timeout"), "geoTimeout");
+  assert.equal(geoBannerKey("denied"), "geoDenied");
+  assert.equal(geoBannerKey("ok"), null);
+  assert.equal(irFailKey("timeout"), "irTimeout");
+  assert.equal(irFailKey("denied"), "irDenied");
+  assert.equal(irFailKey(null), "irTap");
+});

@@ -13,6 +13,7 @@ import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround } from "@/domain";
+import { geoBannerKey } from "@/domain/geo-fix";
 import { locateBest } from "@/infrastructure/geo";
 import { applyFix } from "./leaflet-fix";
 import { useMapGuide } from "./use-map-guide";
@@ -935,16 +936,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             )}
           />
           <div className="pointer-events-none absolute bottom-4 left-3 z-[2000]">
-            {geo === "wait" || geo === "denied" ? (
-              <p className="mb-2 rounded-md bg-card px-2.5 py-1 text-xs text-muted-foreground shadow-[var(--shadow-border)]">
-                {geo === "wait" ? t("geoWait") : t("geoDenied")}
+            {geoBannerKey(geo) ? (
+              <p className="mb-2 max-w-[16rem] rounded-md bg-card px-2.5 py-1 text-xs text-muted-foreground shadow-[var(--shadow-border)]">
+                {t(geoBannerKey(geo)!)}
               </p>
             ) : null}
+            <div className="flex items-center gap-2">
             <button
               type="button"
               className="pointer-events-auto inline-flex size-11 items-center justify-center rounded-md bg-primary text-white shadow-md"
-              aria-label={t("geoAsk")}
-              title={t("geoAsk")}
+              aria-label={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
+              title={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
               onClick={(ev) => {
                 ev.stopPropagation();
                 void goToUser(true);
@@ -952,6 +954,19 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             >
               <Locate className="size-5 text-white" strokeWidth={2.4} />
             </button>
+            {geo === "timeout" || geo === "unavailable" || geo === "denied" ? (
+              <button
+                type="button"
+                className="pointer-events-auto rounded-md bg-card px-2.5 py-2 text-xs font-medium text-foreground shadow-[var(--shadow-border)]"
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  void goToUser(true);
+                }}
+              >
+                {t("geoRetry")}
+              </button>
+            ) : null}
+            </div>
           </div>
         </div>
 
