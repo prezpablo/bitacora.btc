@@ -957,7 +957,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             </button>
           </div>
           {showMapActions && pickedLat != null && pickedLon != null ? (
-            <div className="absolute right-3 bottom-4 left-16 z-[2100] lg:hidden">
+            <div className="absolute right-3 bottom-16 left-3 z-[2100] lg:hidden">
               <div className="rounded-md bg-card p-2 shadow-md">
                 <MapPlaceActions
                   onGo={() => startGuide({ lat: pickedLat, lon: pickedLon })}
@@ -1005,7 +1005,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   onClose={() => setPatchOpen(false)}
                 />
               ) : (
-              <div className={cn(!voteOpen && "hidden lg:block")}>
               <MapVotePanel
                 open={voteOpen}
                 captchaKey={selComm.id}
@@ -1036,7 +1035,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
-              </div>
               )}
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
               {guideSteps.length ? (
@@ -1086,7 +1084,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   onClose={() => setPatchOpen(false)}
                 />
               ) : (
-              <div className={cn(!voteOpen && "hidden lg:block")}>
               <MapVotePanel
                 open={voteOpen}
                 captchaKey={sel.id}
@@ -1119,7 +1116,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onHide={() => setVoteOpen(false)}
                 onDismiss={cancelSel}
               />
-              </div>
               )}
               {guideErr ? <p className="text-sm text-pretty text-muted-foreground">{guideErr}</p> : null}
               {guideSteps.length ? (
