@@ -27,7 +27,7 @@ import { SiteShell } from "@/components/site-header";
 import { MapSearch, type SearchHit } from "./map-search";
 import { CommunityCard, PlaceCard } from "./map-listing-card";
 import { ListingPatchForm } from "./map-patch-form";
-import { MapDropPick, MapPlaceActions, MapVotePanel, StarMeter } from "./map-panels";
+import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
 import { EMPTY_COMM_FORM, MapComposeForm, type CommForm } from "./map-compose-form";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
 import type { PayKey } from "@/domain/pays";
@@ -872,9 +872,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
   const hasPin = Boolean(sel || selComm);
-  const showMapActions = hasPin && !voteOpen && !patchOpen;
-  const pickedLat = selComm?.lat ?? sel?.lat;
-  const pickedLon = selComm?.lon ?? sel?.lon;
 
   const body = (
     <>
@@ -956,27 +953,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               <Locate className="size-5 text-white" strokeWidth={2.4} />
             </button>
           </div>
-          {showMapActions && pickedLat != null && pickedLon != null ? (
-            <div className="absolute right-3 bottom-16 left-3 z-[2100] lg:hidden">
-              <div className="rounded-md bg-card p-2 shadow-md">
-                <MapPlaceActions
-                  onGo={() => startGuide({ lat: pickedLat, lon: pickedLon })}
-                  going={guideWait}
-                  onOpen={() => {
-                    setVoteOpen(true);
-                    setPatchOpen(false);
-                    setFormErr("");
-                  }}
-                  onPatch={() => {
-                    setPatchOpen(true);
-                    setVoteOpen(false);
-                    setFormErr("");
-                  }}
-                  onDismiss={cancelSel}
-                />
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <aside className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
