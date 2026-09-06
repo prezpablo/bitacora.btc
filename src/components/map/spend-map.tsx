@@ -871,8 +871,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const local = sel ? store[sel.id] : undefined;
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
-  const picked = Boolean(sel || selComm);
-  const showMapActions = picked && !voteOpen && !patchOpen;
+  const hasPin = Boolean(sel || selComm);
+  const showMapActions = hasPin && !voteOpen && !patchOpen;
   const pickedLat = selComm?.lat ?? sel?.lat;
   const pickedLon = selComm?.lon ?? sel?.lon;
 
@@ -926,7 +926,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       </section>
 
       <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[1fr_320px]">
-        <div className={cn("relative min-h-[280px] lg:min-h-[560px]", picked ? "min-h-[280px]" : "min-h-[420px]")}>
+        <div className={cn("relative min-h-[280px] lg:min-h-[560px]", hasPin ? "min-h-[280px]" : "min-h-[420px]")}>
           <div className="absolute top-3 right-3 left-3 z-[1500] max-w-lg">
             <MapSearch communities={allComms} places={places} onPick={flyTo} />
           </div>
@@ -934,7 +934,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             ref={mapEl}
             className={cn(
               "h-full overflow-hidden rounded-lg shadow-[var(--shadow-border)] lg:min-h-[560px]",
-              picked ? "min-h-[280px]" : "min-h-[420px]",
+              hasPin ? "min-h-[280px]" : "min-h-[420px]",
             )}
           />
           <div className="pointer-events-none absolute bottom-4 left-3 z-[2000]">
