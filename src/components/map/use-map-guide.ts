@@ -34,19 +34,11 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
   const [guideSteps, setGuideSteps] = useState<GuideStep[]>([]);
   const [pickOrigin, setPickOrigin] = useState(false);
 
-  function clearRoute() {
+  function wipeLine() {
     const map = mapRef.current;
     if (routeLine.current && map) {
       map.removeLayer(routeLine.current);
       routeLine.current = null;
-    }
-    if (originMark.current && map) {
-      map.removeLayer(originMark.current);
-      originMark.current = null;
-    }
-    if (destMark.current && map) {
-      map.removeLayer(destMark.current);
-      destMark.current = null;
     }
     if (stepLayer.current) stepLayer.current.clearLayers();
     if (routingRef.current) {
@@ -56,6 +48,19 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
         /* already off */
       }
       routingRef.current = null;
+    }
+  }
+
+  function clearRoute() {
+    const map = mapRef.current;
+    wipeLine();
+    if (originMark.current && map) {
+      map.removeLayer(originMark.current);
+      originMark.current = null;
+    }
+    if (destMark.current && map) {
+      map.removeLayer(destMark.current);
+      destMark.current = null;
     }
     setGuideSteps([]);
     setGuideErr("");
@@ -87,18 +92,40 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
     }
   }
 
+  function paintLine(path: { lat: number; lon: number }[], street: boolean) {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map || path.length < 2) return;
+    wipeLine();
+    const line = L.polyline(
+      path.map((p) => [p.lat, p.lon] as [number, number]),
+      { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
+    );
+    line.addTo(map);
+    routeLine.current = line;
+    map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
+  }
+
   async function drawFrom(from: GeoFix | { lat: number; lon: number }, to: { lat: number; lon: number }) {
     const L = leafletRef.current;
     const map = mapRef.current;
     if (!L || !map) return;
     setUserFix(from);
     guideToRef.current = to;
+    placeGuideEnds(from, to);
+    paintLine(geodesicLine(from, to), false);
     let path: { lat: number; lon: number }[] = [];
     let steps: GuideStep[] = [];
     try {
       const res = await getGuidePath({
         data: { fromLat: from.lat, fromLon: from.lon, toLat: to.lat, toLon: to.lon },
       });
+      if (
+        !guideToRef.current ||
+        Math.abs(guideToRef.current.lat - to.lat) > 1e-6 ||
+        Math.abs(guideToRef.current.lon - to.lon) > 1e-6
+      )
+        return;
       path = res?.path || [];
       steps = res?.steps || [];
     } catch {
@@ -106,14 +133,8 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
     }
     const street = path.length >= 2;
     if (!street) path = geodesicLine(from, to);
-    clearRoute();
     placeGuideEnds(from, to);
-    const line = L.polyline(
-      path.map((p) => [p.lat, p.lon] as [number, number]),
-      { color: "#f7931a", weight: 5, opacity: 0.92, dashArray: street ? undefined : "8 8" },
-    );
-    line.addTo(map);
-    routeLine.current = line;
+    paintLine(path, street);
     if (!stepLayer.current) stepLayer.current = L.layerGroup().addTo(map);
     const group = stepLayer.current;
     group.clearLayers();
@@ -128,7 +149,6 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
         .bindTooltip(formatGuideStep(s, lang), { direction: "top", opacity: 0.95 })
         .addTo(group);
     }
-    map.fitBounds(line.getBounds(), { padding: [36, 36], maxZoom: 16, animate: !prefersReducedMotion() });
     setGuideSteps(steps);
     const gps = "source" in from ? from : null;
     if (!street) setGuideErr(t("irFail"));
@@ -226,11 +246,16 @@ export function useMapGuide(lang: AppLang, t: (k: string) => string) {
   }
 
   function startGuide(to: { lat: number; lon: number }) {
-    pickOriginRef.current = false;
-    setPickOrigin(false);
     guideToRef.current = to;
-    const session = startGpsFromGesture();
+    pickOriginRef.current = true;
+    setPickOrigin(true);
+    setGuideWait(true);
+    setGuideErr(t("irTap"));
     const map = mapRef.current;
+    const c = map?.getCenter();
+    const guess = userFix || (c ? { lat: c.lat, lon: c.lng } : null);
+    if (guess && kmBetween(guess, to) >= 0.08) void drawFrom(guess, to);
+    const session = startGpsFromGesture();
     if (map) {
       map.stopLocate();
       map.once("locationfound", (e: { latlng: { lat: number; lng: number }; accuracy?: number }) => {

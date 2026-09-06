@@ -44,13 +44,13 @@ function stepsFromLegs(legs: { steps?: OsrmStep[] }[] | undefined): GuideStep[] 
   return out;
 }
 
-async function fetchOsrmRoute(from: GuidePt, to: GuidePt, mode: GuideMode): Promise<GuideRoute> {
+async function fetchOsrmAt(host: string, profile: string, from: GuidePt, to: GuidePt, mode: GuideMode): Promise<GuideRoute> {
   const url =
-    `${HOST[mode]}/route/v1/driving/${from.lon.toFixed(6)},${from.lat.toFixed(6)};` +
+    `${host}/route/v1/${profile}/${from.lon.toFixed(6)},${from.lat.toFixed(6)};` +
     `${to.lon.toFixed(6)},${to.lat.toFixed(6)}?overview=full&geometries=geojson&steps=true`;
   const res = await fetch(url, {
     headers: { Accept: "application/json", "User-Agent": UA },
-    signal: AbortSignal.timeout(8_000),
+    signal: AbortSignal.timeout(4_000),
   });
   if (!res.ok) throw new Error(`osrm ${res.status}`);
   const json = (await res.json()) as {
@@ -78,11 +78,15 @@ async function fetchOsrmRoute(from: GuidePt, to: GuidePt, mode: GuideMode): Prom
   };
 }
 
+async function fetchOsrmRoute(from: GuidePt, to: GuidePt, mode: GuideMode): Promise<GuideRoute> {
+  return fetchOsrmAt(HOST[mode], "driving", from, to, mode);
+}
+
 async function fetchValhallaRoute(from: GuidePt, to: GuidePt, mode: GuideMode): Promise<GuideRoute> {
   const res = await fetch("https://valhalla1.openstreetmap.de/route", {
     method: "POST",
     headers: { Accept: "application/json", "Content-Type": "application/json", "User-Agent": UA },
-    signal: AbortSignal.timeout(8_000),
+    signal: AbortSignal.timeout(4_000),
     body: JSON.stringify({
       locations: [
         { lat: from.lat, lon: from.lon },
@@ -133,7 +137,17 @@ async function fetchValhallaRoute(from: GuidePt, to: GuidePt, mode: GuideMode): 
 
 export async function fetchGuidePath(from: GuidePt, to: GuidePt, mode: GuideMode): Promise<GuideRoute> {
   const order: GuideMode[] = mode === "car" ? ["car", "foot"] : ["foot", "car"];
-  for (const m of order) {
+  const jobs: Promise<GuideRoute>[] = [
+    fetchOsrmRoute(from, to, order[0]),
+    fetchOsrmAt("https://router.project-osrm.org", "driving", from, to, mode),
+  ];
+  try {
+    const first = await Promise.any(jobs);
+    if (first.path.length >= 2) return first;
+  } catch {
+    /* mirrors */
+  }
+  for (const m of order.slice(1)) {
     try {
       const route = await fetchOsrmRoute(from, to, m);
       if (route.path.length >= 2) return route;

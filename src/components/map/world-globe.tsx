@@ -134,7 +134,7 @@ function GlobeCanvas({
     let stop = false;
     const timer = window.setTimeout(() => {
       if (!stop) setLoadErr((e) => e || "timeout");
-    }, 12000);
+    }, 20000);
     const load = () => {
       void import("react-globe.gl")
         .then((m) => {

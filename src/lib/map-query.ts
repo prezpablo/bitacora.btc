@@ -55,6 +55,7 @@ export function useMapMerchants(bbox: MapBbox) {
     queryKey: mapKeys.merchants(bbox),
     queryFn: () => getMerchants({ data: bbox }),
     staleTime: STALE.merchants,
+    placeholderData: keepPreviousData,
   });
 }
 

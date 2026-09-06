@@ -31,6 +31,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
     const start = () => {
       setReady(true);
       void prefetchGlobe(qc);
+      void prefetchMapStore(qc);
     };
     const ric = window.requestIdleCallback;
     if (ric) {
