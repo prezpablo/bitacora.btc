@@ -45,8 +45,9 @@ No reescribir el mapa ahora. Partir el alta (P2) cuando no haya ZIP pendiente.
 | **P2** | Tiles 1× en 3G · cluster pines · fuente 400 | Abierto | UX, no bloquea |
 | **P2** | Partir alta fuera de `spend-map` | Abierto | Clean Architecture |
 | **P2** | PWA offline geo + catálogo | Abierto | No ahora |
-| **P3** | LRM fuera del bundle · captcha no visual · táctiles 44px | Abierto | |
+| **P3** | LRM fuera del bundle · táctiles 44px | Abierto | Captcha no visual: hecho en `bb8eb06` (audio + sr-only) |
 | **P3** | CSP sin unsafe-inline · Umbrel | Abierto | Plan híbrido |
+| **P3** | Tutor soberano (IA) | **No ahora** · futuro | Ver § Tutor. No corre en el VPS del mapa. |
 
 **Alertas runner (no son CAÍDA):**
 
@@ -57,7 +58,34 @@ No reescribir el mapa ahora. Partir el alta (P2) cuando no haya ZIP pendiente.
 | P1-03 | Hasta el ZIP, el HTML sigue `lang=es`. El inyector PWA reescribe `lang` + title al servir. |
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org` (CSP ya lo bloqueaba). Preview Grok lo conserva. |
 
-**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08.
+**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`.
+
+---
+
+## Tutor soberano (futuro, 7 set)
+
+Pedido de estudio, **sin implementar**. Guía pedagógica de Bitcoin + Bitácora + Consciencia Bitcoin + LATAM Cripto Mom, en es/pt/en, anclada a soberanía, no custodia y «no confíes, verificá». Público en el roadmap (`domain/roadmap-web3.ts`, fase `tutor`).
+
+**No es un chatbot de un tercero ni un modelo en el mismo VPS.** Njalla (1.5–9 GB) ya corre Caddy + Node + SQLite + mapa. Un 3B pide ~4 GB libres; un 7B, ~8–16 GB. En la misma máquina se pelea con el mapa.
+
+| Pieza | Repo | Uso |
+|---|---|---|
+| Patrón (FTS + prompt, no clonar) | [CHATTY](https://github.com/arbadacarbaYK/CHATTY) | Node + SQLite FTS + Ollama 3B. Local, no público |
+| Inferencia | [llama.cpp](https://github.com/ggml-org/llama.cpp) | Caja 2 (nodo en casa / Umbrel). API local |
+| Pesos «Satoshi 7B» | [HF contrapliant](https://huggingface.co/contrapliant/Satoshi-7B) | **No de entrada.** Inglés, sesgo político, no pedagogía Latam |
+| RAG apps (Open WebUI, AnythingLLM, PrivateGPT) | — | Pesados, otra UI, Docker. No pegan en Clean Architecture |
+| ChatBTC, Groq, Gemini, Bitcoin-PAL | — | **Descartados.** Nube US/Google o repos muertos |
+
+Orden cuando se retome (después del nodo en casa, Q1 del roadmap):
+
+1. Corpus cerrado + FTS (whitepaper, `/conciencia`, `/legal`, LCM). Sin LLM. Cero alucinación.
+2. Prompt + citas + i18n. Sin consejo financiero, sin llaves, sin altcoins.
+3. Widget en el desk. Server-fn con rate limit y captcha. El modelo **no** vive en `/var/www/bitacora`.
+4. Recién ahí llama.cpp ~3B en la máquina del nodo. Si esa caja se apaga, el `.org` sigue.
+
+Fine-tune propio: no. Bitácora/Consciencia/LCM van en el corpus, no en los pesos. Agent con shell o wallet: no.
+
+Legal: el diálogo es dato (URCDP). Tope, retención corta, mismo criterio que contacto.
 
 ---
 
@@ -100,7 +128,8 @@ Sin CI. 3G: globo off (`map-gate`), heatmap off, afiches lazy, queries de mercad
 | P1 QR | on-chain + LN | Cerrado. BIP-322 pendiente |
 | P1 i18n SSR | `?lang=` en HTML | Repo sí · **prod no** |
 | P2 | CSP, BFF, Umbrel | Abierto |
-| P3 a11y | Captcha no visual, globo teclado | Parcial (`prefers-reduced-motion` hecho) |
+| P3 a11y | Captcha audio + sr-only | Hecho en repo (`bb8eb06`) · globo/velas teclado abierto |
+| P3 tutor | Guía soberana (corpus + llama.cpp fuera del VPS) | **Futuro.** No calendarizado. Ver § Tutor |
 | Operador | LN inbound, SMTP no-US, backup semanal, HSTS preload | Abierto |
 
 ---

@@ -75,6 +75,20 @@ const es: RoadCopy = {
         "Si el nodo propio descansa, el sitio no se apaga: usa un respaldo público.",
       ],
     },
+    {
+      id: "tutor",
+      title: "Más adelante · Guía soberana",
+      when: "cuando el nodo en casa esté firme · no calendarizado",
+      items: [
+        "Una guía que explique Bitcoin, Bitácora, Consciencia Bitcoin y LATAM Cripto Mom en castellano, portugués e inglés, con palabras sencillas, sin salirse de Satoshi: soberanía, no custodia, verificar.",
+        "No corre en el mismo servidor que el mapa. Vive en el nodo de casa o no se publica. Nada de OpenAI, Google ni Groq.",
+        "Primero un índice de textos propios (whitepaper, conciencia, legal). Después, si hay máquina, un modelo chico que cita esas fuentes. Sin agente, sin llaves, sin consejo financiero.",
+      ],
+      checks: [
+        "Si la guía se apaga, el mapa sigue.",
+        "No hay API de un tercero en el chat. Quien no quiera usarla igual lee el sitio.",
+      ],
+    },
   ],
 };
 
@@ -143,6 +157,20 @@ const en: RoadCopy = {
         "If our node rests, the site does not go dark: it uses a public backup.",
       ],
     },
+    {
+      id: "tutor",
+      title: "Later · Sovereign guide",
+      when: "once the home node is steady · not scheduled",
+      items: [
+        "A guide that explains Bitcoin, Bitácora, Consciencia Bitcoin and LATAM Cripto Mom in Spanish, Portuguese and English, in plain words, without leaving Satoshi: sovereignty, no custody, verify.",
+        "It does not run on the same server as the map. It lives on the home node or it is not published. No OpenAI, Google or Groq.",
+        "First an index of our own texts (white paper, conciencia, legal). Then, if there is a machine, a small model that cites those sources. No agent, no keys, no financial advice.",
+      ],
+      checks: [
+        "If the guide goes dark, the map stays up.",
+        "No third-party API in the chat. Anyone who skips it can still read the site.",
+      ],
+    },
   ],
 };
 
@@ -209,6 +237,20 @@ const pt: RoadCopy = {
       checks: [
         "Dá para contribuir sem cartão e sem plataforma que congele fundos.",
         "Se o nó próprio descansar, o sítio não apaga: usa um respaldo público.",
+      ],
+    },
+    {
+      id: "tutor",
+      title: "Mais adiante · Guia soberana",
+      when: "quando o nó em casa estiver firme · não calendarizado",
+      items: [
+        "Uma guia que explique Bitcoin, Bitácora, Consciencia Bitcoin e LATAM Cripto Mom em espanhol, português e inglês, com palavras simples, sem sair de Satoshi: soberania, sem custódia, verificar.",
+        "Não corre no mesmo servidor que o mapa. Vive no nó de casa ou não se publica. Nada de OpenAI, Google nem Groq.",
+        "Primeiro um índice de textos próprios (whitepaper, consciência, legal). Depois, se houver máquina, um modelo pequeno que cita essas fontes. Sem agente, sem chaves, sem conselho financeiro.",
+      ],
+      checks: [
+        "Se a guia apagar, o mapa segue.",
+        "Não há API de um terceiro no chat. Quem não quiser usá-la igualmente lê o sítio.",
       ],
     },
   ],
