@@ -21,6 +21,7 @@
     "catalog:sync": "node --experimental-strip-types scripts/sync-catalog.ts",
     "test:live": "node scripts/probe-live.mjs",
     "test:seo": "node scripts/probe-seo.mjs",
+    "test:a11y": "node scripts/probe-a11y.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -91,6 +92,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "axe-core": "^4.13.0",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
