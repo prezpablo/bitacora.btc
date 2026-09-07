@@ -2,16 +2,16 @@ import { createRootRoute, HeadContent, Outlet, Scripts, useRouterState } from "@
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
-import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, SEO } from "@/lib/seo";
+import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, hreflangHref, pageCanonical, pagePath, pageSeo } from "@/lib/seo";
 import { langFromLocation, langFromQuery, type AppLang } from "@/lib/locale";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
 const ORIGIN = PUBLIC_ORIGIN;
-const CANONICAL = `${ORIGIN}/`;
 
-function headFor(lang: AppLang) {
-  const seo = SEO[lang];
+function headFor(path: string, lang: AppLang, explicitLang: boolean) {
+  const seo = pageSeo(path, lang);
+  const canonical = pageCanonical(ORIGIN, path, lang, explicitLang);
   return {
     meta: [
       { charSet: "utf-8" },
@@ -31,7 +31,7 @@ function headFor(lang: AppLang) {
       { property: "og:site_name", content: APP_NAME },
       { property: "og:title", content: seo.title },
       { property: "og:description", content: seo.description },
-      { property: "og:url", content: CANONICAL },
+      { property: "og:url", content: canonical },
       { property: "og:image", content: `${ORIGIN}${OG_IMAGE_PATH}` },
       { property: "og:image:alt", content: seo.title },
       { property: "og:image:width", content: "1200" },
@@ -50,14 +50,26 @@ function headFor(lang: AppLang) {
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
-      { rel: "canonical", href: CANONICAL },
+      { rel: "canonical", href: canonical },
       { rel: "author", href: "/humans.txt" },
-      { rel: "alternate", href: `${CANONICAL}?lang=es`, hrefLang: "es" },
-      { rel: "alternate", href: `${CANONICAL}?lang=pt`, hrefLang: "pt" },
-      { rel: "alternate", href: `${CANONICAL}?lang=en`, hrefLang: "en" },
-      { rel: "alternate", href: CANONICAL, hrefLang: "x-default" },
+      { rel: "alternate", href: hreflangHref(ORIGIN, path, "es"), hrefLang: "es" },
+      { rel: "alternate", href: hreflangHref(ORIGIN, path, "pt"), hrefLang: "pt" },
+      { rel: "alternate", href: hreflangHref(ORIGIN, path, "en"), hrefLang: "en" },
+      { rel: "alternate", href: hreflangHref(ORIGIN, path, "x-default"), hrefLang: "x-default" },
     ],
   };
+}
+
+function loadLocation(location: { pathname?: string; search?: unknown; searchStr?: string; href?: string; url?: string }) {
+  const lang = langFromLocation(location);
+  const path = pagePath(location.pathname || "/");
+  const explicitLang = Boolean(
+    langFromQuery(location.search) ||
+      langFromQuery(location.searchStr) ||
+      langFromQuery(location.href) ||
+      langFromQuery(location.url),
+  );
+  return { lang, path, explicitLang };
 }
 
 export const Route = createRootRoute({
@@ -65,8 +77,9 @@ export const Route = createRootRoute({
     const lang = langFromQuery(raw);
     return lang ? { lang } : {};
   },
-  loader: ({ location }) => ({ lang: langFromLocation(location) }),
-  head: (ctx: { loaderData?: { lang?: AppLang } }) => headFor(ctx.loaderData?.lang ?? "es"),
+  loader: ({ location }) => loadLocation(location),
+  head: (ctx: { loaderData?: { lang?: AppLang; path?: string; explicitLang?: boolean } }) =>
+    headFor(ctx.loaderData?.path ?? "/", ctx.loaderData?.lang ?? "es", Boolean(ctx.loaderData?.explicitLang)),
   component: RootDoc,
 });
 
@@ -74,7 +87,10 @@ function RootDoc() {
   const loaded = Route.useLoaderData();
   const search = useRouterState({ select: (s) => s.location });
   const lang = loaded?.lang || langFromLocation(search);
-  const ld = JSON.stringify(jsonLd(lang, ORIGIN));
+  const path = loaded?.path || pagePath(search.pathname);
+  const explicitLang = loaded?.explicitLang ?? Boolean(langFromQuery(search.search) || langFromQuery(search.searchStr));
+  const canonical = pageCanonical(ORIGIN, path, lang, explicitLang);
+  const ld = JSON.stringify(jsonLd(lang, ORIGIN, path, canonical));
   return (
     <html lang={lang} className="antialiased" suppressHydrationWarning>
       <head>

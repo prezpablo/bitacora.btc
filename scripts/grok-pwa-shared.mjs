@@ -292,6 +292,76 @@ export function applyDocumentLang(html, lang) {
   return next;
 }
 
+function metaContent(html, attr, key) {
+  const keyRe = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const a = String(html).match(new RegExp(`${attr}=["']${keyRe}["']\\s+content=["']([^"']*)["']`, "i"));
+  if (a) return a[1];
+  const b = String(html).match(new RegExp(`content=["']([^"']*)["']\\s+${attr}=["']${keyRe}["']`, "i"));
+  return b ? b[1] : "";
+}
+
+function upsertMeta(html, attr, key, content) {
+  if (!content) return html;
+  const rewritten = rewriteMeta(html, attr, key, content);
+  if (rewritten !== html) return rewritten;
+  return insertBeforeHeadClose(html, `<meta ${attr}="${key}" content="${escapeHtml(content)}">`);
+}
+
+function isBitacoraHost(host) {
+  return String(host || "").toLowerCase().includes("bitacorabtc.org");
+}
+
+export function absoluteFromSearch(host, search) {
+  const publicHost = resolvePublicHost(host) || (isBitacoraHost(host) ? "bitacorabtc.org" : "");
+  if (!publicHost) return "";
+  const raw = String(search || "/");
+  try {
+    const base = `https://${publicHost}`;
+    const u = new URL(raw.includes("://") ? raw : raw.startsWith("/") ? raw : `/${raw}`, base);
+    let path = u.pathname || "/";
+    if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
+    return `${base}${path}${u.search}`;
+  } catch {
+    return `https://${publicHost}/`;
+  }
+}
+
+/** After platform share-strip: restore per-URL OG for bitacorabtc.org. */
+export function applyDocumentShare(html, ctx = {}) {
+  const host = ctx.host || "";
+  let next = String(html);
+  const title = titleFromDocument(next);
+  if (isBitacoraHost(host) && title) {
+    next = rewriteMeta(next, "property", "og:title", title);
+    next = rewriteMeta(next, "name", "twitter:title", title);
+  }
+  const desc = metaContent(next, "name", "description");
+  if (isBitacoraHost(host) && desc) {
+    next = upsertMeta(next, "property", "og:description", desc);
+    next = upsertMeta(next, "name", "twitter:description", desc);
+  }
+  const url = absoluteFromSearch(host, ctx.search);
+  if (url && isBitacoraHost(host)) {
+    next = upsertMeta(next, "property", "og:url", url);
+  }
+  const img = metaContent(next, "property", "og:image");
+  if (img && isBitacoraHost(host)) {
+    next = upsertMeta(next, "name", "twitter:image", img);
+  }
+  if (Number(ctx.status) === 404) {
+    next = upsertMeta(next, "name", "robots", "noindex,follow");
+    next = next.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/gi, "");
+  }
+  return next;
+}
+
+function finishDocumentHead(html, ctx, host) {
+  let out = html;
+  if (!wantGrokExtensions(host)) out = stripGrokExtensions(out);
+  out = applyDocumentLang(out, ctx.lang || langFromSearch(ctx.search));
+  return applyDocumentShare(out, { host, search: ctx.search, status: ctx.status });
+}
+
 export function readGrokProjectId() {
   const fromProcess = typeof process !== "undefined" ? process.env?.VITE_PROJECT_ID : "";
   return String(fromProcess ?? "").trim();
@@ -561,13 +631,10 @@ export function injectGrokPwaHead(html, ctx = {}) {
   }
 
   if (missing.length === 0) {
-    let done = next;
-    if (!wantGrokExtensions(host)) done = stripGrokExtensions(done);
-    return applyDocumentLang(done, ctx.lang || langFromSearch(ctx.search));
+    return finishDocumentHead(next, ctx, host);
   }
-  let out = insertBeforeHeadClose(next, missing.join(""));
-  if (!wantGrokExtensions(host)) out = stripGrokExtensions(out);
-  return applyDocumentLang(out, ctx.lang || langFromSearch(ctx.search));
+  const out = insertBeforeHeadClose(next, missing.join(""));
+  return finishDocumentHead(out, ctx, host);
 }
 
 function findHeadClose(buf) {
@@ -598,6 +665,7 @@ export function createHeadInjector(ctx = {}) {
       site: normalized.site,
       lang: ctx.lang,
       search: ctx.search,
+      status: ctx.status,
     });
 
   return {

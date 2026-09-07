@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { FAQ, GEO, OG_IMAGE_PATH, SITE_NAME, jsonLd, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
-import { useLocale, type AppLang } from "@/lib/locale";
+import { FAQ, GEO, OG_IMAGE_PATH, SITE_NAME, hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
+import { langFromQuery, useLocale, type AppLang } from "@/lib/locale";
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
   if (typeof document === "undefined") return;
@@ -32,11 +32,14 @@ function upsertLink(rel: string, href: string, extra?: Record<string, string>) {
 export function SeoHead() {
   const lang = useLocale((s) => s.lang);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const searchStr = useRouterState({ select: (s) => s.location.searchStr });
+  const search = useRouterState({ select: (s) => s.location.search });
   useEffect(() => {
     const path = pagePath(pathname);
     const seo = pageSeo(path, lang);
     const origin = siteOrigin();
-    const url = path === "/" ? `${origin}/` : `${origin}${path}`;
+    const explicitLang = Boolean(langFromQuery(search) || langFromQuery(searchStr));
+    const canonical = pageCanonical(origin, path, lang, explicitLang);
     const image = `${origin}${OG_IMAGE_PATH}`;
     document.title = seo.title;
     document.documentElement.lang = lang;
@@ -53,7 +56,7 @@ export function SeoHead() {
     upsertMeta("property", "og:site_name", SITE_NAME);
     upsertMeta("property", "og:title", seo.title);
     upsertMeta("property", "og:description", seo.description);
-    upsertMeta("property", "og:url", url);
+    upsertMeta("property", "og:url", canonical);
     upsertMeta("property", "og:image", image);
     upsertMeta("property", "og:image:alt", seo.title);
     upsertMeta("property", "og:image:width", "1200");
@@ -65,11 +68,11 @@ export function SeoHead() {
     upsertMeta("name", "twitter:title", seo.title);
     upsertMeta("name", "twitter:description", seo.description);
     upsertMeta("name", "twitter:image", image);
-    upsertLink("canonical", url);
-    upsertLink("alternate", `${url}?lang=es`, { hreflang: "es" });
-    upsertLink("alternate", `${url}?lang=pt`, { hreflang: "pt" });
-    upsertLink("alternate", `${url}?lang=en`, { hreflang: "en" });
-    upsertLink("alternate", url, { hreflang: "x-default" });
+    upsertLink("canonical", canonical);
+    upsertLink("alternate", hreflangHref(origin, path, "es"), { hreflang: "es" });
+    upsertLink("alternate", hreflangHref(origin, path, "pt"), { hreflang: "pt" });
+    upsertLink("alternate", hreflangHref(origin, path, "en"), { hreflang: "en" });
+    upsertLink("alternate", hreflangHref(origin, path, "x-default"), { hreflang: "x-default" });
     upsertLink("sitemap", `${origin}/sitemap.xml`);
     let ld = document.getElementById("seo-jsonld");
     if (!ld) {
@@ -78,8 +81,8 @@ export function SeoHead() {
       (ld as HTMLScriptElement).type = "application/ld+json";
       document.head.appendChild(ld);
     }
-    ld.textContent = JSON.stringify(jsonLd(lang, origin));
-  }, [lang, pathname]);
+    ld.textContent = JSON.stringify(jsonLd(lang, origin, path, canonical));
+  }, [lang, pathname, search, searchStr]);
   return null;
 }
 

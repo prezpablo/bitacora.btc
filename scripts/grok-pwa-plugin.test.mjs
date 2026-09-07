@@ -68,6 +68,32 @@ test("P1-03 ?lang=pt rewrites html lang and home title", () => {
   assert.match(keep, /<title>Wild Race<\/title>/);
 });
 
+test("P0 /mapa keeps its title and sets og:url from the request", () => {
+  const src =
+    '<html lang="es"><head><title>Mapa Bitcoin Latam | Bitácora.btc</title><meta name="description" content="Mapa de comunidades y comercios que aceptan Bitcoin en Latinoamérica."></head></html>';
+  const out = injectGrokPwaHead(
+    src,
+    blank({ host: "bitacorabtc.org", search: "/mapa?lang=pt", appName: "Bitácora.btc" }),
+  );
+  assert.match(out, /<html lang="pt"/);
+  assert.match(out, /<title>Mapa Bitcoin Latam \| Bitácora\.btc<\/title>/);
+  assert.match(out, /property="og:title" content="Mapa Bitcoin Latam \| Bitácora\.btc"/);
+  assert.match(out, /property="og:url" content="https:\/\/bitacorabtc\.org\/mapa\?lang=pt"/);
+  assert.match(out, /name="twitter:image"/);
+  assert.match(out, /property="og:description"/);
+});
+
+test("P0 404 is noindex and drops home canonical", () => {
+  const src =
+    '<html lang="es"><head><title>Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica</title><link rel="canonical" href="https://bitacorabtc.org/"><meta name="robots" content="index,follow"></head></html>';
+  const out = injectGrokPwaHead(
+    src,
+    blank({ host: "bitacorabtc.org", search: "/no-existe", status: 404 }),
+  );
+  assert.match(out, /name="robots" content="noindex,follow"/);
+  assert.doesNotMatch(out, /rel="canonical"/);
+});
+
 test("injects the extensions script without a project id", () => {
   const out = injectGrokPwaHead("<html><head></head></html>", {
     appName: "Demo",

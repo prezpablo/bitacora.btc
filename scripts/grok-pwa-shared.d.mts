@@ -21,6 +21,11 @@ export declare function wantGrokExtensions(host?: string): boolean;
 export declare function stripGrokExtensions(html: string): string;
 export declare function applyHtmlLang(html: string, lang: string): string;
 export declare function applyDocumentLang(html: string, lang: string): string;
+export declare function absoluteFromSearch(host?: string, search?: string): string;
+export declare function applyDocumentShare(
+  html: string,
+  ctx?: { host?: string; search?: string; status?: number },
+): string;
 export declare function readGrokProjectId(): string;
 export declare function readXCreator(): string;
 export declare function readXCreatorId(): string;
@@ -47,6 +52,7 @@ export type GrokHeadContext = {
   site?: OgSite;
   lang?: string;
   search?: string;
+  status?: number;
 };
 
 export declare function readOgSite(cwd?: string): OgSite;

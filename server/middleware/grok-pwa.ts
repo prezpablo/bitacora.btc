@@ -41,6 +41,7 @@ function injectHeadStreaming(response: Response, host: string, search = ""): Res
     host,
     site: grokOgIdentity.site,
     search,
+    status: response.status,
   });
   const transformed = response.body!.pipeThrough(
     new TransformStream<Uint8Array, Uint8Array>({

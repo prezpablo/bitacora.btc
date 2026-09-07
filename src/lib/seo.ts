@@ -123,6 +123,21 @@ export function pagePath(path: string) {
   return path.endsWith("/") ? path.slice(0, -1) : path;
 }
 
+export function pageAbs(origin: string, path: string) {
+  const p = pagePath(path);
+  return p === "/" ? `${origin}/` : `${origin}${p}`;
+}
+
+export function pageCanonical(origin: string, path: string, lang: AppLang, explicitLang: boolean) {
+  const base = pageAbs(origin, path);
+  return explicitLang ? `${base}?lang=${lang}` : base;
+}
+
+export function hreflangHref(origin: string, path: string, lang: AppLang | "x-default") {
+  const base = pageAbs(origin, path);
+  return lang === "x-default" ? base : `${base}?lang=${lang}`;
+}
+
 export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
   es: [
     {
@@ -180,104 +195,34 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
   ],
 };
 
-export function jsonLd(lang: AppLang, origin: string) {
-  const seo = SEO[lang];
-  const faqs = FAQ[lang];
+export function jsonLd(lang: AppLang, origin: string, path = "/", canonical?: string) {
+  const seo = pageSeo(path, lang);
   const inLanguage = lang === "pt" ? "pt-BR" : lang === "en" ? "en" : "es-UY";
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": `${origin}/#org`,
-        name: SITE_NAME,
-        alternateName: ["bitacora.btc", "Bitácora BTC", "Consciencia Bitcoin"],
-        url: origin,
-        logo: {
-          "@type": "ImageObject",
-          url: `${origin}/logos/conciencia-bitcoin.png`,
-          contentUrl: `${origin}/logos/conciencia-bitcoin.png`,
-        },
-        image: {
-          "@type": "ImageObject",
-          url: `${origin}${OG_IMAGE_PATH}`,
-          width: 1200,
-          height: 630,
-        },
-        foundingDate: "2026",
-        foundingLocation: {
-          "@type": "Place",
-          name: GEO.placename,
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: GEO.city,
-            addressRegion: "Colonia",
-            addressCountry: "UY",
-          },
-          geo: { "@type": "GeoCoordinates", latitude: GEO.lat, longitude: GEO.lon },
-        },
-        areaServed: { "@type": "Place", name: "Latin America" },
-        knowsAbout: ["Bitcoin", "Lightning Network", "self-custody", "Bitcoin circular economies"],
-        sameAs: [...SAME_AS],
-        parentOrganization: { "@type": "Organization", name: "Consciencia Bitcoin" },
-        sponsor: {
-          "@type": "Organization",
-          name: "LATAM Cripto Mom",
-          sameAs: ["https://www.instagram.com/latamcriptomom/"],
-        },
+  const base = pageAbs(origin, path);
+  const pageUrl = canonical || base;
+  const home = pagePath(path) === "/";
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "Organization",
+      "@id": `${origin}/#org`,
+      name: SITE_NAME,
+      alternateName: ["bitacora.btc", "Bitácora BTC", "Consciencia Bitcoin"],
+      url: origin,
+      logo: {
+        "@type": "ImageObject",
+        url: `${origin}/logos/conciencia-bitcoin.png`,
+        contentUrl: `${origin}/logos/conciencia-bitcoin.png`,
       },
-      {
-        "@type": "WebSite",
-        "@id": `${origin}/#site`,
-        url: origin,
-        name: SITE_NAME,
-        inLanguage: ["es", "pt", "en"],
-        description: seo.description,
-        publisher: { "@id": `${origin}/#org` },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${origin}/?q={search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
-        },
+      image: {
+        "@type": "ImageObject",
+        url: `${origin}${OG_IMAGE_PATH}`,
+        width: 1200,
+        height: 630,
       },
-      {
-        "@type": "WebPage",
-        "@id": `${origin}/#page`,
-        url: origin,
-        name: seo.title,
-        description: seo.description,
-        inLanguage,
-        isPartOf: { "@id": `${origin}/#site` },
-        about: { "@id": `${origin}/#org` },
-        primaryImageOfPage: {
-          "@type": "ImageObject",
-          url: `${origin}${OG_IMAGE_PATH}`,
-          width: 1200,
-          height: 630,
-        },
-        speakable: {
-          "@type": "SpeakableSpecification",
-          cssSelector: ["#conciencia h2", "#conciencia h3", "#faq-seo"],
-        },
-      },
-      {
-        "@type": "FAQPage",
-        "@id": `${origin}/#faq`,
-        url: origin,
-        inLanguage,
-        mainEntity: faqs.map((f) => ({
-          "@type": "Question",
-          name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
-      },
-      {
+      foundingDate: "2026",
+      foundingLocation: {
         "@type": "Place",
-        "@id": `${origin}/#place`,
-        name: "Consciencia Bitcoin — Colonia del Sacramento",
+        name: GEO.placename,
         address: {
           "@type": "PostalAddress",
           addressLocality: GEO.city,
@@ -286,6 +231,70 @@ export function jsonLd(lang: AppLang, origin: string) {
         },
         geo: { "@type": "GeoCoordinates", latitude: GEO.lat, longitude: GEO.lon },
       },
-    ],
-  };
+      areaServed: { "@type": "Place", name: "Latin America" },
+      knowsAbout: ["Bitcoin", "Lightning Network", "self-custody", "Bitcoin circular economies"],
+      sameAs: [...SAME_AS],
+      parentOrganization: { "@type": "Organization", name: "Consciencia Bitcoin" },
+      sponsor: {
+        "@type": "Organization",
+        name: "LATAM Cripto Mom",
+        sameAs: ["https://www.instagram.com/latamcriptomom/"],
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${origin}/#site`,
+      url: origin,
+      name: SITE_NAME,
+      inLanguage: ["es", "pt", "en"],
+      description: SEO[lang].description,
+      publisher: { "@id": `${origin}/#org` },
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${base}#page`,
+      url: pageUrl,
+      name: seo.title,
+      description: seo.description,
+      inLanguage,
+      isPartOf: { "@id": `${origin}/#site` },
+      about: { "@id": `${origin}/#org` },
+      primaryImageOfPage: {
+        "@type": "ImageObject",
+        url: `${origin}${OG_IMAGE_PATH}`,
+        width: 1200,
+        height: 630,
+      },
+    },
+    {
+      "@type": "Place",
+      "@id": `${origin}/#place`,
+      name: "Consciencia Bitcoin — Colonia del Sacramento",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: GEO.city,
+        addressRegion: "Colonia",
+        addressCountry: "UY",
+      },
+      geo: { "@type": "GeoCoordinates", latitude: GEO.lat, longitude: GEO.lon },
+    },
+  ];
+  if (home) {
+    (graph[2] as { speakable?: unknown }).speakable = {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["#conciencia h2", "#conciencia h3", "#faq-seo"],
+    };
+    graph.splice(3, 0, {
+      "@type": "FAQPage",
+      "@id": `${origin}/#faq`,
+      url: origin,
+      inLanguage,
+      mainEntity: FAQ[lang].map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
 }

@@ -9,7 +9,7 @@ Bitácora.btc is a community logbook (bitácora) run by Consciencia Bitcoin from
 Canonical: https://bitacorabtc.org/
 
 - Home: https://bitacorabtc.org/
-- Map / globe: https://bitacorabtc.org/#mapa
+- Map / globe: https://bitacorabtc.org/mapa
 - Consciencia Bitcoin: https://bitacorabtc.org/#conciencia
 - Community & events: https://bitacorabtc.org/#comunidad
 - News pulse: https://bitacorabtc.org/#pulso
@@ -22,7 +22,7 @@ Canonical: https://bitacorabtc.org/
 
 Languages: Spanish (default), Portuguese, English (`?lang=es|pt|en`).
 
-Map search: `https://bitacorabtc.org/?q={city-or-community}#mapa`
+Map search: `https://bitacorabtc.org/mapa`
 
 ## What it is not
 

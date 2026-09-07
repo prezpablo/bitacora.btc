@@ -45,3 +45,15 @@ export function AppErrorComponent({ error }: ErrorComponentProps) {
     </main>
   );
 }
+
+export function AppNotFound() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
+      <h1 className="text-lg font-semibold">No encontrado</h1>
+      <p className="max-w-md text-sm text-zinc-500 dark:text-zinc-400">Esa dirección no existe en Bitácora.btc.</p>
+      <a href="/" className="mt-2 text-sm font-medium text-orange-600 hover:underline">
+        Volver al inicio
+      </a>
+    </main>
+  );
+}
