@@ -1,4 +1,5 @@
 import { BitcoinMark } from "@/components/dashboard/brand-mark";
+import { SkipLink } from "@/components/skip-link";
 
 export function LabifDossier() {
   return (
@@ -23,6 +24,7 @@ export function LabifDossier() {
         }
       `}</style>
 
+      <SkipLink />
       <header className="border-b border-[#e6e6e6]">
         <div className="mx-auto flex max-w-[46rem] items-center justify-between gap-4 px-6 py-5">
           <div className="flex items-center gap-[0.14em] font-display text-2xl font-medium tracking-tight sm:text-3xl">
@@ -36,7 +38,7 @@ export function LabifDossier() {
         <hr className="rule" />
       </header>
 
-      <main className="mx-auto max-w-[46rem] px-6 py-10 sm:py-14">
+      <main id="contenido" className="mx-auto max-w-[46rem] px-6 py-10 sm:py-14">
         <p className="labif-noprint mb-6 text-sm text-[#5c6370]">
           Documento para imprimir o guardar como PDF (Ctrl+P). Estética Bitácora / bitcoin.org.
         </p>

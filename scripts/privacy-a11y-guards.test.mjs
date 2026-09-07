@@ -39,8 +39,15 @@ test("footer and banner link the four legal texts", () => {
   }
   assert.match(banner, /\/legal#cookies/);
   assert.match(banner, /\/legal#privacidad/);
-  assert.match(header, /skipToContent/);
+  assert.match(banner, /id="storage-banner"/);
+  assert.match(banner, /role="region"/);
+  assert.doesNotMatch(banner, /role="dialog"/);
+  assert.match(read("src/components/skip-link.tsx"), /skipToContent/);
   assert.match(header, /id="contenido"/);
+  assert.match(header, /SkipLink/);
+  assert.match(labif, /SkipLink/);
+  assert.match(labif, /id="contenido"/);
+  assert.match(read("src/styles.css"), /:focus-visible/);
 });
 
 test("forms gate on privacy checkbox", () => {

@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { StorageBanner } from "@/components/storage-banner";
 import { BrandMark } from "@/components/dashboard/brand-mark";
 import { SeoHead } from "@/components/seo-head";
+import { SkipLink } from "@/components/skip-link";
 import { COPY, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale, type AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
@@ -183,12 +184,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   const t = useT();
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <a
-        href="#contenido"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[90] focus:m-3 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:text-white"
-      >
-        {t("skipToContent")}
-      </a>
+      <SkipLink />
       <SeoHead />
       <SiteHeader />
       <main id="contenido" className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-[1.618rem] px-4 py-[1.618rem] sm:px-[1.618rem] sm:py-[2.618rem]">

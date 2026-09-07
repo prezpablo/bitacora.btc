@@ -54,7 +54,7 @@ try {
     else bad("skip-link first Tab", `focused ${active}`);
   }
 
-  const banner = page.getByRole("dialog");
+  const banner = page.locator("#storage-banner");
   try {
     await banner.waitFor({ state: "visible", timeout: 8000 });
   } catch {
@@ -76,9 +76,9 @@ try {
     else ok(`home footer ${href}`);
   }
 
-  const h1 = await page.locator("h1 .sr-only").first().textContent();
-  if (h1?.includes("Bitácora.btc")) ok("H1 sr-only Bitácora.btc");
-  else bad("H1 sr-only", h1 || "empty");
+  const h1 = ((await page.locator("h1").first().textContent()) || "").replace(/\s+/g, " ").trim();
+  if (/bit[aá]cora/i.test(h1) && !/bit[aá]cora\.btc\s*bit[aá]cora/i.test(h1)) ok("H1 único con Bitácora");
+  else bad("H1 único", h1 || "empty");
 
   if ((await page.locator("section#legal").count()) > 0) bad("home legal embed", "section#legal still on home");
   else ok("home does not embed legal");
@@ -148,15 +148,20 @@ try {
     else ok(`labif ${href}`);
   }
 
+  if ((await page.locator("a[href='#contenido']").count()) < 1) bad("labif skip", "missing");
+  else ok("labif skip-link");
+  if ((await page.locator("main#contenido").count()) < 1) bad("labif main", "no #contenido");
+  else ok("labif main#contenido");
+
   await goto("/");
   await banner.waitFor({ state: "visible" }).catch(() => {});
-  if (await page.getByRole("dialog").isVisible()) {
+  if (await page.locator("#storage-banner").isVisible()) {
     await page.getByRole("button", { name: /Solo necesario|Necessary only|Só necessário/i }).click();
     await page.waitForTimeout(200);
     const choice = await page.evaluate(() => localStorage.getItem("bitacora-storage"));
     if (choice === "min") ok("banner Solo necesario persists");
     else bad("banner persist", String(choice));
-    if (await page.getByRole("dialog").isVisible()) bad("banner dismiss", "still visible");
+    if (await page.locator("#storage-banner").isVisible()) bad("banner dismiss", "still visible");
     else ok("banner dismisses");
   }
 

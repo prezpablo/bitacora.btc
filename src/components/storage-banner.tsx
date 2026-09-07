@@ -10,8 +10,9 @@ export function StorageBanner() {
   }, []);
   if (!show) return null;
   return (
-    <div
-      role="dialog"
+    <aside
+      id="storage-banner"
+      role="region"
       aria-label={t("storeTitle")}
       className="fixed inset-x-0 bottom-0 z-[85] border-t border-border bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-6"
     >
@@ -62,6 +63,6 @@ export function StorageBanner() {
           </button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
