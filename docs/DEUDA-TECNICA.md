@@ -1,19 +1,85 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 5 de setiembre de 2026  
+**Fecha:** 7 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` (`9bb7e57`) · deploy = ZIP (el VPS no tiene `.git`)  
+**Repo:** `prezpablo/bitacora.btc` `main` (`7d4cc30`) · deploy = ZIP (el VPS no tiene `.git`)  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests externos:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md)
 
-## Resumen (5 set)
+## Mapa vigente (7 set)
 
-Bitácora.btc es mapa + desk Bitcoin (Latam), educación y altas comunitarias con prueba pública `CARGA`. Stack: TanStack Start, Leaflet, SQLite, Caddy. Visitante sin cuenta.
+Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
 
-**Estable en código:** mapa con overlay propio + BTC Map, Ir/OSRM con consentimiento, pines 7d, parches de ficha, tickets de disputa, Pulso traducido en servidor, eventos 3×3, lazy IO, fees multi-fuente, precio OKX si Binance 451.
+**En el `.org` hoy:** `lang` por `?lang=`, H1 único por ruta, skip en `/` `/mapa` `/legal` `/labif`, captcha con audio + sr-only, 404 noindex, probe SEO.
 
-**Hueco operativo:** el VPS a veces corre un build anterior al `main`. P1-03 (HTML `lang`) está hecho en repo y **sigue en español en producción**. El runner marca mempool/Binance desde *su* IP; eso no es CAÍDA del `.org`.
+**En `main` y no en el `.org`:** fase pública «Guía soberana» (`7d4cc30`). El probe axe (`npm run test:a11y`) es de repo, no de sitio.
 
-Internos: `npm run test:bitacora` (80). Externos: `npm run test:live`.
+**No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
+
+```mermaid
+flowchart TB
+  subgraph prod["Producto · roadmap público #roadmap"]
+    Q1["Q1 sep26–ene27<br/>Datos en casa · nodo Colonia"]
+    Q2["Q2 feb–jun 27<br/>Que llegue a todos · 3G"]
+    Q3["Q3 jul–nov 27<br/>Confianza sin papeles · CARGA"]
+    Q4["Q4 dic27–abr28<br/>Que se sostenga · halving"]
+    T["Más adelante<br/>Guía soberana · no calendarizado"]
+    Q1 --> Q2 --> Q3 --> Q4 --> T
+  end
+  subgraph deuda["Deuda técnica · repo"]
+    P0["P0 borde<br/>HTTPS · healthz · ZIP = main"]
+    P1["P1 identidad/ops<br/>lang SSR · URCDP · backup · probe"]
+    P2["P2 casa y carga<br/>Umbrel · Lighthouse · partir alta"]
+    P3["P3 a11y / tutor<br/>contraste · globo · 44px · IA"]
+    P0 --> P1 --> P2 --> P3
+  end
+  Q1 -.->|nodo en casa| P2
+  T -.->|después del nodo| P3
+```
+
+### Roadmap de producto
+
+| Fase | Ventana | Qué | Estado 7 set |
+|---|---|---|---|
+| **Q1** | sep 2026 – ene 2027 | Nodo en Colonia. Si se apaga, el sitio sigue. Nadie entra de afuera. | **Abierto.** Umbrel/Tailscale no existen. Desk = APIs públicas. |
+| **Q2** | feb – jun 2027 | Mapa usable en celular/3G. Si un feed cae, el resto sigue. | **Parcial.** Lazy + globo off en 3G en código. Lighthouse real en `.org` no medido. |
+| **Q3** | jul – nov 2027 | Alta con prueba pública, no KYC. Señal en bitcoin opt-in. Sin custodia. | **Parcial.** CARGA + pines 7d + parches + tickets. BIP-322 abierto. |
+| **Q4** | dic 2027 – abr 2028 | Aportes P2P. Fees/bloques del nodo propio cuando esté. Memoria, no producto. | **Abierto.** QR LN ya. Inbound LN y fees-del-nodo no. |
+| **Tutor** | no calendarizado | Guía pedagógica BTC + Bitácora + Consciencia + LCM. Corpus en casa, no nube. | **Futuro.** Escrito en roadmap (`main`). Falta ZIP. Ver § Tutor. |
+
+### Deuda técnica
+
+| Pri | Ítem | Estado | Dónde |
+|---|---|---|---|
+| **P0** | ZIP VPS = `main` | **Abierto cada release** | Guía soberana aún no está en `.org` |
+| **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | 30/08 404 cerrado |
+| **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
+| **P1** | Head SEO por ruta (canonical, hreflang, JSON-LD, 404 noindex, H1 único) | **Cerrado en `.org`** | `npm run test:seo` |
+| **P1** | URCDP | Presentada 2 set | Revisión, no código |
+| **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
+| **P1** | Probe live en el VPS | Hecho en repo | `probe-live.mjs` · cron 08:20 |
+| **P1** | Lazy viewport + mercado al `#mercado` | **Cerrado** | `in-view` + `LazyMount` |
+| **P2** | Lighthouse mobile 3G/4G en `.org` | Abierto | Meta ≥ 80 4G / ≥ 50 3G |
+| **P2** | Tiles 1× en 3G · cluster pines · fuente 400 | Abierto | UX, no bloquea |
+| **P2** | Partir alta fuera de `spend-map` | Abierto | Clean Architecture |
+| **P2** | PWA offline geo + catálogo | Abierto | No ahora |
+| **P2** | Umbrel + worker (plan híbrido) | Abierto | Q1. No fingir el nodo |
+| **P2** | CSP sin `unsafe-inline` · BFF | Abierto | Plan híbrido |
+| **P3** | Captcha no visual | **Cerrado en `.org`** | Audio + sr-only (`bb8eb06`) |
+| **P3** | Skip + foco visible + banner `region` | **Cerrado en `.org`** | Incl. `/labif` |
+| **P3** | Contraste `.text-short` y naranja LABIF · links subrayados en párrafo | **Abierto** | axe 7 set: 1.4.3 y 1.4.1 |
+| **P3** | Globo / velas por teclado · táctiles 44px · LRM fuera del bundle | Abierto | |
+| **P3** | Tutor soberano (IA) | **No ahora** | § Tutor. No en el VPS del mapa |
+| **Ops** | LN inbound · SMTP no-US · HSTS preload | Abierto | Operador |
+
+### Alertas runner (no son CAÍDA)
+
+| Código | Qué hacer |
+|---|---|
+| D-MP-FEE / TIP | mempool.space mudo *en el runner*. Fees: ninja + emzy + blockstream + last-known. Avisar solo si el **probe VPS** también vacío 2–3 días. |
+| D-BN | Binance 451. Vision + OKX cubren. Nunca «mercado caído». |
+| P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
+
+**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`.
 
 ---
 
@@ -21,44 +87,20 @@ Internos: `npm run test:bitacora` (80). Externos: `npm run test:live`.
 
 | Capa | Qué | ¿Cumple? |
 |---|---|---|
-| `domain/` | CSV, guía, geo, legal, events, parches, fees | **Sí** |
+| `domain/` | CSV, guía, geo, legal, events, parches, fees, roadmap | **Sí** |
 | `application/` | mercado, locate, applyListingPatch | **Sí** |
 | `infrastructure/` | OSRM, BTC Map, SQLite, server-fns, vision/OKX | **Sí** |
 | `components/` | UI | **Parcial** — `spend-map.tsx` sigue gordo |
 
 No reescribir el mapa ahora. Partir el alta (P2) cuando no haya ZIP pendiente.
 
----
+Regla de oro: el dominio no sabe de Leaflet ni de OSRM. La ruta y el GPS se piden **después** del clic (consentimiento).
 
-## Deuda redefinida (5 set)
+**Partido:** `use-map-guide.ts`, `leaflet-fix.ts`, `domain/street-addr.ts`, `hydrateMapCsv`, `event-board`, `lib/in-view.ts`.
 
-| Pri | Ítem | Estado | Nota |
-|---|---|---|---|
-| **P0** | ZIP VPS = `main` | **Abierto cada release** | P1-03 / P2-16 no se ven en `.org` hasta el ZIP de este main |
-| **P0** | Sitio HTTPS / healthz / first-party 200 | **Cerrado** (30/08 404 cerrado) | Probe A1–A15 |
-| **P1** | P1-03 `html lang` + title SSR | **Hecho en inyector** · **pendiente ZIP** | grok-pwa reescribe `lang`/`title`/`og:locale` según `?lang=` |
-| **P1** | URCDP | Presentada 2 set | Revisión URCDP, no código |
-| **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
-| **P1** | Probe en el VPS (no en el runner) | **Nuevo** | `scripts/probe-live.mjs` · cron 08:20 |
-| **P1** | Lazy viewport + mercado al #mercado | **Hecho** | `in-view` + `LazyMount` |
-| **P2** | Lighthouse mobile 3G/4G en `.org` | Abierto | Meta Perf ≥ 80 4G / ≥ 50 3G |
-| **P2** | Tiles 1× en 3G · cluster pines · fuente 400 | Abierto | UX, no bloquea |
-| **P2** | Partir alta fuera de `spend-map` | Abierto | Clean Architecture |
-| **P2** | PWA offline geo + catálogo | Abierto | No ahora |
-| **P3** | LRM fuera del bundle · táctiles 44px | Abierto | Captcha no visual: hecho en `bb8eb06` (audio + sr-only) |
-| **P3** | CSP sin unsafe-inline · Umbrel | Abierto | Plan híbrido |
-| **P3** | Tutor soberano (IA) | **No ahora** · futuro | Ver § Tutor. No corre en el VPS del mapa. |
+**Sigue gordo (no reescribir ahora):** `spend-map.tsx` (~1.3k), `extra-feeds.ts`, `btc-map.ts`, `i18n.ts`, LRM en `package.json` casi sin uso.
 
-**Alertas runner (no son CAÍDA):**
-
-| Código | Qué hacer |
-|---|---|
-| D-MP-FEE / TIP | mempool.space mudo *en el runner*. Fees: ninja + emzy + blockstream + last-known. Avisar solo si el **probe VPS** también vacío 2–3 días. |
-| D-BN | Binance 451. Vision + OKX cubren. Nunca “mercado caído”. |
-| P1-03 | Hasta el ZIP, el HTML sigue `lang=es`. El inyector PWA reescribe `lang` + title al servir. |
-| P2-16 | `extensions.js` se omite en `bitacorabtc.org` (CSP ya lo bloqueaba). Preview Grok lo conserva. |
-
-**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`.
+**Ops cerrado:** DNS SPF `-all` + DMARC `p=reject` + CAA. Pimienta IP en `/etc/bitacora.env`. QR on-chain + LN (BIP-322 pendiente).
 
 ---
 
@@ -95,10 +137,9 @@ Legal: el diálogo es dato (URCDP). Tope, retención corta, mismo criterio que c
 |---|---|---|
 | Dominio / guards | `npm run test:bitacora` | No mergear |
 | Live `.org` | `npm run test:live` | Exit 1 = CAÍDA. `DEGRADA` = runner o SSR |
-| Live estricto | `PROBE_STRICT=1 npm run test:live` | P1-03 cuenta como fallo |
+| SEO | `npm run test:seo` | Exit 1 = identidad rota |
+| A11y axe | `npm run test:a11y` | Exit 1 = contrast/label/skip graves |
 | Manual mapa/desk | [`TEST-EXTERNO.md`](TEST-EXTERNO.md) § D | Checklist humano |
-
-Lista completa de URLs y terceros: [`TEST-EXTERNO.md`](TEST-EXTERNO.md).
 
 ### IntersectionObserver
 
@@ -110,57 +151,4 @@ desk (mapa + conciencia)
 
 Latch al intersectar. Hash `#mercado|#red|#pulso|#datos` salta el gate.
 
-### Lighthouse (código, 5 set)
-
-Sin CI. 3G: globo off (`map-gate`), heatmap off, afiches lazy, queries de mercado gated. Cierre: scores reales en DevTools sobre el `.org`.
-
----
-
-## Estado por fase (histórico + vigente)
-
-| Fase | Qué | Estado |
-|---|---|---|
-| P0 producto / VPS | `/legal`, 18.331, CSV sin tokens, skip-link, canónica `.org`, last-known | **Cerrado** |
-| P0 deploy | ZIP a `/var/www/bitacora` | Procedimiento estable · **desfase frecuente** |
-| P1 URCDP | Contacto y seguridad | Presentada 2 set |
-| P1 DNS | SPF `-all`, DMARC `p=reject`, CAA | **Cerrado** |
-| P1 pimienta IP | `/etc/bitacora.env` | **Cerrado en VPS** |
-| P1 QR | on-chain + LN | Cerrado. BIP-322 pendiente |
-| P1 i18n SSR | `?lang=` en HTML | Repo sí · **prod no** |
-| P2 | CSP, BFF, Umbrel | Abierto |
-| P3 a11y | Captcha audio + sr-only | Hecho en repo (`bb8eb06`) · globo/velas teclado abierto |
-| P3 tutor | Guía soberana (corpus + llama.cpp fuera del VPS) | **Futuro.** No calendarizado. Ver § Tutor |
-| Operador | LN inbound, SMTP no-US, backup semanal, HSTS preload | Abierto |
-
----
-
-## Clean Architecture (detalle 4 set)
-
-| Capa | Qué vive ahí | ¿Cumple? |
-|---|---|---|
-| `domain/` | Entidades, CSV, guía, geo-fix, calle, legal, event-board | **Sí.** No importa infra. |
-| `application/` | Mercado, `locateOnConsent` | **Sí.** Puertos de mercado; geo fuse sin fetch. |
-| `infrastructure/` | OSRM, BTC Map, SQLite, Photon, GPS, server-fns | **Sí.** Adapters. |
-| `components/` | UI. `use-map-guide` orquesta Leaflet | **Parcial.** `spend-map.tsx` sigue siendo el formulario + pines. |
-
-Regla de oro: el dominio no sabe de Leaflet ni de OSRM. La ruta y el GPS se piden **después** del clic (consentimiento).
-
-### Qué se partió
-- `use-map-guide.ts` — Ir, GPS, pasos, Cancelar
-- `leaflet-fix.ts` — círculo ⊙
-- `domain/street-addr.ts` — validar calle
-- `hydrateMapCsv` — CSV → store
-- `MIN_STREET_ACCURACY_M = 150`
-- `domain/event-board.ts` — página 9, `?ep=`
-- `lib/in-view.ts` + `LazyMount`
-
-### Qué queda gordo (no reescribir ahora)
-- `spend-map.tsx` (~1.3k)
-- `extra-feeds.ts`, `btc-map.ts`, `i18n.ts`
-- `leaflet-routing-machine` en package.json, casi sin uso
-
----
-
-## Estado 2 set 2026 (fases, archivo)
-
-Lo de abajo es el informe largo de agosto/2 set. La tabla **Deuda redefinida** de arriba manda. Canónica vigente = **bitacorabtc.org** (no sslip.io).
+Lighthouse: sin CI. 3G: globo off (`map-gate`), heatmap off, afiches lazy, mercado gated. Cierre: scores reales en DevTools sobre el `.org`.
