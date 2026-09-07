@@ -16,6 +16,11 @@ export declare function renderInstallPageHtml(
 export declare function renderWebManifest(hostHeader: string | null | undefined): string;
 export declare function grokPwaHeadTags(appName?: string): Array<[string, string]>;
 export declare const GROK_EXTENSIONS_SCRIPT_SRC: string;
+export declare function langFromSearch(search?: string | null): "es" | "en" | "pt" | "";
+export declare function wantGrokExtensions(host?: string): boolean;
+export declare function stripGrokExtensions(html: string): string;
+export declare function applyHtmlLang(html: string, lang: string): string;
+export declare function applyDocumentLang(html: string, lang: string): string;
 export declare function readGrokProjectId(): string;
 export declare function readXCreator(): string;
 export declare function readXCreatorId(): string;
@@ -40,6 +45,8 @@ export type GrokHeadContext = {
   host?: string | null;
   cwd?: string;
   site?: OgSite;
+  lang?: string;
+  search?: string;
 };
 
 export declare function readOgSite(cwd?: string): OgSite;

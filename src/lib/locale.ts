@@ -23,16 +23,30 @@ export function langFromQuery(raw?: unknown): AppLang | null {
       const params = new URLSearchParams(s.startsWith("?") ? s : s.includes("=") ? s : "");
       q = params.get("lang");
     }
-  } else if (raw && typeof raw === "object" && "lang" in raw) {
-    const v = (raw as { lang?: unknown }).lang;
-    q = typeof v === "string" ? v : null;
+  } else if (typeof URLSearchParams !== "undefined" && raw instanceof URLSearchParams) {
+    q = raw.get("lang");
+  } else if (raw && typeof raw === "object") {
+    const v = "lang" in raw ? (raw as { lang?: unknown }).lang : null;
+    if (Array.isArray(v)) q = String(v[0] ?? "");
+    else if (typeof v === "string") q = v;
   }
   const l = (q || "").slice(0, 2).toLowerCase();
   return l === "es" || l === "en" || l === "pt" ? l : null;
 }
 
-export function langFromLocation(location: { search?: unknown; searchStr?: string; href?: string }): AppLang {
-  return langFromQuery(location.search) || langFromQuery(location.searchStr) || langFromQuery(location.href) || "es";
+export function langFromLocation(location: {
+  search?: unknown;
+  searchStr?: string;
+  href?: string;
+  url?: string;
+}): AppLang {
+  return (
+    langFromQuery(location.search) ||
+    langFromQuery(location.searchStr) ||
+    langFromQuery(location.href) ||
+    langFromQuery(location.url) ||
+    "es"
+  );
 }
 
 function readLang(): AppLang {

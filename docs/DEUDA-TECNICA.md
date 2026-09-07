@@ -34,9 +34,9 @@ No reescribir el mapa ahora. Partir el alta (P2) cuando no haya ZIP pendiente.
 
 | Pri | Ítem | Estado | Nota |
 |---|---|---|---|
-| **P0** | ZIP VPS = `main` | **Abierto cada release** | Hoy: P1-03 no se ve en `.org` hasta ZIP `9bb7e57` |
+| **P0** | ZIP VPS = `main` | **Abierto cada release** | P1-03 / P2-16 no se ven en `.org` hasta el ZIP de este main |
 | **P0** | Sitio HTTPS / healthz / first-party 200 | **Cerrado** (30/08 404 cerrado) | Probe A1–A15 |
-| **P1** | P1-03 `html lang` + title SSR | **Hecho en repo** · **pendiente VPS** | `validateSearch` + `searchStr` |
+| **P1** | P1-03 `html lang` + title SSR | **Hecho en inyector** · **pendiente ZIP** | grok-pwa reescribe `lang`/`title`/`og:locale` según `?lang=` |
 | **P1** | URCDP | Presentada 2 set | Revisión URCDP, no código |
 | **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
 | **P1** | Probe en el VPS (no en el runner) | **Nuevo** | `scripts/probe-live.mjs` · cron 08:20 |
@@ -54,7 +54,8 @@ No reescribir el mapa ahora. Partir el alta (P2) cuando no haya ZIP pendiente.
 |---|---|
 | D-MP-FEE / TIP | mempool.space mudo *en el runner*. Fees: ninja + emzy + blockstream + last-known. Avisar solo si el **probe VPS** también vacío 2–3 días. |
 | D-BN | Binance 451. Vision + OKX cubren. Nunca “mercado caído”. |
-| P1-03 | Hasta el ZIP, el HTML sigue `lang=es`. Después, probe B1–B3. |
+| P1-03 | Hasta el ZIP, el HTML sigue `lang=es`. El inyector PWA reescribe `lang` + title al servir. |
+| P2-16 | `extensions.js` se omite en `bitacorabtc.org` (CSP ya lo bloqueaba). Preview Grok lo conserva. |
 
 **No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08.
 

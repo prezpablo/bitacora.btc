@@ -10,10 +10,6 @@ const APP_NAME = "Bitácora.btc";
 const ORIGIN = PUBLIC_ORIGIN;
 const CANONICAL = `${ORIGIN}/`;
 
-function langOf(search: unknown): AppLang {
-  return langFromQuery(search) || "es";
-}
-
 function headFor(lang: AppLang) {
   const seo = SEO[lang];
   return {

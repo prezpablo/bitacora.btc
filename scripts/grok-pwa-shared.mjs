@@ -202,6 +202,96 @@ export function grokPwaHeadTags(appName = DEFAULT_APP_NAME) {
 
 export const GROK_EXTENSIONS_SCRIPT_SRC = "https://grok.com/grok-app-builder/extensions.js";
 
+const DOC_LANG = {
+  es: {
+    title: "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica",
+    locale: "es_UY",
+  },
+  en: {
+    title: "Bitácora.btc | Bitcoin community and merchant map for Latin America",
+    locale: "en_US",
+  },
+  pt: {
+    title: "Bitácora.btc | Mapa de comunidades e comércios Bitcoin na América Latina",
+    locale: "pt_BR",
+  },
+};
+
+export function langFromSearch(search) {
+  const s = String(search || "");
+  let q = "";
+  try {
+    if (s.includes("://") || s.startsWith("/")) {
+      q = new URL(s, "https://bitacorabtc.org").searchParams.get("lang") || "";
+    } else {
+      q = new URLSearchParams(s.replace(/^\?/, "")).get("lang") || "";
+    }
+  } catch {
+    const cut = s.includes("?") ? s.slice(s.indexOf("?") + 1) : s;
+    q = new URLSearchParams(cut).get("lang") || "";
+  }
+  const l = q.slice(0, 2).toLowerCase();
+  return l === "es" || l === "en" || l === "pt" ? l : "";
+}
+
+/** Preview (Grok / sslip / local) keeps extensions.js. Production CSP blocks grok.com. */
+export function wantGrokExtensions(host = "") {
+  return !String(host || "")
+    .toLowerCase()
+    .includes("bitacorabtc.org");
+}
+
+export function stripGrokExtensions(html) {
+  return String(html).replace(
+    /<script\b[^>]*grok-app-builder\/extensions\.js[^>]*>\s*<\/script>/gi,
+    "",
+  );
+}
+
+export function applyHtmlLang(html, lang) {
+  if (!lang || typeof html !== "string") return html;
+  if (!/<html\b/i.test(html)) return html;
+  return html.replace(/<html\b([^>]*)>/i, (_, attrs) => {
+    const cleaned = String(attrs).replace(/\s*lang\s*=\s*["'][^"']*["']/i, "");
+    return `<html lang="${lang}"${cleaned}>`;
+  });
+}
+
+function rewriteMeta(html, attr, key, content) {
+  const esc = escapeHtml(content);
+  const keyRe = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const a = new RegExp(`${attr}=["']${keyRe}["']\\s+content=["'][^"']*["']`, "i");
+  const b = new RegExp(`content=["'][^"']*["']\\s+${attr}=["']${keyRe}["']`, "i");
+  if (a.test(html)) return html.replace(a, `${attr}="${key}" content="${esc}"`);
+  if (b.test(html)) return html.replace(b, `${attr}="${key}" content="${esc}"`);
+  return html;
+}
+
+const HOME_TITLES = new Set([
+  DOC_LANG.es.title,
+  DOC_LANG.en.title,
+  DOC_LANG.pt.title,
+  "Bitácora.btc | Mapa Bitcoin Latinoamérica",
+]);
+
+/**
+ * Crawler-facing i18n (P1-03). SSR often emits lang=es for every ?lang=.
+ * Only home titles are rewritten so /mapa /legal keep their own <title>.
+ */
+export function applyDocumentLang(html, lang) {
+  const seo = DOC_LANG[lang];
+  if (!seo) return html;
+  let next = applyHtmlLang(html, lang);
+  const current = titleFromDocument(next);
+  if (HOME_TITLES.has(current)) {
+    next = next.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(seo.title)}</title>`);
+    next = rewriteMeta(next, "property", "og:title", seo.title);
+    next = rewriteMeta(next, "name", "twitter:title", seo.title);
+  }
+  next = rewriteMeta(next, "property", "og:locale", seo.locale);
+  return next;
+}
+
 export function readGrokProjectId() {
   const fromProcess = typeof process !== "undefined" ? process.env?.VITE_PROJECT_ID : "";
   return String(fromProcess ?? "").trim();
@@ -447,10 +537,12 @@ export function injectGrokPwaHead(html, ctx = {}) {
     grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
   );
 
-  if (!next.includes("/grok-app-builder/extensions.js")) {
-    missing.push(...grokExtensionsHeadTags(projectId));
-  } else if (projectId && !next.includes('name="grok-project-id"')) {
-    missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
+  if (wantGrokExtensions(host)) {
+    if (!next.includes("/grok-app-builder/extensions.js")) {
+      missing.push(...grokExtensionsHeadTags(projectId));
+    } else if (projectId && !next.includes('name="grok-project-id"')) {
+      missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
+    }
   }
   if (
     projectId &&
@@ -468,8 +560,14 @@ export function injectGrokPwaHead(html, ctx = {}) {
     if (!next.includes('property="x:creator:id"')) missing.push(creatorTags[1]);
   }
 
-  if (missing.length === 0) return next;
-  return insertBeforeHeadClose(next, missing.join(""));
+  if (missing.length === 0) {
+    let done = next;
+    if (!wantGrokExtensions(host)) done = stripGrokExtensions(done);
+    return applyDocumentLang(done, ctx.lang || langFromSearch(ctx.search));
+  }
+  let out = insertBeforeHeadClose(next, missing.join(""));
+  if (!wantGrokExtensions(host)) out = stripGrokExtensions(out);
+  return applyDocumentLang(out, ctx.lang || langFromSearch(ctx.search));
 }
 
 function findHeadClose(buf) {
@@ -498,6 +596,8 @@ export function createHeadInjector(ctx = {}) {
       host: normalized.host,
       cwd: normalized.cwd,
       site: normalized.site,
+      lang: ctx.lang,
+      search: ctx.search,
     });
 
   return {

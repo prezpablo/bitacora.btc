@@ -44,7 +44,7 @@ Internos (repo): `npm run test:bitacora` — 80 tests de dominio, CSV, fees, i18
 | B3 | `/?lang=en` | `<html lang="en">`, title en inglés |
 | B4 | Selector ES/PT/EN | Cambia copy **en cliente** (zustand). No alcanza para Google. |
 
-Hoy en producción B2/B3 siguen en `lang="es"`. El probe lo marca `DEGRADA`. Con `PROBE_STRICT=1` pasa a fallo.
+Hoy en producción B2/B3 siguen en `lang="es"` hasta el ZIP que incluye el inyector `?lang=`. El probe lo marca `DEGRADA`. Con `PROBE_STRICT=1` pasa a fallo.
 
 ---
 

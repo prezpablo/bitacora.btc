@@ -111,6 +111,10 @@ for (const p of firstParty) {
   const titleShift = titles.pt !== titles.es || titles.en !== titles.es;
   add(STRICT ? core : warn, "P1-03 html lang SSR", ssrOk, `es=${langs.es || "?"} pt=${langs.pt || "?"} en=${langs.en || "?"}`);
   add(STRICT ? core : warn, "P1-03 title SSR", titleShift, `es="${titles.es.slice(0, 48)}" pt="${titles.pt.slice(0, 48)}"`);
+  const grokJs = /grok\.com\/grok-app-builder\/extensions\.js/.test(es.text);
+  add(STRICT ? core : warn, "P2-16 sin grok.com/extensions.js", !grokJs, grokJs ? "residual grok.com script" : "limpio");
+  const desk = /bit[aá]cora/i.test(es.text) && (es.text.includes("Pulso") || es.text.includes("Mercado") || es.text.includes("mapa"));
+  add(core, "desk HTML", desk, "origen renderiza; D-BN/D-MP del runner no es CAÍDA");
 }
 
 async function third(id, url) {
@@ -121,13 +125,18 @@ async function third(id, url) {
     const res = await fetch(url, { signal: ctrl.signal, headers: { "user-agent": UA } });
     const ms = Date.now() - t0;
     const note = `${res.status} ${ms}ms`;
-    if (id === "binance.api") {
-      add(warn, `3p ${id}`, true, `${note} (451 esperado en varias IPs; no es CAÍDA)`);
+    if (id === "binance.api" || id === "mempool.space") {
+      add(warn, `3p ${id}`, true, `${note} (D-BN/D-MP: runner; no es CAÍDA del origen)`);
       return;
     }
     add(warn, `3p ${id}`, res.ok, note);
   } catch (err) {
-    add(warn, `3p ${id}`, false, err instanceof Error ? err.message : "fail");
+    const note = err instanceof Error ? err.message : "fail";
+    if (id === "binance.api" || id === "mempool.space") {
+      add(warn, `3p ${id}`, true, `${note} (D-BN/D-MP: runner; no es CAÍDA del origen)`);
+      return;
+    }
+    add(warn, `3p ${id}`, false, note);
   } finally {
     clearTimeout(timer);
   }
