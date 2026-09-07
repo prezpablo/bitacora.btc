@@ -95,6 +95,21 @@ test("captcha ticket checks proof-of-work", () => {
   assert.match(src, /salt/);
 });
 
+test("captcha has audio and screen-reader alternatives", () => {
+  const src = read("src/components/map/captcha.tsx");
+  assert.match(src, /speakChallenge/);
+  assert.match(src, /captchaListen/);
+  assert.match(src, /captchaSpoken/);
+  assert.match(src, /sr-only/);
+  assert.match(src, /aria-live/);
+  assert.match(src, /role="alert"/);
+  assert.match(src, /Volume2/);
+  const i18n = read("src/lib/i18n.ts");
+  assert.match(i18n, /captchaListen:/);
+  assert.match(i18n, /captchaAlt:/);
+  assert.match(i18n, /captchaNoSpeech:/);
+});
+
 test("clean architecture: no lib/btc facade, last-known is server-only", () => {
   assert.equal(exists("src/lib/btc"), false);
   assert.equal(exists("src/infrastructure/last-known.ts"), false);

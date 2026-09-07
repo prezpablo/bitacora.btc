@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { RefreshCw, Volume2 } from "lucide-react";
 import { issueCaptcha } from "@/infrastructure/server-fns";
+import { speakChallenge, spokenCode } from "@/lib/captcha-speech";
 import { minePow } from "@/lib/pow";
 import { useT } from "@/lib/i18n";
+import { useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 export type CaptchaTicket = { id: string; answer: string; nonce: string };
@@ -35,6 +37,10 @@ export function CaptchaBox({
   onTicket?: (t: CaptchaTicket | null) => void;
 }) {
   const t = useT();
+  const lang = useLocale((s) => s.lang);
+  const uid = useId();
+  const spokenId = `${uid}-spoken`;
+  const altId = `${uid}-alt`;
   const [id, setId] = useState("");
   const [code, setCode] = useState("");
   const [typed, setTyped] = useState("");
@@ -48,6 +54,7 @@ export function CaptchaBox({
 
   async function load() {
     mineAbort.current?.abort();
+    if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     setLoading(true);
     onOk(false);
     onTicket?.(null);
@@ -84,7 +91,10 @@ export function CaptchaBox({
 
   useEffect(() => {
     void load();
-    return () => mineAbort.current?.abort();
+    return () => {
+      mineAbort.current?.abort();
+      if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -122,9 +132,17 @@ export function CaptchaBox({
     onTicket?.({ id, answer: typed.trim().toUpperCase(), nonce });
   }
 
+  function listen() {
+    if (!code || loading) return;
+    if (!speakChallenge(code, lang)) setFail(t("captchaNoSpeech"));
+  }
+
   return (
     <div className="space-y-2 rounded-md bg-elevated p-3 shadow-[var(--shadow-border)]">
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("captchaTitle")}</p>
+      <p id={altId} className="text-xs text-pretty text-muted-foreground">
+        {t("captchaAlt")}
+      </p>
       <div className="flex items-center gap-2">
         <svg viewBox="0 0 180 56" className="h-14 w-full rounded-md bg-[#1a1a1a]" aria-hidden="true">
           {lines.map((l, i) => (
@@ -157,6 +175,16 @@ export function CaptchaBox({
         <button
           type="button"
           className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-card text-primary"
+          onClick={listen}
+          disabled={loading || !code}
+          aria-label={t("captchaListen")}
+          title={t("captchaListen")}
+        >
+          <Volume2 className="size-4" />
+        </button>
+        <button
+          type="button"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-card text-primary"
           onClick={() => void load()}
           aria-label={t("captchaRefresh")}
           title={t("captchaRefresh")}
@@ -164,6 +192,9 @@ export function CaptchaBox({
           <RefreshCw className="size-4" />
         </button>
       </div>
+      <p id={spokenId} className="sr-only" aria-live="polite">
+        {code && !loading ? t("captchaSpoken", { code: spokenCode(code).replaceAll(". ", ", ") }) : t("captchaPow")}
+      </p>
       <label className="hidden" aria-hidden="true">
         {t("hpWeb")}
         <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={(e) => setHp(e.target.value)} />
@@ -192,7 +223,8 @@ export function CaptchaBox({
             }
           }}
           placeholder={t("captchaHint")}
-          aria-label={t("captchaTitle")}
+          aria-label={t("captchaHint")}
+          aria-describedby={`${altId} ${spokenId}`}
           autoComplete="off"
           spellCheck={false}
           maxLength={8}
@@ -211,8 +243,16 @@ export function CaptchaBox({
           {ok ? t("captchaOk") : nonce ? t("captchaCheck") : t("captchaPow")}
         </button>
       </div>
-      {!nonce && code && !fail ? <p className="text-xs text-muted-foreground">{t("captchaPow")}</p> : null}
-      {fail ? <p className="text-xs text-short">{fail}</p> : null}
+      {!nonce && code && !fail ? (
+        <p className="text-xs text-muted-foreground" aria-live="polite">
+          {t("captchaPow")}
+        </p>
+      ) : null}
+      {fail ? (
+        <p role="alert" className="text-xs text-short">
+          {fail}
+        </p>
+      ) : null}
     </div>
   );
 }
