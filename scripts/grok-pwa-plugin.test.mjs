@@ -92,6 +92,12 @@ test("P0 404 is noindex and drops home canonical", () => {
   );
   assert.match(out, /name="robots" content="noindex,follow"/);
   assert.doesNotMatch(out, /rel="canonical"/);
+  assert.match(out, /<title>No encontrado \| Bitácora\.btc<\/title>/);
+  const en = injectGrokPwaHead(
+    src,
+    blank({ host: "bitacorabtc.org", search: "/missing?lang=en", status: 404 }),
+  );
+  assert.match(en, /<title>Not found \| Bitácora\.btc<\/title>/);
 });
 
 test("injects the extensions script without a project id", () => {

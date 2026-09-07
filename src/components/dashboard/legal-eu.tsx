@@ -55,7 +55,7 @@ export function LegalEu() {
     <section id="legal" className="scroll-mt-[var(--header-offset)] space-y-4">
       <header className="space-y-2">
         <p className="text-xs font-medium tracking-wide text-primary uppercase">{t("legalKicker")}</p>
-        <h2 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{t("legalTitle")}</h2>
+        <h1 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{t("legalTitle")}</h1>
         <p className="max-w-3xl text-sm text-pretty text-muted-foreground sm:text-base">{copy.lead}</p>
       </header>
       <div className="space-y-3">
@@ -65,7 +65,7 @@ export function LegalEu() {
             id={b.id}
             className={cn("rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5", b.id && "scroll-mt-[var(--header-offset)]")}
           >
-            <h3 className="font-display text-lg font-medium text-foreground">{b.title}</h3>
+            <h2 className="font-display text-lg font-medium text-foreground">{b.title}</h2>
             <Paragraphs text={b.body} />
             {b.table ? <LegalTable table={b.table} /> : null}
           </article>

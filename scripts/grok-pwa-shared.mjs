@@ -217,6 +217,12 @@ const DOC_LANG = {
   },
 };
 
+const NOT_FOUND_TITLE = {
+  es: "No encontrado | Bitácora.btc",
+  en: "Not found | Bitácora.btc",
+  pt: "Não encontrado | Bitácora.btc",
+};
+
 export function langFromSearch(search) {
   const s = String(search || "");
   let q = "";
@@ -349,6 +355,11 @@ export function applyDocumentShare(html, ctx = {}) {
     next = upsertMeta(next, "name", "twitter:image", img);
   }
   if (Number(ctx.status) === 404) {
+    const lang = langFromSearch(ctx.search) || "es";
+    const missing = NOT_FOUND_TITLE[lang] || NOT_FOUND_TITLE.es;
+    next = next.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(missing)}</title>`);
+    next = rewriteMeta(next, "property", "og:title", missing);
+    next = rewriteMeta(next, "name", "twitter:title", missing);
     next = upsertMeta(next, "name", "robots", "noindex,follow");
     next = next.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/gi, "");
   }

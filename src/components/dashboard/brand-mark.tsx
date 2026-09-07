@@ -20,21 +20,20 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
   const t = useT();
   return (
     <div className="min-w-0">
-      <h1
+      <p
         className={cn(
           "font-display flex items-baseline leading-none font-medium tracking-tight text-foreground",
           compact ? "text-2xl sm:text-3xl" : "text-[2rem] sm:text-5xl",
         )}
       >
-        <span className="sr-only">Bitácora.btc</span>
-        <span aria-hidden="true" className="flex items-baseline">
+        <span className="flex items-baseline">
           <span className="relative mr-[0.06em] inline-block w-[0.95em] shrink-0">
             <span className="invisible">B</span>
             <BitcoinMark className="pointer-events-none absolute left-1/2 top-[0.16em] size-[1.12em] -translate-x-1/2" />
           </span>
           itácora<span className="text-primary">.btc</span>
         </span>
-      </h1>
+      </p>
       {compact ? null : (
         <p className="mt-2 text-base text-pretty text-muted-foreground sm:text-xl">
           {t("tagline").split("Bitcoin")[0]}

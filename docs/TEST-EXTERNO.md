@@ -53,9 +53,9 @@ Cerrado con el ZIP de `2f48c76` (inyector + head por ruta). Lo cubre `npm run te
 
 P0 (exit 1): title/canonical/hreflang/JSON-LD **por ruta**, `og:url` + `twitter:image`, 404 `noindex`, robots, sitemap `/mapa|/legal|/labif`, `llms.txt` → `/mapa`, `og.jpg` 1200×630, www→apex, sin `extensions.js`.
 
-P1/P2 (DEGRADA, no cae el sitio): H1 sin texto duplicado (`Bitácora.btcBitácora.btc` por `sr-only` + visible), title 404 propio, `/mapa/` 307, `lastmod` del sitemap.
+P1/P2 (DEGRADA, no cae el sitio): H1 único por ruta (no `Bitácora.btcBitácora.btc`), title 404 propio, `/mapa/` 307, `lastmod` del sitemap.
 
-Corrida 7 set 2026: **core 81/81**. DEGRADA = H1 duplicado en home/mapa/legal + title 404 = home.
+Tras ZIP de H1+404: H1 home = bienvenida; `/mapa` = “Mapa Bitcoin Latam”; `/legal` = privacidad; 404 title = “No encontrado | Bitácora.btc”.
 
 ---
 

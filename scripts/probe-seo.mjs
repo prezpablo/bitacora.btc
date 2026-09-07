@@ -20,31 +20,37 @@ const EXPECT = {
     title: "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica",
     canonical: `${ORIGIN}/`,
     lang: "es",
+    h1: /bit[aá]cora/i,
   },
   "/mapa": {
     title: "Mapa Bitcoin Latam | Bitácora.btc",
     canonical: `${ORIGIN}/mapa`,
     lang: "es",
+    h1: /mapa bitcoin|bitcoin map/i,
   },
   "/legal": {
     title: "Aviso, privacidad y cookies | Bitácora.btc",
     canonical: `${ORIGIN}/legal`,
     lang: "es",
+    h1: /privacidad|privacy|privacidade/i,
   },
   "/labif": {
     title: "LABIF · Bitácora.btc",
     canonical: `${ORIGIN}/labif`,
     lang: "es",
+    h1: /bit[aá]cora|labif/i,
   },
   "/mapa?lang=pt": {
     title: "Mapa Bitcoin Latam | Bitácora.btc",
     canonical: `${ORIGIN}/mapa?lang=pt`,
     lang: "pt",
+    h1: /mapa bitcoin|bitcoin map/i,
   },
   "/legal?lang=en": {
     title: "Legal notice, privacy and cookies | Bitácora.btc",
     canonical: `${ORIGIN}/legal?lang=en`,
     lang: "en",
+    h1: /privacidad|privacy|privacidade/i,
   },
 };
 
@@ -204,7 +210,7 @@ export async function runSeoProbe({ origin = ORIGIN, fetchPage = pull } = {}) {
     add(core, `${path} twitter:image`, Boolean(h.metas["twitter:image"]), h.metas["twitter:image"] ? "sí" : "(vacío)");
     add(core, `${path} grok.js`, !h.grokJs, h.grokJs ? "residual" : "limpio");
     const h1 = h.h1[0] || "";
-    const h1Ok = h.h1.length === 1 && /bit[aá]cora/i.test(h1) && !/bit[aá]cora\.btc\s*bit[aá]cora/i.test(h1);
+    const h1Ok = h.h1.length === 1 && want.h1.test(h1) && !/bit[aá]cora\.btc\s*bit[aá]cora/i.test(h1);
     add(warn, `${path} h1`, h1Ok, h.h1.join(" | ") || "(sin h1)");
   }
 
