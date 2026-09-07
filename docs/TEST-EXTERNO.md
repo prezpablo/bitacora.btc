@@ -1,13 +1,14 @@
 # Tests externos — bitacorabtc.org
 
-**Fecha:** 5 de setiembre de 2026  
+**Fecha:** 7 de setiembre de 2026  
 **Origen:** `https://bitacorabtc.org`  
 **Correr:** `npm run test:live`  (o `node scripts/probe-live.mjs`)  
-**Estricto (P1-03 = fallo):** `PROBE_STRICT=1 npm run test:live`
+**SEO técnico:** `npm run test:seo`  
+**Estricto:** `PROBE_STRICT=1 npm run test:seo` (warnings = fail)
 
 El probe pega al sitio público. **No** usa mempool.space ni Binance para decidir si Bitácora está caída. Esos van como `DEGRADA` del *runner*, no del VPS.
 
-Internos (repo): `npm run test:bitacora` — 80 tests de dominio, CSV, fees, i18n, parches, pines.
+Internos (repo): `npm test` — dominio, CSV, fees, i18n, parches, pines, SEO parsers.
 
 ---
 
@@ -35,16 +36,26 @@ Internos (repo): `npm run test:bitacora` — 80 tests de dominio, CSV, fees, i18
 
 ---
 
-## B. i18n SSR (P1-03 — DEGRADA hasta el ZIP)
+## B. i18n SSR (P1-03 — cerrado en `.org` 7 set)
 
-| # | URL | Esperado tras ZIP `9bb7e57`+ |
+| # | URL | Esperado |
 |---|---|---|
 | B1 | `/?lang=es` | `<html lang="es">`, title en español |
 | B2 | `/?lang=pt` | `<html lang="pt">`, title en portugués |
 | B3 | `/?lang=en` | `<html lang="en">`, title en inglés |
-| B4 | Selector ES/PT/EN | Cambia copy **en cliente** (zustand). No alcanza para Google. |
+| B4 | Selector ES/PT/EN | Cambia copy **en cliente** (zustand). Google lee el HTML del primer byte. |
 
-Hoy en producción B2/B3 siguen en `lang="es"` hasta el ZIP que incluye el inyector `?lang=`. El probe lo marca `DEGRADA`. Con `PROBE_STRICT=1` pasa a fallo.
+Cerrado con el ZIP de `2f48c76` (inyector + head por ruta). Lo cubre `npm run test:seo`.
+
+---
+
+## F. SEO técnico (`npm run test:seo`)
+
+P0 (exit 1): title/canonical/hreflang/JSON-LD **por ruta**, `og:url` + `twitter:image`, 404 `noindex`, robots, sitemap `/mapa|/legal|/labif`, `llms.txt` → `/mapa`, `og.jpg` 1200×630, www→apex, sin `extensions.js`.
+
+P1/P2 (DEGRADA, no cae el sitio): H1 sin texto duplicado (`Bitácora.btcBitácora.btc` por `sr-only` + visible), title 404 propio, `/mapa/` 307, `lastmod` del sitemap.
+
+Corrida 7 set 2026: **core 81/81**. DEGRADA = H1 duplicado en home/mapa/legal + title 404 = home.
 
 ---
 
