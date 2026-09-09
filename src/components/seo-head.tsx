@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { FAQ, GEO, OG_IMAGE_PATH, SITE_NAME, hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
-import { langFromQuery, useLocale, type AppLang } from "@/lib/locale";
+import { langFromQuery, type AppLang } from "@/lib/locale";
+import { useAppLang } from "@/lib/i18n";
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
   if (typeof document === "undefined") return;
@@ -30,7 +31,7 @@ function upsertLink(rel: string, href: string, extra?: Record<string, string>) {
 }
 
 export function SeoHead() {
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const searchStr = useRouterState({ select: (s) => s.location.searchStr });
   const search = useRouterState({ select: (s) => s.location.search });

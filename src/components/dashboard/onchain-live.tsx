@@ -1,8 +1,7 @@
 import type { OnchainPayload } from "@/domain";
 import { formatCompact } from "@/lib/utils";
 import { localeTag } from "@/lib/display";
-import { useLocale } from "@/lib/locale";
-import { useT } from "@/lib/i18n";
+import { useAppLang, useT } from "@/lib/i18n";
 import { StaleStamp } from "./stale-stamp";
 
 function ehLabel(eh: number) {
@@ -13,7 +12,7 @@ function ehLabel(eh: number) {
 
 export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null }) {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   if (!data) return null;
   const mb = data.mempoolVsize != null ? data.mempoolVsize / 1e6 : null;
   const rows = [

@@ -4,8 +4,8 @@ import { StorageBanner } from "@/components/storage-banner";
 import { BrandMark } from "@/components/dashboard/brand-mark";
 import { SeoHead } from "@/components/seo-head";
 import { SkipLink } from "@/components/skip-link";
-import { COPY, useT, type CopyKey } from "@/lib/i18n";
-import { LANGS, useLocale, type AppLang } from "@/lib/locale";
+import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
+import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
@@ -30,7 +30,7 @@ const NAV_LEGAL: { hash: string; key: CopyKey; href?: string }[] = [
 
 function LangButtons() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const setLang = useLocale((s) => s.setLang);
   return (
     <div role="group" aria-label={t("langAria")} className="inline-flex rounded-md bg-elevated p-0.5 shadow-[var(--shadow-border)]">
@@ -56,7 +56,7 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
   const hydrate = useLocale((s) => s.hydrate);
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const labels = COPY[lang];
   const headRef = useRef<HTMLElement>(null);
   const offsetRef = useRef(116);

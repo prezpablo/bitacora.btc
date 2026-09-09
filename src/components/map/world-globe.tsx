@@ -5,8 +5,7 @@ import { FOUNDING_UY } from "@/domain/globe";
 import { capitalOf } from "@/domain/capitals";
 import { mapKeys, useGlobeStats } from "@/lib/map-query";
 import { localeTag } from "@/lib/display";
-import { useLocale } from "@/lib/locale";
-import { useT } from "@/lib/i18n";
+import { useAppLang, useT } from "@/lib/i18n";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { imgSrc } from "@/domain/map-csv";
@@ -62,7 +61,7 @@ function GlobeCanvas({
   onSkip: () => void;
 }) {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const reduceMotion = usePrefersReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
   const globeRef = useRef<{ controls: () => { autoRotate: boolean; autoRotateSpeed: number }; pointOfView: () => { lat: number; lng: number; altitude: number } } | null>(null);

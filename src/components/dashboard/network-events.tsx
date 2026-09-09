@@ -6,8 +6,8 @@ import { getCityFrame } from "@/infrastructure/server-fns";
 import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
 import { locateBest } from "@/infrastructure/geo";
 import { countryName as namedCountry, localeTag } from "@/lib/display";
-import { useLocale, type AppLang } from "@/lib/locale";
-import { useT, type CopyKey } from "@/lib/i18n";
+import { type AppLang } from "@/lib/locale";
+import { useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { StaleStamp } from "./stale-stamp";
@@ -238,7 +238,7 @@ function GeoMenu({
 
 export function NetworkEvents() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const qc = useQueryClient();
   const boot = typeof window === "undefined" ? {} : eventQueryFromSearch(window.location.search);
   const [country, setCountry] = useState(boot.country || "");

@@ -17,9 +17,8 @@ import { geoBannerKey } from "@/domain/geo-fix";
 import { locateBest } from "@/infrastructure/geo";
 import { applyFix } from "./leaflet-fix";
 import { useMapGuide } from "./use-map-guide";
-import { useT } from "@/lib/i18n";
+import { useAppLang, useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
-import { useLocale } from "@/lib/locale";
 import { cn, escapeHtml } from "@/lib/utils";
 import { extrasAllowed, readExtra, writeExtra } from "@/lib/storage-consent";
 import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
@@ -87,7 +86,7 @@ function applyCsv(text: string) {
 
 export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFocus; onWorld?: () => void; embedded?: boolean }) {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const {
     mapRef,
     leafletRef,

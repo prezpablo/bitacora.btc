@@ -20,8 +20,7 @@ import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { LazyMount } from "@/components/lazy-mount";
 import { useInView } from "@/lib/in-view";
-import { DATOS, useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { DATOS, useAppLang, useT } from "@/lib/i18n";
 import { slowNet } from "@/lib/net";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
@@ -79,7 +78,7 @@ export function Desk() {
   const [ma, setMa] = useState(DEFAULT_MA);
   const [heatOn, setHeatOn] = useState(() => !slowNet());
   const liq = asLiq(range);
-  const uiLang = useLocale((s) => s.lang);
+  const uiLang = useAppLang();
   const t = useT();
   const [allowFetch, setAllowFetch] = useState(false);
   const [liveOk, setLiveOk] = useState(false);

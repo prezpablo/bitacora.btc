@@ -1,10 +1,9 @@
 import { ROADMAP_WEB3 } from "@/domain/roadmap-web3";
-import { useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { useAppLang, useT } from "@/lib/i18n";
 
 export function RoadmapWeb3() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const copy = ROADMAP_WEB3[lang];
   return (
     <section id="roadmap" className="scroll-mt-[var(--header-offset)] space-y-4">

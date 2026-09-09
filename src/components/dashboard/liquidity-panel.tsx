@@ -1,8 +1,7 @@
 import type { LiquidityPayload } from "@/domain";
 import { cn, formatCompact, formatPct } from "@/lib/utils";
 import { localeTag } from "@/lib/display";
-import { useLocale } from "@/lib/locale";
-import { useT } from "@/lib/i18n";
+import { useAppLang, useT } from "@/lib/i18n";
 import { Sparkline } from "./spark";
 
 function scoreKey(n: number) {
@@ -51,7 +50,7 @@ function Metric({
 
 export function LiquidityPanel({ data }: { data: LiquidityPayload | null }) {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const tot1 = data ? data.depth1m.bid + data.depth1m.ask : 0;
   const bidPct = tot1 > 0 && data ? (data.depth1m.bid / tot1) * 100 : 50;
   const next =

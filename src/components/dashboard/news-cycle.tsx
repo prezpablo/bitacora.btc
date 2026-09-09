@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, Radio } from "lucide-react";
 import type { NewsItem, PulsePayload } from "@/domain";
-import { formatAgo, useT } from "@/lib/i18n";
+import { formatAgo, useAppLang, useT } from "@/lib/i18n";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import { StaleStamp } from "./stale-stamp";
-import { LANGS, useLocale, type AppLang } from "@/lib/locale";
+import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 function headline(item: { title: string; sourceLang?: string }) {
@@ -13,7 +13,7 @@ function headline(item: { title: string; sourceLang?: string }) {
 }
 
 export function NewsCycle({ data, fetching = false }: { data: PulsePayload | null; fetching?: boolean }) {
-  const lang = useLocale((s) => s.lang) as AppLang;
+  const lang = useAppLang();
   const setLang = useLocale((s) => s.setLang);
   const t = useT();
   const news: NewsItem[] = data?.news ?? [];

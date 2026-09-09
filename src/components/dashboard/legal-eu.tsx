@@ -1,6 +1,5 @@
 import { LEGAL_EU, type LegalBlock } from "@/domain/legal-eu";
-import { useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { useAppLang, useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 function Paragraphs({ text }: { text: string }) {
@@ -49,7 +48,7 @@ function LegalTable({ table }: { table: NonNullable<LegalBlock["table"]> }) {
 
 export function LegalEu() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const copy = LEGAL_EU[lang];
   return (
     <section id="legal" className="scroll-mt-[var(--header-offset)] space-y-4">

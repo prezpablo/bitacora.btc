@@ -2,13 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
-import { useLocale } from "@/lib/locale";
+import { useAppLang } from "@/lib/i18n";
 import { pageSeo } from "@/lib/seo";
 
 export const Route = createFileRoute("/mapa")({ component: MapaPage });
 
 function MapaPage() {
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const heading = pageSeo("/mapa", lang).title.replace(/\s*[|·]\s*Bitácora\.btc\s*$/i, "");
   return (
     <SiteShell>

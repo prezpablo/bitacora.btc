@@ -1,10 +1,9 @@
 import { SOBERANIA } from "@/domain/soberania";
-import { useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { useAppLang, useT } from "@/lib/i18n";
 
 export function SoberaniaBlock() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const copy = SOBERANIA[lang];
   return (
     <section id="soberania" className="scroll-mt-[var(--header-offset)] space-y-4">

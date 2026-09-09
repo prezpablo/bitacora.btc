@@ -47,6 +47,8 @@ Internos (repo): `npm test` — dominio, CSV, fees, i18n, parches, pines, SEO pa
 
 Cerrado con el ZIP de `2f48c76` (inyector + head por ruta). Lo cubre `npm run test:seo`.
 
+P1-03 **copy SSR** (7 set abierto, 9 set arreglo en repo): H1 home y cuerpos `LEGAL_EU`/`CONCIENCIA` leían el store (`es` en servidor). `useAppLang()` toma `?lang=` del router. Probe: `P1-03 copy SSR home/legal`. Falta ZIP.
+
 ---
 
 ## F. SEO técnico (`npm run test:seo`)

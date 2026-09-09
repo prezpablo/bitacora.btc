@@ -3,8 +3,7 @@ import { RefreshCw, Volume2 } from "lucide-react";
 import { issueCaptcha } from "@/infrastructure/server-fns";
 import { speakChallenge, spokenCode } from "@/lib/captcha-speech";
 import { minePow } from "@/lib/pow";
-import { useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { useAppLang, useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export type CaptchaTicket = { id: string; answer: string; nonce: string };
@@ -37,7 +36,7 @@ export function CaptchaBox({
   onTicket?: (t: CaptchaTicket | null) => void;
 }) {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const uid = useId();
   const spokenId = `${uid}-spoken`;
   const altId = `${uid}-alt`;

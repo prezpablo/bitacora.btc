@@ -111,6 +111,21 @@ for (const p of firstParty) {
   const titleShift = titles.pt !== titles.es || titles.en !== titles.es;
   add(STRICT ? core : warn, "P1-03 html lang SSR", ssrOk, `es=${langs.es || "?"} pt=${langs.pt || "?"} en=${langs.en || "?"}`);
   add(STRICT ? core : warn, "P1-03 title SSR", titleShift, `es="${titles.es.slice(0, 48)}" pt="${titles.pt.slice(0, 48)}"`);
+  const ptH1 = (pt.text.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || "";
+  const ptH1Plain = ptH1.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  add(
+    STRICT ? core : warn,
+    "P1-03 copy SSR home",
+    /boas-vindas/i.test(ptH1Plain) && !/te damos la bienvenida/i.test(ptH1Plain),
+    ptH1Plain.slice(0, 80) || "(sin h1)",
+  );
+  const legalPt = await pull("/legal?lang=pt");
+  add(
+    STRICT ? core : warn,
+    "P1-03 copy SSR legal",
+    /bit[aá]cora comunit[aá]ria|aviso legal · respons[aá]vel/i.test(legalPt.text) && !/es una bitácora comunitaria/i.test(legalPt.text),
+    /es una bitácora comunitaria/i.test(legalPt.text) ? "cuerpo aún en es" : "cuerpo pt",
+  );
   const grokJs = /grok\.com\/grok-app-builder\/extensions\.js/.test(es.text);
   add(STRICT ? core : warn, "P2-16 sin grok.com/extensions.js", !grokJs, grokJs ? "residual grok.com script" : "limpio");
   const desk = /bit[aá]cora/i.test(es.text) && (es.text.includes("Pulso") || es.text.includes("Mercado") || es.text.includes("mapa"));

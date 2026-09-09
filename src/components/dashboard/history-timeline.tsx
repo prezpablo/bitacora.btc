@@ -1,10 +1,9 @@
 import { FileText } from "lucide-react";
-import { MILESTONES, WHITEPAPER, useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { MILESTONES, WHITEPAPER, useAppLang, useT } from "@/lib/i18n";
 
 export function HistoryTimeline() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const rows = MILESTONES[lang];
   const localPaper = WHITEPAPER[lang];
 

@@ -3,8 +3,7 @@ import { MapPin } from "lucide-react";
 import { searchAddress } from "@/infrastructure/server-fns";
 import { addressIssues, formatStreet, type AddrIssue, type StreetHit } from "@/infrastructure/address";
 import { countryName } from "@/lib/display";
-import { useLocale } from "@/lib/locale";
-import { useT, type CopyKey } from "@/lib/i18n";
+import { useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const ISSUE_COPY: Record<AddrIssue, CopyKey> = {
@@ -28,7 +27,7 @@ export function AddressSearch({
   hit: StreetHit | null;
 }) {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);

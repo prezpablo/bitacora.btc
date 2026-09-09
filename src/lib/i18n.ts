@@ -1533,10 +1533,15 @@ export const COPY: Record<AppLang, Record<keyof typeof es, string>> = { es, en, 
 
 export type CopyKey = keyof typeof es;
 
-export function useT() {
+/** URL `?lang=` first (SSR + share), then the store. Never seed the store on the server. */
+export function useAppLang(): AppLang {
   const storeLang = useLocale((s) => s.lang);
   const location = useRouterState({ select: (s) => s.location });
-  const lang = (langFromQuery(location.search) || langFromQuery(location.searchStr) || storeLang) as AppLang;
+  return langFromQuery(location.search) || langFromQuery(location.searchStr) || storeLang;
+}
+
+export function useT() {
+  const lang = useAppLang();
   return useCallback(
     (key: CopyKey, vars?: Record<string, string | number>) => {
       const table = COPY[lang] ?? COPY.es;

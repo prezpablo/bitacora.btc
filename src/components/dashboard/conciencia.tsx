@@ -1,10 +1,9 @@
 import { SeoFaq } from "@/components/seo-head";
-import { CONCIENCIA, useT } from "@/lib/i18n";
-import { useLocale } from "@/lib/locale";
+import { CONCIENCIA, useAppLang, useT } from "@/lib/i18n";
 
 export function ConcienciaBlock() {
   const t = useT();
-  const lang = useLocale((s) => s.lang);
+  const lang = useAppLang();
   const c = CONCIENCIA[lang];
   return (
     <div className="space-y-6">
