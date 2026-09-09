@@ -140,15 +140,15 @@ async function third(id, url) {
     const res = await fetch(url, { signal: ctrl.signal, headers: { "user-agent": UA } });
     const ms = Date.now() - t0;
     const note = `${res.status} ${ms}ms`;
-    if (id === "binance.api" || id === "mempool.space") {
-      add(warn, `3p ${id}`, true, `${note} (D-BN/D-MP: runner; no es CAÍDA del origen)`);
+    if (id === "binance.api" || id === "mempool.space" || id === "formsubmit") {
+      add(warn, `3p ${id}`, true, `${note} (D-BN/D-MP/D-FS: runner; no es CAÍDA del origen)`);
       return;
     }
     add(warn, `3p ${id}`, res.ok, note);
   } catch (err) {
     const note = err instanceof Error ? err.message : "fail";
-    if (id === "binance.api" || id === "mempool.space") {
-      add(warn, `3p ${id}`, true, `${note} (D-BN/D-MP: runner; no es CAÍDA del origen)`);
+    if (id === "binance.api" || id === "mempool.space" || id === "formsubmit") {
+      add(warn, `3p ${id}`, true, `${note} (D-BN/D-MP/D-FS: runner; no es CAÍDA del origen)`);
       return;
     }
     add(warn, `3p ${id}`, false, note);
@@ -163,6 +163,7 @@ await third("blockstream", "https://blockstream.info/api/blocks/tip/height");
 await third("binance.api", "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
 await third("binance.vision", "https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT");
 await third("okx", "https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP");
+await third("formsubmit", "https://formsubmit.co/");
 
 const coreFail = core.filter((x) => !x.pass);
 const warnFail = warn.filter((x) => !x.pass);

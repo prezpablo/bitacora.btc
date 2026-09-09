@@ -3,7 +3,8 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
 import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, hreflangHref, pageCanonical, pagePath, pageSeo } from "@/lib/seo";
-import { langFromLocation, langFromQuery, type AppLang } from "@/lib/locale";
+import { langFromLocation, langFromQuery, pickLang, langIsExplicit, retainLangSearch, type AppLang } from "@/lib/locale";
+import { SsrLangProvider } from "@/lib/ssr-lang";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
@@ -60,24 +61,31 @@ function headFor(path: string, lang: AppLang, explicitLang: boolean) {
   };
 }
 
-function loadLocation(location: { pathname?: string; search?: unknown; searchStr?: string; href?: string; url?: string }) {
-  const lang = langFromLocation(location);
+function loadLocation(
+  location: { pathname?: string; search?: unknown; searchStr?: string; href?: string; url?: string },
+  requestUrl = "",
+) {
+  const lang = pickLang(location.search, location.searchStr, location.href, location.url, requestUrl);
   const path = pagePath(location.pathname || "/");
-  const explicitLang = Boolean(
-    langFromQuery(location.search) ||
-      langFromQuery(location.searchStr) ||
-      langFromQuery(location.href) ||
-      langFromQuery(location.url),
-  );
+  const explicitLang = langIsExplicit(location.search, location.searchStr, location.href, location.url, requestUrl);
   return { lang, path, explicitLang };
 }
 
 export const Route = createRootRoute({
-  validateSearch: (raw: Record<string, unknown>) => {
-    const lang = langFromQuery(raw);
-    return lang ? { lang } : {};
+  validateSearch: retainLangSearch,
+  loader: async ({ location }) => {
+    let requestUrl = "";
+    if (typeof window === "undefined") {
+      try {
+        const { langFromServerRequest } = await import("@/lib/request-lang.server");
+        const fromReq = langFromServerRequest();
+        if (fromReq) requestUrl = `?lang=${fromReq}`;
+      } catch {
+        requestUrl = "";
+      }
+    }
+    return loadLocation(location, requestUrl);
   },
-  loader: ({ location }) => loadLocation(location),
   head: (ctx: { loaderData?: { lang?: AppLang; path?: string; explicitLang?: boolean } }) =>
     headFor(ctx.loaderData?.path ?? "/", ctx.loaderData?.lang ?? "es", Boolean(ctx.loaderData?.explicitLang)),
   component: RootDoc,
@@ -101,7 +109,9 @@ function RootDoc() {
         <PreviewHostBridge />
         <AuthProvider>
           <AppQueryProvider>
-            <Outlet />
+            <SsrLangProvider lang={lang}>
+              <Outlet />
+            </SsrLangProvider>
           </AppQueryProvider>
         </AuthProvider>
         <Scripts />

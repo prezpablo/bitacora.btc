@@ -1,6 +1,7 @@
 import { useLocale, langFromQuery, type AppLang } from "./locale";
 import { useCallback } from "react";
 import { useRouterState } from "@tanstack/react-router";
+import { useSsrLang } from "./ssr-lang";
 
 const es = {
   navMercado: "Mercado",
@@ -1533,11 +1534,19 @@ export const COPY: Record<AppLang, Record<keyof typeof es, string>> = { es, en, 
 
 export type CopyKey = keyof typeof es;
 
-/** URL `?lang=` first (SSR + share), then the store. Never seed the store on the server. */
+/** URL `?lang=` first (SSR + share), then the root loader, then the store. */
 export function useAppLang(): AppLang {
+  const ssrLang = useSsrLang();
   const storeLang = useLocale((s) => s.lang);
   const location = useRouterState({ select: (s) => s.location });
-  return langFromQuery(location.search) || langFromQuery(location.searchStr) || storeLang;
+  return (
+    langFromQuery(location.search) ||
+    langFromQuery(location.searchStr) ||
+    langFromQuery(location.href) ||
+    langFromQuery(location.url) ||
+    ssrLang ||
+    storeLang
+  );
 }
 
 export function useT() {

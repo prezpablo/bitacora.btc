@@ -4,8 +4,12 @@ import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { useAppLang } from "@/lib/i18n";
 import { pageSeo } from "@/lib/seo";
+import { retainLangSearch } from "@/lib/locale";
 
-export const Route = createFileRoute("/mapa")({ component: MapaPage });
+export const Route = createFileRoute("/mapa")({
+  validateSearch: retainLangSearch,
+  component: MapaPage,
+});
 
 function MapaPage() {
   const lang = useAppLang();

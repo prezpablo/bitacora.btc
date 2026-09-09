@@ -49,6 +49,24 @@ export function langFromLocation(location: {
   );
 }
 
+/** Keep `?lang=` on every file route so the index `/` does not drop it. */
+export function retainLangSearch(raw: Record<string, unknown>): { lang?: AppLang } {
+  const lang = langFromQuery(raw);
+  return lang ? { lang } : {};
+}
+
+export function pickLang(...candidates: unknown[]): AppLang {
+  for (const c of candidates) {
+    const lang = langFromQuery(c);
+    if (lang) return lang;
+  }
+  return "es";
+}
+
+export function langIsExplicit(...candidates: unknown[]): boolean {
+  return candidates.some((c) => langFromQuery(c) != null);
+}
+
 function readLang(): AppLang {
   if (typeof window === "undefined") return "es";
   try {

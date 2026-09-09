@@ -53,6 +53,7 @@ flowchart TB
 | **P0** | ZIP VPS = `main` | **Abierto cada release** | Guía soberana aún no está en `.org` |
 | **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | 30/08 404 cerrado |
 | **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
+| **P1** | Copy SSR (H1 / legal / contacto) | **Hecho en repo** · falta ZIP | Primer byte aún en es en `.org` |
 | **P1** | Head SEO por ruta (canonical, hreflang, JSON-LD, 404 noindex, H1 único) | **Cerrado en `.org`** | `npm run test:seo` |
 | **P1** | URCDP | Presentada 2 set | Revisión, no código |
 | **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
@@ -77,6 +78,8 @@ flowchart TB
 |---|---|
 | D-MP-FEE / TIP | mempool.space mudo *en el runner*. Fees: ninja + emzy + blockstream + last-known. Avisar solo si el **probe VPS** también vacío 2–3 días. |
 | D-BN | Binance 451. Vision + OKX cubren. Nunca «mercado caído». |
+| D-FS | formsubmit.co timeout *en el runner*. El contacto va por server-fn del VPS. No es CAÍDA. |
+| P1-03 copy SSR | `lang`+title sí (inyector). Cuerpo del home en el primer byte: arreglo en repo (`retainLangSearch` + loader `getRequest`). Falta ZIP. |
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
 
 **No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`.
