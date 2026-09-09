@@ -1,10 +1,9 @@
 # Tests externos — bitacorabtc.org
 
-**Fecha:** 7 de setiembre de 2026  
+**Fecha:** 9 de setiembre de 2026  
 **Origen:** `https://bitacorabtc.org`  
-**Correr:** `npm run test:live`  (o `node scripts/probe-live.mjs`)  
-**SEO técnico:** `npm run test:seo`  
-**Estricto:** `PROBE_STRICT=1 npm run test:seo` (warnings = fail)
+**Correr:** `npm run test:live` · `npm run test:seo` · `PROBE_STRICT=1` si warnings = fail  
+**Smoke diario (agente):** [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) — prompt para pegar. No reemplaza estos probes.
 
 El probe pega al sitio público. **No** usa mempool.space ni Binance para decidir si Bitácora está caída. Esos van como `DEGRADA` del *runner*, no del VPS.
 
