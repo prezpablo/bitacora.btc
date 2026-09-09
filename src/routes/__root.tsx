@@ -5,6 +5,7 @@ import { AppQueryProvider } from "@/lib/query";
 import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, hreflangHref, pageCanonical, pagePath, pageSeo } from "@/lib/seo";
 import { langFromLocation, langFromQuery, pickLang, langIsExplicit, retainLangSearch, type AppLang } from "@/lib/locale";
 import { SsrLangProvider } from "@/lib/ssr-lang";
+import { getRequestLang } from "@/infrastructure/request-lang";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Bitácora.btc";
@@ -75,10 +76,9 @@ export const Route = createRootRoute({
   validateSearch: retainLangSearch,
   loader: async ({ location }) => {
     let requestUrl = "";
-    if (typeof window === "undefined") {
+    if (typeof document === "undefined") {
       try {
-        const { langFromServerRequest } = await import("@/lib/request-lang.server");
-        const fromReq = langFromServerRequest();
+        const fromReq = await getRequestLang();
         if (fromReq) requestUrl = `?lang=${fromReq}`;
       } catch {
         requestUrl = "";
