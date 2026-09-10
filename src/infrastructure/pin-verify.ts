@@ -129,7 +129,7 @@ export async function scrapePendingPins(rows: CommunityPin[], limit = 4): Promis
   if (!pending.length) return { rows, changed: false };
   const hits = await Promise.all(
     pending.map(async (p) => {
-      const ok = await scrapeShowsToken(p.proof, p.token, p.links);
+      const ok = p.proof ? await scrapeShowsToken(p.proof, p.token, p.links) : false;
       return ok ? p.id : "";
     }),
   );

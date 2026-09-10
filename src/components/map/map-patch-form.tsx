@@ -4,7 +4,7 @@ import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
-import { VerifyIgHow } from "./verify-ig-how";
+import { CargaProofStep } from "./carga-proof-step";
 
 export function ListingPatchForm({
   listingId,
@@ -38,7 +38,6 @@ export function ListingPatchForm({
   const [nextAddr, setNextAddr] = useState(address || "");
   const [nextNotes, setNextNotes] = useState(notes || "");
   const [nextLogo, setNextLogo] = useState(logo || "");
-  const [proof, setProof] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
@@ -50,8 +49,9 @@ export function ListingPatchForm({
     if (code === "captcha") setErr(t("captchaNeed"));
     else if (code === "rate") setErr(t("patchRate"));
     else if (code === "nochange") setErr(t("patchNochange"));
-    else if (code === "links") setErr(t("verifyNeedLink"));
-    else if (code === "need") setErr(t("patchNeed"));
+    else if (code === "links" || code === "need") setErr(t("verifyNeedLink"));
+    else if (code === "instagram") setErr(t("pinNoIg"));
+    else if (code === "proof") setErr(t("pinProofFail"));
     else setErr(t("patchFail"));
   }
 
@@ -59,42 +59,29 @@ export function ListingPatchForm({
     return (
       <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
         <p className="text-muted-foreground">{t("patchPending")}</p>
-        <p>
-          <code className="rounded bg-primary px-1.5 py-0.5 font-mono text-sm font-bold text-white">{pending.token}</code>
-        </p>
-        <VerifyIgHow />
-        {err ? <p className="text-primary">{err}</p> : null}
-        <Button
-          type="button"
-          className="w-full"
-          disabled={busy}
-          onClick={() => {
+        <CargaProofStep
+          token={pending.token}
+          busy={busy}
+          err={err}
+          onCheck={(url) => {
             setBusy(true);
             setErr("");
-            void verifyListingPatch({ data: { id: pending.id, token: pending.token } })
+            void verifyListingPatch({ data: { id: pending.id, token: pending.token, proof: url } })
               .then((res) => {
                 if (res.ok) {
                   setPending(null);
                   onApplied?.();
                   onClose?.();
-                } else setErr(res.error === "proof" ? t("pinProofFail") : t("patchFail"));
+                } else fail(res.error);
               })
               .finally(() => setBusy(false));
           }}
-        >
-          {t("pinCheck")}
-        </Button>
-        <button
-          type="button"
-          className="w-full text-center text-xs text-muted-foreground"
-          onClick={() => {
+          onCancel={() => {
             void cancelListingPatch({ data: { id: pending.id, token: pending.token } });
             setPending(null);
             onClose?.();
           }}
-        >
-          {t("pinCancel")}
-        </button>
+        />
       </div>
     );
   }
@@ -122,7 +109,6 @@ export function ListingPatchForm({
             address: isCommunity ? undefined : nextAddr,
             notes: nextNotes,
             logo: nextLogo,
-            proof,
             lat,
             lon,
             community: Boolean(isCommunity),
@@ -139,9 +125,13 @@ export function ListingPatchForm({
       }}
     >
       <p className="text-xs text-pretty text-muted-foreground">{t("patchLead")}</p>
+      <p className="text-xs text-muted-foreground">{t("reqHint")}</p>
       <label className="block text-sm">
-        {t("fldName")}
-        <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextName} onChange={(e) => setNextName(e.target.value)} />
+        {t("fldName")}{" "}
+        <span className="text-primary" aria-hidden="true">
+          *
+        </span>
+        <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextName} onChange={(e) => setNextName(e.target.value)} aria-required="true" required />
       </label>
       <label className="block text-sm">
         {t("fldDesc")}
@@ -153,21 +143,11 @@ export function ListingPatchForm({
           <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextAddr} onChange={(e) => setNextAddr(e.target.value)} />
         </label>
       ) : null}
-      <label className="block text-sm">
-        {t("patchProof")}
-        <input
-          className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]"
-          value={proof}
-          onChange={(e) => setProof(e.target.value)}
-          placeholder={t("patchPhProof")}
-          required
-        />
-      </label>
       <CaptchaBox ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
       <PrivacyAccept id={`privacy-patch-${listingId}`} checked={privacyOk} onChange={setPrivacyOk} />
       {err ? <p className="text-sm text-primary">{err}</p> : null}
       <div className="grid grid-cols-2 gap-2">
-        <Button type="submit" size="sm" disabled={busy}>
+        <Button type="submit" size="sm" disabled={busy || !nextName.trim() || !captchaOk || !privacyOk} title={nextName.trim() && captchaOk && privacyOk ? undefined : t("reqHint")}>
           {t("patchSubmit")}
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={() => onClose?.()}>

@@ -117,7 +117,7 @@ export function parsePinsCsv(text: string): CommunityPin[] {
     const id = get("id");
     if (!id) continue;
     const proof = get("proof");
-    if (!/^https?:\/\//i.test(proof)) continue;
+    if (proof && !/^https?:\/\//i.test(proof)) continue;
     rows.push({
       id,
       name: get("name").slice(0, 80),

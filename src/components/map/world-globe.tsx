@@ -64,7 +64,10 @@ function GlobeCanvas({
   const lang = useAppLang();
   const reduceMotion = usePrefersReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
-  const globeRef = useRef<{ controls: () => { autoRotate: boolean; autoRotateSpeed: number }; pointOfView: () => { lat: number; lng: number; altitude: number } } | null>(null);
+  const globeRef = useRef<{
+    controls: () => { autoRotate: boolean; autoRotateSpeed: number; enableZoom: boolean };
+    pointOfView: () => { lat: number; lng: number; altitude: number };
+  } | null>(null);
   const entered = useRef(false);
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
   const [loadErr, setLoadErr] = useState("");
@@ -167,6 +170,7 @@ function GlobeCanvas({
     const apply = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
+      if (w < 40 || h < 40) return;
       setSize((s) => (Math.abs(s.w - w) < 8 && Math.abs(s.h - h) < 8 ? s : { w, h }));
     };
     apply();
@@ -189,10 +193,10 @@ function GlobeCanvas({
     }
   }, [lang]);
 
-  function enter(lat: number, lon: number, zoom: number, iso?: string, pin?: { id?: string; kind?: "shop" | "community" }) {
+  function enter(lat: number, lon: number, zoom: number, iso?: string, pin?: { id?: string; kind?: "shop" | "community" }, join?: boolean) {
     if (entered.current) return;
     entered.current = true;
-    onEnter({ lat, lon, zoom, iso, id: pin?.id, kind: pin?.kind });
+    onEnter({ lat, lon, zoom, iso, id: pin?.id, kind: pin?.kind, join });
   }
 
   async function joinHere() {
@@ -207,7 +211,7 @@ function GlobeCanvas({
       } catch {
         city = (await locateBest(false, cityOf)).city;
       }
-      enter(city.lat, city.lon, 13, city.countryCode);
+      enter(city.lat, city.lon, 16, city.countryCode, undefined, true);
     } catch {
       onSkip();
     } finally {
@@ -257,7 +261,7 @@ function GlobeCanvas({
     (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo" }) => {
       const el = document.createElement("button");
       const founding = d.id === FOUNDING_UY.id;
-      const sizePx = founding ? 14 : d.face === "btc" ? 11 : 12;
+      const sizePx = founding ? 28 : 24;
       el.type = "button";
       el.title = d.name || "";
       el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
@@ -293,7 +297,7 @@ function GlobeCanvas({
         <p className="font-display text-2xl text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
         <p className="mt-1 text-sm text-neutral-600 sm:text-base">{t("globeTitle")}</p>
         {world ? (
-          <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-5 gap-y-1">
+          <p className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 sm:grid-cols-4 sm:justify-items-center">
             <span>
               <span className="text-2xl font-bold text-primary sm:text-3xl">{world.cities.toLocaleString()}</span>
               <span className="ml-1.5 text-sm font-medium text-neutral-600">{t("globeCities")}</span>
@@ -314,11 +318,23 @@ function GlobeCanvas({
         ) : null}
       </header>
 
+      <div className="isolate overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
       <div
         ref={wrap}
-        className="relative z-0 h-[min(58dvh,520px)] w-full min-h-[320px] overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)] sm:h-[min(78dvh,740px)]"
+        tabIndex={0}
+        title={t("zoomNeedFocus")}
+        onPointerDown={() => wrap.current?.focus({ preventScroll: true })}
+        onFocus={() => {
+          const g = globeRef.current;
+          if (g) g.controls().enableZoom = true;
+        }}
+        onBlur={() => {
+          const g = globeRef.current;
+          if (g) g.controls().enableZoom = false;
+        }}
+        className="relative z-0 h-[min(52dvh,480px)] w-full min-h-[320px] overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)] sm:h-[min(58dvh,560px)]"
       >
-      {Globe ? (
+      {Globe && !geo.isPending && !geo.isError ? (
         <Globe
           ref={globeRef}
           width={Math.max(size.w, 280)}
@@ -334,11 +350,11 @@ function GlobeCanvas({
           polygonCapCurvatureResolution={4}
           polygonCapColor={(d: Feat) => {
             const on = d.shops + d.comms + d.events + d.cities > 0;
-            if (hover?.iso === d.iso) return "rgba(247,147,26,0.32)";
-            return on ? "rgba(247,147,26,0.14)" : "#ffffff";
+            if (hover?.iso === d.iso) return "rgba(247,147,26,0.55)";
+            return on ? "rgba(247,147,26,0.4)" : "#f3f1ec";
           }}
-          polygonSideColor={() => "#111111"}
-          polygonStrokeColor={() => "#111111"}
+          polygonSideColor={() => "rgba(29,29,27,0.45)"}
+          polygonStrokeColor={() => "#1d1d1b"}
           polygonAltitude={(d: Feat) => {
             if (hover?.iso === d.iso) return 0.012;
             return d.shops + d.comms + d.events + d.cities > 0 ? 0.005 : 0.003;
@@ -346,7 +362,7 @@ function GlobeCanvas({
           polygonsTransitionDuration={0}
           htmlElementsData={htmlPins}
           htmlLat="lat"
-          htmlLng="lng"
+          htmlLng={(d: { lng?: number; lon?: number }) => d.lng ?? d.lon}
           htmlAltitude={0.008}
           htmlTransitionDuration={0}
           htmlElement={htmlElement}
@@ -373,12 +389,13 @@ function GlobeCanvas({
             const c = g.controls();
             c.autoRotate = !reduceMotion;
             c.autoRotateSpeed = reduceMotion ? 0 : 0.4;
+            c.enableZoom = document.activeElement === wrap.current;
           }}
         />
       ) : (
         <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center">
-          <p className="text-sm text-neutral-500">{loadErr ? t("globeFail") : t("loading")}</p>
-          {loadErr ? (
+          <p className="text-sm text-neutral-500">{loadErr || geo.isError ? t("globeFail") : t("loading")}</p>
+          {loadErr || geo.isError ? (
             <button type="button" className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white" onClick={onSkip}>
               {t("globeSkip")}
             </button>
@@ -387,7 +404,7 @@ function GlobeCanvas({
       )}
 
       {hover ? (
-        <div className="pointer-events-none absolute top-12 right-2 left-2 z-20 rounded-md bg-white/95 px-3 py-2 shadow-[var(--shadow-border)] sm:top-auto sm:right-auto sm:bottom-16 sm:left-1/2 sm:w-[min(92%,320px)] sm:-translate-x-1/2">
+        <div className="pointer-events-none absolute top-12 right-2 left-2 z-20 rounded-md bg-white/95 px-3 py-2 shadow-[var(--shadow-border)] sm:top-auto sm:right-auto sm:bottom-4 sm:left-1/2 sm:w-[min(92%,320px)] sm:-translate-x-1/2">
           <p className="font-medium text-neutral-900">{names?.of(hover.iso) || hover.iso}</p>
           <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 font-mono text-xs text-neutral-700 sm:grid-cols-1 sm:text-sm">
             <li>
@@ -404,27 +421,26 @@ function GlobeCanvas({
             </li>
           </ul>
         </div>
-      ) : (
-        <p className="pointer-events-none absolute bottom-12 left-1/2 z-10 hidden -translate-x-1/2 text-xs text-neutral-500 sm:block">
-          {t("globeHint")}
-        </p>
-      )}
-
-      <button
-        type="button"
-        className="absolute top-2 left-2 z-20 h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-60 sm:top-auto sm:bottom-3 sm:left-3"
-        onClick={() => void joinHere()}
-        disabled={joining}
-      >
-        {joining ? t("geoWait") : t("globeJoin")}
-      </button>
-      <button
-        type="button"
-        className="absolute top-2 right-2 z-20 h-9 rounded-md bg-primary px-3 text-sm font-medium text-white sm:top-auto sm:right-3 sm:bottom-3"
-        onClick={onSkip}
-      >
-        {t("globeSkip")}
-      </button>
+      ) : null}
+      </div>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-border px-3 py-2">
+        <button
+          type="button"
+          className="h-9 w-fit max-w-full justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-60"
+          onClick={() => void joinHere()}
+          disabled={joining}
+        >
+          {joining ? t("geoWait") : t("globeJoin")}
+        </button>
+        <p className="hidden text-center text-xs text-neutral-500 sm:block">{t("globeHint")}</p>
+        <button
+          type="button"
+          className="h-9 w-fit max-w-full justify-self-end rounded-md bg-primary px-3 text-sm font-medium text-white"
+          onClick={onSkip}
+        >
+          {t("globeSkip")}
+        </button>
+      </div>
       </div>
     </div>
   );
@@ -432,7 +448,7 @@ function GlobeCanvas({
 
 export function WorldGlobe({ onEnter, onSkip }: { onEnter: (focus: GlobeFocus) => void; onSkip: () => void }) {
   return (
-    <ClientOnly fallback={<div className="h-[min(88dvh,820px)] rounded-lg bg-white" />}>
+    <ClientOnly fallback={<div className="h-[min(58dvh,560px)] rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
       <GlobeCanvas onEnter={onEnter} onSkip={onSkip} />
     </ClientOnly>
   );

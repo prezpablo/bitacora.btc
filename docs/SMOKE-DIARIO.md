@@ -2,7 +2,7 @@
 
 Pegar el bloque de abajo en el agente (Grok u otro). No pentest. Complementa `npm run test:live` y `npm run test:seo`; no los reemplaza.
 
-Fecha del prompt: 9 set 2026. Hallazgos: copy SSR cerrado; Vision cubre Binance; fees ninja/emzy/blockstream; no exigir precio ni Leaflet en el primer byte.
+Fecha del prompt: 10 set 2026. Hallazgos: copy SSR cerrado en repo; IA D-NAV 01–05 (barra de 4 + Sumate + destinos). Sesión completa de todos los componentes: [`TEST-COMPLETO.md`](TEST-COMPLETO.md). Funcionamiento (más corto): [`SMOKE-FUNCIONAL.md`](SMOKE-FUNCIONAL.md).
 
 ---
 
@@ -52,7 +52,7 @@ P0 Infra origen
 - P0-18 GET /no-existe-bitacora → 404, robots noindex (meta o header), title con «No encontrado» o Not found. 200 con home = CAÍDA de identidad
 
 P1 Producto
-- P1-01 home con anclas/secciones mapa, pulso, red, mercado, contribución, contacto (texto o href, no hace falta Leaflet)
+- P1-01 home con anclas mapa, aprender, comunidad, mercado (pulso y red pueden ser internas; texto o href, no hace falta Leaflet)
 - P1-02 claims no-custodia / no-cuenta / no-PSAV
 - P1-03 i18n: /?lang=es|pt|en 200; <html lang> coincide (es/pt/en)
 - P1-03b copy SSR (regresión): H1 de /?lang=pt = Boas-vindas (NO «Te damos la bienvenida»). H1 /?lang=en = Welcome. /legal?lang=pt H1 Privacidade. Si lang=pt y el H1 sigue en castellano = DEGRADA
@@ -67,6 +67,11 @@ P1 Producto
 - P1-30 BTC address exacta + URI bitcoin: coherente
 - P1-33 form contacto visible (NO enviar)
 - P1-40 /legal anclas vivas (#aviso #privacidad #cookies #accesibilidad #contacto)
+- P1-50 barra 4 destinos en orden Mapa, Aprender, Comunidad, Mercado (en/pt equivalentes). No Roadmap/Red/Pulso/Historia/Networking en la barra
+- P1-51 CTA Sumate en header (Join / Junta-te)
+- P1-52 Aprender: índice Qué es Bitácora · Historia de Bitcoin · Bitcoin hoy
+- P1-53 pie sin Privacidad duplicada; rumbo y contacto en el pie, no en la barra
+- P1-54 #red ancla interna de #mercado
 
 P2 Seguridad
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer-policy no-referrer, permissions-policy

@@ -28,6 +28,42 @@ const SHARE_META_KEYS = new Set([
   "x:game:image:height",
 ]);
 
+const BITACORA_HOST = new Set(["bitacorabtc.org", "www.bitacorabtc.org"]);
+const HOME_TITLE = {
+  es: "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica",
+  en: "Bitácora.btc | Bitcoin community and merchant map for Latin America",
+  pt: "Bitácora.btc | Mapa de comunidades e comércios Bitcoin na América Latina",
+};
+const HOME_LOCALE = { es: "es_UY", en: "en_US", pt: "pt_BR" };
+const NOT_FOUND_TITLE = {
+  es: "No encontrado | Bitácora.btc",
+  en: "Not found | Bitácora.btc",
+  pt: "Não encontrado | Bitácora.btc",
+};
+
+export function langFromSearch(search = "") {
+  const m = String(search).match(/[?&]lang=(es|en|pt)\b/i);
+  return m ? m[1].toLowerCase() : "";
+}
+
+export function wantGrokExtensions(host = "") {
+  const h = String(host).split(":")[0].toLowerCase().replace(/^www\./, "");
+  if (h === "bitacorabtc.org") return false;
+  return true;
+}
+
+export function stripGrokExtensions(html) {
+  return String(html)
+    .replace(/<script\b[^>]*grok-app-builder\/extensions\.js[^>]*>\s*<\/script>/gi, "")
+    .replace(/<script\b[^>]*grok-app-builder\/extensions\.js[^>]*\/?\s*>/gi, "");
+}
+
+function pathFromSearch(search = "") {
+  const raw = String(search || "/");
+  const path = raw.split("?")[0] || "/";
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
 export function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -202,177 +238,6 @@ export function grokPwaHeadTags(appName = DEFAULT_APP_NAME) {
 
 export const GROK_EXTENSIONS_SCRIPT_SRC = "https://grok.com/grok-app-builder/extensions.js";
 
-const DOC_LANG = {
-  es: {
-    title: "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica",
-    locale: "es_UY",
-  },
-  en: {
-    title: "Bitácora.btc | Bitcoin community and merchant map for Latin America",
-    locale: "en_US",
-  },
-  pt: {
-    title: "Bitácora.btc | Mapa de comunidades e comércios Bitcoin na América Latina",
-    locale: "pt_BR",
-  },
-};
-
-const NOT_FOUND_TITLE = {
-  es: "No encontrado | Bitácora.btc",
-  en: "Not found | Bitácora.btc",
-  pt: "Não encontrado | Bitácora.btc",
-};
-
-export function langFromSearch(search) {
-  const s = String(search || "");
-  let q = "";
-  try {
-    if (s.includes("://") || s.startsWith("/")) {
-      q = new URL(s, "https://bitacorabtc.org").searchParams.get("lang") || "";
-    } else {
-      q = new URLSearchParams(s.replace(/^\?/, "")).get("lang") || "";
-    }
-  } catch {
-    const cut = s.includes("?") ? s.slice(s.indexOf("?") + 1) : s;
-    q = new URLSearchParams(cut).get("lang") || "";
-  }
-  const l = q.slice(0, 2).toLowerCase();
-  return l === "es" || l === "en" || l === "pt" ? l : "";
-}
-
-/** Preview (Grok / sslip / local) keeps extensions.js. Production CSP blocks grok.com. */
-export function wantGrokExtensions(host = "") {
-  return !String(host || "")
-    .toLowerCase()
-    .includes("bitacorabtc.org");
-}
-
-export function stripGrokExtensions(html) {
-  return String(html).replace(
-    /<script\b[^>]*grok-app-builder\/extensions\.js[^>]*>\s*<\/script>/gi,
-    "",
-  );
-}
-
-export function applyHtmlLang(html, lang) {
-  if (!lang || typeof html !== "string") return html;
-  if (!/<html\b/i.test(html)) return html;
-  return html.replace(/<html\b([^>]*)>/i, (_, attrs) => {
-    const cleaned = String(attrs).replace(/\s*lang\s*=\s*["'][^"']*["']/i, "");
-    return `<html lang="${lang}"${cleaned}>`;
-  });
-}
-
-function rewriteMeta(html, attr, key, content) {
-  const esc = escapeHtml(content);
-  const keyRe = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const a = new RegExp(`${attr}=["']${keyRe}["']\\s+content=["'][^"']*["']`, "i");
-  const b = new RegExp(`content=["'][^"']*["']\\s+${attr}=["']${keyRe}["']`, "i");
-  if (a.test(html)) return html.replace(a, `${attr}="${key}" content="${esc}"`);
-  if (b.test(html)) return html.replace(b, `${attr}="${key}" content="${esc}"`);
-  return html;
-}
-
-const HOME_TITLES = new Set([
-  DOC_LANG.es.title,
-  DOC_LANG.en.title,
-  DOC_LANG.pt.title,
-  "Bitácora.btc | Mapa Bitcoin Latinoamérica",
-]);
-
-/**
- * Crawler-facing i18n (P1-03). SSR often emits lang=es for every ?lang=.
- * Only home titles are rewritten so /mapa /legal keep their own <title>.
- */
-export function applyDocumentLang(html, lang) {
-  const seo = DOC_LANG[lang];
-  if (!seo) return html;
-  let next = applyHtmlLang(html, lang);
-  const current = titleFromDocument(next);
-  if (HOME_TITLES.has(current)) {
-    next = next.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(seo.title)}</title>`);
-    next = rewriteMeta(next, "property", "og:title", seo.title);
-    next = rewriteMeta(next, "name", "twitter:title", seo.title);
-  }
-  next = rewriteMeta(next, "property", "og:locale", seo.locale);
-  return next;
-}
-
-function metaContent(html, attr, key) {
-  const keyRe = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const a = String(html).match(new RegExp(`${attr}=["']${keyRe}["']\\s+content=["']([^"']*)["']`, "i"));
-  if (a) return a[1];
-  const b = String(html).match(new RegExp(`content=["']([^"']*)["']\\s+${attr}=["']${keyRe}["']`, "i"));
-  return b ? b[1] : "";
-}
-
-function upsertMeta(html, attr, key, content) {
-  if (!content) return html;
-  const rewritten = rewriteMeta(html, attr, key, content);
-  if (rewritten !== html) return rewritten;
-  return insertBeforeHeadClose(html, `<meta ${attr}="${key}" content="${escapeHtml(content)}">`);
-}
-
-function isBitacoraHost(host) {
-  return String(host || "").toLowerCase().includes("bitacorabtc.org");
-}
-
-export function absoluteFromSearch(host, search) {
-  const publicHost = resolvePublicHost(host) || (isBitacoraHost(host) ? "bitacorabtc.org" : "");
-  if (!publicHost) return "";
-  const raw = String(search || "/");
-  try {
-    const base = `https://${publicHost}`;
-    const u = new URL(raw.includes("://") ? raw : raw.startsWith("/") ? raw : `/${raw}`, base);
-    let path = u.pathname || "/";
-    if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
-    return `${base}${path}${u.search}`;
-  } catch {
-    return `https://${publicHost}/`;
-  }
-}
-
-/** After platform share-strip: restore per-URL OG for bitacorabtc.org. */
-export function applyDocumentShare(html, ctx = {}) {
-  const host = ctx.host || "";
-  let next = String(html);
-  const title = titleFromDocument(next);
-  if (isBitacoraHost(host) && title) {
-    next = rewriteMeta(next, "property", "og:title", title);
-    next = rewriteMeta(next, "name", "twitter:title", title);
-  }
-  const desc = metaContent(next, "name", "description");
-  if (isBitacoraHost(host) && desc) {
-    next = upsertMeta(next, "property", "og:description", desc);
-    next = upsertMeta(next, "name", "twitter:description", desc);
-  }
-  const url = absoluteFromSearch(host, ctx.search);
-  if (url && isBitacoraHost(host)) {
-    next = upsertMeta(next, "property", "og:url", url);
-  }
-  const img = metaContent(next, "property", "og:image");
-  if (img && isBitacoraHost(host)) {
-    next = upsertMeta(next, "name", "twitter:image", img);
-  }
-  if (Number(ctx.status) === 404) {
-    const lang = langFromSearch(ctx.search) || "es";
-    const missing = NOT_FOUND_TITLE[lang] || NOT_FOUND_TITLE.es;
-    next = next.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(missing)}</title>`);
-    next = rewriteMeta(next, "property", "og:title", missing);
-    next = rewriteMeta(next, "name", "twitter:title", missing);
-    next = upsertMeta(next, "name", "robots", "noindex,follow");
-    next = next.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/gi, "");
-  }
-  return next;
-}
-
-function finishDocumentHead(html, ctx, host) {
-  let out = html;
-  if (!wantGrokExtensions(host)) out = stripGrokExtensions(out);
-  out = applyDocumentLang(out, ctx.lang || langFromSearch(ctx.search));
-  return applyDocumentShare(out, { host, search: ctx.search, status: ctx.status });
-}
-
 export function readGrokProjectId() {
   const fromProcess = typeof process !== "undefined" ? process.env?.VITE_PROJECT_ID : "";
   return String(fromProcess ?? "").trim();
@@ -510,6 +375,8 @@ export function grokOgHeadTags({
   site = {},
   documentTitle = "",
   cwd = process.cwd(),
+  search = "",
+  description = "",
 } = {}) {
   const title = resolveOgTitle(site, appName, host, documentTitle);
   const publicHost = resolvePublicHost(host);
@@ -517,9 +384,9 @@ export function grokOgHeadTags({
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta property="og:title" content="${escapeHtml(title)}">`,
   ];
-  const description = String(site.description ?? "").trim();
-  if (description) {
-    tags.push(`<meta property="og:description" content="${escapeHtml(description)}">`);
+  const desc = String(description || site.description || "").trim();
+  if (desc) {
+    tags.push(`<meta property="og:description" content="${escapeHtml(desc)}">`);
   }
   if (String(site.type ?? "").toLowerCase() === "x:game") {
     tags.push(`<meta property="og:type" content="x:game">`);
@@ -533,8 +400,11 @@ export function grokOgHeadTags({
     const color = !custom ? placeholderCardColor(site) : "";
     if (color) image += `&color=${encodeURIComponent(color)}`;
     tags.push(`<meta property="og:image" content="${escapeHtml(image)}">`);
+    tags.push(`<meta name="twitter:image" content="${escapeHtml(image)}">`);
     tags.push(`<meta property="og:image:width" content="1200">`);
     tags.push(`<meta property="og:image:height" content="630">`);
+    const path = search ? (String(search).startsWith("/") ? search : `/${search}`) : "/";
+    tags.push(`<meta property="og:url" content="${escapeHtml(`https://${publicHost}${path === "/" && !search ? "/" : path}`)}">`);
     const banner = String(site.banner ?? "").trim();
     if (banner) {
       const bannerUrl = `https://${publicHost}${banner.startsWith("/") ? banner : `/${banner}`}`;
@@ -593,17 +463,68 @@ export function normalizeHeadContext(ctx = {}) {
   };
 }
 
+function descriptionFromDocument(html) {
+  const tag = String(html).match(/<meta\b[^>]*\bname=["']description["'][^>]*>/i);
+  if (!tag) return "";
+  const content = tag[0].match(/\bcontent=["']([^"']*)["']/i);
+  return content ? content[1] : "";
+}
+
+function setHtmlLang(html, lang) {
+  if (!lang || !/<html\b/i.test(html)) return html;
+  return html.replace(/<html\b([^>]*)>/i, (full, attrs) => {
+    if (/\blang=/i.test(attrs)) return `<html${attrs.replace(/\blang=["'][^"']*["']/i, `lang="${lang}"`)}>`;
+    return `<html lang="${lang}"${attrs}>`;
+  });
+}
+
+function setTitle(html, title) {
+  if (/<title\b/i.test(html)) return html.replace(/<title\b[^>]*>[^<]*<\/title>/i, `<title>${title}</title>`);
+  return insertAfterHeadOpen(html, `<title>${title}</title>`);
+}
+
 export function injectGrokPwaHead(html, ctx = {}) {
   if (typeof html !== "string") return html;
   const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
-  const documentTitle = titleFromDocument(html);
+  const search = ctx.search || "";
+  const status = Number(ctx.status || 0);
+  const lang = String(ctx.lang || langFromSearch(search) || "").toLowerCase();
+  const pathname = pathFromSearch(search);
+  let next = html;
+  if (!wantGrokExtensions(host)) next = stripGrokExtensions(next);
+  if (lang) next = setHtmlLang(next, lang);
+
+  const bitacora = wantGrokExtensions(host) === false;
+  if (status === 404) {
+    next = setTitle(next, NOT_FOUND_TITLE[lang] || NOT_FOUND_TITLE.es);
+    if (/name=["']robots["']/i.test(next)) {
+      next = next.replace(/<meta\b[^>]*name=["']robots["'][^>]*>/gi, `<meta name="robots" content="noindex,follow">`);
+    } else {
+      next = insertAfterHeadOpen(next, `<meta name="robots" content="noindex,follow">`);
+    }
+    next = next.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/gi, "");
+  } else if (bitacora && lang && (pathname === "/" || pathname === "")) {
+    const title = HOME_TITLE[lang];
+    if (title) next = setTitle(next, title);
+    const loc = HOME_LOCALE[lang];
+    if (loc) {
+      if (/property=["']og:locale["']/i.test(next)) {
+        next = next.replace(/<meta\b[^>]*property=["']og:locale["'][^>]*>/i, `<meta property="og:locale" content="${loc}">`);
+      } else {
+        next = insertAfterHeadOpen(next, `<meta property="og:locale" content="${loc}">`);
+      }
+    }
+  }
+
+  const documentTitle = titleFromDocument(next);
   const appName = resolveOgTitle(
     site,
     ctx.appName ?? DEFAULT_APP_NAME,
     host,
     documentTitle,
   );
-  let next = stripShareMetaTags(html);
+  const pageDesc = descriptionFromDocument(next);
+  next = stripShareMetaTags(next);
 
   const missing = grokPwaHeadTags(appName)
     .filter(([key]) => {
@@ -615,7 +536,15 @@ export function injectGrokPwaHead(html, ctx = {}) {
 
   next = insertAfterHeadOpen(
     next,
-    grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
+    grokOgHeadTags({
+      host,
+      appName,
+      site,
+      documentTitle,
+      cwd,
+      search,
+      description: pageDesc,
+    }).join(""),
   );
 
   if (wantGrokExtensions(host)) {
@@ -624,13 +553,13 @@ export function injectGrokPwaHead(html, ctx = {}) {
     } else if (projectId && !next.includes('name="grok-project-id"')) {
       missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
     }
-  }
-  if (
-    projectId &&
-    !next.includes('property="grok:app_id"') &&
-    !next.includes("property='grok:app_id'")
-  ) {
-    missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
+    if (
+      projectId &&
+      !next.includes('property="grok:app_id"') &&
+      !next.includes("property='grok:app_id'")
+    ) {
+      missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
+    }
   }
   const creatorTags = grokXCreatorHeadTags(creator, creatorId);
   if (creatorTags.length > 0) {
@@ -641,11 +570,8 @@ export function injectGrokPwaHead(html, ctx = {}) {
     if (!next.includes('property="x:creator:id"')) missing.push(creatorTags[1]);
   }
 
-  if (missing.length === 0) {
-    return finishDocumentHead(next, ctx, host);
-  }
-  const out = insertBeforeHeadClose(next, missing.join(""));
-  return finishDocumentHead(out, ctx, host);
+  if (missing.length === 0) return next;
+  return insertBeforeHeadClose(next, missing.join(""));
 }
 
 function findHeadClose(buf) {
@@ -674,9 +600,9 @@ export function createHeadInjector(ctx = {}) {
       host: normalized.host,
       cwd: normalized.cwd,
       site: normalized.site,
-      lang: ctx.lang,
-      search: ctx.search,
-      status: ctx.status,
+      search: ctx.search || "",
+      status: ctx.status || 0,
+      lang: ctx.lang || "",
     });
 
   return {

@@ -88,7 +88,7 @@ export function proposePatch(
 ): { patch: ListingPatch } | { error: PatchErr } {
   const fields = sanitizePatchFields(raw);
   const url = cleanHttp(proof);
-  if (!/^https?:\/\//i.test(url)) return { error: "links" };
+  if (url && !/^https?:\/\//i.test(url)) return { error: "links" };
   if (listingIsOurs(row.id) && !patchChanged(row, fields)) return { error: "nochange" };
   if (!listingIsOurs(row.id) && !patchChanged(row, fields) && !fields.name && !row.name) return { error: "need" };
   if (fields.name !== undefined && fields.name.length < 2) return { error: "name" };

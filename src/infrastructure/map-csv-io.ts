@@ -177,3 +177,29 @@ export async function savePublicMapCsv(csv: string): Promise<boolean> {
   await snapCsv(next);
   return true;
 }
+
+export async function countPendingMapRows(now = Date.now(), ttlMs = 7 * 24 * 60 * 60_000) {
+  await ensureSeed();
+  const row = openSqlite()
+    .prepare(
+      `SELECT COUNT(*) AS n FROM map_rows
+       WHERE verified_at = 0 AND created > ?
+         AND (id LIKE 'local:%' OR (id LIKE 'c:%' AND id != 'c:cc-btc'))`,
+    )
+    .get(now - ttlMs);
+  return Number(row?.n) || 0;
+}
+
+export async function deleteUnverifiedMapRow(id: string, token: string): Promise<"ok" | "live" | "token"> {
+  await ensureSeed();
+  const row = openSqlite().prepare("SELECT token, verified_at FROM map_rows WHERE id = ?").get(id);
+  if (!row) return "ok";
+  if (Number(row.verified_at) > 0) return "live";
+  if (String(row.token || "") !== token) return "token";
+  sqlTx(() => {
+    openSqlite().prepare("DELETE FROM map_rows WHERE id = ? AND verified_at = 0").run(id);
+  });
+  const left = allRows();
+  await snapCsv(left);
+  return "ok";
+}

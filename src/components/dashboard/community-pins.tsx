@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { VerifyIgHow } from "@/components/map/verify-ig-how";
+import { CargaPendingView, holdCargaSpinner } from "@/components/map/carga-proof-step";
 
 const PENDING_KEY = "bitacora-pin-pending";
 
@@ -145,13 +146,8 @@ export function CommunityPinsBoard() {
       setErr(t("privacyAcceptNeed"));
       return;
     }
-    const proofUrl = proof.trim().match(/^https?:\/\//i) ? proof.trim() : `https://${proof.trim()}`;
-    if (!name.trim() || !proof.trim()) {
+    if (!name.trim()) {
       setErr(t("pinNeed"));
-      return;
-    }
-    if (/instagram\.com/i.test(proofUrl) && !/instagram\.com\/(p|reel|reels|tv)\//i.test(proofUrl)) {
-      setErr(t("pinNoIg"));
       return;
     }
     setBusy(true);
@@ -165,16 +161,15 @@ export function CommunityPinsBoard() {
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
       const res = await submitCommunityPin({
-        data: { name: name.trim(), blurb, proof: proofUrl, links: extra, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce },
+        data: { name: name.trim(), blurb, links: extra, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce },
       });
-      const wait = Math.max(0, 700 - (Date.now() - started));
-      if (wait) await new Promise((r) => window.setTimeout(r, wait));
+      await holdCargaSpinner(started);
       if (cancelled.current) return;
       if (!res?.ok || !res.token || !res.id) {
         setErr(res?.error === "rate" ? t("pinRate") : res?.error === "captcha" ? t("captchaNeed") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
         return;
       }
-      keepPending({ id: res.id, token: res.token, name: name.trim(), proof: proofUrl, created: Date.now() });
+      keepPending({ id: res.id, token: res.token, name: name.trim(), proof: "", created: Date.now() });
       await q.refetch();
     } catch {
       setErr(t("pinNeed"));
@@ -184,14 +179,15 @@ export function CommunityPinsBoard() {
     }
   }
 
-  async function check() {
+  async function check(url?: string) {
     if (!pending) return;
+    const proofUrl = (url ?? proof).trim();
     setBusy(true);
     setErr("");
     try {
-      const res = await verifyCommunityPin({ data: { id: pending.id } });
+      const res = await verifyCommunityPin({ data: { id: pending.id, proof: proofUrl || undefined } });
       if (!res.ok) {
-        setErr(res.error === "instagram" ? t("pinIgBlock") : t("pinProofFail"));
+        setErr(res.error === "instagram" ? t("pinNoIg") : res.error === "need" ? t("verifyNeedLink") : t("pinProofFail"));
         return;
       }
       keepPending(null);
@@ -205,17 +201,6 @@ export function CommunityPinsBoard() {
       setErr(t("pinProofFail"));
     } finally {
       setBusy(false);
-    }
-  }
-
-  async function copyCode() {
-    if (!pending) return;
-    try {
-      await navigator.clipboard.writeText(pending.token);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 4000);
-    } catch {
-      setErr(pending.token);
     }
   }
 
@@ -259,6 +244,7 @@ export function CommunityPinsBoard() {
               <div>
                 <p className="text-sm font-medium text-foreground">{t("pinFormTitle")}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t("pinHow")}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("reqHint")}</p>
                 <div className="mt-2">
                   <VerifyIgHow />
                 </div>
@@ -271,49 +257,17 @@ export function CommunityPinsBoard() {
                 {t("pinCancel")}
               </button>
             </div>
-        {generating && !pending ? (
-          <div
-            className="mt-6 flex min-h-32 flex-col items-center justify-center gap-2"
-            role="status"
-            aria-live="polite"
-            aria-busy="true"
-          >
-            <span className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden />
-            <p className="font-display text-lg font-medium text-foreground">{t("pinGenerating")}</p>
-          </div>
-        ) : pending ? (
-          <div className="mt-4 space-y-3">
-            <p className="text-sm text-foreground">{t("pinPostCode")}</p>
-            <button
-              type="button"
-              onClick={() => void copyCode()}
-              className="block w-full rounded-md bg-primary px-3 py-3 text-center font-mono text-2xl font-bold tracking-widest text-white sm:text-3xl"
-              title={t("pinCopy")}
-              aria-label={`${t("pinCopy")}: ${pending.token}`}
-            >
-              {pending.token}
-            </button>
-            <p className="text-sm font-medium text-primary" role="status" aria-live="polite">
-              {copied ? t("pinCopied") : t("pinPostHint")}
-            </p>
-            {pending.proof ? (
-              <p className="truncate text-xs text-muted-foreground">
-                {pending.name ? `${pending.name} · ` : ""}
-                {pending.proof}
-              </p>
-            ) : null}
-            {err ? <p className="text-sm text-primary" role="alert">{err}</p> : null}
-            <button
-              type="button"
-              className="h-10 w-full rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
-              onClick={() => void check()}
-              disabled={busy}
-            >
-              {t("pinCheck")}
-            </button>
-            <button type="button" className="h-10 w-full rounded-md bg-elevated px-3 text-sm font-medium text-foreground" onClick={abort}>
-              {t("pinCancel")}
-            </button>
+        {generating || pending ? (
+          <div className="mt-4">
+            <CargaPendingView
+              generating={generating}
+              token={pending?.token}
+              name={pending?.name}
+              busy={busy}
+              err={err}
+              onCheck={(url) => void check(url)}
+              onCancel={abort}
+            />
           </div>
         ) : (
           <form
@@ -324,26 +278,19 @@ export function CommunityPinsBoard() {
             }}
           >
             <label className="block text-sm sm:col-span-1">
-              <span className="text-muted-foreground">{t("pinName")}</span>
+              <span className="text-muted-foreground">
+                {t("pinName")}{" "}
+                <span className="text-primary" aria-hidden="true">
+                  *
+                </span>
+              </span>
               <input
                 className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={80}
+                aria-required="true"
                 required
-              />
-            </label>
-            <label className="block text-sm sm:col-span-1">
-              <span className="text-muted-foreground">{t("pinProof")}</span>
-              <input
-                className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2"
-                value={proof}
-                onChange={(e) => setProof(e.target.value)}
-                placeholder="URL"
-                inputMode="url"
-                autoComplete="url"
-                required
-                aria-invalid={/instagram\.com/i.test(proof) || undefined}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -375,7 +322,8 @@ export function CommunityPinsBoard() {
               <button
                 type="submit"
                 className="h-9 min-w-40 flex-1 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
-                disabled={busy || !privacyOk}
+                disabled={busy || !privacyOk || !captchaOk || !name.trim()}
+                title={name.trim() && captchaOk && privacyOk ? undefined : t("reqHint")}
               >
                 {t("pinSubmit")}
               </button>
@@ -421,10 +369,12 @@ function PinCard({ pin, now, onCopy }: { pin: CommunityPin; now: number; onCopy?
           <button type="button" className="truncate text-left hover:underline" onClick={onCopy}>
             {pin.name}
           </button>
-        ) : (
+        ) : href ? (
           <a href={href} target="_blank" rel="noopener noreferrer" className="truncate no-underline hover:underline">
             {pin.name}
           </a>
+        ) : (
+          <span className="truncate">{pin.name}</span>
         )}
       </p>
       {pin.blurb ? <p className="mt-1 text-xs text-pretty text-muted-foreground">{pin.blurb}</p> : null}

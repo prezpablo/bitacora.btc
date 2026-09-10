@@ -9,11 +9,11 @@ import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
 import { nominatimCity, requestBeaconFix, type CityFrame } from "./geo";
-import { searchStreets, type StreetHit } from "./address";
+import { searchStreets, reverseStreet, nearbyStreets, type StreetHit } from "./address";
 import { fetchGuidePath, type GuidePath } from "./osrm";
 import { pickGuideMode, type GuideMode, type GuideStep } from "@/domain/guide";
 import { buildEventBoard } from "@/domain/event-board";
-import { loadMapCsvText, saveMapCsvText, savePublicMapCsv } from "./map-csv-io";
+import { loadMapCsvText, saveMapCsvText, savePublicMapCsv, countPendingMapRows, deleteUnverifiedMapRow } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
 import { loadPatches, savePatch, replacePatches, countPendingPatches, saveContactTicket } from "./patches-io";
 import { scrapeShowsToken } from "./pin-verify";
@@ -24,11 +24,13 @@ import { getRequest } from "@tanstack/react-start/server";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
+import { localShopId, slugifyName } from "@/domain/map-compose";
 import { applyListingPatch, proposeListingPatch } from "@/application/map-listings";
 import { makeContactTicket, PATCH_TTL_MS, patchAlive } from "@/domain/listing-patch";
-import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
+import { parseMapCsv, socialsFromCsv, socialsToCsv, stringifyMapCsv, stringifyMapCsvPublic, type MapCsvRow } from "@/domain/map-csv";
 import { mergeLiveFees } from "@/domain/fees";
 import { localeOf, translateFeed, translateNews } from "./translate";
+import { normalizeProofUrl, cargaVerifyGate } from "@/domain/verify";
 
 export const getMarket = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange; liq: LiqRange }) => input)
@@ -164,10 +166,27 @@ export const getCityFrame = createServerFn({ method: "POST" })
   });
 
 export const searchAddress = createServerFn({ method: "POST" })
-  .validator((input: { q: string; lang?: string }) => input)
+  .validator((input: { q: string; lang?: string; lat?: number; lon?: number }) => input)
   .handler(async ({ data }): Promise<StreetHit[]> => {
-    if (tooMany(clientKey("addr"), 40, 60 * 60_000) || tooMany("addr:global", 240, 60 * 60_000)) return [];
-    return await searchStreets(data.q, data.lang || "es");
+    // Autocompletar pega más que reverse/nearby: bucket aparte para no dejar la lista vacía.
+    if (tooMany(clientKey("addr-q"), 400, 60 * 60_000) || tooMany("addr-q:global", 4000, 60 * 60_000)) return [];
+    const near =
+      Number.isFinite(data.lat) && Number.isFinite(data.lon) ? { lat: Number(data.lat), lon: Number(data.lon) } : null;
+    return await searchStreets(data.q, data.lang || "es", near);
+  });
+
+export const reverseAddress = createServerFn({ method: "POST" })
+  .validator((input: { lat: number; lon: number; lang?: string }) => input)
+  .handler(async ({ data }): Promise<StreetHit | null> => {
+    if (tooMany(clientKey("addr-geo"), 80, 60 * 60_000) || tooMany("addr-geo:global", 800, 60 * 60_000)) return null;
+    return await reverseStreet(data.lat, data.lon, data.lang || "es");
+  });
+
+export const nearbyAddress = createServerFn({ method: "POST" })
+  .validator((input: { lat: number; lon: number; lang?: string }) => input)
+  .handler(async ({ data }): Promise<StreetHit[]> => {
+    if (tooMany(clientKey("addr-geo"), 80, 60 * 60_000) || tooMany("addr-geo:global", 800, 60 * 60_000)) return [];
+    return await nearbyStreets(data.lat, data.lon, data.lang || "es");
   });
 
 export const getGuidePath = createServerFn({ method: "POST" })
@@ -235,6 +254,84 @@ export const saveMapCsv = createServerFn({ method: "POST" })
     return { ok };
   });
 
+export const submitMapListing = createServerFn({ method: "POST" })
+  .validator((input: {
+    kind: "shop" | "community";
+    name: string;
+    slug?: string;
+    description?: string;
+    notes?: string;
+    address?: string;
+    logo?: string;
+    lat: number;
+    lon: number;
+    socials?: string;
+    hours?: string;
+    pays?: string;
+    captchaId?: string;
+    captcha?: string;
+    captchaNonce?: string;
+    hp?: string;
+  }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; id?: string; token?: string; error?: string }> => {
+    if ((data.hp || "").trim()) return { ok: true }; // honeypot: ok sin id/token, el formulario no avanza
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
+      return { ok: false, error: "captcha" };
+    }
+    if (tooMany(clientKey("map-add"), 6, 60 * 60_000)) return { ok: false, error: "rate" };
+    if (tooMany("map-add:global", 24, 60 * 60_000)) return { ok: false, error: "rate" };
+    if ((await countPendingMapRows()) >= 80) return { ok: false, error: "rate" };
+    const lat = Number(data.lat);
+    const lon = Number(data.lon);
+    const name = (data.name || "").trim().slice(0, 80);
+    if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) return { ok: false, error: "need" };
+    const rows = parseMapCsv(await loadMapCsvText());
+    let id = "";
+    if (data.kind === "community") {
+      const slug = slugifyName(data.slug || data.name);
+      if (!slug) return { ok: false, error: "slug" };
+      id = `c:${slug}`;
+    } else {
+      id = localShopId(lat, lon);
+    }
+    const existing = rows.find((r) => r.id === id);
+    if (existing?.verifiedAt) return { ok: false, error: data.kind === "community" ? "slugTaken" : "need" };
+    if (existing) return { ok: false, error: "pending" };
+    const row: MapCsvRow = {
+      id,
+      tipo: data.kind === "community" ? "community" : "shop",
+      name,
+      lat,
+      lon,
+      address: (data.address || "").trim().slice(0, 160),
+      description: (data.description || "").trim().slice(0, 500),
+      notes: (data.notes || "").trim().slice(0, 280),
+      score: 0,
+      votes: 0,
+      logo: (data.logo || "").trim().slice(0, 500),
+      socials: (data.socials || "").trim().slice(0, 800),
+      hours: (data.hours || "").replace(/\s+/g, "").slice(0, 200),
+      pays: (data.pays || "").trim().slice(0, 80),
+      created: Date.now(),
+      token: makePinToken(),
+      verifiedAt: 0, // público recién cuando el scrape ve el código en la URL
+    };
+    const ok = await saveMapCsvText(stringifyMapCsv([...rows, row]));
+    if (!ok) return { ok: false, error: "save" };
+    return { ok: true, id: row.id, token: row.token };
+  });
+
+export const cancelMapListing = createServerFn({ method: "POST" })
+  .validator((input: { id: string; token: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const token = (data.token || "").trim();
+    if (!token || !data.id) return { ok: false, error: "token" };
+    const gone = await deleteUnverifiedMapRow(data.id, token);
+    if (gone === "live") return { ok: false, error: "live" };
+    if (gone === "token") return { ok: false, error: "token" };
+    return { ok: true };
+  });
+
 function safeHttp(raw: string) {
   let u = raw.trim();
   if (u && !/^https?:\/\//i.test(u)) u = `https://${u}`;
@@ -249,7 +346,7 @@ function safeHttp(raw: string) {
 export const getCommunityPins = createServerFn({ method: "POST" }).handler(async (): Promise<CommunityPin[]> => {
   try {
     const rows = await loadPins();
-    enqueuePendingPins(rows.filter((p) => !p.verified && Date.now() - p.created < PIN_TTL_MS).map((p) => p.id));
+    enqueuePendingPins(rows.filter((p) => !p.verified && p.proof && Date.now() - p.created < PIN_TTL_MS).map((p) => p.id));
     return rows
       .filter((p) => pinAlive(p))
       .slice(0, 48)
@@ -260,13 +357,19 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
 });
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { name: string; blurb: string; proof: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string }) => input)
+  .validator((input: { name: string; blurb: string; proof?: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = data.name.trim().slice(0, 80);
     const blurb = data.blurb.trim().slice(0, 220);
-    const proof = safeHttp(data.proof);
-    if (!name || !proof) return { ok: false, error: "need" };
+    if (!name) return { ok: false, error: "need" };
+    let proof = "";
+    if ((data.proof || "").trim()) {
+      const n = normalizeProofUrl(data.proof || "");
+      if ("error" in n) return { ok: false, error: n.error };
+      proof = safeHttp(n.url);
+      if (!proof) return { ok: false, error: "need" };
+    }
     if (tooMany(clientKey("pin"), 8, 60 * 60_000)) return { ok: false, error: "rate" };
     if (tooMany("pin:global", 30, 60 * 60_000)) return { ok: false, error: "rate" };
     if ((await countPendingPins()) >= 80) return { ok: false, error: "rate" };
@@ -293,7 +396,7 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
   });
 
 export const verifyCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { id: string }) => input)
+  .validator((input: { id: string; proof?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     if (tooMany(clientKey("pin-verify-burst"), 5, 5_000)) return { ok: false, error: "rate" };
     if (tooMany(clientKey("pin-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
@@ -301,6 +404,14 @@ export const verifyCommunityPin = createServerFn({ method: "POST" })
     const rows = await loadPins();
     const pin = rows.find((p) => p.id === data.id);
     if (!pin) return { ok: false, error: "missing" };
+    if ((data.proof || "").trim()) {
+      const n = normalizeProofUrl(data.proof || "");
+      if ("error" in n) return { ok: false, error: n.error };
+      const proof = safeHttp(n.url);
+      if (!proof) return { ok: false, error: "proof" };
+      pin.proof = proof;
+    }
+    if (!pin.proof) return { ok: false, error: "need" };
     const hit = await scrapeShowsToken(pin.proof, pin.token, pin.links);
     if (!hit) {
       const ig = /instagram\.com/i.test(pin.proof);
@@ -327,23 +438,38 @@ export const cancelCommunityPin = createServerFn({ method: "POST" })
   });
 
 export const verifyMapListing = createServerFn({ method: "POST" })
-  .validator((input: { id: string; token?: string }) => input)
-  .handler(async ({ data }): Promise<{ ok: boolean; token?: string; error?: string }> => {
-    if (tooMany(clientKey("map-verify-burst"), 5, 5_000)) return { ok: false, token: data.token, error: "rate" };
-    if (tooMany(clientKey("map-verify"), 12, 60 * 60_000)) return { ok: false, token: data.token, error: "rate" };
-    if (tooMany("map-verify:global", 80, 60 * 60_000)) return { ok: false, token: data.token, error: "rate" };
+  .validator((input: { id: string; token?: string; proof?: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    if (tooMany(clientKey("map-verify-burst"), 5, 5_000)) return { ok: false, error: "rate" };
+    if (tooMany(clientKey("map-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
+    if (tooMany("map-verify:global", 80, 60 * 60_000)) return { ok: false, error: "rate" };
     const text = await loadMapCsvText();
     const rows = parseMapCsv(text);
     const row = rows.find((r) => r.id === data.id);
-    if (!row) return { ok: false, error: "missing" };
-    if (!row.token) row.token = (data.token || makePinToken()).toUpperCase();
-    const urls = socialsFromCsv(row.socials).map((l) => l.url).filter(Boolean);
-    if (!urls.length) return { ok: false, token: row.token, error: "links" };
+    const gate = cargaVerifyGate(row, data.token);
+    if (gate !== "ok" || !row) return { ok: false, error: gate };
+    const extra = socialsFromCsv(row.socials).map((l) => l.url).filter(Boolean);
+    let proof = "";
+    if ((data.proof || "").trim()) {
+      const n = normalizeProofUrl(data.proof || "");
+      if ("error" in n) return { ok: false, error: n.error };
+      proof = safeHttp(n.url);
+      if (!proof) return { ok: false, error: "proof" };
+    }
+    if (!proof) return { ok: false, error: "need" };
+    const urls = [proof, ...extra.filter((u) => u !== proof)];
     const hit = await scrapeShowsToken(urls[0]!, row.token, urls.slice(1));
-    if (!hit) return { ok: false, token: row.token, error: "proof" };
+    if (!hit) return { ok: false, error: "proof" };
+    if (proof) {
+      const links = socialsFromCsv(row.socials);
+      if (!links.some((l) => l.url === proof)) {
+        links.push({ key: "web", label: "web", url: proof });
+        row.socials = socialsToCsv(links);
+      }
+    }
     row.verifiedAt = Date.now();
     await saveMapCsvText(stringifyMapCsv(rows));
-    return { ok: true, token: row.token };
+    return { ok: true };
   });
 
 export const submitListingPatch = createServerFn({ method: "POST" })
@@ -354,7 +480,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     address?: string;
     notes?: string;
     logo?: string;
-    proof: string;
+    proof?: string;
     lat?: number;
     lon?: number;
     community?: boolean;
@@ -371,8 +497,13 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     if (tooMany(clientKey("patch"), 6, 60 * 60_000)) return { ok: false, error: "rate" };
     if (tooMany("patch:global", 24, 60 * 60_000)) return { ok: false, error: "rate" };
     if ((await countPendingPatches()) >= 80) return { ok: false, error: "rate" };
-    const proof = safeHttp(data.proof);
-    if (!proof || !isPublicHttp(proof)) return { ok: false, error: "links" };
+    let proof = "";
+    if ((data.proof || "").trim()) {
+      const n = normalizeProofUrl(data.proof || "");
+      if ("error" in n) return { ok: false, error: n.error };
+      proof = safeHttp(n.url);
+      if (!proof) return { ok: false, error: "links" };
+    }
     const rows = parseMapCsv(await loadMapCsvText());
     const existing = rows.find((r) => r.id === data.listingId);
     const lat = Number(data.lat);
@@ -414,7 +545,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
   });
 
 export const verifyListingPatch = createServerFn({ method: "POST" })
-  .validator((input: { id: string; token?: string }) => input)
+  .validator((input: { id: string; token?: string; proof?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     if (tooMany(clientKey("patch-verify-burst"), 5, 5_000)) return { ok: false, error: "rate" };
     if (tooMany(clientKey("patch-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
@@ -422,6 +553,14 @@ export const verifyListingPatch = createServerFn({ method: "POST" })
     const patch = patches.find((p) => p.id === data.id);
     if (!patch || !patchAlive(patch)) return { ok: false, error: "missing" };
     if (data.token && data.token !== patch.token) return { ok: false, error: "token" };
+    if ((data.proof || "").trim()) {
+      const n = normalizeProofUrl(data.proof || "");
+      if ("error" in n) return { ok: false, error: n.error };
+      const proof = safeHttp(n.url);
+      if (!proof) return { ok: false, error: "proof" };
+      patch.proof = proof;
+    }
+    if (!patch.proof) return { ok: false, error: "links" };
     const extra = socialsFromCsv(parseMapCsv(await loadMapCsvText()).find((r) => r.id === patch.listingId)?.socials || "")
       .map((l) => l.url)
       .filter(Boolean);

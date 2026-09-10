@@ -81,7 +81,11 @@ async function snapCsv(rows: CommunityPin[]) {
 export async function loadPins(): Promise<CommunityPin[]> {
   await ensureSeed();
   const raw = openSqlite().prepare("SELECT * FROM pins").all();
-  return raw.map(rowToPin).filter((p) => p.id && /^https?:\/\//i.test(p.proof));
+  return raw.map(rowToPin).filter((p) => {
+    if (!p.id) return false;
+    if (p.proof && !/^https?:\/\//i.test(p.proof)) return false;
+    return true;
+  });
 }
 
 export async function savePins(rows: CommunityPin[]): Promise<boolean> {

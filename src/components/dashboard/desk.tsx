@@ -3,6 +3,8 @@ import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
+import { COMMUNITY_HUB, MARKET_HUB, sectorOf } from "@/domain/nav";
+import { HubIndex } from "./hub-index";
 import { buildModelMarket } from "@/application";
 import { getDeskExtras, getEtfFlows, getMarket, getOnchainLive, getPulse, getTick } from "@/infrastructure/server-fns";
 import { cn, formatPct, formatUsd } from "@/lib/utils";
@@ -16,12 +18,14 @@ import { NewsCycle } from "./news-cycle";
 import { OnchainPanel } from "./onchain-panel";
 import { OnchainLiveBar } from "./onchain-live";
 import { ConcienciaBlock } from "./conciencia";
+import { LearnIndex } from "./learn-index";
 import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { LazyMount } from "@/components/lazy-mount";
 import { useInView } from "@/lib/in-view";
 import { DATOS, useAppLang, useT } from "@/lib/i18n";
 import { slowNet } from "@/lib/net";
+import { scrollDeskTo } from "@/lib/desk-scroll";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
@@ -83,20 +87,45 @@ export function Desk() {
   const [allowFetch, setAllowFetch] = useState(false);
   const [liveOk, setLiveOk] = useState(false);
   const hash = useRouterState({ select: (s) => s.location.hash });
+  const [deskHash, setDeskHash] = useState(() => String(hash || "").replace(/^#/, "") || "mapa");
+  useEffect(() => {
+    const read = () => setDeskHash(window.location.hash.replace(/^#/, "") || "mapa");
+    read();
+    window.addEventListener("hashchange", read);
+    window.addEventListener("bitacora-desk", read);
+    return () => {
+      window.removeEventListener("hashchange", read);
+      window.removeEventListener("bitacora-desk", read);
+    };
+  }, []);
+  useEffect(() => {
+    setDeskHash(String(hash || "").replace(/^#/, "") || "mapa");
+  }, [hash]);
   const live = useInView("280px");
-  const tab = hash.replace(/^#/, "");
-  const wantLive = live.shown || tab === "mercado" || tab === "red" || tab === "pulso" || tab === "datos";
+  const tab = deskHash;
+  const sector = sectorOf(tab);
+  const wantLive = live.shown || sector === "mercado" || tab === "red" || tab === "datos";
   useEffect(() => {
     setAllowFetch(true);
     const n = window.setTimeout(() => setLiveOk(true), slowNet() ? 2800 : 400);
     return () => window.clearTimeout(n);
   }, []);
   useEffect(() => {
-    const h = hash.replace(/^#/, "");
+    const id = deskHash;
+    if (!id) return;
+    const t = window.setTimeout(() => scrollDeskTo(id), 80);
+    return () => window.clearTimeout(t);
+  }, [deskHash, sector]);
+  useEffect(() => {
+    if (sector !== "llegar") return;
+    window.dispatchEvent(new Event("resize"));
+  }, [sector]);
+  useEffect(() => {
+    const h = deskHash;
     if (h === "legal" || h === "aviso" || h === "privacidad" || h === "cookies" || h === "accesibilidad" || h === "terminos") {
       window.location.replace(h === "legal" ? "/legal" : `/legal#${h}`);
     }
-  }, [hash]);
+  }, [deskHash]);
 
   const fallback = useMemo(() => buildModelMarket(range, liq), [range, liq]);
 
@@ -206,78 +235,88 @@ export function Desk() {
   }, [market.candles, market.lookbackMs]);
 
   return (
-    <SiteShell>
-      <section id="mapa" className="scroll-mt-[var(--header-offset)] min-h-[min(70dvh,640px)]">
+    <SiteShell fill>
+      <div
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "llegar" && "hidden")}
+        aria-hidden={sector !== "llegar" || undefined}
+      >
+      <section id="mapa" className="relative scroll-mt-[var(--header-offset)]">
         <ClientOnly fallback={<div className="h-[min(70dvh,640px)] rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
           <MapGate embedded />
         </ClientOnly>
       </section>
 
-      <section id="conciencia" className="scroll-mt-[var(--header-offset)] space-y-4">
-        <ConcienciaBlock />
+      <section id="aprender" className="relative z-10 bg-background pt-2 scroll-mt-[var(--header-offset)] space-y-6">
+        <LearnIndex />
+        <section id="conciencia" className="scroll-mt-[4.5rem] space-y-4">
+          <ConcienciaBlock />
+          <Suspense fallback={<Soft />}>
+            <ContributeQr />
+          </Suspense>
+        </section>
         <Suspense fallback={<Soft />}>
-          <ContributeQr />
+          <LazyMount fallback={<Soft />} minHeight="12rem">
+            <section id="historia" className="scroll-mt-[4.5rem]">
+              <HistoryTimeline />
+            </section>
+          </LazyMount>
         </Suspense>
+        <section id="pulso" className="scroll-mt-[4.5rem]">
+          <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} fetching={pulse.isFetching} />
+        </section>
       </section>
+      </div>
 
-      <Suspense fallback={<Soft />}>
-        <LazyMount fallback={<Soft />} minHeight="10rem">
-          <RoadmapWeb3 />
-        </LazyMount>
-      </Suspense>
-
+      <div
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "comunidad" && "hidden")}
+        aria-hidden={sector !== "comunidad" || undefined}
+      >
       <section id="comunidad" className="scroll-mt-[var(--header-offset)] space-y-6">
+        <HubIndex
+          kicker="navComunidad"
+          items={COMMUNITY_HUB}
+          labels={{ anuncios: "hubAds", eventos: "hubEvents", feed: "hubFeed" }}
+          fallbackHash="anuncios"
+          parentHash="comunidad"
+        />
+        <section id="anuncios" className="scroll-mt-[4.5rem]">
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="12rem">
             <CommunityPinsBoard />
           </LazyMount>
         </Suspense>
+        </section>
+        <section id="eventos" className="scroll-mt-[4.5rem]">
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="28rem">
             <NetworkEvents />
           </LazyMount>
         </Suspense>
+        </section>
+        <section id="feed" className="scroll-mt-[4.5rem]">
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="10rem">
             <CommunityFeedPanel />
           </LazyMount>
         </Suspense>
+        </section>
       </section>
+      </div>
 
-      <section id="pulso" className="scroll-mt-[var(--header-offset)]">
-        <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} fetching={pulse.isFetching} />
-      </section>
-
-      <Suspense fallback={<Soft />}>
-        <LazyMount fallback={<Soft />} minHeight="12rem">
-          <HistoryTimeline />
-        </LazyMount>
-      </Suspense>
-
-      <section id="red" className="scroll-mt-[var(--header-offset)] space-y-3">
-        <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{t("redTitle")}</h2>
-        <LiquidityPanel data={liqData} />
-        <div className="grid gap-3 lg:grid-cols-3">
-          <OnchainPanel
-            data={
-              extras.data?.onchain
-                ? { ...extras.data.onchain, ...onchainLive.data }
-                : extras.data?.onchain ?? null
-            }
-            priceDelta={priceDelta}
-          />
-          <FearGreedPanel data={fg} />
-          <ClarityPanel data={extras.data?.clarity ?? null} />
-        </div>
-      </section>
-
+      <div
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "mercado" && "hidden")}
+        aria-hidden={sector !== "mercado" || undefined}
+      >
       <section id="mercado" ref={live.ref} className="scroll-mt-[var(--header-offset)] space-y-3">
+        <HubIndex
+          kicker="navMercado"
+          items={MARKET_HUB}
+          labels={{ mercado: "mercadoTitle", red: "redTitle" }}
+          fallbackHash="mercado"
+        />
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="font-display font-medium tracking-tight text-foreground">
-              {t("mercadoTitle")}
-            </h2>
-            <p className="mt-1 text-base text-pretty text-muted-foreground">
+            <p className="text-base text-pretty text-muted-foreground">
               {t("mercadoLead")}
             </p>
             <p className="mt-2 text-xs text-pretty text-muted-foreground">{t("marketDisclaimer")}</p>
@@ -379,11 +418,43 @@ export function Desk() {
             </ClientOnly>
           </LazyMount>
         </div>
+        <p className="border-t border-border px-3 py-2 text-xs text-pretty text-muted-foreground">{t("chartDisclaimer")}</p>
       </section>
       <Suspense fallback={<Soft />}>
         <EtfFlowPanel data={etfFlows.data ?? null} />
       </Suspense>
+      <section id="red" className="scroll-mt-[4.5rem] space-y-3">
+        <h3 className="font-display text-xl font-medium tracking-tight text-foreground sm:text-2xl">{t("redTitle")}</h3>
+        <LiquidityPanel data={liqData} />
+        <div className="grid gap-3 lg:grid-cols-3">
+          <OnchainPanel
+            data={
+              extras.data?.onchain
+                ? { ...extras.data.onchain, ...onchainLive.data }
+                : extras.data?.onchain ?? null
+            }
+            priceDelta={priceDelta}
+          />
+          <FearGreedPanel data={fg} />
+          <ClarityPanel data={extras.data?.clarity ?? null} />
+        </div>
       </section>
+      </section>
+
+      {query.isError && (
+        <p className="text-sm text-short">
+          {t("marketFail")}
+        </p>
+      )}
+      </div>
+
+      <div
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "pie" && "hidden")}
+        aria-hidden={sector !== "pie" || undefined}
+      >
+      <Suspense fallback={<Soft />}>
+        <RoadmapWeb3 />
+      </Suspense>
 
       <section id="datos" className="scroll-mt-[var(--header-offset)] rounded-lg bg-card px-4 py-3 shadow-[var(--shadow-border)] sm:px-5">
         <details>
@@ -413,12 +484,7 @@ export function Desk() {
           </LazyMount>
         </Suspense>
       </section>
-
-      {query.isError && (
-        <p className="text-sm text-short">
-          {t("marketFail")}
-        </p>
-      )}
+      </div>
     </SiteShell>
   );
 }

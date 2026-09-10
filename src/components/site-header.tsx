@@ -7,26 +7,26 @@ import { SkipLink } from "@/components/skip-link";
 import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
+import { LEGAL_NAV, PRIMARY_NAV, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
+import { requestJoinMap } from "@/application/join-map";
+import { scrollDeskTo } from "@/lib/desk-scroll";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
 
-const NAV: { hash: string; key: CopyKey; href?: string }[] = [
-  { hash: "mapa", key: "navMapa" },
-  { hash: "conciencia", key: "navParticipe" },
-  { hash: "roadmap", key: "navRoadmap" },
-  { hash: "comunidad", key: "navComunidad" },
-  { hash: "pulso", key: "navPulso" },
-  { hash: "historia", key: "navHistoria" },
-  { hash: "red", key: "navRed" },
-  { hash: "mercado", key: "navMercado" },
-  { hash: "legal", key: "legalTitle", href: "/legal" },
-  { hash: "contacto", key: "navContacto" },
-];
+const NAV_COPY: Record<string, CopyKey> = {
+  mapa: "navMapa",
+  comunidad: "navComunidad",
+  aprender: "navAprender",
+  mercado: "navMercado",
+  hacia: "navHacia",
+  contacto: "navContacto",
+  privacidad: "navShortLegal",
+};
 
-const NAV_LEGAL: { hash: string; key: CopyKey; href?: string }[] = [
-  { hash: "privacidad", key: "legalPrivacy" },
-  { hash: "contacto", key: "navContacto" },
-];
+function navHref(item: NavItem, pathname: string) {
+  if (item.href) return item.href;
+  return pathname === "/" ? `#${item.hash}` : `/#${item.hash}`;
+}
 
 function LangButtons() {
   const t = useT();
@@ -63,7 +63,7 @@ export function SiteHeader() {
   const lockRef = useRef<string | null>(null);
   const lockTimer = useRef(0);
   const legalPage = pathname === "/legal";
-  const items = legalPage ? NAV_LEGAL : NAV;
+  const items = legalPage ? LEGAL_NAV : PRIMARY_NAV;
   const [spy, setSpy] = useState(() => {
     const h = String(hash || "").replace(/^#/, "");
     if (h) return h;
@@ -92,14 +92,15 @@ export function SiteHeader() {
     const ids = items.map((n) => n.hash);
 
     const go = (id: string) => {
-      const node = document.getElementById(id);
-      if (!node) return false;
       lockRef.current = id;
-      if (ids.includes(id)) setSpy(id);
-      node.scrollIntoView({ behavior: "smooth", block: "start" });
+      setSpy(legalPage ? id : spyOf(id));
       const qs = window.location.search || "";
       const path = pathname || "/";
       history.replaceState(null, "", `${path}${qs}#${id}`);
+      window.dispatchEvent(new Event("bitacora-desk"));
+      window.setTimeout(() => {
+        scrollDeskTo(id);
+      }, 40);
       window.clearTimeout(lockTimer.current);
       lockTimer.current = window.setTimeout(() => {
         lockRef.current = null;
@@ -108,12 +109,20 @@ export function SiteHeader() {
     };
 
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement | null)?.closest?.("a[href^='#']");
+      const a = (e.target as HTMLElement | null)?.closest?.("a[href]");
       if (!a) return;
       const href = a.getAttribute("href") || "";
-      const id = href.startsWith("#") ? href.slice(1) : "";
+      let id = "";
+      if (href.startsWith("#")) id = href.slice(1);
+      else {
+        try {
+          const u = new URL(href, window.location.origin);
+          if (u.pathname === (pathname || "/") && u.hash) id = u.hash.slice(1);
+        } catch {
+          return;
+        }
+      }
       if (!id || id === "contenido") return;
-      if (!document.getElementById(id)) return;
       e.preventDefault();
       go(id);
     };
@@ -121,16 +130,17 @@ export function SiteHeader() {
     const onScroll = () => {
       if (lockRef.current) return;
       const line = offsetRef.current + 8;
-      let current = ids[0]!;
+      let current = "";
       for (const id of ids) {
         const node = document.getElementById(id);
-        if (node && node.getBoundingClientRect().top <= line + 2) current = id;
+        if (!node || node.offsetParent === null) continue;
+        if (node.getBoundingClientRect().top <= line + 2) current = id;
       }
-      setSpy(current);
+      if (current) setSpy(current);
     };
 
     window.addEventListener("click", onClick, true);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
     onScroll();
     return () => {
       window.clearTimeout(lockTimer.current);
@@ -141,6 +151,20 @@ export function SiteHeader() {
 
   const activeHash = spy || items[0]!.hash;
 
+  function goJoin() {
+    requestJoinMap();
+    if (pathname !== "/") {
+      window.location.assign("/#mapa");
+      return;
+    }
+    history.replaceState(null, "", `${pathname || "/"}${window.location.search || ""}#mapa`);
+    window.dispatchEvent(new Event("bitacora-desk"));
+    setSpy("mapa");
+    window.setTimeout(() => {
+      scrollDeskTo("mapa");
+    }, 40);
+  }
+
   return (
     <header ref={headRef} className="sticky top-0 z-[80] isolate border-b border-border bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-[0.618rem] px-4 py-[0.618rem] sm:px-[1.618rem]">
@@ -148,29 +172,44 @@ export function SiteHeader() {
           <BrandMark compact />
         </Link>
         <div className="flex items-center gap-[0.618rem]">
-          <Suspense fallback={null}>
-            <ContributeQr compact />
-          </Suspense>
+          <button
+            type="button"
+            onClick={goJoin}
+            className="inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-white sm:h-9 sm:text-sm"
+          >
+            {labels.navSumate}
+          </button>
+          <div className="hidden sm:block">
+            <Suspense fallback={null}>
+              <ContributeQr compact />
+            </Suspense>
+          </div>
           <LangButtons />
         </div>
       </div>
-      <nav className="border-t border-border" aria-label={labels.navAria} lang={lang}>
-        <div className="mx-auto flex max-w-6xl flex-wrap justify-center px-1 sm:px-[1.618rem]">
+      <nav
+        className="border-t border-border"
+        aria-label={labels.navAria}
+        lang={lang}
+        data-destinos={legalPage ? undefined : items.map((n) => n.id).join(",")}
+      >
+        <div className="mx-auto grid max-w-6xl grid-cols-4 px-1 sm:px-[1.618rem]">
           {items.map((item) => {
             const active = activeHash === item.hash;
-            const href = item.href ?? (pathname === "/" ? `#${item.hash}` : `/#${item.hash}`);
+            const href = legalPage ? `#${item.hash}` : navHref(item, pathname);
+            const key = NAV_COPY[item.id] || "navMapa";
             return (
               <a
-                key={`${lang}-${item.hash}`}
-                href={legalPage ? `#${item.hash}` : href}
+                key={`${lang}-${item.id}`}
+                href={href}
                 className={cn(
-                  "inline-flex max-w-[48%] items-center justify-center border-b-2 px-[0.5rem] py-[0.618rem] text-center text-[0.7rem] leading-tight no-underline sm:max-w-none sm:px-[0.618rem] sm:text-sm",
+                  "inline-flex items-center justify-center border-b-2 px-[0.5rem] py-[0.618rem] text-center text-[0.7rem] leading-tight no-underline sm:px-[0.618rem] sm:text-sm",
                   active
                     ? "border-primary font-medium text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
-                {labels[item.key]}
+                {labels[key]}
               </a>
             );
           })}
@@ -180,48 +219,60 @@ export function SiteHeader() {
   );
 }
 
-export function SiteShell({ children }: { children: ReactNode }) {
+export function SiteShell({ children, fill = false }: { children: ReactNode; fill?: boolean }) {
   const t = useT();
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className={cn("flex min-h-dvh flex-col bg-background", fill && "h-dvh overflow-hidden")}>
       <SkipLink />
       <SeoHead />
       <SiteHeader />
-      <main id="contenido" className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-[1.618rem] px-4 py-[1.618rem] sm:px-[1.618rem] sm:py-[2.618rem]">
+      <main
+        id="contenido"
+        className={cn(
+          "mx-auto flex w-full max-w-6xl flex-1 flex-col gap-[1.618rem] px-4 sm:px-[1.618rem]",
+          fill ? "min-h-0 overflow-hidden py-[0.618rem]" : "py-[1.618rem] sm:py-[2.618rem]",
+        )}
+      >
         {children}
       </main>
-      <footer className="mt-auto border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-[1rem] px-4 py-[1.618rem] sm:px-[1.618rem] sm:py-[2.618rem]">
-          <div className="flex flex-wrap items-center justify-center gap-[1rem]">
-            <p className="font-display text-center text-base tracking-wide text-foreground sm:text-lg">
+      <footer className={cn("border-t border-border", fill ? "shrink-0" : "mt-auto")}>
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-[0.382rem] px-4 py-[0.618rem] sm:px-[1.618rem]">
+          <div className="flex flex-wrap items-center justify-center gap-x-[0.618rem] gap-y-[0.236rem]">
+            <p className="font-display text-center text-sm tracking-wide text-foreground">
               {t("initiative")}
             </p>
             <img
               src="/latam-cripto-mom.jpg"
               alt="Latam Cripto Mom"
-              width={88}
-              height={88}
+              width={32}
+              height={32}
               loading="lazy"
               decoding="async"
-              className="size-[4.236rem] sm:size-[5.236rem] rounded-full object-cover"
+              className="size-8 rounded-full object-cover"
             />
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-[1rem] gap-y-[0.382rem] text-sm text-muted-foreground">
-            <p>
-              <a href="https://bitacorabtc.org" className="text-foreground">
-                Bitácora.btc
+          <p className="text-xs text-muted-foreground">
+            <a href="https://bitacorabtc.org" className="font-medium text-foreground underline underline-offset-2">
+              Bitácora.btc
+            </a>
+            {" · "}
+            {t("taglineShort")}
+          </p>
+          <nav
+            aria-label={t("legalNavAria")}
+            className="flex flex-wrap items-center justify-center gap-x-[0.618rem] gap-y-[0.236rem] text-xs"
+          >
+            {UTILITY_NAV.map((item) => (
+              <a key={item.id} href={navHref(item, "/")} className="text-foreground">
+                {t(NAV_COPY[item.id] || "navContacto")}
               </a>
-              {" · "}
-              {t("taglineShort")}
-            </p>
+            ))}
             <a href="/#datos" className="text-foreground">
               {t("dataOrigin")}
             </a>
             <a href="/#soberania" className="text-foreground">
               {t("sovTitle")}
             </a>
-          </div>
-          <nav aria-label={t("legalNavAria")} className="flex flex-wrap items-center justify-center gap-x-[1rem] gap-y-[0.382rem] text-sm">
             <a href="/legal#aviso" className="text-foreground">
               {t("legalAviso")}
             </a>

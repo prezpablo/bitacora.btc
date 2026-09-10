@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust } from "@/domain";
@@ -11,12 +11,11 @@ import { StarMeter } from "./map-panels";
 import { PayRow } from "./pay-row";
 import { SocialRow } from "./social-row";
 import { VerifiedStar } from "./verified-star";
-import { VerifyIgHow } from "./verify-ig-how";
+import { CargaProofStep } from "./carga-proof-step";
 
 export function CommunityCard({
   community,
   onVerified,
-  onPatched,
 }: {
   community: Community;
   onVerified: () => void;
@@ -25,10 +24,13 @@ export function CommunityCard({
   const t = useT();
   const trust = communityTrust(community);
   const [imgOk, setImgOk] = useState(true);
+  const [proofErr, setProofErr] = useState("");
+  const [proofBusy, setProofBusy] = useState(false);
   useEffect(() => {
     setImgOk(true);
   }, [community.id, community.logo]);
   const showImg = Boolean(imgSrc(community.logo || "")) && imgOk;
+  const needsCarga = Boolean(community.verifyToken && !(community.verifiedAt ?? 0));
   return (
     <div className="space-y-3">
       <p className="flex items-center gap-1 text-xs tracking-wide text-muted-foreground uppercase">
@@ -55,17 +57,29 @@ export function CommunityCard({
             {trust.verified ? <VerifiedStar title={t("verified")} className="size-7" /> : null}
           </h3>
           <p className="font-mono text-xs text-muted-foreground">@{community.slug}</p>
-          {!trust.verified ? <p className="mt-1 text-xs text-muted-foreground">{t("verifyPending")}</p> : null}
+          {needsCarga ? <p className="mt-1 text-xs text-muted-foreground">{t("verifyPending")}</p> : null}
         </div>
       </div>
       {community.description ? <p className="text-sm text-pretty">{community.description}</p> : null}
       <SocialRow links={community.links} />
-      {!trust.verified && community.verifyToken ? (
-        <ScrapeVerifyBox
-          id={community.id}
-          token={community.verifyToken}
-          hasLinks={community.links.length > 0}
-          onVerified={onVerified}
+      {needsCarga ? (
+        <CargaProofStep
+          token={community.verifyToken!}
+          name={community.name}
+          busy={proofBusy}
+          err={proofErr}
+          onCheck={(proof) => {
+            setProofBusy(true);
+            setProofErr("");
+            void verifyMapListing({ data: { id: community.id, token: community.verifyToken, proof } })
+              .then((res) => {
+                if (res.ok) onVerified();
+                else if (res.error === "instagram") setProofErr(t("pinNoIg"));
+                else if (res.error === "links" || res.error === "need") setProofErr(t("verifyNeedLink"));
+                else setProofErr(t("pinProofFail"));
+              })
+              .finally(() => setProofBusy(false));
+          }}
         />
       ) : null}
     </div>
@@ -78,7 +92,6 @@ export function PlaceCard({
   removable,
   onRemove,
   onVerified,
-  onPatched,
 }: {
   place: MerchantPlace;
   local?: MerchantLocal;
@@ -89,8 +102,12 @@ export function PlaceCard({
 }) {
   const t = useT();
   const g = gradeOf(local, Date.now());
-  const trust = listingTrust(local?.links, g?.avg ?? 0, g?.count ?? 0, (local?.verifiedAt ?? 0) > 0);
+  const overlay = place.id.startsWith("local:");
+  const trust = listingTrust(local?.links, g?.avg ?? 0, g?.count ?? 0, (local?.verifiedAt ?? 0) > 0, overlay);
   const logo = pickListingLogo(local?.logo, place.logo);
+  const [proofErr, setProofErr] = useState("");
+  const [proofBusy, setProofBusy] = useState(false);
+  const needsCarga = Boolean(local?.verifyToken && !(local?.verifiedAt ?? 0) && onVerified);
   return (
     <>
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{place.category}</p>
@@ -134,12 +151,24 @@ export function PlaceCard({
       {local?.hours ? <HoursView hours={local.hours} /> : null}
       {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
       {local?.links?.length ? <SocialRow links={local.links} /> : null}
-      {!trust.verified && local?.verifyToken && onVerified ? (
-        <ScrapeVerifyBox
-          id={place.id}
-          token={local.verifyToken}
-          hasLinks={(local.links?.length ?? 0) > 0}
-          onVerified={onVerified}
+      {needsCarga ? (
+        <CargaProofStep
+          token={local!.verifyToken!}
+          name={place.name}
+          busy={proofBusy}
+          err={proofErr}
+          onCheck={(proof) => {
+            setProofBusy(true);
+            setProofErr("");
+            void verifyMapListing({ data: { id: place.id, token: local?.verifyToken, proof } })
+              .then((res) => {
+                if (res.ok) onVerified?.();
+                else if (res.error === "instagram") setProofErr(t("pinNoIg"));
+                else if (res.error === "links" || res.error === "need") setProofErr(t("verifyNeedLink"));
+                else setProofErr(t("pinProofFail"));
+              })
+              .finally(() => setProofBusy(false));
+          }}
         />
       ) : null}
       {removable ? (
@@ -148,76 +177,5 @@ export function PlaceCard({
         </Button>
       ) : null}
     </>
-  );
-}
-
-function ScrapeVerifyBox({
-  id,
-  token,
-  hasLinks,
-  onVerified,
-}: {
-  id: string;
-  token?: string;
-  hasLinks: boolean;
-  onVerified: () => void;
-}) {
-  const t = useT();
-  const [err, setErr] = useState("");
-  const [busy, setBusy] = useState(false);
-  const doneFn = useRef(onVerified);
-  doneFn.current = onVerified;
-  useEffect(() => {
-    if (!token || !hasLinks) return;
-    let stop = false;
-    const tick = async () => {
-      setBusy(true);
-      try {
-        const res = await verifyMapListing({ data: { id, token } });
-        if (stop) return;
-        if (res.ok) doneFn.current();
-        else if (res.error === "links") setErr(t("verifyNeedLink"));
-      } catch {
-        /* next */
-      } finally {
-        if (!stop) setBusy(false);
-      }
-    };
-    const n = window.setInterval(() => void tick(), 10000);
-    const first = window.setTimeout(() => void tick(), 2000);
-    return () => {
-      stop = true;
-      window.clearInterval(n);
-      window.clearTimeout(first);
-    };
-  }, [id, token, hasLinks, t]);
-  if (!token) return null;
-  return (
-    <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
-      <p className="text-muted-foreground">{t("verifyScrapeHint")}</p>
-      <p>
-        <code className="rounded bg-primary px-1.5 py-0.5 font-mono text-sm font-bold text-white">{token}</code>
-      </p>
-      <VerifyIgHow />
-      {!hasLinks ? <p className="text-primary">{t("verifyNeedLink")}</p> : null}
-      {err ? <p className="text-primary">{err}</p> : null}
-      <Button
-        type="button"
-        className="w-full"
-        disabled={busy || !hasLinks || !token}
-        onClick={() => {
-          if (!token) return;
-          setBusy(true);
-          void verifyMapListing({ data: { id, token } })
-            .then((res) => {
-              if (res.ok) onVerified();
-              else setErr(res.error === "links" ? t("verifyNeedLink") : t("pinProofFail"));
-            })
-            .finally(() => setBusy(false));
-        }}
-      >
-        {t("pinCheck")}
-      </Button>
-    </div>
   );
 }

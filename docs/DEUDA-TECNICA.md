@@ -1,19 +1,21 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 7 de setiembre de 2026  
+**Fecha:** 10 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` (`7d4cc30`) · deploy = ZIP (el VPS no tiene `.git`)  
+**Repo:** `prezpablo/bitacora.btc` `main` · deploy = ZIP (el VPS no tiene `.git`)  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests externos:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md)
 
-## Mapa vigente (7 set)
+## Mapa vigente (10 set)
 
 Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
 
 **En el `.org` hoy:** `lang` por `?lang=`, H1 único por ruta, skip en `/` `/mapa` `/legal` `/labif`, captcha con audio + sr-only, 404 noindex, probe SEO.
 
-**En `main` y no en el `.org`:** fase pública «Guía soberana» (`7d4cc30`). El probe axe (`npm run test:a11y`) es de repo, no de sitio.
+**En `main` y no en el `.org`:** fase pública «Guía soberana». El probe axe (`npm run test:a11y`) es de repo, no de sitio.
 
 **No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
+
+**Navegación (10 set):** **D-NAV-01…04 hechos.** Composición del desk: Mapa+Aprender (scroll interno), Comunidad y Mercado destinos, pie (roadmap/datos/contacto) aparte.
 
 ```mermaid
 flowchart TB
@@ -30,7 +32,9 @@ flowchart TB
     P1["P1 identidad/ops<br/>lang SSR · URCDP · backup · probe"]
     P2["P2 casa y carga<br/>Umbrel · Lighthouse · partir alta"]
     P3["P3 a11y / tutor<br/>contraste · globo · 44px · IA"]
+    NAV["D-NAV 01–04<br/>4 destinos · una fase/ZIP"]
     P0 --> P1 --> P2 --> P3
+    P1 --> NAV
   end
   Q1 -.->|nodo en casa| P2
   T -.->|después del nodo| P3
@@ -70,6 +74,7 @@ flowchart TB
 | **P3** | Contraste `.text-short` y naranja LABIF · links subrayados en párrafo | **Abierto** | axe 7 set: 1.4.3 y 1.4.1 |
 | **P3** | Globo / velas por teclado · táctiles 44px · LRM fuera del bundle | Abierto | |
 | **P3** | Tutor soberano (IA) | **No ahora** | § Tutor. No en el VPS del mapa |
+| **D-NAV** | 4 destinos (Mapa, Comunidad, Aprender, Mercado) | **01–04 hechos en repo** | § Navegación. Una fase = un ZIP |
 | **Ops** | LN inbound · SMTP no-US · HSTS preload | Abierto | Operador |
 
 ### Alertas runner (no son CAÍDA)
@@ -83,6 +88,38 @@ flowchart TB
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
 
 **No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`.
+
+---
+
+## Navegación · D-NAV (10 set) — una fase por ZIP
+
+Pedido: barra de 10 anclas es un índice interno, no un menú de novato (unión + conocimiento). Referentes: bitcoin.org (5 destinos), BTC Map (Maps / Maintain), Meetup (CTA Join), GOV.UK (tareas).
+
+**Regla:** se implementa **una** fila, se mira en preview, se acepta o se revierte **ese** ZIP. No fusionar fases. Estilos: mismos tokens (`primary` #9a5600, `font-display`, `shadow-border`, header sticky). No inventar mega-menú ni hamburguesa hasta D-NAV-04 si el wrap de 4 ítems no entra en 320px.
+
+Objetivo de barra (es / en / pt):
+
+| Destino | es | en | pt |
+|---|---|---|---|
+| 1 | Mapa | Map | Mapa |
+| 2 | Comunidad | Community | Comunidade |
+| 3 | Aprender | Learn | Aprender |
+| 4 | Mercado | Market | Mercado |
+| CTA | Sumate | Join | Junta-te |
+
+Pie: Hacia dónde vamos / Where we're heading / Para onde vamos · Contacto · Privacidad. «Consciencia Bitcoin» queda como H1 de Aprender, no como ítem de barra.
+
+| Id | Qué entra | Archivos | Cómo volver atrás | Verificación |
+|---|---|---|---|---|
+| **D-NAV-01** | Barra = 4 destinos. Roadmap, legal y contacto **salen** de `NAV` y se listan en el pie. i18n `navAprender` + recorte de `navComunidad`. Anclas `#conciencia` `#pulso` `#historia` `#red` `#roadmap` siguen en el HTML. IA en `domain/nav.ts`. | `domain/nav.ts`, `site-header.tsx`, `i18n.ts` | Revertir esos archivos + `domain/nav.test.ts`. | **Hecho en repo (10 set).** Preview: una fila, 4 palabras + pie. Aprender → `#conciencia`. |
+| **D-NAV-02** | Hub **Aprender**: `#aprender` envuelve Consciencia + Historia + Pulso. Índice corto interno (qué es / historia / hoy). Barra apunta a `#aprender`. | `domain/nav.ts`, `desk.tsx`, `learn-index.tsx`, `i18n.ts` | Sacar el wrapper, devolver `hash` a `#conciencia`. | **Hecho en repo (10 set).** |
+| **D-NAV-03** | **Red** se fusiona en **Mercado**. `#red` queda como ancla interna. | `domain/nav.ts`, `desk.tsx` | Restaurar `<section id="red">` suelta. | **Hecho en repo (10 set).** |
+| **D-NAV-04** | CTA **Sumate** en el header (`requestJoinMap`). QR compacto a partir de `sm`. Sin hamburguesa: 4 destinos caben. | `application/join-map.ts`, `site-header.tsx`, `map-gate.tsx`, `spend-map.tsx` | Quitar el botón del header. | **Hecho en repo (10 set).** |
+| **D-NAV-05** | Desk en 3 destinos + pie: Mapa+Aprender scrollean juntos; Comunidad y Mercado no se alcanzan con la rueda; roadmap fuera del medio. `SiteShell fill`. | `domain/nav.ts` (`sectorOf`), `desk.tsx`, `site-header.tsx` | Sacar `fill` y los wrappers `hidden`. | **Hecho en repo (10 set).** |
+
+**Hecho (10 set, no es D-NAV):** dirección de comercio/comunidad **opcional**. El pin es el punto. `AddressSearch` sin `*`. `propose()` usa `drop.lat/lon`.
+
+**No hacer en estas fases:** snap-scroll (ya revertido). Rutas nuevas `/aprender`. Cambiar CARGA. Traducir la marca Consciencia Bitcoin en el H1.
 
 ---
 

@@ -53,6 +53,8 @@ export { boxAround, frameFromFix } from "./geo-frame";
 export { slugifyName, localShopId, draftShop, draftCommunity, rateLocal, rateCommunity } from "./map-compose";
 export { addressIssues } from "./street-addr";
 export type { AddrIssue, StreetHit } from "./street-addr";
+export { LEARN_HUB, LEGAL_NAV, MARKET_HUB, PRIMARY_NAV, UTILITY_NAV, sectorOf, spyOf } from "./nav";
+export type { DeskSector, NavItem } from "./nav";
 export { syntheticCandles, syntheticDailyHistory } from "./synthetic";
 
 export {
@@ -92,7 +94,7 @@ export { DAY_MS, TF_SPEC, homeLookback, resampleToTf, bucketStart } from "./ohlc
 export { SOCIAL_KEYS, SOCIALS, linksFromPicked, urlFor, keyFromUrl } from "./socials";
 export { DAYS, EMPTY_HOURS, formatHours, isOpenNow, daySlots } from "./hours";
 export { PAY_KEYS, PAYS } from "./pays";
-export { communityTrust, listingTrust, hasScrapeLink, shopIsPublic, communityIsPublic } from "./verify";
+export { communityTrust, listingTrust, hasScrapeLink, normalizeProofUrl, shopIsPublic, communityIsPublic, overlayPending, cargaVerifyGate } from "./verify";
 export { feesFromMempool, feesFromEsplora, feesFromBitcoiner, mergeLiveFees, quoteReady } from "./fees";
 export {
   addScore,

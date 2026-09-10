@@ -39,11 +39,18 @@ test("only overlay listings accept patches", () => {
   assert.equal(listingIsOurs("btcmap:99"), false);
 });
 
-test("proposePatch needs a public proof and a real change", () => {
+test("proposePatch allows empty proof (code first) and rejects junk URLs", () => {
   const same = proposePatch(row(), { description: "Pagos en sats" }, "https://x.com/nodo/status/1");
   assert.equal("error" in same && same.error, "nochange");
   const noUrl = proposePatch(row(), { description: "Nuevo horario" }, "not-a-url");
   assert.equal("error" in noUrl && noUrl.error, "links");
+  const pending = proposePatch(row(), { description: "Ahora cierra 18h" }, "");
+  assert.equal("patch" in pending, true);
+  if ("patch" in pending) {
+    assert.equal(pending.patch.proof, "");
+    assert.match(pending.patch.token, /^CARGA-[A-Z0-9]{6}$/);
+    assert.equal(pending.patch.verified, false);
+  }
   const ok = proposePatch(row(), { description: "Ahora cierra 18h" }, "https://nodo.uy/bitacora");
   assert.equal("patch" in ok, true);
   if ("patch" in ok) {

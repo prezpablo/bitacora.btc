@@ -36,4 +36,4 @@ export type GlobeStats = {
   asOf: number;
 };
 
-export type GlobeFocus = { lat: number; lon: number; zoom: number; iso?: string; id?: string; kind?: "shop" | "community" };
+export type GlobeFocus = { lat: number; lon: number; zoom: number; iso?: string; id?: string; kind?: "shop" | "community"; join?: boolean };

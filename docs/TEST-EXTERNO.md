@@ -7,6 +7,8 @@
 
 El probe pega al sitio público. **No** usa mempool.space ni Binance para decidir si Bitácora está caída. Esos van como `DEGRADA` del *runner*, no del VPS.
 
+Verificación completa (prompt para pegar, todos los componentes + destinos D-NAV-05): [`TEST-COMPLETO.md`](TEST-COMPLETO.md).
+
 Internos (repo): `npm test` — dominio, CSV, fees, i18n, parches, pines, SEO parsers.
 
 ---

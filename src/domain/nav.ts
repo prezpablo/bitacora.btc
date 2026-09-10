@@ -1,0 +1,77 @@
+/**
+ * Información de arquitectura de la bitácora (D-NAV).
+ * El header/pie solo pintan.
+ * D-NAV-01: 4 destinos.
+ * D-NAV-02: Aprender = #aprender (conciencia + historia + pulso).
+ * D-NAV-03: Red vive dentro de Mercado.
+ * D-NAV-04: Sumate es CTA de aplicación (`requestJoinMap`), no un ítem de barra.
+ */
+
+export type NavItem = {
+  id: string;
+  hash: string;
+  href?: string;
+};
+
+export const PRIMARY_NAV: readonly NavItem[] = [
+  { id: "mapa", hash: "mapa" },
+  { id: "aprender", hash: "aprender" },
+  { id: "comunidad", hash: "comunidad" },
+  { id: "mercado", hash: "mercado" },
+];
+
+/** Pie: rumbo y contacto. Privacidad vive en la fila legal, no acá. */
+export const UTILITY_NAV: readonly NavItem[] = [
+  { id: "hacia", hash: "roadmap" },
+  { id: "contacto", hash: "contacto" },
+];
+
+export const LEGAL_NAV: readonly NavItem[] = [
+  { id: "privacidad", hash: "privacidad" },
+  { id: "contacto", hash: "contacto" },
+];
+
+export const LEARN_HUB: readonly NavItem[] = [
+  { id: "conciencia", hash: "conciencia" },
+  { id: "historia", hash: "historia" },
+  { id: "pulso", hash: "pulso" },
+];
+
+/** D-NAV-03: Red vive dentro de Mercado. #red queda como ancla. */
+export const MARKET_HUB: readonly NavItem[] = [
+  { id: "mercado", hash: "mercado" },
+  { id: "red", hash: "red" },
+];
+
+export const COMMUNITY_HUB: readonly NavItem[] = [
+  { id: "anuncios", hash: "anuncios" },
+  { id: "eventos", hash: "eventos" },
+  { id: "feed", hash: "feed" },
+];
+
+export type DeskSector = "llegar" | "comunidad" | "mercado" | "pie";
+
+const LLEGAR = new Set(["", "mapa", "aprender", "conciencia", "historia", "pulso"]);
+const COMUNIDAD = new Set(["comunidad", "anuncios", "eventos", "feed"]);
+const MERCADO = new Set(["mercado", "red"]);
+
+export function sectorOf(hash: string): DeskSector {
+  const id = hash.replace(/^#/, "");
+  if (LLEGAR.has(id)) return "llegar";
+  if (COMUNIDAD.has(id)) return "comunidad";
+  if (MERCADO.has(id)) return "mercado";
+  return "pie";
+}
+
+/** What the primary bar underlines. Pie hashes underline nothing. */
+export function spyOf(hash: string): string {
+  const id = hash.replace(/^#/, "") || "mapa";
+  const sector = sectorOf(id);
+  if (sector === "llegar") {
+    if (id === "conciencia" || id === "historia" || id === "pulso" || id === "aprender") return "aprender";
+    return "mapa";
+  }
+  if (sector === "comunidad") return "comunidad";
+  if (sector === "mercado") return "mercado";
+  return "";
+}

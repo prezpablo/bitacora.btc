@@ -55,6 +55,7 @@ async function runPin(id: string) {
   const pin = rows.find((p) => p.id === id);
   if (!pin || pin.verified) return;
   if (Date.now() - pin.created > PIN_TTL_MS) return;
+  if (!pin.proof) return;
   const ok = await scrapeShowsToken(pin.proof, pin.token, pin.links);
   if (!ok) return;
   pin.verified = true;

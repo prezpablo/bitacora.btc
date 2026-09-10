@@ -59,11 +59,11 @@ test("forms gate on privacy checkbox", () => {
   ]) {
     const src = read(file);
     assert.match(src, /privacyOk/);
-    assert.match(src, /if \(!privacyOk\)|disabled=\{[^}]*!privacyOk/);
+    assert.match(src, /if \(!privacyOk\)|disabled=\{[^}]*!privacyOk|&& privacyOk/);
   }
   assert.match(read("src/components/map/spend-map.tsx"), /if \(!privacyOk\)/);
   assert.match(read("src/components/map/map-compose-form.tsx"), /PrivacyAccept/);
-  assert.match(read("src/components/map/map-compose-form.tsx"), /disabled=\{[^}]*!privacyOk/);
+  assert.match(read("src/components/map/map-compose-form.tsx"), /disabled=\{[^}]*!privacyOk|&& privacyOk/);
   const accept = read("src/components/privacy-accept.tsx");
   assert.match(accept, /aria-required/);
   assert.match(accept, /\/legal#privacidad/);
@@ -93,8 +93,8 @@ test("legal copy lives on /legal, not on the home desk", () => {
   assert.match(read("src/routes/legal.tsx"), /LegalEu/);
   assert.match(read("src/routes/legal.tsx"), /ContactBlock/);
   assert.match(desk, /location\.replace.*\/legal/);
-  const header = read("src/components/site-header.tsx");
-  assert.match(header, /NAV_LEGAL/);
-  assert.match(header, /hash: "privacidad"/);
-  assert.match(header, /hash: "contacto"/);
+  const nav = read("src/domain/nav.ts");
+  assert.match(nav, /hash: "privacidad"/);
+  assert.match(nav, /hash: "contacto"/);
+  assert.match(read("src/components/site-header.tsx"), /LEGAL_NAV/);
 });

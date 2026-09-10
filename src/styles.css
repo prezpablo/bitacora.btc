@@ -24,7 +24,7 @@
   --color-border-strong: #c8c8c8;
   --color-ring: #9a5600;
   --color-long: #0ecb81;
-  --color-short: #f6465d;
+  --color-short: #c4283d;
   --color-doji: #848e9c;
   --color-ma-1d: #5ec8ff;
   --color-ma-1w: #c9a0ff;
@@ -73,6 +73,17 @@ html {
 
 body {
   line-height: var(--leading-body);
+}
+
+/* Habitaciones: rueda y táctil sí; la barra no come ancho ni se pinta. */
+.scroll-free {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-free::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .bit-section {

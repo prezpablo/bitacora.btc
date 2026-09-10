@@ -601,6 +601,7 @@ export function PriceChart({
     const node = wrapRef.current;
     if (!node) return;
     const onWheel = (ev: WheelEvent) => {
+      if (document.activeElement !== node) return;
       ev.preventDefault();
       const lay = layoutRef.current;
       if (lay.nAll < 4) return;
@@ -776,7 +777,13 @@ export function PriceChart({
   }, [layout]);
 
   return (
-    <div className="relative h-[min(58dvh,420px)] w-full overflow-hidden sm:h-[min(64dvh,560px)]" ref={wrapRef}>
+    <div
+      className="relative h-[min(58dvh,420px)] w-full overflow-hidden outline-none sm:h-[min(64dvh,560px)]"
+      ref={wrapRef}
+      tabIndex={0}
+      title={t("zoomNeedFocus")}
+      onPointerDown={() => wrapRef.current?.focus({ preventScroll: true })}
+    >
       <div className="absolute top-2 left-2 z-10 flex gap-1">
         <Button
           type="button"

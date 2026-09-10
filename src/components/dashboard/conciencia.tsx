@@ -27,7 +27,7 @@ export function ConcienciaBlock() {
 
       <div className="space-y-3">
         <h2 className="text-lg font-medium text-foreground">{c.mapTitle}</h2>
-        <ul className="space-y-3">
+        <ul className="grid gap-3 sm:grid-cols-2">
           {c.mapItems.map((item) => (
             <li key={item.title} className="text-sm leading-relaxed sm:text-base">
               <span className="font-medium text-foreground">

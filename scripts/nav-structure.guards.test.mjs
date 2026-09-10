@@ -1,0 +1,84 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+
+const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
+
+test("D-NAV bar order is Mapa, Aprender, Comunidad, Mercado", () => {
+  const nav = read("src/domain/nav.ts");
+  const ids = [...nav.matchAll(/PRIMARY_NAV[\s\S]*?id: "([^"]+)"/g)].map((m) => m[1]);
+  const primary = nav.slice(nav.indexOf("PRIMARY_NAV"), nav.indexOf("UTILITY_NAV"));
+  assert.deepEqual(
+    [...primary.matchAll(/id: "([^"]+)"/g)].map((m) => m[1]),
+    ["mapa", "aprender", "comunidad", "mercado"],
+  );
+  assert.equal(ids[0], "mapa");
+});
+
+test("D-NAV-02 Aprender hub wraps conciencia, historia and pulso", () => {
+  const desk = read("src/components/dashboard/desk.tsx");
+  const aprender = desk.indexOf('id="aprender"');
+  const conciencia = desk.indexOf('id="conciencia"');
+  const pulso = desk.indexOf('id="pulso"');
+  const comunidad = desk.indexOf('id="comunidad"');
+  const roadmap = desk.indexOf("<RoadmapWeb3");
+  assert.ok(aprender > 0 && conciencia > aprender && pulso > conciencia && pulso < comunidad);
+  assert.ok(roadmap > comunidad, "roadmap must not sit between Aprender and Comunidad");
+  assert.match(desk, /LearnIndex/);
+  assert.match(desk, /COMMUNITY_HUB/);
+  assert.match(desk, /id="anuncios"/);
+  assert.match(desk, /id="eventos"/);
+  assert.match(desk, /id="feed"/);
+  assert.match(desk, /SiteShell fill/);
+  assert.match(desk, /sectorOf/);
+});
+
+test("D-NAV-03 Red is nested inside Mercado", () => {
+  const desk = read("src/components/dashboard/desk.tsx");
+  const mercado = desk.indexOf('id="mercado"');
+  const red = desk.indexOf('id="red"');
+  const datos = desk.indexOf('id="datos"');
+  assert.ok(mercado > 0 && red > mercado && red < datos);
+});
+
+test("D-NAV-04 header Sumate is a CTA, not a fifth destination", () => {
+  const head = read("src/components/site-header.tsx");
+  assert.match(head, /requestJoinMap/);
+  assert.match(head, /navSumate/);
+  assert.match(head, /data-destinos/);
+  assert.doesNotMatch(read("src/domain/nav.ts"), /id: "sumate"/);
+});
+
+test("footer does not list Privacidad twice", () => {
+  const head = read("src/components/site-header.tsx");
+  assert.equal((head.match(/legalPrivacy/g) || []).length, 1);
+  assert.match(head, /UTILITY_NAV/);
+  assert.doesNotMatch(read("src/domain/nav.ts").slice(
+    read("src/domain/nav.ts").indexOf("UTILITY_NAV"),
+    read("src/domain/nav.ts").indexOf("LEGAL_NAV"),
+  ), /privacidad/);
+});
+
+test("carga shop does not require an address to enable Pedir código", () => {
+  const form = read("src/components/map/map-compose-form.tsx");
+  assert.match(form, /shopReady = Boolean\(shopName.trim\(\)\) && captchaOk && privacyOk/);
+  assert.doesNotMatch(form, /pinMatchesAddress/);
+  assert.match(read("src/components/map/address-search.tsx"), /addrOptional/);
+  assert.doesNotMatch(read("src/components/map/address-search.tsx"), /aria-required="true"/);
+});
+
+test("wheel zoom waits for focus on map, globe and chart", () => {
+  assert.match(read("src/components/map/spend-map.tsx"), /scrollWheelZoom: false/);
+  assert.match(read("src/components/map/world-globe.tsx"), /enableZoom = true/);
+  assert.match(read("src/components/map/world-globe.tsx"), /enableZoom = false/);
+  const chart = read("src/components/dashboard/price-chart.tsx");
+  assert.match(chart, /document.activeElement !== node/);
+  assert.match(read("src/components/dashboard/desk.tsx"), /chartDisclaimer/);
+});
+
+test("i18n nav labels exist in es en pt", () => {
+  const copy = read("src/lib/i18n.ts");
+  for (const label of ["Historia de Bitcoin", "Bitcoin history", "História do Bitcoin", "Bitcoin hoy", "Bitcoin today", "Bitcoin hoje"]) {
+    assert.match(copy, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});

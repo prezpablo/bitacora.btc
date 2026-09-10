@@ -68,9 +68,16 @@ test("mergePins does not un-verify", () => {
   assert.equal(out[0]!.blurb, "nuevo");
 });
 
-test("parsePinsCsv drops rows without http proof", () => {
-  const csv = "id,name,blurb,proof,links,token,verified,verifiedAt,created\npin:x,N,b,javascript:alert(1),,CARGA-AAAAAA,0,0,1\n";
-  assert.equal(parsePinsCsv(csv).length, 0);
+test("parsePinsCsv keeps empty proof (pin first) and drops javascript", () => {
+  const empty = parsePinsCsv(
+    "id,name,blurb,proof,links,token,verified,verifiedAt,created\npin:x,N,b,,,CARGA-AAAAAA,0,0,1\n",
+  );
+  assert.equal(empty.length, 1);
+  assert.equal(empty[0]!.proof, "");
+  const bad = parsePinsCsv(
+    "id,name,blurb,proof,links,token,verified,verifiedAt,created\npin:x,N,b,javascript:alert(1),,CARGA-AAAAAA,0,0,1\n",
+  );
+  assert.equal(bad.length, 0);
 });
 
 test("pinTimeLeft counts real remainder until TTL", () => {

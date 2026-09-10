@@ -15,6 +15,7 @@ export function listingTrust(
   score: number,
   count: number,
   scraped = false,
+  overlay = false,
 ) {
   const rows = links ?? [];
   const identity = rows.length >= 2 && rows.some((l) => ID_KEYS.has(l.key || keyFromUrl(l.url)));
@@ -23,7 +24,7 @@ export function listingTrust(
     identity,
     reputation,
     scraped,
-    verified: identity || reputation || scraped,
+    verified: overlay ? scraped : identity || reputation || scraped,
     avg: count > 0 ? score : null,
     count,
     socials: rows.length,
@@ -34,7 +35,8 @@ export function communityTrust(c: Community) {
   const count = c.voteCount ?? c.votes?.length ?? 0;
   const score = count ? (c.score ?? averageStars(c.votes ?? []) ?? 0) : 0;
   const scraped = (c.verifiedAt ?? 0) > 0;
-  const base = listingTrust(c.links, score, count, scraped);
+  const overlay = (c.id || "").startsWith("c:") && !isFounding(c);
+  const base = listingTrust(c.links, score, count, scraped, overlay);
   if (isFounding(c)) return { ...base, verified: true, identity: true };
   return base;
 }
@@ -44,6 +46,26 @@ export function hasScrapeLink(links: { key?: string; url: string }[] | undefined
     const u = (l.url || "").trim();
     return /^https?:\/\//i.test(u);
   });
+}
+
+export type ProofErr = "need" | "links" | "instagram";
+
+/** Vacío = todavía no hay prueba (paso 1). Instagram solo si es post/reel. */
+export function normalizeProofUrl(raw: string): { url: string } | { error: ProofErr } {
+  const t = String(raw || "").trim();
+  if (!t) return { error: "need" };
+  if (/^javascript:/i.test(t) || /^data:/i.test(t)) return { error: "links" };
+  const url = /^https?:\/\//i.test(t) ? t : `https://${t}`;
+  try {
+    const href = new URL(url).toString();
+    if (!/^https?:\/\//i.test(href)) return { error: "links" };
+    if (/instagram\.com/i.test(href) && !/instagram\.com\/(?:p|reel|reels|tv)\//i.test(href)) {
+      return { error: "instagram" };
+    }
+    return { url: href.slice(0, 300) };
+  } catch {
+    return { error: "links" };
+  }
 }
 
 export function shopIsPublic(id: string, verifiedAt?: number) {
@@ -59,4 +81,26 @@ export function communityIsPublic(c: { id?: string; slug?: string; verifiedAt?: 
   if (id.startsWith("btcmap:")) return true;
   if (id.startsWith("c:")) return (c.verifiedAt ?? 0) > 0;
   return (c.verifiedAt ?? 0) > 0 || !id.startsWith("c:");
+}
+
+/** Carga del usuario aún no scrapeada. Catalog/btcmap no pasan por acá. */
+export function overlayPending(id: string, verifiedAt?: number) {
+  if ((verifiedAt ?? 0) > 0) return false;
+  if (id.startsWith("local:")) return true;
+  if (id.startsWith("c:") && !isFounding({ id })) return true;
+  return false;
+}
+
+export type CargaGate = "ok" | "missing" | "live" | "token";
+
+/** Overlay pending + matching token. Never mints. Catalog / founding / already-live stay out. */
+export function cargaVerifyGate(
+  row: { id: string; token?: string; verifiedAt?: number } | undefined,
+  givenToken?: string,
+): CargaGate {
+  if (!row) return "missing";
+  if (!overlayPending(row.id, row.verifiedAt)) return "live";
+  const given = (givenToken || "").trim();
+  if (!row.token || !given || given !== row.token) return "token";
+  return "ok";
 }

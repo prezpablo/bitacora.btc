@@ -1,0 +1,72 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { COMMUNITY_HUB, LEARN_HUB, LEGAL_NAV, MARKET_HUB, PRIMARY_NAV, UTILITY_NAV, sectorOf, spyOf } from "./nav.ts";
+
+test("D-NAV-01 primary bar is four destinations", () => {
+  assert.deepEqual(
+    PRIMARY_NAV.map((n) => n.id),
+    ["mapa", "aprender", "comunidad", "mercado"],
+  );
+});
+
+test("D-NAV-02 Aprender hashes to the hub, not a inner block", () => {
+  assert.equal(PRIMARY_NAV.find((n) => n.id === "aprender")?.hash, "aprender");
+  assert.deepEqual(
+    LEARN_HUB.map((n) => n.hash),
+    ["conciencia", "historia", "pulso"],
+  );
+});
+
+test("D-NAV-01 utilities live in the footer, not the bar", () => {
+  assert.deepEqual(
+    UTILITY_NAV.map((n) => n.id),
+    ["hacia", "contacto"],
+  );
+  assert.ok(!UTILITY_NAV.some((n) => n.id === "privacidad"));
+  assert.ok(!PRIMARY_NAV.some((n) => n.id === "hacia" || n.id === "privacidad"));
+});
+
+test("legal page keeps privacy and contact", () => {
+  assert.deepEqual(
+    LEGAL_NAV.map((n) => n.hash),
+    ["privacidad", "contacto"],
+  );
+});
+
+test("D-NAV-03 Red is inside Mercado, not a primary destination", () => {
+  assert.deepEqual(
+    MARKET_HUB.map((n) => n.hash),
+    ["mercado", "red"],
+  );
+  assert.ok(!PRIMARY_NAV.some((n) => n.id === "red"));
+});
+
+test("community hub is anuncios, eventos, feed", () => {
+  assert.deepEqual(
+    COMMUNITY_HUB.map((n) => n.hash),
+    ["anuncios", "eventos", "feed"],
+  );
+});
+
+test("D-NAV-04 Sumate is not a nav destination", () => {
+  assert.ok(!PRIMARY_NAV.some((n) => n.id === "sumate" || n.id === "join"));
+  assert.ok(!UTILITY_NAV.some((n) => n.id === "sumate"));
+});
+
+test("desk sectors: Mapa+Aprender share llegar; comunidad and mercado are own rooms; pie is footer hashes", () => {
+  assert.equal(sectorOf(""), "llegar");
+  assert.equal(sectorOf("mapa"), "llegar");
+  assert.equal(sectorOf("aprender"), "llegar");
+  assert.equal(sectorOf("pulso"), "llegar");
+  assert.equal(sectorOf("comunidad"), "comunidad");
+  assert.equal(sectorOf("anuncios"), "comunidad");
+  assert.equal(sectorOf("eventos"), "comunidad");
+  assert.equal(sectorOf("feed"), "comunidad");
+  assert.equal(sectorOf("mercado"), "mercado");
+  assert.equal(sectorOf("red"), "mercado");
+  assert.equal(sectorOf("roadmap"), "pie");
+  assert.equal(sectorOf("contacto"), "pie");
+  assert.equal(spyOf("historia"), "aprender");
+  assert.equal(spyOf("red"), "mercado");
+  assert.equal(spyOf("roadmap"), "");
+});

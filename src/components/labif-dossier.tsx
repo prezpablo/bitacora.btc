@@ -30,7 +30,7 @@ export function LabifDossier() {
           <div className="flex items-center gap-[0.14em] font-display text-2xl font-medium tracking-tight sm:text-3xl">
             <BitcoinMark className="h-[1em] w-[1em] shrink-0" />
             <span>
-              itacora<span className="text-[#F7931A]">.btc</span>
+              itacora<span className="text-[#9a5600]">.btc</span>
             </span>
           </div>
           <p className="kicker m-0">LABIF 2026</p>
@@ -396,7 +396,7 @@ export function LabifDossier() {
             <div className="flex items-center gap-2 text-lg font-medium">
               <BitcoinMark className="size-8" />
               <span>
-                itacora<span className="text-[#F7931A]">.btc</span>
+                itacora<span className="text-[#9a5600]">.btc</span>
               </span>
             </div>
             <img src="/logos/conciencia-bitcoin.png" alt="Consciencia Bitcoin" className="size-16 rounded-full object-cover" />
