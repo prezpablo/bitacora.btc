@@ -22,6 +22,8 @@
     "test:live": "node scripts/probe-live.mjs",
     "test:seo": "node scripts/probe-seo.mjs",
     "test:a11y": "node scripts/probe-a11y.mjs",
+    "deuda:status": "node scripts/deuda-status.mjs",
+    "deuda:live": "node scripts/deuda-status.mjs --live",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

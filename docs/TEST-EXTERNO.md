@@ -110,6 +110,7 @@ Cron diario 08:20 -03 (antes de la corrida 08:30):
 
 ```
 20 8 * * * cd /var/www/bitacora && node scripts/probe-live.mjs >> /var/log/bitacora-probe.log 2>&1
+22 8 * * * cd /var/www/bitacora && node scripts/deuda-status.mjs --live >> /var/log/bitacora-deuda.log 2>&1
 ```
 
 Lectura: `SITE FAIL` = pager. `DEGRADA` = anotar 2–3 días, no tumbar el desk.

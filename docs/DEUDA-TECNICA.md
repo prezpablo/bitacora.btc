@@ -9,6 +9,8 @@
 
 Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponible hoy: sitio + CSV + snapshots + `/healthz` + `/legal`. FLOSS oponible **solo** cuando el repo liste 200 anónimo.
 
+**Seguimiento automático:** cola machine-readable [`deuda-cola.json`](deuda-cola.json). `npm run deuda:status` (repo) · `npm run deuda:live` (origen + GitHub anónimo). Guards (healthz, lang pt, CSV, fonts) fallan el exit si se rompen. Ítems ABIERTOS no tumban CI. Cron VPS 08:22 -03; Grok Automations diario 08:10 -03.
+
 | Retirado (no backlog P0) | Queda (severidad justa) |
 |---|---|
 | `/health` 404, CSV token como fuga, snapshot ausente, lang fijo sin `?lang=`, legal por API, serverFn CVE, www/SAN, Geo-IP, `/privacidad` 404, SSRF P0, Mercado = down, globo = no hay mapa, FormSubmit oculto, REST v1 ya | **D-FOSS** (repo 404 anónimo) · **D-PIN** · **D-STATS** · **D-CTA** · **D-418** · **D-MKT** UX · globo-first desktop (relato, no apagar) · P3 PWA / img-src / LICENSE |
