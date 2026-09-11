@@ -153,7 +153,7 @@ J) i18n + SEO
 K) P2 SEGURIDAD
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer no-referrer, permissions-policy
 - P2-02 object-src none; form-action self + formsubmit.co
-- P2-03 connect-src: geojs, ipwho.is, nominatim, OSM/ArcGIS, btcmap. Velas NO en connect-src
+- P2-03 connect-src: geojs, ipwho.is, nominatim, Esri/OpenTopoMap, btcmap. Velas NO en connect-src
 - P2-04 sin gtag/fbq/pixel/hotjar
 - P2-06 sin login / wallet-connect / depósito / «enviá fondos»
 - P2-07 /api y /__grok no exponen admin, keys ni CARGA-
@@ -167,7 +167,7 @@ K) P2 SEGURIDAD
 - P2-19 404 sin stack, sin /var/www, sin env
 
 L) P3 FEEDS — 1 GET/HEAD
-Mapa: D-BTCMAP-E D-BTCMAP-A D-OSM D-ESRI D-NOM D-GEOJS D-IPWHO
+Mapa: D-BTCMAP-E D-BTCMAP-A D-ESRI D-OTM D-NOM D-GEOJS D-IPWHO
 Desk (1 de 4 = precio_ok SI): D-BN D-BN-VISION D-OKX D-HL (HL 405/404 = N/D, no DEGRADA; NO POST)
 On-chain: D-MP-FEE D-MP-TIP D-MP-NINJA D-FNG D-BITBO D-POLY (404 poly = N/D)
 Contacto: D-FS HEAD formsubmit.co

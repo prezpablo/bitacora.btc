@@ -109,13 +109,15 @@ export function prefetchEventPage(qc: QueryClient, query: EventBoardQuery = {}) 
   });
 }
 
-export function prefetchMapStore(qc: QueryClient) {
+export function prefetchMapPins(qc: QueryClient) {
   return Promise.all([
-    prefetchGlobe(qc),
     qc.prefetchQuery({ queryKey: mapKeys.communities, queryFn: () => getBtcCommunities(), staleTime: STALE.communities }),
     qc.prefetchQuery({ queryKey: mapKeys.csv, queryFn: () => getMapCsv(), staleTime: STALE.csv }),
-    prefetchEventPage(qc),
   ]);
+}
+
+export function prefetchMapStore(qc: QueryClient) {
+  return Promise.all([prefetchGlobe(qc), prefetchMapPins(qc)]);
 }
 
 export function invalidateMapWrite(qc: QueryClient, csv?: string) {

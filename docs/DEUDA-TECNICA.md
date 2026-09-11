@@ -1,17 +1,17 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 10 de setiembre de 2026  
+**Fecha:** 11 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
 **Repo:** `prezpablo/bitacora.btc` `main` · deploy = ZIP (el VPS no tiene `.git`)  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests externos:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md)
 
-## Mapa vigente (10 set)
+## Mapa vigente (11 set)
 
 Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
 
-**En el `.org` hoy:** `lang` por `?lang=`, H1 único por ruta, skip en `/` `/mapa` `/legal` `/labif`, captcha con audio + sr-only, 404 noindex, probe SEO.
+**En el `.org` hoy:** barra 4 destinos + Sumate, `lang` por `?lang=`, H1 único, skip en `/` `/mapa` `/legal` `/labif`, captcha audio, 404 noindex, CSP **sin Google Fonts**, shops/comms 200. **Teselas todavía OSMF** (403 «Access blocked») — el ZIP de Esri no subió.
 
-**En `main` y no en el `.org`:** fase pública «Guía soberana». El probe axe (`npm run test:a11y`) es de repo, no de sitio.
+**En el workspace (no pusheado / no en `.org`):** D-TILE — Esri World Street + OpenTopoMap, preconnect, Leaflet en idle, eventos después del mapa. Carto y `tile.openstreetmap.org` fuera.
 
 **No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
 
@@ -54,27 +54,33 @@ flowchart TB
 
 | Pri | Ítem | Estado | Dónde |
 |---|---|---|---|
-| **P0** | ZIP VPS = `main` | **Abierto cada release** | Guía soberana aún no está en `.org` |
-| **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | 30/08 404 cerrado |
+| **P0** | ZIP VPS = workspace teselas Esri | **Abierto** | `.org` sigue OSMF 403. Push + ZIP. |
+| **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | shops/comms 200 (11 set) |
 | **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
-| **P1** | Copy SSR (H1 / legal / contacto) | **Hecho en repo** · falta ZIP | Primer byte aún en es en `.org` |
+| **P1** | Copy SSR (H1 / legal / contacto) | **Cerrado en `.org`** | H1 pt Boas-vindas / en Welcome |
 | **P1** | Head SEO por ruta (canonical, hreflang, JSON-LD, 404 noindex, H1 único) | **Cerrado en `.org`** | `npm run test:seo` |
+| **P1** | sitemap `lastmod` | **Abierto** | Sigue 2026-09-07 |
 | **P1** | URCDP | Presentada 2 set | Revisión, no código |
 | **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
 | **P1** | Probe live en el VPS | Hecho en repo | `probe-live.mjs` · cron 08:20 |
 | **P1** | Lazy viewport + mercado al `#mercado` | **Cerrado** | `in-view` + `LazyMount` |
+| **P2** | D-TILE teselas sin OSMF/Carto | **Hecho en workspace** · falta push+ZIP | Esri + OpenTopoMap + preconnect |
+| **P2** | Teselas soberanas (no Esri US) | Abierto | OpenFreeMap / PMTiles en el VPS. No ahora |
 | **P2** | Lighthouse mobile 3G/4G en `.org` | Abierto | Meta ≥ 80 4G / ≥ 50 3G |
-| **P2** | Tiles 1× en 3G · cluster pines · fuente 400 | Abierto | UX, no bloquea |
+| **P2** | Cluster pines · fuente 400 | Abierto | UX, no bloquea |
 | **P2** | Partir alta fuera de `spend-map` | Abierto | Clean Architecture |
 | **P2** | PWA offline geo + catálogo | Abierto | No ahora |
 | **P2** | Umbrel + worker (plan híbrido) | Abierto | Q1. No fingir el nodo |
 | **P2** | CSP sin `unsafe-inline` · BFF | Abierto | Plan híbrido |
+| **P2** | P2-18 Google Fonts | **Cerrado en `.org`** | `font-src 'self'` Ubuntu self-host |
+| **P3** | Skip en 404 `AppNotFound` | Abierto | Producto 4/4; 404 sin `#contenido` |
 | **P3** | Captcha no visual | **Cerrado en `.org`** | Audio + sr-only (`bb8eb06`) |
 | **P3** | Skip + foco visible + banner `region` | **Cerrado en `.org`** | Incl. `/labif` |
-| **P3** | Contraste `.text-short` y naranja LABIF · links subrayados en párrafo | **Abierto** | axe 7 set: 1.4.3 y 1.4.1 |
-| **P3** | Globo / velas por teclado · táctiles 44px · LRM fuera del bundle | Abierto | |
+| **P3** | Contraste / táctiles 24–44px | Parcial | `--color-short` y LABIF oscurecidos; 44px abierto |
+| **P3** | Globo / velas por teclado · LRM fuera del bundle | Abierto | |
+| **P3** | `js-yaml` high (npm audit) | Abierto | No parsea YAML de usuarios. No `npm audit fix` en VPS |
 | **P3** | Tutor soberano (IA) | **No ahora** | § Tutor. No en el VPS del mapa |
-| **D-NAV** | 4 destinos (Mapa, Comunidad, Aprender, Mercado) | **01–04 hechos en repo** | § Navegación. Una fase = un ZIP |
+| **D-NAV** | 4 destinos + D-NAV-05 | **Cerrado en `.org`** | Mapa · Aprender · Comunidad · Mercado |
 | **Ops** | LN inbound · SMTP no-US · HSTS preload | Abierto | Operador |
 
 ### Alertas runner (no son CAÍDA)
@@ -84,10 +90,23 @@ flowchart TB
 | D-MP-FEE / TIP | mempool.space mudo *en el runner*. Fees: ninja + emzy + blockstream + last-known. Avisar solo si el **probe VPS** también vacío 2–3 días. |
 | D-BN | Binance 451. Vision + OKX cubren. Nunca «mercado caído». |
 | D-FS | formsubmit.co timeout *en el runner*. El contacto va por server-fn del VPS. No es CAÍDA. |
-| P1-03 copy SSR | `lang`+title sí (inyector). Cuerpo del home en el primer byte: arreglo en repo (`retainLangSearch` + loader `getRequest`). Falta ZIP. |
+| D-OSM / Carto | Tesela 200 con marca («blocked» / «API KEY REQUIRED»). Leaflet no dispara `tileerror`. **No usar.** D-TILE = Esri. |
+| P0-12 shops 404 | Falso positivo si el GET de 3 MB corta a 8 s. Origen 200. Timeout smoke ≥ 12 s. |
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
 
-**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`.
+**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`. Google Fonts remoto. Teselas OSMF o Carto sin clave.
+
+---
+
+## Teselas · D-TILE (11 set)
+
+OSMF y Carto devuelven PNG 200 con franja. El fallback a Esri **nunca** corría.
+
+| Id | Qué | Estado |
+|---|---|---|
+| **D-TILE-01** | Primaria Esri World Street (sin API key). Reserva OpenTopoMap. CSP sin `tile.openstreetmap.org` ni Carto. | **Hecho en workspace.** Falta push + ZIP. |
+| **D-TILE-02** | `preconnect` Esri + Leaflet en idle en el globo. Eventos después de `mapReady`. | **Hecho en workspace.** |
+| **D-TILE-03** | Teselas propias (OpenFreeMap / PMTiles en el VPS). | Abierto. Soberanía vs Esri US. No ahora. |
 
 ---
 

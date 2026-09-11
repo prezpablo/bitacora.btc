@@ -4,13 +4,35 @@ import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { boxAround } from "@/domain";
 import { onJoinMap, takeJoinIntent } from "@/application/join-map";
-import { prefetchMapStore } from "@/lib/map-query";
+import { prefetchGlobe, prefetchMapPins } from "@/lib/map-query";
 import { slowNet } from "@/lib/net";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { locateBest } from "@/infrastructure/geo";
 
 const WorldGlobe = lazy(() => import("./world-globe").then((m) => ({ default: m.WorldGlobe })));
 const SpendMap = lazy(() => import("./spend-map").then((m) => ({ default: m.SpendMap })));
+
+const ESRI = "https://server.arcgisonline.com";
+let mapEngineWarm = false;
+
+/** DNS/TLS a teselas + chunk Leaflet mientras se ve el globo (sin pelear con eventos). */
+function warmMapEngine() {
+  if (typeof document === "undefined" || mapEngineWarm) return;
+  mapEngineWarm = true;
+  if (!document.head.querySelector(`link[rel="preconnect"][href="${ESRI}"]`)) {
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = ESRI;
+    document.head.appendChild(link);
+  }
+  void import("leaflet/dist/leaflet.css");
+  void import("leaflet");
+  void import("./spend-map");
+  const img = new Image();
+  img.referrerPolicy = "no-referrer";
+  img.decoding = "async";
+  img.src = `${ESRI}/ArcGIS/rest/services/World_Street_Map/MapServer/tile/3/2/2`;
+}
 
 function MapFallback() {
   return (
@@ -40,19 +62,31 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
   modeRef.current = mode;
 
   useEffect(() => {
-    void prefetchMapStore(qc);
+    void prefetchGlobe(qc);
+    if (modeRef.current === "map") {
+      warmMapEngine();
+      void prefetchMapPins(qc);
+      return;
+    }
+    if (typeof requestIdleCallback === "function") {
+      const idle = requestIdleCallback(() => warmMapEngine(), { timeout: 800 });
+      return () => cancelIdleCallback(idle);
+    }
+    const t = window.setTimeout(warmMapEngine, 0);
+    return () => clearTimeout(t);
   }, [qc]);
 
   function goMap(next?: GlobeFocus) {
     if (next) setFocus(next);
     setMode("map");
-    void prefetchMapStore(qc);
+    warmMapEngine();
+    void prefetchMapPins(qc);
   }
 
   useEffect(() => {
     async function locateThenJoin() {
       if (mapHasPendingCarga()) {
-        setMode("map");
+        goMap();
         return;
       }
       if (modeRef.current === "map") return;

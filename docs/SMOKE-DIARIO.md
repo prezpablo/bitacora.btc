@@ -76,7 +76,7 @@ P1 Producto
 P2 Seguridad
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer-policy no-referrer, permissions-policy
 - P2-02 object-src none; form-action self + formsubmit.co
-- P2-03 connect-src allowlist: geojs, ipwho.is, nominatim, OSM/ArcGIS, btcmap. Velas NO van en connect-src (son server-fn)
+- P2-03 connect-src allowlist: geojs, ipwho.is, nominatim, Esri/OpenTopoMap, btcmap. Velas NO van en connect-src (son server-fn)
 - P2-04 sin gtag/fbq/pixel/hotjar
 - P2-06 sin login / wallet-connect / depósito
 - P2-07 /api y /__grok no exponen admin, keys ni CARGA-
@@ -93,8 +93,8 @@ P3 Dependencias — 1 GET/HEAD c/u
 Mapa
 - D-BTCMAP-E https://api.btcmap.org/v2/elements
 - D-BTCMAP-A https://api.btcmap.org/v2/areas
-- D-OSM 1 tesela https://tile.openstreetmap.org/3/2/2.png
-- D-ESRI 1 tesela https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/0/0
+- D-ESRI 1 tesela https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/4/5/6
+- D-OTM 1 tesela https://a.tile.opentopomap.org/4/5/6.png
 - D-NOM https://nominatim.openstreetmap.org/
 - D-GEOJS https://get.geojs.io/v1/ip/geo.json
 - D-IPWHO https://ipwho.is/

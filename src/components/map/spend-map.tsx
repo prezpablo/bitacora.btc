@@ -11,7 +11,7 @@ import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } 
 import { getCityFrame, saveMapCsv, submitMapListing, cancelMapListing, verifyMapListing, reverseAddress } from "@/infrastructure/server-fns";
 import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
-import { countryFromGlobe, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
+import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
 import { boxAround } from "@/domain";
 import { geoBannerKey } from "@/domain/geo-fix";
 import { locateBest } from "@/infrastructure/geo";
@@ -146,7 +146,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     goToUser,
     startGuide,
   } = useMapGuide(lang, t);
-  const { invalidate } = useMapStore();
+  const { qc, invalidate } = useMapStore();
   const onWorldRef = useRef(onWorld);
   onWorldRef.current = onWorld;
   const skipWorldRef = useRef(false);
@@ -552,18 +552,23 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         focus ? [focus.lat, focus.lon] : [20, -40],
         focus?.zoom ?? 4,
       );
-      const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://btcmap.org">BTC Map</a>',
-        subdomains: "abc",
-        maxZoom: 19,
-      }).addTo(map);
-      osm.on("tileerror", () => {
+      // Teselas sin API key: OSMF y Carto marcan «blocked/key» con PNG 200 (Leaflet no ve error).
+      const streets = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution:
+            'Esri · &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://btcmap.org">BTC Map</a>',
+          maxZoom: 19,
+        },
+      ).addTo(map);
+      streets.on("tileerror", () => {
         if (!map || (map as { _bitacoraFb?: boolean })._bitacoraFb) return;
         (map as { _bitacoraFb?: boolean })._bitacoraFb = true;
-        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
-          attribution: "Esri · OSM · BTC Map",
-          maxZoom: 19,
+        L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://opentopomap.org">OpenTopoMap</a> · BTC Map',
+          subdomains: "abc",
+          maxZoom: 17,
         }).addTo(map);
       });
       L.control.zoom({ position: "topright" }).addTo(map);
@@ -656,6 +661,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!mapReady) return;
+    const run = () => void prefetchEventPage(qc);
+    if (typeof requestIdleCallback === "function") {
+      const idle = requestIdleCallback(run, { timeout: 2500 });
+      return () => cancelIdleCallback(idle);
+    }
+    const t = window.setTimeout(run, 1200);
+    return () => clearTimeout(t);
+  }, [mapReady, qc]);
 
   useEffect(() => {
     const map = mapRef.current;

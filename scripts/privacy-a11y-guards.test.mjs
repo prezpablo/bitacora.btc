@@ -98,3 +98,18 @@ test("legal copy lives on /legal, not on the home desk", () => {
   assert.match(nav, /hash: "contacto"/);
   assert.match(read("src/components/site-header.tsx"), /LEGAL_NAV/);
 });
+
+test("map tiles are Esri then OpenTopoMap, never OSMF or Carto keys", () => {
+  const map = read("src/components/map/spend-map.tsx");
+  const caddy = read("deploy/Caddyfile");
+  assert.match(map, /World_Street_Map/);
+  assert.match(map, /tile\.opentopomap\.org/);
+  assert.doesNotMatch(map, /tile\.openstreetmap\.org/);
+  assert.doesNotMatch(map, /basemaps\.cartocdn/);
+  assert.match(read("src/components/map/map-gate.tsx"), /rel="preconnect"/);
+  assert.match(read("src/lib/map-query.ts"), /prefetchMapPins/);
+  assert.match(caddy, /server\.arcgisonline\.com/);
+  assert.match(caddy, /tile\.opentopomap\.org/);
+  assert.doesNotMatch(caddy, /tile\.openstreetmap\.org/);
+  assert.doesNotMatch(caddy, /basemaps\.cartocdn/);
+});
