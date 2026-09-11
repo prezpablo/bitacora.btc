@@ -15,8 +15,11 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **1** | **D-PIN-01** | `pushBbox()` **justo después** de `map.on("moveend")`. Bbox inicial = `map.getBounds()`, no Montevideo hardcode. | Entrar desde el globo a BR/AR: pines de ese país, no solo MVD | Revertir el `setBbox` extra en `spend-map.tsx` |
 | **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` MIT. | Zoom continente: clusters LATAM. Zoom 9+: pines sueltos. Catálogo 27 k no se recorta a los primeros 800 del JSON | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
 | **3** | **D-PIN-03** | Payload flaco tipo BTC Map v4: `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: respuesta de comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo en el GET |
-| **4** | **D-TILE-03** | Teselas propias: OpenFreeMap / PMTiles. Sale Esri US. | CSP sin `arcgisonline` | Volver a D-TILE-01 |
-| **5** | **P3 lote** | Skip en 404 · sitemap `lastmod` · contraste 44px · globo/velas teclado | smoke P1-14 4/4 + 404 | Por ítem |
+| **4** | **D-STATS** | Totales del globo: **Latam** vs **BTC Map mundial**. Copy i18n 3 idiomas. No inflar “Mapa Latam” con 27 k globales. | Globo y FAQ muestran dos líneas | Revertir strings |
+| **5** | **D-CTA** | Separar “Sumate” (cargar punto) de “Apoyá con sats” (QR). Header no pone donar al lado de alta. | Un CTA de mapa, donación en pie o `#aportes` | Restaurar QR compacto en header |
+| **6** | **D-418** | Verificar React #418: `lang` SSR vs `localStorage` sin `?lang=`. Si el HTML es `es` y el cliente hidrata `en`, fijar idioma **antes** del render (URL gana). | Consola `.org` sin #418; `html lang` = copy | Solo si se reproduce |
+| **7** | **D-TILE-03** | Teselas propias: OpenFreeMap / PMTiles. Sale Esri US. | CSP sin `arcgisonline` | Volver a D-TILE-01 |
+| **8** | **P3 lote** | Skip 404 · sitemap `lastmod` · 44px · globo/velas teclado · PWA fuera de `/__grok/` · `LICENSE` MIT/AGPL · `img-src` allowlist · banner storage compacto | Por ítem | Por ítem |
 
 **Referentes (no copiar Mapbox GL):**
 - [mapbox/supercluster](https://github.com/mapbox/supercluster) — `getClusters([w,s,e,n], zoom)`
@@ -32,6 +35,69 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 
 ---
 
+## Informe caja gris 11 set — cotejo (no pentest)
+
+Fuente: revisión de superficie pública 11 set 2026. **Caja gris ≠ fuente de verdad.** Varios P0 del informe ya están cerrados o son errores de observación.
+
+### El informe se equivoca (no abrir deuda)
+
+| Dice el informe | En el producto |
+|---|---|
+| «El código no es público» | Repo público [`prezpablo/bitacora.btc`](https://github.com/prezpablo/bitacora.btc). Falta `LICENSE` (P3), no el código. |
+| «Sin healthcheck `/health` 404» | Existe **`GET /healthz`** `{ok:true}`. Probed P0-13. |
+| «CSV con tokens de carga» | Columna `token` vacía en público. CI: `stringifyMapCsvPublic` / `privacy-a11y-guards`. |
+| «Sin snapshot BTC Map» | `public/data/btcmap-shops.json` (~27 k) + SQLite catálogo + TTL 6 h. El hueco es el **LIMIT 800**, no la ausencia de dump. |
+| «FormSubmit es el único canal y el legal no avisa» | `/legal` declara FormSubmit→Gmail. Ops: SMTP propio (abierto, no P0 producto). |
+| «Rutas `/aprender` `/comunidad` `/mercado`» | **No hacer.** D-NAV: anclas en un desk. Sitemap de rutas reales: `/` `/mapa` `/legal` `/labif`. |
+| «Apagar el globo en P0» | Producto: globo = relato; 3G ya salta a Leaflet (`slowNet`). Usable = D-PIN, no matar el globo. |
+| «API REST pública v1 ya» | Overlay propio = 2 filas. Publicar API vacía no suma. Tras D-PIN + overlay. Plan híbrido. |
+| «Leaflet.markercluster» | Descartado a 27 k. Supercluster servidor = D-PIN-02. |
+| «No hay `/healthz` ni CI de CSV» | Hay ambos. |
+
+### El informe acierta y **ya estaba** en deuda
+
+| Hallazgo | Deuda vigente |
+|---|---|
+| Teselas Esri vs OSM/OpenFreeMap | D-TILE-01 (Esri temporal) → D-TILE-03 |
+| Mapa lento / pines incompletos | D-PIN-01…03 |
+| Mercado “sin datos” | Runner D-BN / D-MP. Vision+OKX+last-known. No es CAÍDA. |
+| Globo 1.9 MB / no teclado | P3 globo teclado; 3G off; D-TILE-02 precarga Leaflet |
+| FormSubmit + Gmail | Ops SMTP no-US |
+| CSP `unsafe-inline` / wasm | P2 CSP · plan híbrido |
+| sitemap `lastmod` 07-set | P1 sitemap |
+| Skip 404, 44px, contraste | P3 lote |
+| LN / Lightning Address | Q4 + Ops LN inbound. QR on-chain+LN ya |
+| Umbrel / nodo en casa | Q1 |
+| i18n legal “traducción automática” | Legal ES/PT/EN está **escrito** en `legal-eu.ts`. No reabrir. |
+| Geo-IP vs “GPS no IP” | L0.5: Geo-IP solo extras o botón. Cumplido en código. |
+| `/privacidad` 404 | Anclas `/legal#privacidad`. Banner ya apunta ahí. |
+
+### El informe acierta y **entra** a la cola (16 set+)
+
+| Id | Hallazgo | Pri | Nota |
+|---|---|---|---|
+| **D-STATS** | Contadores globales bajo marca Latam | P2 | Dos líneas: Latam / BTC Map mundial |
+| **D-CTA** | QR donar al lado de Sumate | P2 | Semántica distinta |
+| **D-418** | React #418 hidratación | P1 | Verificar; candidato `lang` localStorage |
+| **D-PWA** | Namespace `/__grok/` | P3 | Manifest propio. robots ya Disallow |
+| **D-CSP-IMG** | `img-src https:` amplio | P2 | Allowlist self + btcmap + data/blob + teselas |
+| **D-BANNER** | Banner storage cubre pie | P3 | Compactar tras la 1ª visita |
+| **D-LIC** | Sin archivo LICENSE | P3 | MIT o AGPL; el repo ya es público |
+| **D-MKT** | Widgets Mercado vacíos enseñan fragilidad | P2 | Ocultar fila si el proxy trae vacío; no apagar precio+fees |
+| **D-LABIF** | `/labif` en sitemap | P3 | Editorial. No es CVE. Datado / noindex opcional |
+| **D-DARK** | Sin modo oscuro | P3 | Bitcoiner lo espera. No bloquea mapa |
+| **D-API** | GeoJSON/CSV público versionado | P2 **después** de D-PIN | No P0 |
+
+### No adoptar (choca con decisiones ya cerradas)
+
+- Mega-menú, rutas nuevas de destinos, snap-scroll.
+- Wallet connect, KYC, Turnstile, Google Fonts, OSMF/Carto tiles, `npm audit fix` de js-yaml en el VPS.
+- Polymarket/CLARITY: recorte **después** de D-PIN (ruido, no incidente).
+- Trusted Types: P2 CSP híbrido, no 16 set.
+- Publicar OpenAPI con 2 filas de overlay.
+
+---
+
 ## Mapa vigente (11 set)
 
 Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
@@ -43,18 +109,6 @@ Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba públic
 **No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
 
 **Navegación:** D-NAV-01…05 **cerrados en `.org`**.
-
-## Mapa vigente (11 set)
-
-Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
-
-**En el `.org` hoy:** barra 4 destinos + Sumate, `lang` por `?lang=`, H1 único, skip en `/` `/mapa` `/legal` `/labif`, captcha audio, 404 noindex, CSP **sin Google Fonts**, shops/comms 200. **Teselas todavía OSMF** (403 «Access blocked») — el ZIP de Esri no subió.
-
-**En el workspace (no pusheado / no en `.org`):** D-TILE — Esri World Street + OpenTopoMap, preconnect, Leaflet en idle, eventos después del mapa. Carto y `tile.openstreetmap.org` fuera.
-
-**No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
-
-**Navegación (10 set):** **D-NAV-01…04 hechos.** Composición del desk: Mapa+Aprender (scroll interno), Comunidad y Mercado destinos, pie (roadmap/datos/contacto) aparte.
 
 ```mermaid
 flowchart TB
@@ -105,6 +159,16 @@ flowchart TB
 | **P1** | Lazy viewport + mercado al `#mercado` | **Cerrado** | `in-view` + `LazyMount` |
 | **P2** | D-TILE teselas sin OSMF/Carto | **En `main` `8502f33`** | Falta confirmar ZIP en `.org` (paso 0) |
 | **P2** | **D-PIN-01…03** Supercluster + bbox real + payload flaco | **Abierto · 16 set** | § Cola. No LIMIT 800 |
+| **P2** | **D-STATS** Latam vs mundial en el globo | **Abierto · 16 set** | Informe 11 set §3.2 |
+| **P2** | **D-CTA** Sumate ≠ donar | **Abierto · 16 set** | QR sale del header |
+| **P1** | **D-418** hidratación lang | Verificar 16 set | Solo si consola `.org` muestra #418 |
+| **P2** | **D-CSP-IMG** `img-src` allowlist | Abierto | Hoy `https:` |
+| **P2** | **D-MKT** ocultar widgets Mercado vacíos | Abierto | No apagar precio+fees |
+| **P3** | **D-PWA** `/__grok/` → manifest propio | Abierto | robots ya Disallow |
+| **P3** | **D-LIC** archivo LICENSE | Abierto | Repo ya público |
+| **P3** | **D-BANNER** storage compacto | Abierto | Tras 1ª decisión |
+| **P3** | **D-DARK** modo oscuro | Abierto | No bloquea |
+| **P3** | **D-LABIF** sitemap editorial | Abierto | noindex opcional |
 | **P2** | Teselas soberanas (no Esri US) | Abierto · después de D-PIN | D-TILE-03 OpenFreeMap / PMTiles |
 | **P2** | Lighthouse mobile 3G/4G en `.org` | Abierto | Meta ≥ 80 4G / ≥ 50 3G |
 | **P2** | Cluster pines · fuente 400 | **Supersede** | Lo cubre D-PIN-02. No Leaflet.markercluster |
@@ -134,7 +198,7 @@ flowchart TB
 | P0-12 shops 404 | Falso positivo si el GET de 3 MB corta a 8 s. Origen 200. Timeout smoke ≥ 12 s. |
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
 
-**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`. Google Fonts remoto. Teselas OSMF o Carto sin clave.
+**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`. Google Fonts remoto. Teselas OSMF o Carto sin clave. Rutas `/aprender`. Leaflet.markercluster. «El repo no es público». `/health` como P0 (`/healthz` existe).
 
 ---
 
