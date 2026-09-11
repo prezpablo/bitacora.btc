@@ -1,9 +1,48 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 11 de setiembre de 2026  
+**Fecha:** 11 de setiembre de 2026 · **Retomar el 16 set 2026**  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` · deploy = ZIP (el VPS no tiene `.git`)  
-**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests externos:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md)
+**Repo:** `prezpablo/bitacora.btc` `main` · último push teselas `8502f33` · deploy = ZIP  
+**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md)
+
+## Cola desde el 16 set — una fase por ZIP
+
+No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Carto.
+
+| Orden | Id | Qué | Verificación | Cómo volver |
+|---|---|---|---|---|
+| **0** | **D-TILE-ZIP** | Confirmar que `.org` ya no pide OSMF. CSP con `arcgisonline` + `opentopomap`. Si el mapa sigue en franja amarilla: el ZIP de `8502f33` no se instaló — repetir scp. | `curl -sI https://bitacorabtc.org \| grep content-security` | N/A (ops) |
+| **1** | **D-PIN-01** | `pushBbox()` **justo después** de `map.on("moveend")`. Bbox inicial = `map.getBounds()`, no Montevideo hardcode. | Entrar desde el globo a BR/AR: pines de ese país, no solo MVD | Revertir el `setBbox` extra en `spend-map.tsx` |
+| **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` MIT. | Zoom continente: clusters LATAM. Zoom 9+: pines sueltos. Catálogo 27 k no se recorta a los primeros 800 del JSON | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
+| **3** | **D-PIN-03** | Payload flaco tipo BTC Map v4: `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: respuesta de comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo en el GET |
+| **4** | **D-TILE-03** | Teselas propias: OpenFreeMap / PMTiles. Sale Esri US. | CSP sin `arcgisonline` | Volver a D-TILE-01 |
+| **5** | **P3 lote** | Skip en 404 · sitemap `lastmod` · contraste 44px · globo/velas teclado | smoke P1-14 4/4 + 404 | Por ítem |
+
+**Referentes (no copiar Mapbox GL):**
+- [mapbox/supercluster](https://github.com/mapbox/supercluster) — `getClusters([w,s,e,n], zoom)`
+- [teambtcmap/btcmap.org#276](https://github.com/teambtcmap/btcmap.org/issues/276) — dump v4 ~200 KB gzip
+- [comparación MarkerCluster vs Supercluster](https://github.com/AndrejGajdos/leaflet-markercluster-vs-supercluster) — MarkerCluster minutos a 100k; Supercluster 1–2 s a 500k
+- **No usar** `Leaflet.markercluster` a 27 k pines
+
+**Diagnóstico 11 set (por qué no se ven todos los comercios):**
+1. `bbox` arranca en MVD (`spend-map.tsx` ~L161). `setView` dispara `moveend` **antes** del listener → el recorte nunca es el de la vista.
+2. `catalogShopsInBox` `LIMIT 800` sin `ORDER BY`. Seed 27.403 locales; los primeros 800 del JSON no son LATAM (~365).
+3. Zoom < 9 agrupa en “ciudades” (a propósito). Sin (1)+(2) el continente queda vacío.
+4. Teselas Esri/Carto **no** cortan el catálogo.
+
+---
+
+## Mapa vigente (11 set)
+
+Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
+
+**En el `.org` (antes del ZIP `8502f33`):** barra 4 destinos + Sumate, i18n SSR, CSP sin Google Fonts, shops/comms 200. Teselas OSMF 403 si el operador no instaló el ZIP.
+
+**En `main` (`8502f33`):** D-TILE-01/02 — Esri World Street + OpenTopoMap, preconnect, Leaflet en idle, eventos después del mapa. Carto y `tile.openstreetmap.org` fuera.
+
+**No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
+
+**Navegación:** D-NAV-01…05 **cerrados en `.org`**.
 
 ## Mapa vigente (11 set)
 
@@ -54,7 +93,7 @@ flowchart TB
 
 | Pri | Ítem | Estado | Dónde |
 |---|---|---|---|
-| **P0** | ZIP VPS = workspace teselas Esri | **Abierto** | `.org` sigue OSMF 403. Push + ZIP. |
+| **P0** | ZIP VPS = `8502f33` teselas Esri | **Ops** | Cola 16 set paso 0. CSP debe traer arcgisonline |
 | **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | shops/comms 200 (11 set) |
 | **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
 | **P1** | Copy SSR (H1 / legal / contacto) | **Cerrado en `.org`** | H1 pt Boas-vindas / en Welcome |
@@ -64,10 +103,11 @@ flowchart TB
 | **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
 | **P1** | Probe live en el VPS | Hecho en repo | `probe-live.mjs` · cron 08:20 |
 | **P1** | Lazy viewport + mercado al `#mercado` | **Cerrado** | `in-view` + `LazyMount` |
-| **P2** | D-TILE teselas sin OSMF/Carto | **Hecho en workspace** · falta push+ZIP | Esri + OpenTopoMap + preconnect |
-| **P2** | Teselas soberanas (no Esri US) | Abierto | OpenFreeMap / PMTiles en el VPS. No ahora |
+| **P2** | D-TILE teselas sin OSMF/Carto | **En `main` `8502f33`** | Falta confirmar ZIP en `.org` (paso 0) |
+| **P2** | **D-PIN-01…03** Supercluster + bbox real + payload flaco | **Abierto · 16 set** | § Cola. No LIMIT 800 |
+| **P2** | Teselas soberanas (no Esri US) | Abierto · después de D-PIN | D-TILE-03 OpenFreeMap / PMTiles |
 | **P2** | Lighthouse mobile 3G/4G en `.org` | Abierto | Meta ≥ 80 4G / ≥ 50 3G |
-| **P2** | Cluster pines · fuente 400 | Abierto | UX, no bloquea |
+| **P2** | Cluster pines · fuente 400 | **Supersede** | Lo cubre D-PIN-02. No Leaflet.markercluster |
 | **P2** | Partir alta fuera de `spend-map` | Abierto | Clean Architecture |
 | **P2** | PWA offline geo + catálogo | Abierto | No ahora |
 | **P2** | Umbrel + worker (plan híbrido) | Abierto | Q1. No fingir el nodo |
@@ -104,9 +144,17 @@ OSMF y Carto devuelven PNG 200 con franja. El fallback a Esri **nunca** corría.
 
 | Id | Qué | Estado |
 |---|---|---|
-| **D-TILE-01** | Primaria Esri World Street (sin API key). Reserva OpenTopoMap. CSP sin `tile.openstreetmap.org` ni Carto. | **Hecho en workspace.** Falta push + ZIP. |
-| **D-TILE-02** | `preconnect` Esri + Leaflet en idle en el globo. Eventos después de `mapReady`. | **Hecho en workspace.** |
-| **D-TILE-03** | Teselas propias (OpenFreeMap / PMTiles en el VPS). | Abierto. Soberanía vs Esri US. No ahora. |
+| **D-TILE-01** | Primaria Esri World Street (sin API key). Reserva OpenTopoMap. CSP sin OSMF ni Carto. | **`main` `8502f33`.** Paso 0 = ZIP en VPS. |
+| **D-TILE-02** | `preconnect` Esri + Leaflet en idle en el globo. Eventos después de `mapReady`. | **`main` `8502f33`.** |
+| **D-TILE-03** | Teselas propias (OpenFreeMap / PMTiles en el VPS). | Abierto. **Después** de D-PIN. |
+
+### D-PIN · pines (retomar 16 set)
+
+Archivos: `src/components/map/spend-map.tsx` (bbox L161, `moveend` ~L596), `src/infrastructure/catalog.ts` (`LIMIT 800`), `src/infrastructure/btc-map.ts` (`fetchMerchants` slice 800), `src/lib/map-query.ts` (`useMapMerchants`), `src/domain/shop-cache.ts`.
+
+Índice Supercluster: **servidor** (Node), no en el browser. `getMerchants` pasa a recibir `zoom`. Dominio no importa Leaflet.
+
+No partir `spend-map.tsx` en la misma fase que D-PIN-02.
 
 ---
 
