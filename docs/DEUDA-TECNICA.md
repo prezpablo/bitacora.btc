@@ -3,7 +3,17 @@
 **Fecha:** 11 de setiembre de 2026 · **Retomar el 16 set 2026**  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
 **Repo:** `prezpablo/bitacora.btc` `main` · último push teselas `8502f33` · deploy = ZIP  
-**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md)
+**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md)
+
+## Acuerdo 11 set (tarde) — congelado
+
+Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponible hoy: sitio + CSV + snapshots + `/healthz` + `/legal`. FLOSS oponible **solo** cuando el repo liste 200 anónimo.
+
+| Retirado (no backlog P0) | Queda (severidad justa) |
+|---|---|
+| `/health` 404, CSV token como fuga, snapshot ausente, lang fijo sin `?lang=`, legal por API, serverFn CVE, www/SAN, Geo-IP, `/privacidad` 404, SSRF P0, Mercado = down, globo = no hay mapa, FormSubmit oculto, REST v1 ya | **D-FOSS** (repo 404 anónimo) · **D-PIN** · **D-STATS** · **D-CTA** · **D-418** · **D-MKT** UX · globo-first desktop (relato, no apagar) · P3 PWA / img-src / LICENSE |
+
+---
 
 ## Cola desde el 16 set — una fase por ZIP
 
@@ -88,6 +98,8 @@ Fuente: revisión de superficie pública 11 set 2026. **Caja gris ≠ fuente de 
 | **D-LABIF** | `/labif` en sitemap | P3 | Editorial. No es CVE. Datado / noindex opcional |
 | **D-DARK** | Sin modo oscuro | P3 | Bitcoiner lo espera. No bloquea mapa |
 | **D-API** | GeoJSON/CSV público versionado | P2 **después** de D-PIN | No P0 |
+| **D-FOSS** | Repo GitHub 404 anónimo | P1 ops | Settings → Public. No oponer FLOSS hasta 200 |
+| **D-GLOBE** | Globo-first en desktop | P3 producto | 3G ya Leaflet. No apagar el globo |
 
 ### No adoptar (choca con decisiones ya cerradas)
 
