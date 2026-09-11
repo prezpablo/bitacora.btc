@@ -12,6 +12,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | Orden | Id | Qué | Verificación | Cómo volver |
 |---|---|---|---|---|
 | **0** | **D-TILE-ZIP** | Confirmar que `.org` ya no pide OSMF. CSP con `arcgisonline` + `opentopomap`. Si el mapa sigue en franja amarilla: el ZIP de `8502f33` no se instaló — repetir scp. | `curl -sI https://bitacorabtc.org \| grep content-security` | N/A (ops) |
+| **0b** | **D-FOSS** | GitHub: visibilidad **Public**. Clone anónimo 200. `LICENSE` MIT o AGPL. Link en `/legal` y 404. Hasta entonces no oponer «FOSS» a BTC Map. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → Change visibility |
 | **1** | **D-PIN-01** | `pushBbox()` **justo después** de `map.on("moveend")`. Bbox inicial = `map.getBounds()`, no Montevideo hardcode. | Entrar desde el globo a BR/AR: pines de ese país, no solo MVD | Revertir el `setBbox` extra en `spend-map.tsx` |
 | **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` MIT. | Zoom continente: clusters LATAM. Zoom 9+: pines sueltos. Catálogo 27 k no se recorta a los primeros 800 del JSON | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
 | **3** | **D-PIN-03** | Payload flaco tipo BTC Map v4: `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: respuesta de comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo en el GET |
@@ -43,7 +44,7 @@ Fuente: revisión de superficie pública 11 set 2026. **Caja gris ≠ fuente de 
 
 | Dice el informe | En el producto |
 |---|---|
-| «El código no es público» | Repo público [`prezpablo/bitacora.btc`](https://github.com/prezpablo/bitacora.btc). Falta `LICENSE` (P3), no el código. |
+| «El código no es público» | **Parcial.** Push con sesión ≠ clone anónimo (404). D-FOSS. |
 | «Sin healthcheck `/health` 404» | Existe **`GET /healthz`** `{ok:true}`. Probed P0-13. |
 | «CSV con tokens de carga» | Columna `token` vacía en público. CI: `stringifyMapCsvPublic` / `privacy-a11y-guards`. |
 | «Sin snapshot BTC Map» | `public/data/btcmap-shops.json` (~27 k) + SQLite catálogo + TTL 6 h. El hueco es el **LIMIT 800**, no la ausencia de dump. |
@@ -82,7 +83,7 @@ Fuente: revisión de superficie pública 11 set 2026. **Caja gris ≠ fuente de 
 | **D-PWA** | Namespace `/__grok/` | P3 | Manifest propio. robots ya Disallow |
 | **D-CSP-IMG** | `img-src https:` amplio | P2 | Allowlist self + btcmap + data/blob + teselas |
 | **D-BANNER** | Banner storage cubre pie | P3 | Compactar tras la 1ª visita |
-| **D-LIC** | Sin archivo LICENSE | P3 | MIT o AGPL; el repo ya es público |
+| **D-LIC** | Sin archivo LICENSE | **Va con D-FOSS** | Inútil si el repo sigue 404 |
 | **D-MKT** | Widgets Mercado vacíos enseñan fragilidad | P2 | Ocultar fila si el proxy trae vacío; no apagar precio+fees |
 | **D-LABIF** | `/labif` en sitemap | P3 | Editorial. No es CVE. Datado / noindex opcional |
 | **D-DARK** | Sin modo oscuro | P3 | Bitcoiner lo espera. No bloquea mapa |
@@ -148,6 +149,7 @@ flowchart TB
 | Pri | Ítem | Estado | Dónde |
 |---|---|---|---|
 | **P0** | ZIP VPS = `8502f33` teselas Esri | **Ops** | Cola 16 set paso 0. CSP debe traer arcgisonline |
+| **P1** | **D-FOSS** repo público + LICENSE | **Abierto · ops GitHub** | Hoy 404 anónimo. LABIF ya decía privado |
 | **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | shops/comms 200 (11 set) |
 | **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
 | **P1** | Copy SSR (H1 / legal / contacto) | **Cerrado en `.org`** | H1 pt Boas-vindas / en Welcome |
@@ -165,7 +167,7 @@ flowchart TB
 | **P2** | **D-CSP-IMG** `img-src` allowlist | Abierto | Hoy `https:` |
 | **P2** | **D-MKT** ocultar widgets Mercado vacíos | Abierto | No apagar precio+fees |
 | **P3** | **D-PWA** `/__grok/` → manifest propio | Abierto | robots ya Disallow |
-| **P3** | **D-LIC** archivo LICENSE | Abierto | Repo ya público |
+| **P3** | **D-LIC** archivo LICENSE | **Va con D-FOSS** | Inútil si el repo sigue 404 |
 | **P3** | **D-BANNER** storage compacto | Abierto | Tras 1ª decisión |
 | **P3** | **D-DARK** modo oscuro | Abierto | No bloquea |
 | **P3** | **D-LABIF** sitemap editorial | Abierto | noindex opcional |
@@ -198,7 +200,7 @@ flowchart TB
 | P0-12 shops 404 | Falso positivo si el GET de 3 MB corta a 8 s. Origen 200. Timeout smoke ≥ 12 s. |
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
 
-**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`. Google Fonts remoto. Teselas OSMF o Carto sin clave. Rutas `/aprender`. Leaflet.markercluster. «El repo no es público». `/health` como P0 (`/healthz` existe).
+**No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`. Google Fonts remoto. Teselas OSMF o Carto sin clave. Rutas `/aprender`. Leaflet.markercluster. `/health` como P0 (`/healthz` existe). «FOSS oponible» mientras el repo sea 404 anónimo.
 
 ---
 
