@@ -171,7 +171,7 @@ export function layoutCityLogos<T extends NamedPin>(rows: T[], gapDeg: number): 
   const min = gap * 0.98;
   const placed: LaidPin<T>[] = [];
   for (const r of laid) {
-    let lat = r.lat;
+    const lat = r.lat;
     let lon = r.lon;
     let guard = 0;
     const hits = () => placed.some((p) => Math.hypot((p.lat - lat) / 0.9, p.lon - lon) < min);

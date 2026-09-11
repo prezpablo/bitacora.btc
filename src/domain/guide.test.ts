@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { formatGuideStep, geodesicLine, geoUri, kmBetween, pickGuideMode } from "./guide.ts";
+import { formatGuideStep, geodesicLine, geoUri, pickGuideMode } from "./guide.ts";
 
 test("nearby shop uses walking, far uses car", () => {
   const mvd = { lat: -34.9011, lon: -56.1645 };

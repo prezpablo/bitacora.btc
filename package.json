@@ -25,7 +25,11 @@
     "deuda:status": "node scripts/deuda-status.mjs",
     "deuda:live": "node scripts/deuda-status.mjs --live",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "lint:core": "eslint src/domain src/application scripts/deuda-status.mjs scripts/quality.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check src/domain src/application",
+    "quality": "node scripts/quality.mjs",
+    "quality:full": "node scripts/quality.mjs --full"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",

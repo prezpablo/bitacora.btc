@@ -1,0 +1,11 @@
+node_modules
+.output
+dist
+data
+public/data
+package-lock.json
+src/routeTree.gen.ts
+*.png
+*.jpg
+*.webp
+*.svg

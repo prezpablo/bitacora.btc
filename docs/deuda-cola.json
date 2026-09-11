@@ -82,6 +82,13 @@
       "done": "widget Mercado vacío no se pinta"
     },
     {
+      "id": "D-QA",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "npx tsc --noEmit y eslint . --max-warnings 0 en verde. Hoy: npm run quality (test+lint:core)."
+    },
+    {
       "id": "D-GLOBE",
       "pri": "P3",
       "open": true,

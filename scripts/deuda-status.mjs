@@ -75,6 +75,11 @@ function repoCheck(id) {
     const off = /openfreemap|pmtiles/i.test(map);
     return { pass: !esri && off, detail: esri ? "sigue Esri" : off ? "OpenFreeMap/PMTiles" : "sin tesela soberana" };
   }
+  if (id === "D-QA") {
+    const pkg = read("package.json");
+    const has = /"quality":/.test(pkg) && /"lint:core":/.test(pkg);
+    return { pass: false, detail: has ? "quality existe; tsc global aún falla (D-QA abierto)" : "falta npm run quality" };
+  }
   if (id === "D-PWA") {
     const root = read("src/routes/__root.tsx");
     const grok = /\/__grok\//.test(root);

@@ -9,7 +9,7 @@
 
 Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponible hoy: sitio + CSV + snapshots + `/healthz` + `/legal`. FLOSS oponible **solo** cuando el repo liste 200 anónimo.
 
-**Seguimiento automático:** cola machine-readable [`deuda-cola.json`](deuda-cola.json). `npm run deuda:status` (repo) · `npm run deuda:live` (origen + GitHub anónimo). Guards (healthz, lang pt, CSV, fonts) fallan el exit si se rompen. Ítems ABIERTOS no tumban CI. Cron VPS 08:22 -03; Grok Automations diario 08:10 -03.
+**Seguimiento automático:** cola [`deuda-cola.json`](deuda-cola.json). `npm run deuda:status` · `npm run deuda:live`. **Calidad:** `npm run quality` (test + eslint dominio/aplicación + auth + deuda). `npm run quality:full` = tsc + eslint global (D-QA, aún DEGRADA). Cron VPS 08:22; Grok 08:10 -03.
 
 | Retirado (no backlog P0) | Queda (severidad justa) |
 |---|---|

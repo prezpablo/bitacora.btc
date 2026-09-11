@@ -1,6 +1,6 @@
 import { averageStars } from "./merchant-grade.ts";
 import { keyFromUrl } from "./socials.ts";
-import type { Community, CommunityLink } from "./entities";
+import type { Community } from "./entities";
 
 const ID_KEYS = new Set(["web", "x", "nostr", "telegram", "github"]);
 
