@@ -90,25 +90,26 @@ body {
    min-height no puede superar el viewport (landscape teléfono). */
 .bit-stage {
   width: 100%;
+  flex-shrink: 0;
   height: min(42dvh, 300px);
-  min-height: min(13.75rem, 46dvh);
+  min-height: 220px;
 }
 @media (width >= 40rem) {
   .bit-stage {
     height: min(52dvh, 480px);
-    min-height: min(17.5rem, 50dvh);
+    min-height: 280px;
   }
 }
 @media (width >= 64rem) {
   .bit-stage {
     height: min(58dvh, 560px);
-    min-height: min(20rem, 54dvh);
+    min-height: 320px;
   }
 }
 @media (max-height: 32rem) {
   .bit-stage {
-    height: min(62dvh, 14rem);
-    min-height: 9rem;
+    height: min(62dvh, 220px);
+    min-height: 140px;
   }
 }
 

@@ -90,6 +90,8 @@ test("responsive queries use Tailwind rem cuts and short viewport", () => {
   assert.match(css, /@media \(width >= 64rem\)/);
   assert.match(css, /@media \(max-height: 32rem\)/);
   assert.match(css, /\.bit-spark/);
+  assert.match(css, /min-height: 220px/);
+  assert.match(css, /flex-shrink: 0/);
   assert.match(read("src/components/site-header.tsx"), /site-head/);
   assert.match(read("src/components/dashboard/etf-flow.tsx"), /bit-spark/);
 });
