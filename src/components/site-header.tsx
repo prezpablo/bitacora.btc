@@ -236,56 +236,54 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
         {children}
       </main>
       <footer className={cn("border-t border-border", fill ? "shrink-0" : "mt-auto")}>
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-[0.382rem] px-4 py-[0.618rem] sm:px-[1.618rem]">
-          <div className="flex flex-wrap items-center justify-center gap-x-[0.618rem] gap-y-[0.236rem]">
-            <p className="font-display text-center text-sm tracking-wide text-foreground">
-              {t("initiative")}
-            </p>
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-1 px-3 py-1.5 sm:px-[1.618rem] sm:py-2">
+          <p className="flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-center text-[11px] leading-tight text-muted-foreground sm:text-xs">
+            <span className="font-display tracking-wide text-foreground">{t("initiative")}</span>
             <img
               src="/latam-cripto-mom.jpg"
               alt="Latam Cripto Mom"
-              width={32}
-              height={32}
+              width={20}
+              height={20}
               loading="lazy"
               decoding="async"
-              className="size-8 rounded-full object-cover"
+              className="size-5 rounded-full object-cover sm:size-6"
             />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            <a href="https://bitacorabtc.org" className="font-medium text-foreground underline underline-offset-2">
-              Bitácora.btc
-            </a>
-            {" · "}
-            {t("taglineShort")}
+            <span>
+              <a href="https://bitacorabtc.org" className="font-medium text-foreground underline underline-offset-2">
+                Bitácora.btc
+              </a>
+              {" · "}
+              {t("taglineShort")}
+            </span>
           </p>
           <nav
             aria-label={t("legalNavAria")}
-            className="flex flex-wrap items-center justify-center gap-x-[0.618rem] gap-y-[0.236rem] text-xs"
+            className="flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-0 text-[11px] leading-none sm:text-xs"
           >
             {UTILITY_NAV.map((item) => (
-              <a key={item.id} href={navHref(item, "/")} className="text-foreground">
+              <a key={item.id} href={navHref(item, "/")} className="inline-flex min-h-6 items-center text-foreground">
                 {t(NAV_COPY[item.id] || "navContacto")}
               </a>
             ))}
-            <a href="/#datos" className="text-foreground">
+            <a href="/#datos" className="inline-flex min-h-6 items-center text-foreground">
               {t("dataOrigin")}
             </a>
-            <a href="/#soberania" className="text-foreground">
+            <a href="/#soberania" className="inline-flex min-h-6 items-center text-foreground">
               {t("sovTitle")}
             </a>
-            <a href="/legal#aviso" className="text-foreground">
+            <a href="/legal#aviso" className="inline-flex min-h-6 items-center text-foreground">
               {t("legalAviso")}
             </a>
-            <a href="/legal#privacidad" className="text-foreground">
+            <a href="/legal#privacidad" className="inline-flex min-h-6 items-center text-foreground">
               {t("legalPrivacy")}
             </a>
-            <a href="/legal#cookies" className="text-foreground">
+            <a href="/legal#cookies" className="inline-flex min-h-6 items-center text-foreground">
               {t("legalCookies")}
             </a>
-            <a href="/legal#accesibilidad" className="text-foreground">
+            <a href="/legal#accesibilidad" className="inline-flex min-h-6 items-center text-foreground">
               {t("legalA11y")}
             </a>
-            <a href="/legal#terminos" className="text-foreground">
+            <a href="/legal#terminos" className="inline-flex min-h-6 items-center text-foreground">
               {t("legalTerms")}
             </a>
           </nav>

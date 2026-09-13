@@ -53,6 +53,8 @@ test("footer does not list Privacidad twice", () => {
   const head = read("src/components/site-header.tsx");
   assert.equal((head.match(/legalPrivacy/g) || []).length, 1);
   assert.match(head, /UTILITY_NAV/);
+  assert.match(head, /min-h-6/);
+  assert.match(head, /size-5/);
   assert.doesNotMatch(read("src/domain/nav.ts").slice(
     read("src/domain/nav.ts").indexOf("UTILITY_NAV"),
     read("src/domain/nav.ts").indexOf("LEGAL_NAV"),
