@@ -73,7 +73,7 @@ function GlobeCanvas({
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
   const [loadErr, setLoadErr] = useState("");
   const [joining, setJoining] = useState(false);
-  const [size, setSize] = useState({ w: 800, h: 600 });
+  const [size, setSize] = useState({ w: 360, h: 240 });
   const [hover, setHover] = useState<Feat | null>(null);
   const [alt, setAlt] = useState(2.35);
 
@@ -171,7 +171,7 @@ function GlobeCanvas({
     const apply = () => {
       const w = el.clientWidth || el.getBoundingClientRect().width;
       const h = el.clientHeight || el.getBoundingClientRect().height;
-      const next = { w: Math.max(Math.floor(w) || 640, 280), h: Math.max(Math.floor(h) || 360, 280) };
+      const next = { w: Math.max(Math.floor(w) || 320, 220), h: Math.max(Math.floor(h) || 220, 200) };
       setSize((s) => (Math.abs(s.w - next.w) < 8 && Math.abs(s.h - next.h) < 8 ? s : next));
     };
     apply();
@@ -295,26 +295,26 @@ function GlobeCanvas({
 
   return (
     <div className="space-y-3">
-      <header className="rounded-lg bg-white px-4 py-3 text-center shadow-[var(--shadow-border)]">
-        <p className="font-display text-2xl text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
-        <p className="mt-1 text-sm text-neutral-600 sm:text-base">{t("globeTitle")}</p>
+      <header className="rounded-lg bg-white px-3 py-2 text-center shadow-[var(--shadow-border)] sm:px-4 sm:py-3">
+        <p className="font-display text-xl text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
+        <p className="mt-1 text-xs text-neutral-600 sm:text-base">{t("globeTitle")}</p>
         {world ? (
-          <p className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 sm:grid-cols-4 sm:justify-items-center">
+          <p className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:mt-3 sm:grid-cols-4 sm:justify-items-center sm:gap-x-5 sm:gap-y-2">
             <span>
-              <span className="text-2xl font-bold text-primary sm:text-3xl">{world.cities.toLocaleString()}</span>
-              <span className="ml-1.5 text-sm font-medium text-neutral-600">{t("globeCities")}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.cities.toLocaleString()}</span>
+              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeCities")}</span>
             </span>
             <span>
-              <span className="text-2xl font-bold text-primary sm:text-3xl">{world.shops.toLocaleString()}</span>
-              <span className="ml-1.5 text-sm font-medium text-neutral-600">{t("globeShops")}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.shops.toLocaleString()}</span>
+              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeShops")}</span>
             </span>
             <span>
-              <span className="text-2xl font-bold text-primary sm:text-3xl">{world.comms.toLocaleString()}</span>
-              <span className="ml-1.5 text-sm font-medium text-neutral-600">{t("globeComms")}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.comms.toLocaleString()}</span>
+              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeComms")}</span>
             </span>
             <span>
-              <span className="text-2xl font-bold text-primary sm:text-3xl">{world.events.toLocaleString()}</span>
-              <span className="ml-1.5 text-sm font-medium text-neutral-600">{t("globeEvents")}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.events.toLocaleString()}</span>
+              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeEvents")}</span>
             </span>
           </p>
         ) : null}
@@ -334,13 +334,13 @@ function GlobeCanvas({
           const g = globeRef.current;
           if (g) g.controls().enableZoom = false;
         }}
-        className="relative z-0 h-[min(52dvh,480px)] w-full min-h-[320px] overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)] sm:h-[min(58dvh,560px)]"
+        className="bit-stage relative z-0 overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)]"
       >
       {Globe && !geo.isPending && !geo.isError ? (
         <Globe
           ref={globeRef}
-          width={Math.max(size.w, 280)}
-          height={Math.max(size.h, 280)}
+          width={Math.max(size.w, 220)}
+          height={Math.max(size.h, 200)}
           backgroundColor="#ffffff"
           globeImageUrl={WHITE}
           showAtmosphere={false}
@@ -450,7 +450,7 @@ function GlobeCanvas({
 
 export function WorldGlobe({ onEnter, onSkip }: { onEnter: (focus: GlobeFocus) => void; onSkip: () => void }) {
   return (
-    <ClientOnly fallback={<div className="h-[min(58dvh,560px)] rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
+    <ClientOnly fallback={<div className="bit-stage rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
       <GlobeCanvas onEnter={onEnter} onSkip={onSkip} />
     </ClientOnly>
   );

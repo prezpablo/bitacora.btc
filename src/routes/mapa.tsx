@@ -16,9 +16,9 @@ function MapaPage() {
   const heading = pageSeo("/mapa", lang).title.replace(/\s*[|·]\s*Bitácora\.btc\s*$/i, "");
   return (
     <SiteShell>
-      <section id="mapa" className="scroll-mt-[var(--header-offset)] min-h-[min(70dvh,640px)]">
+      <section id="mapa" className="scroll-mt-[var(--header-offset)]">
         <h1 className="font-display mb-3 text-xl font-medium tracking-tight text-foreground sm:text-2xl">{heading}</h1>
-        <ClientOnly fallback={<div className="h-[min(70dvh,640px)] rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
+        <ClientOnly fallback={<div className="bit-stage rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
           <MapGate embedded />
         </ClientOnly>
       </section>

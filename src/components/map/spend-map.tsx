@@ -1344,14 +1344,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <section className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
-        <h2 className="font-display flex items-center gap-[0.28em] text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        <h2 className="font-display flex items-center gap-[0.28em] text-xl font-medium tracking-tight text-foreground sm:text-4xl">
           <span>
             {t("mapTitle")} {t("mapOf")}
           </span>
           <BitcoinMark className="h-[0.9em] w-[0.9em] shrink-0" />
         </h2>
         </div>
-        <p className="text-base text-pretty text-muted-foreground">{t("mapLead")}</p>
+        <p className="text-sm text-pretty text-muted-foreground sm:text-base">{t("mapLead")}</p>
         {countryStat ? (
           <p className="font-mono text-sm text-foreground">
             {(() => {
@@ -1401,7 +1401,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             ref={mapEl}
             tabIndex={0}
             title={t("zoomNeedFocus")}
-            className="h-[min(52dvh,520px)] min-h-[320px] w-full sm:h-[min(58dvh,560px)]"
+            className="bit-stage"
           />
           {geoBannerKey(geo) ? (
             <p className="pointer-events-none absolute bottom-2 left-3 z-[1500] max-w-[16rem] rounded-md bg-card px-2.5 py-1 text-xs text-muted-foreground shadow-[var(--shadow-border)]">

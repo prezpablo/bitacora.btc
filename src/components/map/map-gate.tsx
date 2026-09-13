@@ -36,8 +36,8 @@ function warmMapEngine() {
 
 function MapFallback() {
   return (
-    <div className="flex h-[min(70dvh,640px)] items-center justify-center rounded-lg bg-white shadow-[var(--shadow-border)]">
-      <span className="inline-flex size-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-white">₿</span>
+    <div className="bit-stage flex items-center justify-center rounded-lg bg-white shadow-[var(--shadow-border)]">
+      <span className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-white sm:size-12 sm:text-xl">₿</span>
     </div>
   );
 }
@@ -112,7 +112,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
 
   if (mode === "globe") {
     return (
-      <div className="min-h-[320px] w-full shrink-0">
+      <div className="w-full shrink-0">
       <Suspense fallback={<MapFallback />}>
         <WorldGlobe onEnter={(f) => goMap(f)} onSkip={() => goMap()} />
       </Suspense>
@@ -120,7 +120,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
     );
   }
   return (
-    <div className="min-h-[320px] w-full shrink-0">
+    <div className="w-full shrink-0">
     <Suspense fallback={<MapFallback />}>
       <SpendMap
         focus={focus}

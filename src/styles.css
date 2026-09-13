@@ -86,6 +86,25 @@ body {
   height: 0;
 }
 
+/* Lienzo globo/mapa: misma caja en carga y en vivo. Celular ~φ⁻¹ del alto útil. */
+.bit-stage {
+  width: 100%;
+  height: min(42dvh, 300px);
+  min-height: 220px;
+}
+@media (min-width: 640px) {
+  .bit-stage {
+    height: min(52dvh, 480px);
+    min-height: 280px;
+  }
+}
+@media (min-width: 1024px) {
+  .bit-stage {
+    height: min(58dvh, 560px);
+    min-height: 320px;
+  }
+}
+
 .bit-section {
   scroll-margin-top: var(--header-offset);
 }
