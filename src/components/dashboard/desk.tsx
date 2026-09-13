@@ -268,7 +268,7 @@ export function Desk() {
       </div>
 
       <div
-        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "comunidad" && "hidden")}
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-3 sm:gap-[1.618rem]", sector !== "comunidad" && "hidden")}
         aria-hidden={sector !== "comunidad" || undefined}
       >
       <section id="comunidad" className="scroll-mt-[var(--header-offset)] space-y-6">
@@ -304,7 +304,7 @@ export function Desk() {
       </div>
 
       <div
-        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "mercado" && "hidden")}
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-3 sm:gap-[1.618rem]", sector !== "mercado" && "hidden")}
         aria-hidden={sector !== "mercado" || undefined}
       >
       <section id="mercado" ref={live.ref} className="scroll-mt-[var(--header-offset)] space-y-3">

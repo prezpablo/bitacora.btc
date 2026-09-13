@@ -139,7 +139,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
 }
 
 const selectClass =
-  "h-10 min-w-40 rounded-md bg-elevated px-2.5 text-sm shadow-[var(--shadow-border)] disabled:opacity-40";
+  "chip min-w-0 bg-elevated text-foreground shadow-[var(--shadow-border)] disabled:opacity-40";
 
 function GeoMenu({
   label,
@@ -170,10 +170,10 @@ function GeoMenu({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
   return (
-    <div ref={box} className="relative">
+    <div ref={box} className="relative min-w-0 flex-1 sm:flex-none">
       <button
         type="button"
-        className={cn(selectClass, "inline-flex min-w-48 items-center justify-between gap-2 text-left")}
+        className={cn(selectClass, "inline-flex min-w-0 justify-between gap-1 text-left sm:min-w-40")}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
@@ -406,31 +406,30 @@ export function NetworkEvents() {
         <StaleStamp asOf={q.data?.asOf} />
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button
-          className="gap-2"
-          variant={near ? "default" : "outline"}
+      <div className="chip-row mt-3">
+        <button
+          type="button"
+          className={cn(
+            "chip",
+            near ? "bg-primary text-white" : "bg-card text-foreground shadow-[var(--shadow-border)]",
+          )}
           onClick={() => void nearYou()}
           disabled={locating}
         >
-          <Locate className="size-4" />
+          <Locate />
           {locating ? t("geoWait") : near ? t("netNearOn", { c: countryLabel || country }) : t("netNear")}
-        </Button>
+        </button>
         {(platforms.length ? platforms : platform ? [[platform, 0] as [string, number]] : []).map(([name, n]) => (
-          <Button
+          <button
             key={name}
             type="button"
-            className={cn(
-              "gap-1 bg-primary text-white hover:bg-primary hover:text-white hover:opacity-90",
-              platform === name ? "ring-2 ring-white" : "opacity-90",
-            )}
-            variant="default"
+            className={cn("chip bg-primary text-white", platform === name ? "ring-1 ring-white" : "opacity-90")}
             onClick={() => setPlatform((cur) => (cur === name ? "" : name))}
             aria-pressed={platform === name}
           >
             {name}
-            <span className="font-mono text-xs text-white">{n}</span>
-          </Button>
+            <span className="font-mono tabular-nums">{n}</span>
+          </button>
         ))}
         <select
           className={selectClass}
@@ -457,41 +456,34 @@ export function NetworkEvents() {
           onCountry={pickCountry}
         />
         {dirty ? (
-          <button
-            type="button"
-            className="h-10 px-2 text-sm text-primary"
-            onClick={() => {
-              setCountry("");
-              setKind("");
-              setContinent("");
-              setPlatform("");
-              setNear(false);
-              setCountryName("");
-              setGeoErr("");
-              setDateDir("asc");
-              setPage(1);
-            }}
-          >
+          <button type="button" className="chip text-primary" onClick={() => {
+            setCountry("");
+            setKind("");
+            setContinent("");
+            setPlatform("");
+            setNear(false);
+            setCountryName("");
+            setGeoErr("");
+            setDateDir("asc");
+            setPage(1);
+          }}>
             {t("netClear")}
           </button>
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="chip-row mt-2">
         {KIND_COPY.filter((k) => (kindCounts[k.key] || 0) > 0).map((k) => (
           <button
             key={k.key}
             type="button"
             onClick={() => setKind((cur) => (cur === k.key ? "" : k.key))}
-            className={cn(
-              "h-9 rounded-md px-3 text-sm",
-              kind === k.key ? "bg-primary text-white" : "bg-elevated text-muted-foreground",
-            )}
+            className={cn("chip", kind === k.key ? "bg-primary text-white" : "bg-elevated text-muted-foreground")}
           >
             {t(k.label)} · {kindCounts[k.key]}
           </button>
         ))}
-        <span className="ml-auto self-center text-xs text-muted-foreground">
+        <span className="chip flex-none text-muted-foreground shadow-none">
           {total === 1 ? t("netCount1") : t("netCount", { n: total })}
         </span>
       </div>

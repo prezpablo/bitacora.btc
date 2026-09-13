@@ -1359,14 +1359,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         <p className={cn("text-xs", sync === "fail" ? "text-primary" : "text-muted-foreground")}>
           {sync === "on" ? t("mapCsvOn") : sync === "wait" ? t("mapSyncWait") : sync === "fail" ? t("mapSyncFail") : t("mapSyncOff")}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="chip-row">
           {chips.map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setFilter(k)}
               className={cn(
-                "h-8 rounded-md px-3 font-mono text-xs",
+                "chip font-mono",
                 filter === k ? "bg-primary text-primary-foreground" : "bg-elevated text-muted-foreground",
               )}
             >
