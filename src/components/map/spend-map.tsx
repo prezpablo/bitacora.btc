@@ -5,6 +5,7 @@ import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
 import { dedupeCommunities, dedupeShops, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
+import { coinPinSize, pinBadgeSize } from "@/domain/map-pin-size";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
 import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } from "@/application/map-listings";
@@ -763,31 +764,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         const selected =
           (pin.kind === "shop" && hit?.kind === "place" && hit.id === pin.id) ||
           (pin.kind === "community" && hit?.kind === "community" && hit.id === pin.id);
-        const size =
-          pin.kind === "community"
-            ? selected
-              ? 36
-              : 32
-            : pin.kind === "city"
-              ? pin.count && pin.count > 8
-                ? 34
-                : 28
-              : selected
-                ? 34
-                : pin.logo
-                  ? 28
-                  : 26;
-        const face = coinFaceHtml(pin.logo || "", size - 4);
+        const size = coinPinSize(zoom, pin.kind, selected);
+        const face = coinFaceHtml(pin.logo || "", Math.max(8, size - 2));
+        const badge = pinBadgeSize(size);
         const check = pin.verified
-          ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
+          ? `<span style="position:absolute;right:-3px;bottom:-3px;width:${badge}px;height:${badge}px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : pin.kind === "city" && (pin.count || 0) > 1
-            ? `<span style="position:absolute;right:-6px;bottom:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#f7931a;color:#fff;font:700 10px/16px Ubuntu,sans-serif">${pin.count}</span>`
+            ? `<span style="position:absolute;right:-4px;bottom:-4px;min-width:${badge}px;height:${badge}px;padding:0 3px;border-radius:${Math.ceil(badge / 2)}px;background:#f7931a;color:#fff;font:700 ${Math.max(8, badge - 4)}px/${badge}px Ubuntu,sans-serif">${pin.count}</span>`
             : pin.slots && pin.slots > 1
-              ? `<span style="position:absolute;right:-6px;bottom:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#f7931a;color:#fff;font:700 10px/16px Ubuntu,sans-serif">${pin.slots}</span>`
+              ? `<span style="position:absolute;right:-4px;bottom:-4px;min-width:${badge}px;height:${badge}px;padding:0 3px;border-radius:${Math.ceil(badge / 2)}px;background:#f7931a;color:#fff;font:700 ${Math.max(8, badge - 4)}px/${badge}px Ubuntu,sans-serif">${pin.slots}</span>`
               : "";
+        const ring = size < 14 ? 1 : 1.5;
         const icon = L.divIcon({
           className: "",
-          html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
+          html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;display:flex;align-items:center;justify-content:center;overflow:visible">${face}${check}</div>`,
           iconSize: [size, size],
           iconAnchor: [size / 2, size / 2],
         });

@@ -10,6 +10,7 @@ import { usePrefersReducedMotion } from "@/lib/motion";
 import { BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { imgSrc } from "@/domain/map-csv";
 import { dedupeCommunities, layoutCityLogos } from "@/domain/community-dedupe";
+import { globeCoinSize } from "@/domain/map-pin-size";
 import { ClientOnly } from "@/components/dashboard/client-only";
 import { boxAround } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
@@ -248,23 +249,24 @@ function GlobeCanvas({
 
   const far = alt > 1.48;
   const htmlPins = useMemo(() => {
-    if (far) return coinPins.map((p) => ({ ...p, face: "btc" as const }));
+    const pxFor = (id?: string) => globeCoinSize(alt, id === FOUNDING_UY.id);
+    if (far) return coinPins.map((p) => ({ ...p, face: "btc" as const, px: pxFor(p.id) }));
     return [
-      ...coinPins.map((p) => ({ ...p, face: "logo" as const })),
-      ...ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const })),
+      ...coinPins.map((p) => ({ ...p, face: "logo" as const, px: pxFor(p.id) })),
+      ...ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const, px: pxFor(p.id) })),
     ];
-  }, [coinPins, ownShops, far]);
+  }, [coinPins, ownShops, far, alt]);
 
   const enterRef = useRef(enter);
   enterRef.current = enter;
   const htmlElement = useCallback(
-    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo" }) => {
+    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo"; px?: number }) => {
       const el = document.createElement("button");
-      const founding = d.id === FOUNDING_UY.id;
-      const sizePx = founding ? 28 : 24;
+      const sizePx = d.px ?? globeCoinSize(2.35, d.id === FOUNDING_UY.id);
+      const ring = sizePx < 14 ? 1 : 1.5;
       el.type = "button";
       el.title = d.name || "";
-      el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+      el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
       const logo = d.face === "logo" ? imgSrc(d.logo || "") : "";
       if (logo) {
         const img = document.createElement("img");
