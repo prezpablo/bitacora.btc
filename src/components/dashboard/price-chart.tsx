@@ -778,7 +778,7 @@ export function PriceChart({
 
   return (
     <div
-      className="relative h-[min(58dvh,420px)] w-full overflow-hidden outline-none sm:h-[min(64dvh,560px)]"
+      className="bit-stage relative overflow-hidden outline-none"
       ref={wrapRef}
       tabIndex={0}
       title={t("zoomNeedFocus")}

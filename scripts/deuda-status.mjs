@@ -85,6 +85,22 @@ function repoCheck(id) {
     const grok = /\/__grok\//.test(root);
     return { pass: !grok, detail: grok ? "manifest /__grok/" : "PWA propio" };
   }
+  if (id === "D-VIZ-01") {
+    const chart = read("src/components/dashboard/price-chart.tsx");
+    const pkg = read("package.json");
+    const stage = /bit-stage/.test(chart);
+    const dead = /"recharts"/.test(pkg);
+    return { pass: stage && !dead, detail: !stage ? "velas sin bit-stage" : dead ? "recharts sigue" : "bit-stage + sin recharts" };
+  }
+  if (id === "D-VIZ-02") {
+    const etf = read("src/components/dashboard/etf-flow.tsx");
+    const heat = read("src/components/dashboard/liq-heatmap.tsx");
+    const ok = /viewBox/.test(etf) && /clientWidth|100%/.test(etf) && !/viewBox="0 0 920 400"/.test(heat);
+    return { pass: ok, detail: ok ? "ETF/calor al ancho" : "SVG fijo 720/920" };
+  }
+  if (id === "D-VIZ-03") {
+    return { pass: false, detail: "ticks + hit 24px + EMA menú (manual)" };
+  }
   if (id === "D-FOSS") {
     const lic = existsSync(join(ROOT, "LICENSE"));
     return { pass: false, detail: lic ? "LICENSE en disco; falta 200 anónimo" : "sin LICENSE y repo 404 anónimo" };

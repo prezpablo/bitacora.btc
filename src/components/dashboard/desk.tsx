@@ -410,9 +410,9 @@ export function Desk() {
           </div>
         </div>
         <div className="bg-plot">
-          <LazyMount fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />} minHeight="20rem">
-            <ClientOnly fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
-              <Suspense fallback={<div className="h-[min(58dvh,420px)] sm:h-[min(64dvh,560px)]" />}>
+          <LazyMount fallback={<div className="bit-stage bg-plot" />} minHeight="14rem">
+            <ClientOnly fallback={<div className="bit-stage bg-plot" />}>
+              <Suspense fallback={<div className="bit-stage bg-plot" />}>
                 <PriceChart market={market} enabled={ma} heatOn={heatOn} />
               </Suspense>
             </ClientOnly>

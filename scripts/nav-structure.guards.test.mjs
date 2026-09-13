@@ -76,6 +76,12 @@ test("wheel zoom waits for focus on map, globe and chart", () => {
   assert.match(read("src/components/dashboard/desk.tsx"), /chartDisclaimer/);
 });
 
+test("D-VIZ-01 candles share bit-stage and recharts is gone", () => {
+  assert.match(read("src/components/dashboard/price-chart.tsx"), /bit-stage/);
+  assert.match(read("src/components/dashboard/desk.tsx"), /bit-stage bg-plot/);
+  assert.doesNotMatch(read("package.json"), /"recharts"/);
+});
+
 test("i18n nav labels exist in es en pt", () => {
   const copy = read("src/lib/i18n.ts");
   for (const label of ["Historia de Bitcoin", "Bitcoin history", "História do Bitcoin", "Bitcoin hoy", "Bitcoin today", "Bitcoin hoje"]) {

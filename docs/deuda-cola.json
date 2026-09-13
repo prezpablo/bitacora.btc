@@ -26,6 +26,27 @@
       "done": "spend-map ya no hardcodea bbox MVD; pushBbox al crear el mapa"
     },
     {
+      "id": "D-VIZ-01",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "price-chart usa bit-stage; package.json sin recharts"
+    },
+    {
+      "id": "D-VIZ-02",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "ETF y heatmap al ancho del padre; no SVG 720/920 fijos"
+    },
+    {
+      "id": "D-VIZ-03",
+      "pri": "P3",
+      "open": true,
+      "kind": "manual",
+      "done": "ticks, hit 24px, EMA en menú"
+    },
+    {
       "id": "D-PIN-02",
       "pri": "P2",
       "open": true,
