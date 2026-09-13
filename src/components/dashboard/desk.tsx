@@ -240,7 +240,7 @@ export function Desk() {
         className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "llegar" && "hidden")}
         aria-hidden={sector !== "llegar" || undefined}
       >
-      <section id="mapa" className="relative scroll-mt-[var(--header-offset)]">
+      <section id="mapa" className="relative shrink-0 scroll-mt-[var(--header-offset)]">
         <ClientOnly fallback={<div className="h-[min(70dvh,640px)] rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
           <MapGate embedded />
         </ClientOnly>

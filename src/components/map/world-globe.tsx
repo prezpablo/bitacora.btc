@@ -168,10 +168,10 @@ function GlobeCanvas({
     if (!el) return;
     let t = 0;
     const apply = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w < 40 || h < 40) return;
-      setSize((s) => (Math.abs(s.w - w) < 8 && Math.abs(s.h - h) < 8 ? s : { w, h }));
+      const w = el.clientWidth || el.getBoundingClientRect().width;
+      const h = el.clientHeight || el.getBoundingClientRect().height;
+      const next = { w: Math.max(Math.floor(w) || 640, 280), h: Math.max(Math.floor(h) || 360, 280) };
+      setSize((s) => (Math.abs(s.w - next.w) < 8 && Math.abs(s.h - next.h) < 8 ? s : next));
     };
     apply();
     const ro = new ResizeObserver(() => {

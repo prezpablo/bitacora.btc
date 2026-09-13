@@ -593,7 +593,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       box.addEventListener("blur", wheelOff);
       setMapReady(true);
       setZoom(map.getZoom());
-      requestAnimationFrame(() => map?.invalidateSize());
+      const size = () => map?.invalidateSize({ animate: false });
+      requestAnimationFrame(size);
+      window.setTimeout(size, 120);
+      window.setTimeout(size, 600);
       map.on("zoomend", () => {
         pushBbox();
         if (!map) return;

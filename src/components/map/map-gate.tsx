@@ -112,12 +112,15 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
 
   if (mode === "globe") {
     return (
+      <div className="min-h-[320px] w-full shrink-0">
       <Suspense fallback={<MapFallback />}>
         <WorldGlobe onEnter={(f) => goMap(f)} onSkip={() => goMap()} />
       </Suspense>
+      </div>
     );
   }
   return (
+    <div className="min-h-[320px] w-full shrink-0">
     <Suspense fallback={<MapFallback />}>
       <SpendMap
         focus={focus}
@@ -127,5 +130,6 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
         embedded={embedded}
       />
     </Suspense>
+    </div>
   );
 }
