@@ -56,27 +56,42 @@ export function MaToggles({
     { key: "ema1m", label: "1M", swatch: "bg-ma-1m" },
     { key: "ema6m", label: "6M", swatch: "bg-ma-6m" },
   ];
+  const onCount = items.filter((item) => enabled[item.key]).length;
   return (
-    <div className="flex min-w-0 items-center gap-0.5" role="group" aria-label={t("emaAria")}>
-      {items.map((item) => {
-        const on = enabled[item.key];
-        return (
-          <button
-            key={item.key}
-            type="button"
-            aria-pressed={on}
-            onClick={() => onToggle(item.key)}
-            className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-medium",
-              on ? "text-foreground" : "text-muted-foreground opacity-45 hover:opacity-80",
-            )}
-          >
-            <span className={cn("size-2 rounded-full", item.swatch)} />
-            {item.label}
-          </button>
-        );
-      })}
-    </div>
+    <details className="relative">
+      <summary
+        className="inline-flex h-8 min-h-6 min-w-6 cursor-pointer list-none items-center gap-1.5 rounded-md bg-elevated px-2.5 font-mono text-xs font-medium text-foreground marker:content-none [&::-webkit-details-marker]:hidden"
+        aria-label={t("emaAria")}
+      >
+        <span className="size-2 rounded-full bg-ma-1d" />
+        EMA
+        <span className="tabular-nums text-muted-foreground">{onCount}</span>
+      </summary>
+      <div
+        className="absolute right-0 z-20 mt-1 flex min-w-36 flex-col gap-0.5 rounded-md border border-border bg-card p-1 shadow-[var(--shadow-border)]"
+        role="group"
+        aria-label={t("emaAria")}
+      >
+        {items.map((item) => {
+          const on = enabled[item.key];
+          return (
+            <button
+              key={item.key}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onToggle(item.key)}
+              className={cn(
+                "inline-flex h-8 min-h-6 min-w-6 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-medium",
+                on ? "text-foreground" : "text-muted-foreground opacity-45 hover:opacity-80",
+              )}
+            >
+              <span className={cn("size-2 rounded-full", item.swatch)} />
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+    </details>
   );
 }
 
@@ -94,7 +109,7 @@ export function HeatToggle({
       aria-pressed={on}
       onClick={onToggle}
       className={cn(
-        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2.5 font-mono text-xs font-semibold tracking-wide",
+        "inline-flex h-8 min-h-6 min-w-6 shrink-0 items-center gap-1.5 rounded-md px-2.5 font-mono text-xs font-semibold tracking-wide",
         on
           ? "bg-primary text-primary-foreground"
           : "bg-elevated text-muted-foreground hover:text-foreground",

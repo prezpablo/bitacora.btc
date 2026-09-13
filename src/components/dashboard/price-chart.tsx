@@ -15,6 +15,7 @@ import {
 } from "@/domain";
 import { cn, formatUsd } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { slowNet } from "@/lib/net";
 import { Button } from "@/components/ui/button";
 
 const MA_META: { key: MaKey; tag: string; color: string; width: number }[] = [
@@ -304,6 +305,14 @@ function resampleTime(candles: Candle[], t0: number, t1: number, step: number): 
   return candles.filter((c) => c.t >= t0 && c.t <= t1);
 }
 
+function takeTicks<T>(xs: T[], n: number): T[] {
+  if (xs.length <= n) return xs;
+  if (n <= 1) return xs.slice(0, 1);
+  const out: T[] = [];
+  for (let i = 0; i < n; i++) out.push(xs[Math.round((i * (xs.length - 1)) / (n - 1))]!);
+  return out;
+}
+
 function sampleEma(src: Candle[], values: (number | null)[], dest: Candle[]) {
   if (src.length === dest.length) return values;
   const out: (number | null)[] = [];
@@ -326,6 +335,7 @@ export function PriceChart({
 }) {
   const t = useT();
   const wrapRef = useRef<HTMLDivElement>(null);
+  const [lite, setLite] = useState(false);
   const [frame, setFrame] = useState({ w: 800, h: 430 });
   const [hover, setHover] = useState<number | null>(null);
   const [liqHover, setLiqHover] = useState<number | null>(null);
@@ -345,6 +355,11 @@ export function PriceChart({
   useEffect(() => {
     setView(null);
   }, [market.lookbackMs]);
+
+  useEffect(() => {
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    setLite(coarse || slowNet());
+  }, []);
 
   useEffect(() => {
     const node = wrapRef.current;
@@ -710,8 +725,9 @@ export function PriceChart({
   const hc = hi != null ? layout.candles[hi] : null;
   const hk = hc ? candleKind(hc) : null;
   const liq = liqHover != null ? layout.clusters[liqHover] : null;
-  const ticks = axisTicks(layout.pMin, layout.pMax, 7);
-  const timeTicks = niceTimeTicks(layout.t0, layout.t1, 8);
+  const slim = layout.vbW < 540;
+  const ticks = takeTicks(axisTicks(layout.pMin, layout.pMax, slim ? 3 : 7), slim ? 3 : 7);
+  const timeTicks = takeTicks(niceTimeTicks(layout.t0, layout.t1, slim ? 3 : 8), slim ? 3 : 8);
   const priceY = layout.yOf(market.price);
 
   const cursor = (() => {
@@ -789,7 +805,7 @@ export function PriceChart({
           type="button"
           size="icon"
           variant="subtle"
-          className="size-8"
+          className="size-8 min-h-6 min-w-6"
           aria-label={t("zoomOut")}
           onClick={() => zoomBy(2)}
         >
@@ -799,7 +815,7 @@ export function PriceChart({
           type="button"
           size="icon"
           variant="subtle"
-          className="size-8"
+          className="size-8 min-h-6 min-w-6"
           aria-label={t("zoomIn")}
           onClick={() => zoomBy(1 / 2)}
         >
@@ -809,7 +825,7 @@ export function PriceChart({
           type="button"
           size="icon"
           variant="subtle"
-          className="size-8"
+          className="size-8 min-h-6 min-w-6"
           aria-label={t("zoomHome")}
           disabled={layout.atHome}
           onClick={() => {
@@ -948,7 +964,7 @@ export function PriceChart({
             const coreW = m.key === "ema6m" ? 1.22 + (1 - tight) * 0.18 : m.width;
             const glowOp = 0.22 + (1 - tight) * 0.12;
             return (
-              <g key={m.key} filter={m.key === "ema6m" && tight < 0.55 ? "url(#ema-neon)" : undefined}>
+              <g key={m.key} filter={!lite && m.key === "ema6m" && tight < 0.55 ? "url(#ema-neon)" : undefined}>
                 {m.key === "ema6m" ? (
                   <>
                     <path
@@ -1035,6 +1051,22 @@ export function PriceChart({
           vectorEffect="non-scaling-stroke"
         />
 
+        {layout.candles.map((c, i) => {
+          const x = layout.xOf(c.t);
+          const hw = Math.max(layout.bodyW, 24) / 2;
+          return (
+            <rect
+              key={`hit-${c.t}`}
+              x={x - hw}
+              y={PAD.t}
+              width={hw * 2}
+              height={layout.mainH}
+              fill="transparent"
+              pointerEvents="all"
+            />
+          );
+        })}
+
         {cross && cursor && (
           <CursorAxes
             x={cursor.x}
@@ -1081,6 +1113,7 @@ export function PriceChart({
             heatX={layout.heatX}
             mainH={layout.mainH}
             liveY={liveY}
+            lite={lite}
           />
         ) : null}
       </svg>
@@ -1156,12 +1189,14 @@ function NeonPocPointer({
   heatX,
   mainH,
   liveY,
+  lite,
 }: {
   cluster: { price: number; long: number; short: number };
   yOf: (p: number) => number;
   heatX: number;
   mainH: number;
   liveY: number;
+  lite: boolean;
 }) {
   const y = yOf(cluster.price);
   if (y < PAD.t + 4 || y > PAD.t + mainH - 4) return null;
@@ -1218,7 +1253,7 @@ function NeonPocPointer({
           style={{ animation: `poc-magnet 2.6s ${i * 0.35}s ease-out infinite` }}
         />
       ))}
-      <g className="velar-neon-glow" filter="url(#velar-neon)">
+      <g className="velar-neon-glow" filter={lite ? undefined : "url(#velar-neon)"}>
         <line
           x1={PAD.l + (heatX - PAD.l) * 0.58}
           x2={tip}

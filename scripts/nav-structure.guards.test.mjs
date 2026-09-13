@@ -93,6 +93,14 @@ test("D-VIZ-02 ETF and heatmap follow parent width", () => {
   assert.doesNotMatch(heat, /preserveAspectRatio="none"/);
 });
 
+test("D-VIZ-03 ticks hit-24 and EMA menu", () => {
+  const chart = read("src/components/dashboard/price-chart.tsx");
+  assert.match(chart, /slim \? 3/);
+  assert.match(chart, /Math\.max\(layout\.bodyW, 24\)/);
+  assert.match(chart, /pointer: coarse/);
+  assert.match(read("src/components/dashboard/segmented.tsx"), /<details/);
+});
+
 test("i18n nav labels exist in es en pt", () => {
   const copy = read("src/lib/i18n.ts");
   for (const label of ["Historia de Bitcoin", "Bitcoin history", "História do Bitcoin", "Bitcoin hoy", "Bitcoin today", "Bitcoin hoje"]) {

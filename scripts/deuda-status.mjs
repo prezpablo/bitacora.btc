@@ -99,7 +99,12 @@ function repoCheck(id) {
     return { pass: ok, detail: ok ? "ETF/calor al ancho" : "SVG fijo 720/920" };
   }
   if (id === "D-VIZ-03") {
-    return { pass: false, detail: "ticks + hit 24px + EMA menú (manual)" };
+    const chart = read("src/components/dashboard/price-chart.tsx");
+    const seg = read("src/components/dashboard/segmented.tsx");
+    const ticks = /slim \? 3/.test(chart);
+    const hit = /Math\.max\(layout\.bodyW, 24\)/.test(chart);
+    const menu = /<details/.test(seg);
+    return { pass: ticks && hit && menu, detail: !menu ? "EMA chips" : !hit ? "sin hit 24" : !ticks ? "ticks fijos" : "ticks + hit 24 + menú EMA" };
   }
   if (id === "D-FOSS") {
     const lic = existsSync(join(ROOT, "LICENSE"));

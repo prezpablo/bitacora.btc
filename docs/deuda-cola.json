@@ -42,8 +42,8 @@
     {
       "id": "D-VIZ-03",
       "pri": "P3",
-      "open": true,
-      "kind": "manual",
+      "open": false,
+      "kind": "repo",
       "done": "ticks, hit 24px, EMA en menú"
     },
     {
