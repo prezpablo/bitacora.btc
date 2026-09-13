@@ -7,7 +7,7 @@
     {
       "id": "D-TILE-ZIP",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "live",
       "done": "CSP del origen incluye arcgisonline y opentopomap; no tile.openstreetmap ni cartocdn"
     },
@@ -94,6 +94,20 @@
       "open": true,
       "kind": "manual",
       "done": "juicio de producto: globo-first desktop. No apagar."
+    },
+    {
+      "id": "D-A11Y-24",
+      "pri": "P3",
+      "open": true,
+      "kind": "live",
+      "done": "axe target-size: a[href$='/#datos'] ≥24px en /, /mapa, /legal. Contraste .kicker en /labif"
+    },
+    {
+      "id": "D-SITEMAP",
+      "pri": "P1",
+      "open": true,
+      "kind": "live",
+      "done": "sitemap.xml lastmod = fecha del último ZIP, no 2026-09-07"
     }
   ],
   "guards": [

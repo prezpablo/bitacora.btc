@@ -1,8 +1,8 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 11 de setiembre de 2026 · **Retomar el 16 set 2026**  
+**Fecha:** 13 de setiembre de 2026 · **Retomar el 16 set 2026**  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` · último push teselas `8502f33` · deploy = ZIP  
+**Repo:** `prezpablo/bitacora.btc` `main` · teselas Esri **en `.org`** (D-TILE-ZIP cerrado 13 set) · deploy = ZIP  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda (severidad justa) |
 |---|---|
-| `/health` 404, CSV token como fuga, snapshot ausente, lang fijo sin `?lang=`, legal por API, serverFn CVE, www/SAN, Geo-IP, `/privacidad` 404, SSRF P0, Mercado = down, globo = no hay mapa, FormSubmit oculto, REST v1 ya | **D-FOSS** (repo 404 anónimo) · **D-PIN** · **D-STATS** · **D-CTA** · **D-418** · **D-MKT** UX · globo-first desktop (relato, no apagar) · P3 PWA / img-src / LICENSE |
+| `/health` 404, CSV token como fuga, snapshot ausente, lang fijo sin `?lang=`, legal por API, serverFn CVE, www/SAN, Geo-IP, `/privacidad` 404, SSRF P0, Mercado = down, globo = no hay mapa, FormSubmit oculto, REST v1 ya | **D-FOSS** · **D-PIN** · **D-STATS** · **D-CTA** · **D-418** · **D-MKT** UX · globo-first · D-A11Y-24 · D-SITEMAP · PWA / LICENSE |
 
 ---
 
@@ -23,7 +23,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 
 | Orden | Id | Qué | Verificación | Cómo volver |
 |---|---|---|---|---|
-| **0** | **D-TILE-ZIP** | Confirmar que `.org` ya no pide OSMF. CSP con `arcgisonline` + `opentopomap`. Si el mapa sigue en franja amarilla: el ZIP de `8502f33` no se instaló — repetir scp. | `curl -sI https://bitacorabtc.org \| grep content-security` | N/A (ops) |
+| **0** | **D-TILE-ZIP** | CSP Esri + OpenTopoMap, sin OSMF/Carto. | **Cerrado en `.org` 13 set.** `deuda:live` CERRADO. | N/A |
 | **0b** | **D-FOSS** | GitHub: visibilidad **Public**. Clone anónimo 200. `LICENSE` MIT o AGPL. Link en `/legal` y 404. Hasta entonces no oponer «FOSS» a BTC Map. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → Change visibility |
 | **1** | **D-PIN-01** | `pushBbox()` **justo después** de `map.on("moveend")`. Bbox inicial = `map.getBounds()`, no Montevideo hardcode. | Entrar desde el globo a BR/AR: pines de ese país, no solo MVD | Revertir el `setBbox` extra en `spend-map.tsx` |
 | **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` MIT. | Zoom continente: clusters LATAM. Zoom 9+: pines sueltos. Catálogo 27 k no se recorta a los primeros 800 del JSON | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
@@ -32,13 +32,32 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **5** | **D-CTA** | Separar “Sumate” (cargar punto) de “Apoyá con sats” (QR). Header no pone donar al lado de alta. | Un CTA de mapa, donación en pie o `#aportes` | Restaurar QR compacto en header |
 | **6** | **D-418** | Verificar React #418: `lang` SSR vs `localStorage` sin `?lang=`. Si el HTML es `es` y el cliente hidrata `en`, fijar idioma **antes** del render (URL gana). | Consola `.org` sin #418; `html lang` = copy | Solo si se reproduce |
 | **7** | **D-TILE-03** | Teselas propias: OpenFreeMap / PMTiles. Sale Esri US. | CSP sin `arcgisonline` | Volver a D-TILE-01 |
-| **8** | **P3 lote** | Skip 404 · sitemap `lastmod` · 44px · globo/velas teclado · PWA fuera de `/__grok/` · `LICENSE` MIT/AGPL · `img-src` allowlist · banner storage compacto | Por ítem | Por ítem |
+| **8** | **P3 lote** | Skip 404 · sitemap `lastmod` (sigue 2026-09-07) · **D-A11Y-24** pie `#datos` < 24px · contraste `/labif` `.kicker` · globo/velas teclado · PWA fuera de `/__grok/` · `LICENSE` · `img-src` allowlist · banner compacto | Por ítem | Por ítem |
 
-**Referentes (no copiar Mapbox GL):**
-- [mapbox/supercluster](https://github.com/mapbox/supercluster) — `getClusters([w,s,e,n], zoom)`
-- [teambtcmap/btcmap.org#276](https://github.com/teambtcmap/btcmap.org/issues/276) — dump v4 ~200 KB gzip
-- [comparación MarkerCluster vs Supercluster](https://github.com/AndrejGajdos/leaflet-markercluster-vs-supercluster) — MarkerCluster minutos a 100k; Supercluster 1–2 s a 500k
-- **No usar** `Leaflet.markercluster` a 27 k pines
+**Referentes públicos (13 set) — qué clonar, qué no**
+
+| Deuda | Repo | Encaje | No |
+|---|---|---|---|
+| **D-PIN-02** | [mapbox/supercluster](https://github.com/mapbox/supercluster) MIT | Índice en el VPS: `getClusters([w,s,e,n], zoom)`. 27 k caben en RAM. | Leaflet.markercluster (minutos a 100 k) |
+| **D-PIN-02** patrón HTTP | [rowanwins/supercluster-server](https://github.com/rowanwins/supercluster-server) MIT | Solo el patrón bbox+zoom. **No** otro proceso HTTP: va en `getMerchants`. | Redis / NetCluster (pines no se mueven) |
+| **D-PIN-03** | [teambtcmap/btcmap.org#276](https://github.com/teambtcmap/btcmap.org/issues/276) | Dump `id,lat,lon,icon` ~200 KB gzip | Mandar ficha completa al cluster |
+| **D-TILE-03** | [protomaps/PMTiles](https://github.com/protomaps/PMTiles) + [leafletRasterLayer](https://docs.protomaps.com/pmtiles/leaflet) | Un archivo en el VPS, Leaflet actual, sin MapLibre. Njalla no aguanta 300 GB. | [hyperknot/openfreemap](https://github.com/hyperknot/openfreemap) **self-host** (300 GB). SÍ vale su **instancia pública** (sin API key, sin cookies) como tesela remota |
+| **D-FOSS** | [choosealicense.com](https://choosealicense.com/licenses/) | Tras Public: **AGPL-3.0** si el overlay debe seguir abierto al usarse en red (como BTC Map); MIT si se prioriza reuso. GitHub Settings → Add license. | LICENSE sin visibilidad Public |
+| **D-PWA** | Manifest estático `/manifest.webmanifest` | TanStack Start pelea con [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) ([discussion #4770](https://github.com/TanStack/router/discussions/4770)). Un JSON + iconos propios basta. | Service worker Workbox ahora |
+| **D-A11Y-24** | Ya usamos [dequelabs/axe-core](https://github.com/dequelabs/axe-core) (`npm run test:a11y`) | Subir `min-h/min-w` del link `#datos` del pie a 24px. Contraste `.kicker` LABIF. | No subir umbral axe a 44px en la misma fase |
+| **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
+
+OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
+
+---
+
+**Hallazgos 13 set (sonda, no P0 nuevo)**
+
+- Live 20/20 · SEO 81/81 · guards 4/4 · teselas Esri en origen.
+- `sitemap lastmod` 2026-09-07 (D-SITEMAP).
+- axe: `a[href$="/#datos"]` target-size en `/` `/mapa` `/legal`; contraste `.kicker` en `/labif` (D-A11Y-24).
+- Runner: Binance 451 — no reabrir como CAÍDA.
+- Sandbox a veces pisa `scripts/grok-pwa-shared.mjs` (export `langFromSearch`); `git checkout HEAD --` ese archivo si `npm test` falla en grok-pwa. No es deuda de producto.
 
 **Diagnóstico 11 set (por qué no se ven todos los comercios):**
 1. `bbox` arranca en MVD (`spend-map.tsx` ~L161). `setView` dispara `moveend` **antes** del listener → el recorte nunca es el de la vista.

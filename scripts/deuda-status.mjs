@@ -109,6 +109,11 @@ async function liveCheck(id) {
     const ok = r.status === 200 && lic;
     return { pass: ok, detail: `github ${r.status} license=${lic}` };
   }
+  if (id === "D-SITEMAP") {
+    const r = await pull(ORIGIN + "/sitemap.xml");
+    const stale = /<lastmod>2026-09-07</.test(r.text);
+    return { pass: r.status === 200 && !stale, detail: stale ? "lastmod 2026-09-07" : `sitemap ${r.status}` };
+  }
   return { pass: false, detail: "N/D-live" };
 }
 
