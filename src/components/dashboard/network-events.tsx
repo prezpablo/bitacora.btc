@@ -139,7 +139,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
 }
 
 const selectClass =
-  "chip min-w-0 bg-elevated text-foreground shadow-[var(--shadow-border)] disabled:opacity-40";
+  "chip shrink-0 bg-elevated text-foreground shadow-[var(--shadow-border)] disabled:opacity-40";
 
 function GeoMenu({
   label,
@@ -170,10 +170,10 @@ function GeoMenu({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
   return (
-    <div ref={box} className="relative min-w-0 flex-1 sm:flex-none">
+    <div ref={box} className="relative shrink-0">
       <button
         type="button"
-        className={cn(selectClass, "inline-flex min-w-0 justify-between gap-1 text-left sm:min-w-40")}
+        className={cn(selectClass, "max-w-[10rem] gap-1 sm:max-w-none sm:min-w-40")}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
