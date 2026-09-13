@@ -21,7 +21,7 @@
     {
       "id": "D-PIN-01",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "spend-map ya no hardcodea bbox MVD; pushBbox al crear el mapa"
     },

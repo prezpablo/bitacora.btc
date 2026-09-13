@@ -54,28 +54,30 @@ export function useMapCommunities() {
   });
 }
 
-export function useMapMerchants(bbox: MapBbox) {
+export function useMapMerchants(bbox: MapBbox | null) {
   const qBox = useMemo(
-    () => quantizeBox(bbox),
-    [bbox.west, bbox.south, bbox.east, bbox.north],
+    () => (bbox ? quantizeBox(bbox) : null),
+    [bbox?.west, bbox?.south, bbox?.east, bbox?.north],
   );
-  const cached = shopsFromCache(shopMem, bbox, Date.now());
+  const cached = bbox ? shopsFromCache(shopMem, bbox, Date.now()) : null;
   const query = useQuery({
-    queryKey: mapKeys.merchants(qBox),
+    queryKey: qBox ? mapKeys.merchants(qBox) : [...mapKeys.merchantsRoot, "idle"],
     queryFn: async () => {
+      if (!qBox) return [];
       const shops = await getMerchants({ data: qBox });
       shopMem = rememberShopBox(shopMem, qBox, shops, Date.now());
       return shops;
     },
     staleTime: STALE.merchants,
     placeholderData: keepPreviousData,
-    enabled: cached == null,
+    enabled: Boolean(qBox) && cached == null,
   });
   const data = useMemo(() => {
+    if (!bbox) return [];
     const hit = shopsFromCache(shopMem, bbox, Date.now());
     if (hit) return hit;
     return shopsInView(query.data ?? [], bbox);
-  }, [bbox.west, bbox.south, bbox.east, bbox.north, query.data, query.dataUpdatedAt]);
+  }, [bbox?.west, bbox?.south, bbox?.east, bbox?.north, query.data, query.dataUpdatedAt]);
   return { ...query, data };
 }
 

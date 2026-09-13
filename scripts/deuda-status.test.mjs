@@ -16,13 +16,12 @@ test("cola JSON has unique ids and a resume date", () => {
   assert.ok(doc.guards.some((g) => g.id === "G-HEALTHZ"));
 });
 
-test("repo probes: PIN-01 and FOSS still open on 11 set", async () => {
+test("repo probes: PIN-01 closed, FOSS still open", async () => {
   const { rows } = await runDeuda({ live: false });
   const pin = rows.find((r) => r.id === "D-PIN-01");
   const foss = rows.find((r) => r.id === "D-FOSS");
   const pwa = rows.find((r) => r.id === "D-PWA");
-  assert.equal(pin.state, "ABIERTO");
-  assert.match(pin.detail, /MVD/);
+  assert.equal(pin.state, "CERRADO");
   assert.equal(foss.state, "ABIERTO");
   assert.equal(pwa.state, "ABIERTO");
   assert.match(pwa.detail, /__grok/);

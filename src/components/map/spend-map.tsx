@@ -11,7 +11,7 @@ import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } 
 import { getCityFrame, saveMapCsv, submitMapListing, cancelMapListing, verifyMapListing, reverseAddress } from "@/infrastructure/server-fns";
 import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
-import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore } from "@/lib/map-query";
+import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore, type MapBbox } from "@/lib/map-query";
 import { boxAround } from "@/domain";
 import { geoBannerKey } from "@/domain/geo-fix";
 import { locateBest } from "@/infrastructure/geo";
@@ -158,7 +158,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const proofRef = useRef<HTMLDivElement>(null);
   const joinedRef = useRef(false);
   const [hit, setHit] = useState<SearchHit | null>(null);
-  const [bbox, setBbox] = useState({ west: -56.35, south: -35.05, east: -55.95, north: -34.72 });
+  const [bbox, setBbox] = useState<MapBbox | null>(null);
   const [zoom, setZoom] = useState(focus?.zoom ?? 4);
   const [mapReady, setMapReady] = useState(false);
   const [store, setStore] = useState<Record<string, MerchantLocal>>({});
@@ -423,7 +423,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const countryStat = countryFromGlobe(globe.data, focus?.iso);
 
   const places = useMemo(() => {
-    if (filter === "comunidades") return [];
+    if (filter === "comunidades" || !bbox) return [];
     const pad = 0.8;
     const extra: MerchantPlace[] = Object.entries(store)
       .filter(([id, s]) => !s.removed && s.lat != null && s.lon != null && (shopIsPublic(id, s.verifiedAt) || id === sel?.id || Boolean(s.verifyToken && !s.verifiedAt)))
@@ -499,7 +499,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }, [btcComms.data, overlayComms]);
 
   const visibleComms = useMemo(() => {
-    if (filter === "comercios") return [];
+    if (filter === "comercios" || !bbox) return [];
     const isoBox: Record<string, { s: number; n: number; w: number; e: number }> = {
       UY: { s: -35.15, n: -30.05, w: -58.6, e: -53.0 },
       AR: { s: -55.1, n: -21.7, w: -73.6, e: -53.5 },
@@ -548,10 +548,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         minZoom: 2,
         maxZoom: 19,
         scrollWheelZoom: false,
-      }).setView(
-        focus ? [focus.lat, focus.lon] : [20, -40],
-        focus?.zoom ?? 4,
-      );
+      });
+      // Listener ANTES de setView: si no, el moveend inicial se pierde y el bbox queda el del useState.
+      const pushBbox = () => {
+        if (!map) return;
+        const b = map.getBounds();
+        setBbox({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth() });
+        setZoom(map.getZoom());
+      };
+      map.on("moveend", pushBbox);
+      map.setView(focus ? [focus.lat, focus.lon] : [20, -40], focus?.zoom ?? 4);
+      pushBbox();
       // Teselas sin API key: OSMF y Carto marcan «blocked/key» con PNG 200 (Leaflet no ve error).
       const streets = L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
@@ -587,13 +594,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setMapReady(true);
       setZoom(map.getZoom());
       requestAnimationFrame(() => map?.invalidateSize());
-      const pushBbox = () => {
-        if (!map) return;
-        const b = map.getBounds();
-        setBbox({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth() });
-        setZoom(map.getZoom());
-      };
-      map.on("moveend", pushBbox);
       map.on("zoomend", () => {
         pushBbox();
         if (!map) return;
