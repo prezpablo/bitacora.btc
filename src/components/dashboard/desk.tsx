@@ -237,8 +237,12 @@ export function Desk() {
   return (
     <SiteShell fill>
       <div
-        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-3 sm:gap-[1.618rem]", sector !== "llegar" && "hidden")}
+        className={cn(
+          "scroll-free min-h-0 flex-col gap-3 sm:gap-[1.618rem]",
+          sector === "llegar" ? "flex flex-1" : "hidden",
+        )}
         aria-hidden={sector !== "llegar" || undefined}
+        {...(sector !== "llegar" ? { inert: true } : {})}
       >
       <section id="mapa" className="relative shrink-0 scroll-mt-[var(--header-offset)]">
         <ClientOnly fallback={<div className="bit-stage rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
@@ -268,8 +272,12 @@ export function Desk() {
       </div>
 
       <div
-        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-3 sm:gap-[1.618rem]", sector !== "comunidad" && "hidden")}
+        className={cn(
+          "scroll-free min-h-0 flex-col gap-3 sm:gap-[1.618rem]",
+          sector === "comunidad" ? "flex flex-1" : "hidden",
+        )}
         aria-hidden={sector !== "comunidad" || undefined}
+        {...(sector !== "comunidad" ? { inert: true } : {})}
       >
       <section id="comunidad" className="scroll-mt-[var(--header-offset)] space-y-6">
         <HubIndex
@@ -304,8 +312,12 @@ export function Desk() {
       </div>
 
       <div
-        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-3 sm:gap-[1.618rem]", sector !== "mercado" && "hidden")}
+        className={cn(
+          "scroll-free min-h-0 flex-col gap-3 sm:gap-[1.618rem]",
+          sector === "mercado" ? "flex flex-1" : "hidden",
+        )}
         aria-hidden={sector !== "mercado" || undefined}
+        {...(sector !== "mercado" ? { inert: true } : {})}
       >
       <section id="mercado" ref={live.ref} className="scroll-mt-[var(--header-offset)] space-y-3">
         <HubIndex

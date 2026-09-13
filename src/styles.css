@@ -138,6 +138,8 @@ body {
 }
 .chip {
   display: inline-flex;
+  position: relative;
+  z-index: 1;
   height: 2rem;
   min-height: 1.5rem;
   flex: 0 0 auto;
@@ -145,11 +147,16 @@ body {
   justify-content: center;
   gap: 0.3rem;
   padding: 0 0.65rem;
+  border: 0;
   border-radius: var(--radius-md);
   font-size: 0.75rem;
   line-height: 1.2;
   font-weight: 500;
   white-space: nowrap;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .chip svg {
   width: 0.75rem;

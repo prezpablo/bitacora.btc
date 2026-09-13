@@ -406,7 +406,7 @@ export function NetworkEvents() {
         <StaleStamp asOf={q.data?.asOf} />
       </div>
 
-      <div className="chip-row mt-3">
+      <div className="relative z-[2] chip-row mt-3">
         <button
           type="button"
           className={cn(
@@ -472,7 +472,7 @@ export function NetworkEvents() {
         ) : null}
       </div>
 
-      <div className="chip-row mt-2">
+      <div className="relative z-[2] chip-row mt-2">
         {KIND_COPY.filter((k) => (kindCounts[k.key] || 0) > 0).map((k) => (
           <button
             key={k.key}

@@ -22,7 +22,7 @@ export function HubIndex({
     select: (s) => String(s.location.hash || "").replace(/^#/, ""),
   });
   return (
-    <header className="sticky top-0 z-20 space-y-1 bg-background pb-1 sm:space-y-2 sm:pb-2">
+    <header className="relative z-20 space-y-1 bg-background pb-1 sm:sticky sm:top-0 sm:space-y-2 sm:pb-2">
       <p className="text-[10px] font-medium tracking-wide text-primary uppercase sm:text-xs">{t(kicker)}</p>
       <nav aria-label={t(kicker)} className="chip-row">
         {items.map((item) => {
