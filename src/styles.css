@@ -86,22 +86,60 @@ body {
   height: 0;
 }
 
-/* Lienzo globo/mapa: misma caja en carga y en vivo. Celular ~φ⁻¹ del alto útil. */
+/* Lienzo globo/mapa/velas. Cortes = Tailwind sm 40rem / lg 64rem.
+   min-height no puede superar el viewport (landscape teléfono). */
 .bit-stage {
   width: 100%;
   height: min(42dvh, 300px);
-  min-height: 220px;
+  min-height: min(13.75rem, 46dvh);
 }
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .bit-stage {
     height: min(52dvh, 480px);
-    min-height: 280px;
+    min-height: min(17.5rem, 50dvh);
   }
 }
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .bit-stage {
     height: min(58dvh, 560px);
-    min-height: 320px;
+    min-height: min(20rem, 54dvh);
+  }
+}
+@media (max-height: 32rem) {
+  .bit-stage {
+    height: min(62dvh, 14rem);
+    min-height: 9rem;
+  }
+}
+
+/* ETF / sparks: misma escala, no h-[180px] suelto. */
+.bit-spark {
+  height: 10.5rem;
+}
+@media (width >= 40rem) {
+  .bit-spark {
+    height: 13.75rem;
+  }
+}
+@media (max-height: 32rem) {
+  .bit-spark {
+    height: 8rem;
+  }
+}
+
+/* Header y main en landscape / SE. */
+@media (max-height: 32rem) {
+  .site-head > div:first-of-type {
+    padding-block: 0.25rem;
+  }
+  .site-head nav a {
+    padding-block: 0.35rem;
+  }
+}
+@media (max-width: 22.5rem) {
+  .site-head nav a {
+    font-size: 0.62rem;
+    padding-inline: 0.2rem;
   }
 }
 

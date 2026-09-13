@@ -166,7 +166,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header ref={headRef} className="sticky top-0 z-[80] isolate border-b border-border bg-background">
+    <header ref={headRef} className="site-head sticky top-0 z-[80] isolate border-b border-border bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-[0.618rem] px-4 py-[0.618rem] sm:px-[1.618rem]">
         <Link to="/" className="min-w-0 no-underline">
           <BrandMark compact />
@@ -229,8 +229,8 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
       <main
         id="contenido"
         className={cn(
-          "mx-auto flex w-full max-w-6xl flex-1 flex-col gap-[1.618rem] px-4 sm:px-[1.618rem]",
-          fill ? "min-h-0 overflow-hidden py-[0.618rem]" : "py-[1.618rem] sm:py-[2.618rem]",
+          "mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-3 sm:gap-[1.618rem] sm:px-[1.618rem]",
+          fill ? "min-h-0 overflow-hidden py-2" : "py-4 sm:py-[1.618rem] lg:py-[2.618rem]",
         )}
       >
         {children}

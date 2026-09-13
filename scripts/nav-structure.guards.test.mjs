@@ -84,6 +84,16 @@ test("D-VIZ-01 candles share bit-stage and recharts is gone", () => {
   assert.doesNotMatch(read("package.json"), /"recharts"/);
 });
 
+test("responsive queries use Tailwind rem cuts and short viewport", () => {
+  const css = read("src/styles.css");
+  assert.match(css, /@media \(width >= 40rem\)/);
+  assert.match(css, /@media \(width >= 64rem\)/);
+  assert.match(css, /@media \(max-height: 32rem\)/);
+  assert.match(css, /\.bit-spark/);
+  assert.match(read("src/components/site-header.tsx"), /site-head/);
+  assert.match(read("src/components/dashboard/etf-flow.tsx"), /bit-spark/);
+});
+
 test("D-VIZ-02 ETF and heatmap follow parent width", () => {
   const etf = read("src/components/dashboard/etf-flow.tsx");
   assert.match(etf, /useParentSize/);

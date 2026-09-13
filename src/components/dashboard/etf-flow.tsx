@@ -58,7 +58,7 @@ function FlowChart({ series }: { series: SeriesPoint[] }) {
   }
 
   return (
-    <div ref={ref} className="relative h-[180px] w-full sm:h-[220px]">
+    <div ref={ref} className="bit-spark relative w-full">
       <svg
         viewBox={`0 0 ${w} ${h}`}
         width="100%"
