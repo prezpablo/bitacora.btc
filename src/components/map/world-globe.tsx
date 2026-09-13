@@ -425,19 +425,19 @@ function GlobeCanvas({
         </div>
       ) : null}
       </div>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-border px-3 py-2">
+      <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
+        <span className="hidden sm:block" />
         <button
           type="button"
-          className="h-9 w-fit max-w-full justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-60"
+          className="h-9 shrink-0 whitespace-nowrap rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-60"
           onClick={() => void joinHere()}
           disabled={joining}
         >
           {joining ? t("geoWait") : t("globeJoin")}
         </button>
-        <p className="hidden text-center text-xs text-neutral-500 sm:block">{t("globeHint")}</p>
         <button
           type="button"
-          className="h-9 w-fit max-w-full justify-self-end rounded-md bg-primary px-3 text-sm font-medium text-white"
+          className="h-9 shrink-0 whitespace-nowrap rounded-md bg-primary px-3 text-sm font-medium text-white sm:justify-self-end"
           onClick={onSkip}
         >
           {t("globeSkip")}

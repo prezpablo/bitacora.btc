@@ -1394,37 +1394,34 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             </p>
           ) : null}
           </div>
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-border px-3 py-2">
-            <div className="flex flex-wrap items-center gap-2 justify-self-start">
-              <button
-                type="button"
-                className="inline-flex size-9 items-center justify-center rounded-md bg-primary text-white"
-                aria-label={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
-                title={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  void goToUser(true);
-                }}
-              >
-                <Locate className="size-4 text-white" strokeWidth={2.4} />
-              </button>
-              <button
-                type="button"
-                className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  startJoin();
-                }}
-                disabled={Boolean(pendingCarga || cargaGenerating)}
-              >
-                {t("globeJoin")}
-              </button>
-            </div>
-            <p className="hidden text-center text-xs text-muted-foreground sm:block">{t("zoomNeedFocus")}</p>
+          <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
+            <button
+              type="button"
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-white sm:justify-self-start"
+              aria-label={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
+              title={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                void goToUser(true);
+              }}
+            >
+              <Locate className="size-4 text-white" strokeWidth={2.4} />
+            </button>
+            <button
+              type="button"
+              className="h-9 shrink-0 whitespace-nowrap rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
+              onClick={(ev) => {
+                ev.stopPropagation();
+                startJoin();
+              }}
+              disabled={Boolean(pendingCarga || cargaGenerating)}
+            >
+              {t("globeJoin")}
+            </button>
             {onWorld ? (
               <button
                 type="button"
-                className="h-9 w-fit justify-self-end rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50"
+                className="h-9 shrink-0 whitespace-nowrap rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:justify-self-end"
                 onClick={(ev) => {
                   ev.stopPropagation();
                   onWorld();
@@ -1435,7 +1432,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 {t("globeBack")}
               </button>
             ) : (
-              <span />
+              <span className="hidden sm:block" />
             )}
           </div>
         </div>

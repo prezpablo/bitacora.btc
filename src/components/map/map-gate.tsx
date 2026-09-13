@@ -5,7 +5,6 @@ import { FOUNDING_UY } from "@/domain/globe";
 import { boxAround } from "@/domain";
 import { onJoinMap, takeJoinIntent } from "@/application/join-map";
 import { prefetchGlobe, prefetchMapPins } from "@/lib/map-query";
-import { slowNet } from "@/lib/net";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { locateBest } from "@/infrastructure/geo";
 
@@ -56,7 +55,7 @@ function mapHasPendingCarga() {
 
 export function MapGate({ embedded = false }: { embedded?: boolean }) {
   const qc = useQueryClient();
-  const [mode, setMode] = useState<"globe" | "map">(slowNet() || mapHasPendingCarga() ? "map" : "globe");
+  const [mode, setMode] = useState<"globe" | "map">(mapHasPendingCarga() ? "map" : "globe");
   const [focus, setFocus] = useState<GlobeFocus | undefined>();
   const modeRef = useRef(mode);
   modeRef.current = mode;
