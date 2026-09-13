@@ -237,7 +237,7 @@ export function Desk() {
   return (
     <SiteShell fill>
       <div
-        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-[1.618rem]", sector !== "llegar" && "hidden")}
+        className={cn("scroll-free flex min-h-0 flex-1 flex-col gap-3 sm:gap-[1.618rem]", sector !== "llegar" && "hidden")}
         aria-hidden={sector !== "llegar" || undefined}
       >
       <section id="mapa" className="relative shrink-0 scroll-mt-[var(--header-offset)]">
