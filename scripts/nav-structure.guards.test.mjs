@@ -82,6 +82,17 @@ test("D-VIZ-01 candles share bit-stage and recharts is gone", () => {
   assert.doesNotMatch(read("package.json"), /"recharts"/);
 });
 
+test("D-VIZ-02 ETF and heatmap follow parent width", () => {
+  const etf = read("src/components/dashboard/etf-flow.tsx");
+  assert.match(etf, /useParentSize/);
+  assert.match(etf, /width="100%"/);
+  assert.doesNotMatch(etf, /const w = 720/);
+  const heat = read("src/components/dashboard/liq-heatmap.tsx");
+  assert.match(heat, /useParentSize/);
+  assert.doesNotMatch(heat, /viewBox="0 0 920 400"/);
+  assert.doesNotMatch(heat, /preserveAspectRatio="none"/);
+});
+
 test("i18n nav labels exist in es en pt", () => {
   const copy = read("src/lib/i18n.ts");
   for (const label of ["Historia de Bitcoin", "Bitcoin history", "História do Bitcoin", "Bitcoin hoy", "Bitcoin today", "Bitcoin hoje"]) {

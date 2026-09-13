@@ -27,7 +27,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **0b** | **D-FOSS** | GitHub: visibilidad **Public**. Clone anónimo 200. `LICENSE` MIT o AGPL. Link en `/legal` y 404. Hasta entonces no oponer «FOSS» a BTC Map. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → Change visibility |
 | **1** | **D-PIN-01** | `moveend` **antes** de `setView`. Bbox inicial = `null` (no MVD). Query de comercios recién con bounds reales. | **Hecho en repo 13 set.** | Restaurar `west: -56.35` + query al montar |
 | **1c** | **D-VIZ-01** | Velas = `.bit-stage` (misma caja que globo/mapa). Sacar `recharts` (no se usa; 2.x muerto). Canvas propio se queda. | **Este ZIP 13 set.** `price-chart` + fallbacks `bit-stage`; `package.json` sin recharts | 58dvh + volver a instalar recharts |
-| **1d** | **D-VIZ-02** | ETF y calor de liquidación al **ancho real** (ResizeObserver / `viewBox` fluido). Patrón [visx ParentSize](https://github.com/airbnb/visx), **sin** instalar visx. | Siguiente ZIP. ETF no 720×220; calor no 920×400 `none` | SVG fijo |
+| **1d** | **D-VIZ-02** | ETF y calor de liquidación al **ancho real** (ResizeObserver / `viewBox` fluido). Patrón visx ParentSize, **sin** instalar visx. | **Este ZIP 13 set.** ETF no 720×220; calor no 920×400 `none` | SVG fijo |
 | **1e** | **D-VIZ-03** | Táctil: 3 ticks Y/X, hit vela ≥ 24 px, EMA en menú no 4 chips. | Tras D-VIZ-02 | chips actuales |
 | **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` MIT. | Zoom continente: clusters LATAM. Zoom 9+: pines sueltos. Catálogo 27 k no se recorta a los primeros 800 del JSON | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
 | **3** | **D-PIN-03** | Payload flaco tipo BTC Map v4: `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: respuesta de comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo en el GET |
@@ -51,7 +51,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad D-VIZ (13 set):** P2 `01` (carga celular, este ZIP) → P2 `02` (siguiente ZIP) → P3 `03` (pulido). **Siguiente fase: D-VIZ-02.** No Lightweight Charts.
+**Prioridad D-VIZ (13 set):** P2 `01` hecho → P2 `02` **este ZIP** → P3 `03` siguiente (ticks, hit 24 px, EMA menú; blur SVG en coarse). **Siguiente fase: D-VIZ-03.** No Lightweight Charts.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 

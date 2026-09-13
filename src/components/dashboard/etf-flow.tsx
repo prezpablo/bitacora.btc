@@ -3,6 +3,7 @@ import type { EtfFlowPayload, SeriesPoint } from "@/domain";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import { StaleStamp } from "./stale-stamp";
+import { useParentSize } from "./use-parent-size";
 
 function moneyM(n: number) {
   const sign = n > 0 ? "+" : n < 0 ? "−" : "";
@@ -33,32 +34,41 @@ function sliceSpan(series: SeriesPoint[], span: Span) {
 function FlowChart({ series }: { series: SeriesPoint[] }) {
   const t = useT();
   const [hover, setHover] = useState<number | null>(null);
+  const { ref, w, h } = useParentSize(320, 180);
   if (series.length < 2) {
     return <p className="px-3 py-8 text-center text-sm text-muted-foreground">{t("etfEmpty")}</p>;
   }
-  const w = 720;
-  const h = 220;
-  const padL = 52;
+  const padL = w < 400 ? 40 : 52;
   const padR = 12;
   const padT = 12;
   const padB = 28;
-  const innerW = w - padL - padR;
-  const innerH = h - padT - padB;
+  const innerW = Math.max(40, w - padL - padR);
+  const innerH = Math.max(40, h - padT - padB);
   const max = Math.max(...series.map((p) => Math.abs(p.v)), 1);
   const zeroY = padT + innerH / 2;
   const bw = Math.max(1.2, innerW / series.length - 0.6);
   const hit = hover != null ? series[hover] : series[series.length - 1]!;
-
   const ticks = [-max, 0, max];
 
+  function barAt(clientX: number, el: SVGSVGElement) {
+    const rect = el.getBoundingClientRect();
+    const x = ((clientX - rect.left) / Math.max(rect.width, 1)) * w;
+    const i = Math.floor(((x - padL) / innerW) * series.length);
+    return Math.max(0, Math.min(series.length - 1, i));
+  }
+
   return (
-    <div className="relative">
+    <div ref={ref} className="relative h-[180px] w-full sm:h-[220px]">
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        className="h-[200px] w-full sm:h-[240px]"
+        width="100%"
+        height="100%"
+        preserveAspectRatio="none"
+        className="block"
         role="img"
         aria-label={t("etfTitle")}
-        onMouseLeave={() => setHover(null)}
+        onPointerLeave={() => setHover(null)}
+        onPointerMove={(ev) => setHover(barAt(ev.clientX, ev.currentTarget))}
       >
         {ticks.map((v) => {
           const y = zeroY - (v / max) * (innerH / 2);
@@ -86,7 +96,6 @@ function FlowChart({ series }: { series: SeriesPoint[] }) {
               rx={0.8}
               fill={p.v >= 0 ? "var(--color-long, #0ecb81)" : "var(--color-short, #f6465d)"}
               opacity={on || hover == null ? 1 : 0.35}
-              onMouseEnter={() => setHover(i)}
             />
           );
         })}

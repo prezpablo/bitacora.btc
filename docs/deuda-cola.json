@@ -35,7 +35,7 @@
     {
       "id": "D-VIZ-02",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "ETF y heatmap al ancho del padre; no SVG 720/920 fijos"
     },
