@@ -35,6 +35,8 @@ export type {
 export { eventIsLive } from "./entities";
 export {
   EVENT_PAGE,
+  EVENT_PAGE_MOBILE,
+  eventPageSize,
   applyEventQuery,
   buildEventBoard,
   eventContinent,

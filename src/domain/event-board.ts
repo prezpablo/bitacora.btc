@@ -3,6 +3,11 @@ import { continentOf } from "./geo-regions.ts";
 import { eventIsLive, type EventKind, type NetworkEvent } from "./entities.ts";
 
 export const EVENT_PAGE = 9;
+export const EVENT_PAGE_MOBILE = 6;
+
+export function eventPageSize(n?: number) {
+  return n === EVENT_PAGE_MOBILE ? EVENT_PAGE_MOBILE : EVENT_PAGE;
+}
 
 export type EventBoardQuery = {
   page?: number;
@@ -70,7 +75,7 @@ export function buildEventBoard(
   now = Date.now(),
 ): EventBoardPage {
   const live = raw.filter((e) => eventIsLive(e, now));
-  const size = EVENT_PAGE;
+  const size = eventPageSize(query.size);
   const dir = query.dir === "desc" ? "desc" : "asc";
   const continent = query.continent || "";
   const country = (query.country || "").toUpperCase();

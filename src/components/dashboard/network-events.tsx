@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
 import type { ContinentId, EventBoardQuery, EventKind, NetworkEvent } from "@/domain";
+import { EVENT_PAGE, EVENT_PAGE_MOBILE } from "@/domain";
 import { applyEventQuery, continentOf, eventQueryFromSearch } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
@@ -79,7 +80,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
   const eventTz = fmtRange(ev.startAt, ev.endAt, ev.timezone, lang);
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-elevated shadow-[var(--shadow-border)]">
-      <div className="relative aspect-[16/10] bg-plot">
+      <div className="relative aspect-[4/3] bg-plot sm:aspect-[16/10]">
         {ev.image ? (
           <img
             src={ev.image}
@@ -91,16 +92,16 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
             height={300}
           />
         ) : (
-          <span className="flex size-full items-center justify-center text-3xl text-primary">₿</span>
+          <span className="flex size-full items-center justify-center text-2xl text-primary sm:text-3xl">₿</span>
         )}
-        <span className="absolute top-1.5 left-1.5 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
+        <span className="absolute top-1 left-1 rounded-md bg-primary px-1 py-0.5 text-[9px] font-semibold tracking-wide text-white uppercase sm:top-1.5 sm:left-1.5 sm:px-1.5 sm:text-[10px]">
           {ev.platform}
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-1.5 p-2.5">
-        <h3 className="line-clamp-2 text-sm font-medium text-pretty text-foreground">{ev.title}</h3>
-        {ev.description ? <p className="line-clamp-2 text-xs text-pretty text-muted-foreground">{ev.description}</p> : null}
-        <ul className="mt-auto space-y-0.5 font-mono text-[11px] text-muted-foreground">
+      <div className="flex flex-1 flex-col gap-1 p-1.5 sm:gap-1.5 sm:p-2.5">
+        <h3 className="line-clamp-2 text-[11px] font-medium text-pretty text-foreground sm:text-sm">{ev.title}</h3>
+        {ev.description ? <p className="hidden line-clamp-2 text-xs text-pretty text-muted-foreground sm:block">{ev.description}</p> : null}
+        <ul className="mt-auto space-y-0.5 font-mono text-[10px] text-muted-foreground sm:text-[11px]">
           <li>
             {t("netDate")}: {fmtDate(ev.startAt, online ? "UTC" : ev.timezone)}
           </li>
@@ -129,7 +130,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
           href={ev.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1 inline-flex h-8 items-center justify-center rounded-md bg-primary text-xs font-medium text-white no-underline"
+          className="mt-1 inline-flex h-7 items-center justify-center rounded-md bg-primary text-[11px] font-medium text-white no-underline sm:h-8 sm:text-xs"
         >
           {t("netEnter")}
         </a>
@@ -236,6 +237,22 @@ function GeoMenu({
   );
 }
 
+function useEventPageSize() {
+  const [size, setSize] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 39.99rem)").matches
+      ? EVENT_PAGE_MOBILE
+      : EVENT_PAGE,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 39.99rem)");
+    const apply = () => setSize(mq.matches ? EVENT_PAGE_MOBILE : EVENT_PAGE);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+  return size;
+}
+
 export function NetworkEvents() {
   const t = useT();
   const lang = useAppLang();
@@ -251,9 +268,11 @@ export function NetworkEvents() {
   const [geoErr, setGeoErr] = useState("");
   const [dateDir, setDateDir] = useState<"asc" | "desc">(boot.dir === "desc" ? "desc" : "asc");
   const [page, setPage] = useState(boot.page || 1);
+  const pageSize = useEventPageSize();
 
   const query: EventBoardQuery = {
     page,
+    size: pageSize,
     dir: dateDir,
     continent,
     country,
@@ -309,7 +328,7 @@ export function NetworkEvents() {
       return;
     }
     setPage(1);
-  }, [country, continent, platform, kind, near, dateDir]);
+  }, [country, continent, platform, kind, near, dateDir, pageSize]);
 
   useEffect(() => {
     if (q.isFetching || !board) return;
@@ -501,7 +520,7 @@ export function NetworkEvents() {
         <p className="mt-4 text-sm text-muted-foreground">{t("netLoading")}</p>
       ) : (
         <>
-          <div className={cn("mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3", q.isFetching && "opacity-70")}>
+          <div className={cn("mt-4 grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2", q.isFetching && "opacity-70")}>
             {rows.map((ev) => (
               <EventCard key={ev.id} ev={ev} lang={lang} />
             ))}

@@ -3,6 +3,8 @@ import { test } from "node:test";
 import type { NetworkEvent } from "./entities.ts";
 import {
   EVENT_PAGE,
+  EVENT_PAGE_MOBILE,
+  eventPageSize,
   applyEventQuery,
   buildEventBoard,
   eventQueryFromSearch,
@@ -66,6 +68,11 @@ test("buildEventBoard pages, sorts and filters on the server", () => {
   assert.equal(page1.total, 23);
   assert.equal(page1.pages, 3);
   assert.equal(page1.events.length, 9);
+  const mobile = buildEventBoard(rows, { page: 1, size: EVENT_PAGE_MOBILE }, { asOf: now }, now);
+  assert.equal(mobile.events.length, EVENT_PAGE_MOBILE);
+  assert.equal(mobile.pages, 4);
+  assert.equal(eventPageSize(6), EVENT_PAGE_MOBILE);
+  assert.equal(eventPageSize(99), EVENT_PAGE);
   assert.equal(page1.events[0]!.id, "e0");
   assert.equal(page1.facets.live, 23);
   assert.equal(page1.facets.kinds.meetup, 12);
