@@ -54,6 +54,13 @@
       "done": "catalog/fetchMerchants sin LIMIT 800 ciego; Supercluster por zoom"
     },
     {
+      "id": "D-UX-13",
+      "pri": "P3",
+      "open": false,
+      "kind": "live",
+      "done": "chip-row+inert en HTML .org; grid-cols-2 eventos; bit-stage; globo no espera geojson"
+    },
+    {
       "id": "D-PIN-03",
       "pri": "P2",
       "open": true,
@@ -114,7 +121,7 @@
       "pri": "P3",
       "open": true,
       "kind": "manual",
-      "done": "juicio de producto: globo-first desktop. No apagar."
+      "done": "juicio de producto: globo-first salvo CARGA pendiente. No apagar."
     },
     {
       "id": "D-A11Y-24",

@@ -1,8 +1,8 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 13 de setiembre de 2026 · **Retomar el 16 set 2026**  
+**Fecha:** 13 de setiembre de 2026 (noche) · **Retomar el 16 set 2026**  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` · teselas Esri **en `.org`** (D-TILE-ZIP cerrado 13 set) · deploy = ZIP  
+**Repo:** `prezpablo/bitacora.btc` `main` **`4e9dd76`** · **ZIP en `.org` 13 set ~20:16 -03** (chip-row, inert, grid 2×6, CSP Esri+OpenTopo, `/healthz` ok)  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -23,19 +23,20 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 
 | Orden | Id | Qué | Verificación | Cómo volver |
 |---|---|---|---|---|
-| **0** | **D-TILE-ZIP** | CSP Esri + OpenTopoMap, sin OSMF/Carto. | **Cerrado en `.org` 13 set.** `deuda:live` CERRADO. | N/A |
-| **0b** | **D-FOSS** | GitHub: visibilidad **Public**. Clone anónimo 200. `LICENSE` MIT o AGPL. Link en `/legal` y 404. Hasta entonces no oponer «FOSS» a BTC Map. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → Change visibility |
-| **1** | **D-PIN-01** | `moveend` **antes** de `setView`. Bbox inicial = `null` (no MVD). Query de comercios recién con bounds reales. | **Hecho en repo 13 set.** | Restaurar `west: -56.35` + query al montar |
-| **1c** | **D-VIZ-01** | Velas = `.bit-stage` (misma caja que globo/mapa). Sacar `recharts` (no se usa; 2.x muerto). Canvas propio se queda. | **Este ZIP 13 set.** `price-chart` + fallbacks `bit-stage`; `package.json` sin recharts | 58dvh + volver a instalar recharts |
-| **1d** | **D-VIZ-02** | ETF y calor de liquidación al **ancho real** (ResizeObserver / `viewBox` fluido). Patrón visx ParentSize, **sin** instalar visx. | **Este ZIP 13 set.** ETF no 720×220; calor no 920×400 `none` | SVG fijo |
-| **1e** | **D-VIZ-03** | Táctil: 3 ticks Y/X en slim, hit vela ≥ 24 px, EMA en menú. Blur SVG off si `pointer:coarse` o `slowNet()`. | **Este ZIP 13 set.** | chips + 7 ticks |
-| **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` ISC. | **Este ZIP 13 set.** Zoom continente: clusters. Zoom 16: pines. | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
-| **3** | **D-PIN-03** | Payload flaco tipo BTC Map v4: `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: respuesta de comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo en el GET |
-| **4** | **D-STATS** | Totales del globo: **Latam** vs **BTC Map mundial**. Copy i18n 3 idiomas. No inflar “Mapa Latam” con 27 k globales. | Globo y FAQ muestran dos líneas | Revertir strings |
-| **5** | **D-CTA** | Separar “Sumate” (cargar punto) de “Apoyá con sats” (QR). Header no pone donar al lado de alta. | Un CTA de mapa, donación en pie o `#aportes` | Restaurar QR compacto en header |
-| **6** | **D-418** | Verificar React #418: `lang` SSR vs `localStorage` sin `?lang=`. Si el HTML es `es` y el cliente hidrata `en`, fijar idioma **antes** del render (URL gana). | Consola `.org` sin #418; `html lang` = copy | Solo si se reproduce |
-| **7** | **D-TILE-03** | Teselas propias: OpenFreeMap / PMTiles. Sale Esri US. | CSP sin `arcgisonline` | Volver a D-TILE-01 |
-| **8** | **P3 lote** | Skip 404 · sitemap `lastmod` (sigue 2026-09-07) · **D-A11Y-24** pie `#datos` < 24px · contraste `/labif` `.kicker` · globo/velas teclado · PWA fuera de `/__grok/` · `LICENSE` · `img-src` allowlist · banner compacto | Por ítem | Por ítem |
+| **0** | **D-TILE-ZIP** | CSP Esri + OpenTopoMap, sin OSMF/Carto. | **Cerrado en `.org` 13 set.** | N/A |
+| **0b** | **D-FOSS** | GitHub: visibilidad **Public**. Clone anónimo 200. `LICENSE` MIT o AGPL. Link en `/legal` y 404. Hasta entonces no oponer «FOSS» a BTC Map. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 · **sigue 404 anónimo 13 set noche** | Settings → Change visibility |
+| **1** | **D-PIN-01** | `moveend` **antes** de `setView`. Bbox inicial = `null`. | **Cerrado repo + `.org` 13 set.** | Restaurar `west: -56.35` |
+| **1c** | **D-VIZ-01** | Velas = `.bit-stage`. Sin `recharts`. | **Cerrado 13 set.** | 58dvh + recharts |
+| **1d** | **D-VIZ-02** | ETF y calor al ancho real. | **Cerrado 13 set.** | SVG 720/920 |
+| **1e** | **D-VIZ-03** | 3 ticks slim, hit ≥ 24 px, EMA menú. | **Cerrado 13 set.** | chips + 7 ticks |
+| **2** | **D-PIN-02** | Supercluster en el VPS. Sin `LIMIT 800` ciego. | **Cerrado repo 13 set.** Live: `shops.json` 13 set 23:16 UTC. | Quitar paquete |
+| **—** | **UX 13 set** | Globo 280 px / no espera geojson · chips wrap+click (`flex`≠`hidden`) · eventos móvil **2×6**. | **En `.org` `4e9dd76`.** | N/A |
+| **3** | **D-PIN-03** | **Siguiente ZIP.** Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo |
+| **4** | **D-STATS** | Totales globo: **Latam** vs **BTC Map mundial**. i18n 3 idiomas. | Globo y FAQ dos líneas | Revertir strings |
+| **5** | **D-CTA** | “Sumate” ≠ “Apoyá con sats”. | Un CTA mapa; donación pie/`#aportes` | QR en header |
+| **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | Consola `.org` sin #418 | Solo si se reproduce |
+| **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | CSP sin `arcgisonline` | Volver a Esri |
+| **8** | **P3 lote** | Skip 404 · sitemap `lastmod` (**sigue 2026-09-07**) · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | Por ítem | Por ítem |
 
 **Referentes públicos (13 set) — qué clonar, qué no**
 
@@ -51,19 +52,21 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad D-VIZ (13 set):** `01` `02` `03` hechos. **D-PIN-02 hecho este ZIP.** **Siguiente fase: D-PIN-03** payload flaco. No Lightweight Charts.
+**Prioridad:** D-VIZ 01–03 y D-PIN-01/02 **cerrados.** **Siguiente fase (un ZIP): D-PIN-03** payload flaco. No Lightweight Charts. No fusionar con D-STATS.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
 ---
 
-**Hallazgos 13 set (sonda, no P0 nuevo)**
+**Hallazgos 13 set noche (sonda `.org`)**
 
-- Live 20/20 · SEO 81/81 · guards 4/4 · teselas Esri en origen.
-- `sitemap lastmod` 2026-09-07 (D-SITEMAP).
-- axe: `a[href$="/#datos"]` target-size en `/` `/mapa` `/legal`; contraste `.kicker` en `/labif` (D-A11Y-24).
-- Runner: Binance 451 — no reabrir como CAÍDA.
-- Sandbox a veces pisa `scripts/grok-pwa-shared.mjs` (export `langFromSearch`); `git checkout HEAD --` ese archivo si `npm test` falla en grok-pwa. No es deuda de producto.
+- HTML: `Aprender`, `chip-row`, `bit-stage`, `/?lang=pt` → `lang=pt` + Boas-vindas. `/healthz` `{ok:true}`.
+- JS `routes-2yBNM1db.js`: `chip-row`, `inert`, `grid-cols-2`. `shops.json` Last-Modified 13 set 23:16 UTC.
+- CSP: Esri + OpenTopo; sin OSMF, Carto, Google Fonts.
+- `sitemap lastmod` **sigue 2026-09-07** (D-SITEMAP).
+- GitHub `prezpablo/bitacora.btc` **404 anónimo** (D-FOSS).
+- Runner Binance 451 — no reabrir como CAÍDA.
+- Sandbox a veces pisa `scripts/grok-pwa-shared.mjs`; `git checkout HEAD --` si `npm test` falla. No es deuda de producto.
 
 **Diagnóstico 11 set (por qué no se ven todos los comercios):**
 1. `bbox` arranca en MVD (`spend-map.tsx` ~L161). `setView` dispara `moveend` **antes** del listener → el recorte nunca es el de la vista.
@@ -142,11 +145,9 @@ Fuente: revisión de superficie pública 11 set 2026. **Caja gris ≠ fuente de 
 
 Bitácora.btc = mapa + desk Bitcoin Latam, educación y altas con prueba pública `CARGA`. Visitante sin cuenta. Stack: TanStack Start, Leaflet, SQLite, Caddy.
 
-**En el `.org` (antes del ZIP `8502f33`):** barra 4 destinos + Sumate, i18n SSR, CSP sin Google Fonts, shops/comms 200. Teselas OSMF 403 si el operador no instaló el ZIP.
+**En el `.org` (`4e9dd76`, 13 set noche):** barra 4 destinos + Sumate, i18n SSR, CSP Esri+OpenTopo sin Google Fonts, chip-row, globo/mapa bit-stage, eventos 2×6 móvil, `/healthz` ok. Teselas OSMF/Carto **fuera**.
 
-**En `main` (`8502f33`):** D-TILE-01/02 — Esri World Street + OpenTopoMap, preconnect, Leaflet en idle, eventos después del mapa. Carto y `tile.openstreetmap.org` fuera.
-
-**No hay CAÍDA.** Runner ≠ origen: mempool/Binance mudos desde *su* IP no apagan el desk.
+**No hay CAÍDA.** Runner ≠ origen.
 
 **Navegación:** D-NAV-01…05 **cerrados en `.org`**.
 
@@ -187,8 +188,8 @@ flowchart TB
 
 | Pri | Ítem | Estado | Dónde |
 |---|---|---|---|
-| **P0** | ZIP VPS = `8502f33` teselas Esri | **Ops** | Cola 16 set paso 0. CSP debe traer arcgisonline |
-| **P1** | **D-FOSS** repo público + LICENSE | **Abierto · ops GitHub** | Hoy 404 anónimo. LABIF ya decía privado |
+| **P0** | ZIP VPS = `4e9dd76` (13 set noche) | **Cerrado en `.org`** | chip-row · inert · Esri CSP · healthz |
+| **P1** | **D-FOSS** repo público + LICENSE | **Abierto · ops GitHub** | 404 anónimo 13 set noche |
 | **P0** | HTTPS / healthz / first-party 200 | **Cerrado** | shops/comms 200 (11 set) |
 | **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
 | **P1** | Copy SSR (H1 / legal / contacto) | **Cerrado en `.org`** | H1 pt Boas-vindas / en Welcome |
@@ -198,8 +199,9 @@ flowchart TB
 | **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
 | **P1** | Probe live en el VPS | Hecho en repo | `probe-live.mjs` · cron 08:20 |
 | **P1** | Lazy viewport + mercado al `#mercado` | **Cerrado** | `in-view` + `LazyMount` |
-| **P2** | D-TILE teselas sin OSMF/Carto | **En `main` `8502f33`** | Falta confirmar ZIP en `.org` (paso 0) |
-| **P2** | **D-PIN-01…03** Supercluster + bbox real + payload flaco | **Abierto · 16 set** | § Cola. No LIMIT 800 |
+| **P2** | D-TILE teselas sin OSMF/Carto | **Cerrado en `.org`** | D-TILE-01/02 + ZIP. Siguiente soberana = D-TILE-03 |
+| **P2** | **D-PIN-01** bbox real · **D-PIN-02** Supercluster | **Cerrado 13 set** | **Siguiente: D-PIN-03** payload flaco |
+| **P2** | **D-PIN-03** `id,lat,lon,icon` al cluster | **Abierto · 16 set** | Un ZIP. Ficha rica al clic |
 | **P2** | **D-STATS** Latam vs mundial en el globo | **Abierto · 16 set** | Informe 11 set §3.2 |
 | **P2** | **D-CTA** Sumate ≠ donar | **Abierto · 16 set** | QR sale del header |
 | **P1** | **D-418** hidratación lang | Verificar 16 set | Solo si consola `.org` muestra #418 |
@@ -249,17 +251,19 @@ OSMF y Carto devuelven PNG 200 con franja. El fallback a Esri **nunca** corría.
 
 | Id | Qué | Estado |
 |---|---|---|
-| **D-TILE-01** | Primaria Esri World Street (sin API key). Reserva OpenTopoMap. CSP sin OSMF ni Carto. | **`main` `8502f33`.** Paso 0 = ZIP en VPS. |
-| **D-TILE-02** | `preconnect` Esri + Leaflet en idle en el globo. Eventos después de `mapReady`. | **`main` `8502f33`.** |
+| **D-TILE-01** | Primaria Esri World Street (sin API key). Reserva OpenTopoMap. CSP sin OSMF ni Carto. | **Cerrado en `.org` 13 set.** |
+| **D-TILE-02** | `preconnect` Esri + Leaflet en idle en el globo. Eventos después de `mapReady`. | **Cerrado en `.org` 13 set.** |
 | **D-TILE-03** | Teselas propias (OpenFreeMap / PMTiles en el VPS). | Abierto. **Después** de D-PIN. |
 
-### D-PIN · pines (retomar 16 set)
+### D-PIN · pines
 
-Archivos: `src/components/map/spend-map.tsx` (bbox L161, `moveend` ~L596), `src/infrastructure/catalog.ts` (`LIMIT 800`), `src/infrastructure/btc-map.ts` (`fetchMerchants` slice 800), `src/lib/map-query.ts` (`useMapMerchants`), `src/domain/shop-cache.ts`.
+| Id | Estado |
+|---|---|
+| **D-PIN-01** bbox `moveend` antes de `setView` | **Cerrado** |
+| **D-PIN-02** Supercluster VPS, sin LIMIT 800 | **Cerrado** (`shop-cluster.ts`) |
+| **D-PIN-03** payload flaco al cluster; ficha al clic | **Siguiente ZIP · 16 set** |
 
-Índice Supercluster: **servidor** (Node), no en el browser. `getMerchants` pasa a recibir `zoom`. Dominio no importa Leaflet.
-
-No partir `spend-map.tsx` en la misma fase que D-PIN-02.
+No partir `spend-map.tsx` en la misma fase que D-PIN-03. Dominio no importa Leaflet.
 
 ---
 
