@@ -7,6 +7,7 @@ import { onJoinMap, takeJoinIntent } from "@/application/join-map";
 import { prefetchGlobe, prefetchMapPins } from "@/lib/map-query";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { locateBest } from "@/infrastructure/geo";
+import { MapCrash } from "./map-crash";
 
 const WorldGlobe = lazy(() => import("./world-globe").then((m) => ({ default: m.WorldGlobe })));
 const SpendMap = lazy(() => import("./spend-map").then((m) => ({ default: m.SpendMap })));
@@ -112,9 +113,17 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
   if (mode === "globe") {
     return (
       <div className="w-full shrink-0">
-      <Suspense fallback={<MapFallback />}>
-        <WorldGlobe onEnter={(f) => goMap(f)} onSkip={() => goMap()} />
-      </Suspense>
+        <MapCrash
+          fallback={
+            <Suspense fallback={<MapFallback />}>
+              <SpendMap onWorld={() => setMode("globe")} embedded={embedded} />
+            </Suspense>
+          }
+        >
+          <Suspense fallback={<MapFallback />}>
+            <WorldGlobe onEnter={(f) => goMap(f)} onSkip={() => goMap()} />
+          </Suspense>
+        </MapCrash>
       </div>
     );
   }

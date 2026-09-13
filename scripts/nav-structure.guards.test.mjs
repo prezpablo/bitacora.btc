@@ -92,6 +92,7 @@ test("responsive queries use Tailwind rem cuts and short viewport", () => {
   assert.match(css, /\.bit-spark/);
   assert.match(css, /min-height: 220px/);
   assert.match(css, /flex-shrink: 0/);
+  assert.match(css, /height: 280px/);
   assert.match(read("src/components/site-header.tsx"), /site-head/);
   assert.match(read("src/components/dashboard/etf-flow.tsx"), /bit-spark/);
 });

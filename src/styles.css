@@ -91,7 +91,8 @@ body {
 .bit-stage {
   width: 100%;
   flex-shrink: 0;
-  height: min(42dvh, 300px);
+  display: block;
+  height: 280px;
   min-height: 220px;
 }
 @media (width >= 40rem) {
@@ -108,8 +109,8 @@ body {
 }
 @media (max-height: 32rem) {
   .bit-stage {
-    height: min(62dvh, 220px);
-    min-height: 140px;
+    height: 200px;
+    min-height: 160px;
   }
 }
 

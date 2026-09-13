@@ -137,30 +137,22 @@ function GlobeCanvas({
     let stop = false;
     const timer = window.setTimeout(() => {
       if (!stop) setLoadErr((e) => e || "timeout");
-    }, 20000);
-    const load = () => {
-      void import("react-globe.gl")
-        .then((m) => {
-          const g = (m as { default?: unknown }).default ?? m;
-          const Cmp = (g as { default?: unknown }).default ?? g;
-          if (!stop) {
-            window.clearTimeout(timer);
-            setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
-          }
-        })
-        .catch((err: Error) => {
-          if (!stop) setLoadErr(err.message || "globe");
-        });
-    };
-    const idle =
-      typeof window.requestIdleCallback === "function"
-        ? window.requestIdleCallback(load, { timeout: 400 })
-        : window.setTimeout(load, 0);
+    }, 8000);
+    void import("react-globe.gl")
+      .then((m) => {
+        const g = (m as { default?: unknown }).default ?? m;
+        const Cmp = (g as { default?: unknown }).default ?? g;
+        if (!stop) {
+          window.clearTimeout(timer);
+          setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
+        }
+      })
+      .catch((err: Error) => {
+        if (!stop) setLoadErr(err.message || "globe");
+      });
     return () => {
       stop = true;
       window.clearTimeout(timer);
-      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle as number);
-      else window.clearTimeout(idle as number);
     };
   }, []);
 
@@ -296,8 +288,8 @@ function GlobeCanvas({
   return (
     <div className="space-y-3">
       <header className="rounded-lg bg-white px-3 py-2 text-center shadow-[var(--shadow-border)] sm:px-4 sm:py-3">
-        <p className="font-display text-xl text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
-        <p className="mt-1 text-xs text-neutral-600 sm:text-base">{t("globeTitle")}</p>
+        <p className="font-display text-lg text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
+        <p className="mt-0.5 text-[11px] text-neutral-600 sm:mt-1 sm:text-base">{t("globeTitle")}</p>
         {world ? (
           <p className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:mt-3 sm:grid-cols-4 sm:justify-items-center sm:gap-x-5 sm:gap-y-2">
             <span>
@@ -336,7 +328,7 @@ function GlobeCanvas({
         }}
         className="bit-stage relative z-0 overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)]"
       >
-      {Globe && !geo.isPending && !geo.isError ? (
+      {Globe ? (
         <Globe
           ref={globeRef}
           width={Math.max(size.w, 220)}
