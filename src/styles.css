@@ -129,19 +129,12 @@ body {
   }
 }
 
-/* Chips: una fila, texto entero. Si no caben, se deslizan (no se aplastan). */
+/* Chips: se envuelven para verse todos. Mismo alto, texto entero, sin recorte. */
 .chip-row {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.chip-row::-webkit-scrollbar {
-  display: none;
 }
 .chip {
   display: inline-flex;
@@ -159,19 +152,16 @@ body {
   white-space: nowrap;
 }
 .chip svg {
-  width: 0.7rem;
-  height: 0.7rem;
+  width: 0.75rem;
+  height: 0.75rem;
   flex-shrink: 0;
 }
 @media (width >= 40rem) {
   .chip-row {
-    flex-wrap: wrap;
     gap: 0.618rem;
-    overflow: visible;
   }
   .chip {
     height: 2.25rem;
-    flex: 0 1 auto;
     padding: 0 0.75rem;
     font-size: 0.875rem;
   }
