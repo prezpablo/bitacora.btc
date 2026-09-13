@@ -187,7 +187,7 @@ export function catalogShopsInBox(b: { west: number; south: number; east: number
     const rows = openSqlite()
       .prepare(
         `SELECT id, name, lat, lon, category, logo, description, created FROM catalog
-         WHERE tipo = 'shop' AND lon >= ? AND lon <= ? AND lat >= ? AND lat <= ? LIMIT 800`,
+         WHERE tipo = 'shop' AND lon >= ? AND lon <= ? AND lat >= ? AND lat <= ?`,
       )
       .all(b.west, b.east, b.south, b.north);
     return rows.map(asShop).filter((p) => p.id);

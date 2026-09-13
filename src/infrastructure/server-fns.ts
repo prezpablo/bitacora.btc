@@ -115,7 +115,7 @@ export const getBtcCommunities = createServerFn({ method: "POST" }).handler(asyn
 });
 
 export const getMerchants = createServerFn({ method: "POST" })
-  .validator((input: { west: number; south: number; east: number; north: number }) => input)
+  .validator((input: { west: number; south: number; east: number; north: number; zoom?: number }) => input)
   .handler(async ({ data }): Promise<MerchantPlace[]> => {
     try {
       return await fetchMerchants(data);

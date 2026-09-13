@@ -29,7 +29,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **1c** | **D-VIZ-01** | Velas = `.bit-stage` (misma caja que globo/mapa). Sacar `recharts` (no se usa; 2.x muerto). Canvas propio se queda. | **Este ZIP 13 set.** `price-chart` + fallbacks `bit-stage`; `package.json` sin recharts | 58dvh + volver a instalar recharts |
 | **1d** | **D-VIZ-02** | ETF y calor de liquidación al **ancho real** (ResizeObserver / `viewBox` fluido). Patrón visx ParentSize, **sin** instalar visx. | **Este ZIP 13 set.** ETF no 720×220; calor no 920×400 `none` | SVG fijo |
 | **1e** | **D-VIZ-03** | Táctil: 3 ticks Y/X en slim, hit vela ≥ 24 px, EMA en menú. Blur SVG off si `pointer:coarse` o `slowNet()`. | **Este ZIP 13 set.** | chips + 7 ticks |
-| **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` MIT. | Zoom continente: clusters LATAM. Zoom 9+: pines sueltos. Catálogo 27 k no se recorta a los primeros 800 del JSON | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
+| **2** | **D-PIN-02** | Supercluster **en el VPS** (`getMerchants(bbox, zoom)`). Índice en memoria desde catálogo SQLite. Nada de `LIMIT 800` sin orden. Leaflet solo pinta lo que vuelve (~50–200 clusters). Dependencia: `supercluster` ISC. | **Este ZIP 13 set.** Zoom continente: clusters. Zoom 16: pines. | Quitar paquete + devolver `catalogShopsInBox` LIMIT |
 | **3** | **D-PIN-03** | Payload flaco tipo BTC Map v4: `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: respuesta de comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo en el GET |
 | **4** | **D-STATS** | Totales del globo: **Latam** vs **BTC Map mundial**. Copy i18n 3 idiomas. No inflar “Mapa Latam” con 27 k globales. | Globo y FAQ muestran dos líneas | Revertir strings |
 | **5** | **D-CTA** | Separar “Sumate” (cargar punto) de “Apoyá con sats” (QR). Header no pone donar al lado de alta. | Un CTA de mapa, donación en pie o `#aportes` | Restaurar QR compacto en header |
@@ -51,7 +51,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad D-VIZ (13 set):** `01` `02` `03` hechos. **Siguiente fase (16 set): D-PIN-02** Supercluster. No Lightweight Charts.
+**Prioridad D-VIZ (13 set):** `01` `02` `03` hechos. **D-PIN-02 hecho este ZIP.** **Siguiente fase: D-PIN-03** payload flaco. No Lightweight Charts.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 

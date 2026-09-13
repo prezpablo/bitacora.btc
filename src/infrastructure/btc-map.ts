@@ -5,6 +5,7 @@ import { logoUrl, parseMapCsv } from "@/domain/map-csv";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 import { loadMapCsvText } from "./map-csv-io";
 import { catalogAllShops, catalogCommunities, catalogShopsInBox, searchCatalogShops } from "./catalog";
+import { clusteredCatalogShops } from "./shop-cluster";
 
 type RawEl = {
   id: string;
@@ -208,9 +209,14 @@ export async function fetchMerchants(bbox: {
   south: number;
   east: number;
   north: number;
+  zoom?: number;
 }): Promise<MerchantPlace[]> {
   const map = new Map<string, MerchantPlace>();
-  for (const p of catalogShopsInBox(bbox)) map.set(p.id, p);
+  const zoom = Number.isFinite(bbox.zoom) ? Number(bbox.zoom) : 4;
+  for (const p of clusteredCatalogShops(bbox, zoom)) map.set(p.id, p);
+  if (!map.size) {
+    for (const p of catalogShopsInBox(bbox)) map.set(p.id, p);
+  }
   if (!map.size) {
     for (const p of readSnap()) if (inBox(p, bbox)) map.set(p.id, p);
   }
@@ -225,7 +231,7 @@ export async function fetchMerchants(bbox: {
         lat: r.lat,
         lon: r.lon,
         name: r.name || prev?.name || r.id,
-        category: prev?.category || "propuesta",
+        category: prev?.category && prev.category !== "cluster" ? prev.category : "propuesta",
         createdAt: r.created || prev?.createdAt || Date.now(),
         logo: r.logo || prev?.logo,
         description: r.description || prev?.description,
@@ -237,7 +243,7 @@ export async function fetchMerchants(bbox: {
   if (!map.size) {
     for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, p);
   }
-  return [...map.values()].slice(0, 800);
+  return [...map.values()];
 }
 
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {

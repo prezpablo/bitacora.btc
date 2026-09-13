@@ -418,7 +418,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     };
   }, []);
 
-  const query = useMapMerchants(bbox);
+  const query = useMapMerchants(bbox, zoom);
   const btcComms = useMapCommunities();
   const globe = useGlobeStats();
   const countryStat = countryFromGlobe(globe.data, focus?.iso);
@@ -711,48 +711,33 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           comm: c,
         });
       }
-      const far = zoom < 9;
-      if (far) {
-        const cell = zoom < 6 ? 1.2 : 0.42;
-        const cities = new Map<string, MapPin>();
-        for (const p of places) {
-          const k = `${Math.round(p.lat / cell)}_${Math.round(p.lon / cell)}`;
-          const prev = cities.get(k);
-          if (!prev) {
-            cities.set(k, {
-              id: `city:${k}`,
-              name: p.name,
-              lat: p.lat,
-              lon: p.lon,
-              logo: pickListingLogo(store[p.id]?.logo, p.logo),
-              kind: "city",
-              verified: false,
-              count: 1,
-            });
-          } else {
-            prev.count = (prev.count || 1) + 1;
-            prev.lat += (p.lat - prev.lat) / (prev.count || 2);
-            prev.lon += (p.lon - prev.lon) / (prev.count || 2);
-            if (!prev.logo) prev.logo = pickListingLogo(store[p.id]?.logo, p.logo);
-          }
-        }
-        pins.push(...cities.values());
-      } else {
-        for (const p of places) {
-          const local = store[p.id];
-          const count = local?.voteCount ?? local?.votes?.length ?? 0;
-          const score = count ? (local?.score ?? 0) : 0;
+      for (const p of places) {
+        const clustered = p.category === "cluster" || p.id.startsWith("cluster:") || (p.clusterCount ?? 0) > 1;
+        if (clustered) {
           pins.push({
             id: p.id,
             name: p.name,
             lat: p.lat,
             lon: p.lon,
-            logo: pickListingLogo(local?.logo, p.logo),
-            kind: "shop",
-            verified: listingTrust(local?.links, score, count, (local?.verifiedAt ?? 0) > 0, p.id.startsWith("local:")).verified,
-            place: p,
+            kind: "city",
+            verified: false,
+            count: p.clusterCount || Number(p.name) || 1,
           });
+          continue;
         }
+        const local = store[p.id];
+        const count = local?.voteCount ?? local?.votes?.length ?? 0;
+        const score = count ? (local?.score ?? 0) : 0;
+        pins.push({
+          id: p.id,
+          name: p.name,
+          lat: p.lat,
+          lon: p.lon,
+          logo: pickListingLogo(local?.logo, p.logo),
+          kind: "shop",
+          verified: listingTrust(local?.links, score, count, (local?.verifiedAt ?? 0) > 0, p.id.startsWith("local:")).verified,
+          place: p,
+        });
       }
       const laid = placeTruePins(pins);
       laid.sort((a, b) => {

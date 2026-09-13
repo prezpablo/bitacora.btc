@@ -52,6 +52,13 @@ test("expired boxes are ignored", () => {
   assert.equal(shopsFromCache(cache, parent, 1_000 + 61_000), null);
 });
 
+test("cache at zoom 4 does not serve zoom 12", () => {
+  const parent = box(-56.4, -35.1, -55.8, -34.6);
+  const cache = rememberShopBox([], parent, [shop("cluster:1", -34.9, -56.16)], 1_000, undefined, 4);
+  assert.ok(shopsFromCache(cache, parent, 1_500, undefined, 4));
+  assert.equal(shopsFromCache(cache, parent, 1_500, undefined, 12), null);
+});
+
 test("shopsInView keeps a small pad at the edge", () => {
   const view = box(-56.2, -34.95, -56.1, -34.85);
   const edge = shop("edge", -34.85, -56.2);

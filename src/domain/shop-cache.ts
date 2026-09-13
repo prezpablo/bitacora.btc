@@ -2,7 +2,7 @@ import type { MerchantPlace } from "./entities";
 
 export type ShopBbox = { west: number; south: number; east: number; north: number };
 
-export type ShopBoxCache = { box: ShopBbox; shops: MerchantPlace[]; at: number };
+export type ShopBoxCache = { box: ShopBbox; shops: MerchantPlace[]; at: number; zoom: number };
 
 export const SHOP_CACHE_TTL_MS = 60_000;
 
@@ -36,16 +36,29 @@ export function shopsInView(shops: MerchantPlace[], view: ShopBbox, pad = 0.05) 
   return shops.filter((p) => inShopBox(p, box));
 }
 
-export function shopsFromCache(cache: ShopBoxCache[], view: ShopBbox, now: number, ttl = SHOP_CACHE_TTL_MS): MerchantPlace[] | null {
+export function shopsFromCache(
+  cache: ShopBoxCache[],
+  view: ShopBbox,
+  now: number,
+  ttl = SHOP_CACHE_TTL_MS,
+  zoom?: number,
+): MerchantPlace[] | null {
   const live = cache.filter((e) => now - e.at < ttl);
-  const cover = live.find((e) => boxContains(e.box, view));
+  const cover = live.find((e) => boxContains(e.box, view) && (zoom == null || e.zoom === zoom));
   if (!cover) return null;
   return shopsInView(cover.shops, view);
 }
 
-export function rememberShopBox(cache: ShopBoxCache[], box: ShopBbox, shops: MerchantPlace[], now: number, ttl = SHOP_CACHE_TTL_MS): ShopBoxCache[] {
-  const next: ShopBoxCache = { box, shops, at: now };
-  return [next, ...cache.filter((e) => now - e.at < ttl && !sameBox(e.box, box))].slice(0, 8);
+export function rememberShopBox(
+  cache: ShopBoxCache[],
+  box: ShopBbox,
+  shops: MerchantPlace[],
+  now: number,
+  ttl = SHOP_CACHE_TTL_MS,
+  zoom = 0,
+): ShopBoxCache[] {
+  const next: ShopBoxCache = { box, shops, at: now, zoom };
+  return [next, ...cache.filter((e) => now - e.at < ttl && !(sameBox(e.box, box) && e.zoom === zoom))].slice(0, 8);
 }
 
 function sameBox(a: ShopBbox, b: ShopBbox) {

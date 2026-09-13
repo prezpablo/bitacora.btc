@@ -49,7 +49,7 @@
     {
       "id": "D-PIN-02",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "catalog/fetchMerchants sin LIMIT 800 ciego; Supercluster por zoom"
     },

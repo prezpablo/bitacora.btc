@@ -182,6 +182,8 @@ export type MerchantPlace = {
   createdAt: number;
   description?: string;
   logo?: string;
+  /** Supercluster: pines agrupados (D-PIN-02). Ausente en ficha suelta. */
+  clusterCount?: number;
 };
 
 export type MerchantVote = { stars: 1 | 2 | 3 | 4 | 5; at: number; by: string };

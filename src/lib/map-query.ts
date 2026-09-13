@@ -18,8 +18,8 @@ export const mapKeys = {
   globe: ["map", "globe"] as const,
   geo: ["map", "geo"] as const,
   merchantsRoot: ["map", "merchants"] as const,
-  merchants: (b: MapBbox) =>
-    ["map", "merchants", b.west.toFixed(3), b.south.toFixed(3), b.east.toFixed(3), b.north.toFixed(3)] as const,
+  merchants: (b: MapBbox, zoom = 4) =>
+    ["map", "merchants", b.west.toFixed(3), b.south.toFixed(3), b.east.toFixed(3), b.north.toFixed(3), String(Math.round(zoom))] as const,
   communities: ["map", "communities"] as const,
   csv: ["map", "csv"] as const,
   eventsRoot: ["map", "events"] as const,
@@ -54,18 +54,19 @@ export function useMapCommunities() {
   });
 }
 
-export function useMapMerchants(bbox: MapBbox | null) {
+export function useMapMerchants(bbox: MapBbox | null, zoom = 4) {
+  const z = Math.max(0, Math.min(16, Math.round(zoom)));
   const qBox = useMemo(
     () => (bbox ? quantizeBox(bbox) : null),
     [bbox?.west, bbox?.south, bbox?.east, bbox?.north],
   );
-  const cached = bbox ? shopsFromCache(shopMem, bbox, Date.now()) : null;
+  const cached = bbox ? shopsFromCache(shopMem, bbox, Date.now(), undefined, z) : null;
   const query = useQuery({
-    queryKey: qBox ? mapKeys.merchants(qBox) : [...mapKeys.merchantsRoot, "idle"],
+    queryKey: qBox ? mapKeys.merchants(qBox, z) : [...mapKeys.merchantsRoot, "idle"],
     queryFn: async () => {
       if (!qBox) return [];
-      const shops = await getMerchants({ data: qBox });
-      shopMem = rememberShopBox(shopMem, qBox, shops, Date.now());
+      const shops = await getMerchants({ data: { ...qBox, zoom: z } });
+      shopMem = rememberShopBox(shopMem, qBox, shops, Date.now(), undefined, z);
       return shops;
     },
     staleTime: STALE.merchants,
@@ -74,10 +75,10 @@ export function useMapMerchants(bbox: MapBbox | null) {
   });
   const data = useMemo(() => {
     if (!bbox) return [];
-    const hit = shopsFromCache(shopMem, bbox, Date.now());
+    const hit = shopsFromCache(shopMem, bbox, Date.now(), undefined, z);
     if (hit) return hit;
     return shopsInView(query.data ?? [], bbox);
-  }, [bbox?.west, bbox?.south, bbox?.east, bbox?.north, query.data, query.dataUpdatedAt]);
+  }, [bbox?.west, bbox?.south, bbox?.east, bbox?.north, z, query.data, query.dataUpdatedAt]);
   return { ...query, data };
 }
 
