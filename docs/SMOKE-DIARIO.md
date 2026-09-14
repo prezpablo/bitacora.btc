@@ -136,7 +136,9 @@ Desk feeds: BN=/VISION=/OKX=/HL= → precio_ok SI/NO (regla 1-de-4)
 Mapa feeds: btcmap-e=/btcmap-a=/osm=/esri=
 On-chain: mempool-fee=/mempool-tip=/ninja=/fng=/bitbo=
 Cert: vence YYYY-MM-DD (N días)
-map.csv filas: N | pins.csv: N | shops.json: OK/404
+map.csv filas: N | pins.csv: N | btcmap-shops.json: OK/404 | btcmap-comms.json: OK/404
+
+Nunca pedir `/data/shops.json` ni `/data/comms.json`: esos 404 no miden el catálogo.
 BTC addr: MATCH | MISMATCH
 H1 pt: Boas-vindas | SIGUE-ES
 Luego una línea por check: ID — OK/DEGRADA/CAÍDA/N/D — evidencia (status o snippet).

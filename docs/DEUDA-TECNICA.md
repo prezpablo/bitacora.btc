@@ -1,8 +1,8 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 13 de setiembre de 2026 (noche) · **Retomar el 16 set 2026**  
+**Fecha:** 14 de setiembre de 2026 · **Retomar el 16 set 2026**  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` **`4e9dd76`** · **ZIP en `.org` 13 set ~20:16 -03** (chip-row, inert, grid 2×6, CSP Esri+OpenTopo, `/healthz` ok)  
+**Repo:** `prezpablo/bitacora.btc` `main` **`622baf9`** · **ZIP en `.org` 13 set ~20:16 -03 = `4e9dd76`** (chip-row, inert, grid 2×6, CSP Esri+OpenTopo, `/healthz` ok). Velas móvil (622baf9) **aún no** en VPS.  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -29,9 +29,10 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **1c** | **D-VIZ-01** | Velas = `.bit-stage`. Sin `recharts`. | **Cerrado 13 set.** | 58dvh + recharts |
 | **1d** | **D-VIZ-02** | ETF y calor al ancho real. | **Cerrado 13 set.** | SVG 720/920 |
 | **1e** | **D-VIZ-03** | 3 ticks slim, hit ≥ 24 px, EMA menú. | **Cerrado 13 set.** | chips + 7 ticks |
-| **2** | **D-PIN-02** | Supercluster en el VPS. Sin `LIMIT 800` ciego. | **Cerrado repo 13 set.** Live: `shops.json` 13 set 23:16 UTC. | Quitar paquete |
-| **—** | **UX 13 set** | Globo 280 px / no espera geojson · chips wrap+click (`flex`≠`hidden`) · eventos móvil **2×6**. | **En `.org` `4e9dd76`.** | N/A |
-| **3** | **D-PIN-03** | **Siguiente ZIP.** Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo |
+| **2** | **D-PIN-02** | Supercluster en el VPS. Sin `LIMIT 800` ciego. | **Cerrado.** Live: `/data/btcmap-shops.json` 200 (2,9 MB, 13 set 23:16 UTC). **No** existe `/data/shops.json`. | Quitar paquete |
+| **—** | **UX 13 set** | Globo 280 px / chips wrap+click · eventos 2×6. | **En `.org` `4e9dd76`.** | N/A |
+| **—** | **D-VIZ-EMA** | Móvil: calor ON, solo EMA 1D, sin pastillas. | **Repo `622baf9`.** Falta ZIP. | 4 EMA + heat off 3G |
+| **3** | **D-PIN-03** | **Siguiente ZIP de producto (16 set).** Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo |
 | **4** | **D-STATS** | Totales globo: **Latam** vs **BTC Map mundial**. i18n 3 idiomas. | Globo y FAQ dos líneas | Revertir strings |
 | **5** | **D-CTA** | “Sumate” ≠ “Apoyá con sats”. | Un CTA mapa; donación pie/`#aportes` | QR en header |
 | **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | Consola `.org` sin #418 | Solo si se reproduce |
@@ -52,16 +53,32 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-VIZ 01–03 y D-PIN-01/02 **cerrados.** **Siguiente fase (un ZIP): D-PIN-03** payload flaco. No Lightweight Charts. No fusionar con D-STATS.
+**Prioridad:** D-VIZ 01–03 y D-PIN-01/02 **cerrados.** **Siguiente ZIP de producto: D-PIN-03.** No fusionar con D-STATS ni con D-VIZ-EMA. D-FOSS = Settings GitHub (sin ZIP).
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
+
+---
+
+**Smoke 14 set 10:55 -03 (Grok diario) — cotejo**
+
+Informe: DEGRADA · P0 19/20 · i18n 7/7 · barra 4 destinos · habitaciones SI · TTFB 0,59 s · cert 77 d · `precio_ok SI`. **Sin CAÍDA ni incidente.**
+
+| Ítem del smoke | Veredicto | Nota |
+|---|---|---|
+| **P0-12** `/data/shops.json` + `/data/comms.json` 404 | **Falso positivo.** Paths cortos. Canónico: `/data/btcmap-shops.json` 200 · `/data/btcmap-comms.json` 200. P0-12 del protocolo ya lo nombra así. | Plantilla del informe decía `shops.json`. Corregida. **No abrir hueco de mapa.** |
+| **D-BN** 451 | Runner. Vision+OKX cubren. | No reabrir mercado caído. |
+| **D-IPWHO** 429 | GeoJS 200. | Locate vivo. |
+| **P2-03b** `*.tile.opentopomap.org` en CSP | **A propósito** (D-TILE reserva). | No es fuga. Allowlist del probe desactualizado. |
+| P3 16/18 · UX 18/20 | Encajan D-SITEMAP (`lastmod` 07-set) y skip 404. | Ya en cola P3. |
+
+`/healthz` GET `{ok:true}`. Overlay `map.csv` 2 filas / `pins.csv` 2. Coherente.
 
 ---
 
 **Hallazgos 13 set noche (sonda `.org`)**
 
 - HTML: `Aprender`, `chip-row`, `bit-stage`, `/?lang=pt` → `lang=pt` + Boas-vindas. `/healthz` `{ok:true}`.
-- JS `routes-2yBNM1db.js`: `chip-row`, `inert`, `grid-cols-2`. `shops.json` Last-Modified 13 set 23:16 UTC.
+- JS `routes-2yBNM1db.js`: `chip-row`, `inert`, `grid-cols-2`. `/data/btcmap-shops.json` Last-Modified 13 set 23:16 UTC.
 - CSP: Esri + OpenTopo; sin OSMF, Carto, Google Fonts.
 - `sitemap lastmod` **sigue 2026-09-07** (D-SITEMAP).
 - GitHub `prezpablo/bitacora.btc` **404 anónimo** (D-FOSS).
@@ -238,7 +255,7 @@ flowchart TB
 | D-BN | Binance 451. Vision + OKX cubren. Nunca «mercado caído». |
 | D-FS | formsubmit.co timeout *en el runner*. El contacto va por server-fn del VPS. No es CAÍDA. |
 | D-OSM / Carto | Tesela 200 con marca («blocked» / «API KEY REQUIRED»). Leaflet no dispara `tileerror`. **No usar.** D-TILE = Esri. |
-| P0-12 shops 404 | Falso positivo si el GET de 3 MB corta a 8 s. Origen 200. Timeout smoke ≥ 12 s. |
+| P0-12 shops 404 | **14 set:** el runner pidió `/data/shops.json`. Canónico es `/data/btcmap-shops.json` (200, 2,9 MB). 404 del alias **no** es hueco de mapa. Timeout 3 MB ≥ 12 s sigue valiendo. |
 | P2-16 | `extensions.js` se omite en `bitacorabtc.org`. Preview Grok lo conserva. |
 
 **No reabrir:** sslip.io como canónica. Nginx. CMP ads. Connect-wallet. Turnstile. First-party 404 del 30/08. OpenAI / Gemini / Groq / reCAPTCHA en el `.org`. Google Fonts remoto. Teselas OSMF o Carto sin clave. Rutas `/aprender`. Leaflet.markercluster. `/health` como P0 (`/healthz` existe). «FOSS oponible» mientras el repo sea 404 anónimo.
