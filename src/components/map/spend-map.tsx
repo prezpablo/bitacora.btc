@@ -448,15 +448,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       }));
     const seen = new Set(extra.map((p) => p.id));
     const api = (query.data ?? [])
+      .filter((p) => p && p.id && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lon)))
       .filter((p) => !store[p.id]?.removed && !seen.has(p.id))
       .map((p) => {
         const local = store[p.id];
         const place = pinAsPlace(p);
         return {
           ...place,
-          lat: local?.lat ?? p.lat,
-          lon: local?.lon ?? p.lon,
-          name: local?.name || place.name,
+          lat: local?.lat ?? place.lat,
+          lon: local?.lon ?? place.lon,
+          name: local?.name || place.name || p.id,
           logo: pickListingLogo(local?.logo),
         };
       });
@@ -689,6 +690,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     const group = marks.current;
     const L = leafletRef.current;
     if (!mapReady || !map || !group || !L) return;
+    try {
     group.clearLayers();
       type MapPin = {
         id: string;
@@ -719,6 +721,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         });
       }
       for (const p of places) {
+        if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
         const clustered = p.category === "cluster" || p.id.startsWith("cluster:") || (p.clusterCount ?? 0) > 1;
         if (clustered) {
           pins.push({
@@ -818,6 +821,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);
       }
+    } catch {
+      /* un pin malo no deja el mapa en blanco */
+    }
   }, [places, store, visibleComms, hit, mapReady, zoom]);
 
   useEffect(() => {

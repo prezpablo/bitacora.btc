@@ -199,16 +199,28 @@ export function isShopCluster(p: { id: string; icon?: string; category?: string;
   return (p.clusterCount ?? 0) > 1 || p.icon === "cluster" || p.category === "cluster" || p.id.startsWith("cluster:");
 }
 
-export function pinAsPlace(p: ShopPin): MerchantPlace {
-  const cluster = isShopCluster(p);
+export function pinAsPlace(p: ShopPin | MerchantPlace): MerchantPlace {
+  if (p && "name" in p && typeof (p as MerchantPlace).name === "string") {
+    const place = p as MerchantPlace;
+    return {
+      ...place,
+      name: place.name || place.category || place.id,
+      category: place.category || "lugar",
+      lat: Number(place.lat),
+      lon: Number(place.lon),
+    };
+  }
+  const pin = p as ShopPin;
+  const cluster = isShopCluster(pin);
+  const icon = pin.icon || "lugar";
   return {
-    id: p.id,
-    lat: p.lat,
-    lon: p.lon,
-    name: cluster ? String(p.clusterCount ?? "") : p.icon,
-    category: cluster ? "cluster" : p.icon,
+    id: pin.id,
+    lat: Number(pin.lat),
+    lon: Number(pin.lon),
+    name: cluster ? String(pin.clusterCount ?? "") : icon,
+    category: cluster ? "cluster" : icon,
     createdAt: 0,
-    clusterCount: p.clusterCount,
+    clusterCount: pin.clusterCount,
   };
 }
 

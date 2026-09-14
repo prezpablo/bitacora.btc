@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadShopIndex, placesFromClusters } from "./shop-cluster.ts";
-import { isShopCluster } from "../domain/entities.ts";
+import { isShopCluster, pinAsPlace } from "../domain/entities.ts";
 import type { ShopPin } from "@/domain";
 
 const shop = (id: string, lat: number, lon: number): ShopPin => ({
@@ -31,4 +31,11 @@ test("continent zoom clusters nearby shops; street zoom lists them", () => {
   const leaf = near.find((p) => p.icon !== "cluster");
   assert.ok(leaf);
   assert.deepEqual(Object.keys(leaf!).sort(), ["icon", "id", "lat", "lon"]);
+});
+
+test("pinAsPlace always has a name so dedupe does not throw", () => {
+  const a = pinAsPlace({ id: "x", lat: 1, lon: 2, icon: "" });
+  assert.equal(a.name, "lugar");
+  const b = pinAsPlace({ id: "y", lat: 1, lon: 2, name: "Cafe", category: "cafe", createdAt: 1 });
+  assert.equal(b.name, "Cafe");
 });

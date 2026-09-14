@@ -129,6 +129,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
   }
   return (
     <div className="w-full shrink-0">
+    <MapCrash fallback={<MapFallback />}>
     <Suspense fallback={<MapFallback />}>
       <SpendMap
         focus={focus}
@@ -138,6 +139,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
         embedded={embedded}
       />
     </Suspense>
+    </MapCrash>
     </div>
   );
 }

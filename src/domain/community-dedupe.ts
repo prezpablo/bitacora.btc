@@ -8,7 +8,7 @@ export type NamedPin = {
 };
 
 function foldName(s: string) {
-  return s
+  return (s || "")
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
