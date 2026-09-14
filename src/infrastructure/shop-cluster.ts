@@ -2,7 +2,7 @@ import Supercluster from "supercluster";
 import type { ShopPin } from "@/domain";
 import { catalogCount, catalogShopPins, ensureCatalog } from "./catalog.ts";
 
-export type ShopPointProps = { id: string; icon: string };
+export type ShopPointProps = { id: string; icon: string; name: string };
 
 export function loadShopIndex(shops: ShopPin[]) {
   const index = new Supercluster<ShopPointProps>({ radius: 72, maxZoom: 16, minPoints: 3 });
@@ -11,14 +11,14 @@ export function loadShopIndex(shops: ShopPin[]) {
       .filter((s) => s.id && Number.isFinite(s.lat) && Number.isFinite(s.lon))
       .map((s) => ({
         type: "Feature" as const,
-        properties: { id: s.id, icon: s.icon || "lugar" },
+        properties: { id: s.id, icon: s.icon || "lugar", name: s.name || s.id },
         geometry: { type: "Point" as const, coordinates: [s.lon, s.lat] as [number, number] },
       })),
   );
   return index;
 }
 
-/** D-PIN-03: id,lat,lon,icon (+ clusterCount si agrupa). */
+/** D-PIN-03: id,lat,lon,icon,name. Sin logo ni descripción. */
 export function placesFromClusters(
   index: Supercluster<ShopPointProps>,
   bbox: [number, number, number, number],
@@ -36,7 +36,7 @@ export function placesFromClusters(
       continue;
     }
     const leaf = p as ShopPointProps;
-    out.push({ id: leaf.id, lat, lon, icon: leaf.icon || "lugar" });
+    out.push({ id: leaf.id, lat, lon, icon: leaf.icon || "lugar", name: leaf.name || leaf.id });
   }
   return out;
 }

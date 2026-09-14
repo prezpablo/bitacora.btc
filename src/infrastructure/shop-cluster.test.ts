@@ -9,6 +9,7 @@ const shop = (id: string, lat: number, lon: number): ShopPin => ({
   lat,
   lon,
   icon: "cafe",
+  name: id,
 });
 
 test("isShopCluster detects cluster placeholders", () => {
@@ -30,12 +31,14 @@ test("continent zoom clusters nearby shops; street zoom lists them", () => {
   );
   const leaf = near.find((p) => p.icon !== "cluster");
   assert.ok(leaf);
-  assert.deepEqual(Object.keys(leaf!).sort(), ["icon", "id", "lat", "lon"]);
+  assert.ok(leaf!.name);
+  assert.equal(leaf!.icon, "cafe");
 });
 
-test("pinAsPlace always has a name so dedupe does not throw", () => {
-  const a = pinAsPlace({ id: "x", lat: 1, lon: 2, icon: "" });
-  assert.equal(a.name, "lugar");
+test("pinAsPlace uses the shop name, not the BTC Map other tag", () => {
+  const a = pinAsPlace({ id: "node:1", lat: -34.89, lon: -56.16, icon: "other", name: "Roderichs Crypto House" });
+  assert.equal(a.name, "Roderichs Crypto House");
+  assert.equal(a.category, "lugar");
   const b = pinAsPlace({ id: "y", lat: 1, lon: 2, name: "Cafe", category: "cafe", createdAt: 1 });
   assert.equal(b.name, "Cafe");
 });

@@ -1769,7 +1769,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               >
                 {p.name}
               </button>
-              <span className="text-muted-foreground"> · {p.category}</span>
+              {p.category && p.category !== "other" && p.category !== "lugar" && p.category !== "cluster" ? (
+                <span className="text-muted-foreground"> · {p.category}</span>
+              ) : null}
             </li>
           ))}
         </ul>

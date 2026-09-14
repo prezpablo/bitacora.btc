@@ -192,6 +192,7 @@ export type ShopPin = {
   lat: number;
   lon: number;
   icon: string;
+  name?: string;
   clusterCount?: number;
 };
 
@@ -200,24 +201,25 @@ export function isShopCluster(p: { id: string; icon?: string; category?: string;
 }
 
 export function pinAsPlace(p: ShopPin | MerchantPlace): MerchantPlace {
-  if (p && "name" in p && typeof (p as MerchantPlace).name === "string") {
+  if (p && "category" in p && typeof (p as MerchantPlace).createdAt === "number") {
     const place = p as MerchantPlace;
+    const cat = place.category === "other" ? "lugar" : place.category || "lugar";
     return {
       ...place,
-      name: place.name || place.category || place.id,
-      category: place.category || "lugar",
+      name: place.name || cat || place.id,
+      category: cat,
       lat: Number(place.lat),
       lon: Number(place.lon),
     };
   }
   const pin = p as ShopPin;
   const cluster = isShopCluster(pin);
-  const icon = pin.icon || "lugar";
+  const icon = pin.icon && pin.icon !== "other" ? pin.icon : "lugar";
   return {
-    id: pin.id,
-    lat: Number(pin.lat),
-    lon: Number(pin.lon),
-    name: cluster ? String(pin.clusterCount ?? "") : icon,
+    id: pin.id || "pin",
+    lat: Number(pin.lat) || 0,
+    lon: Number(pin.lon) || 0,
+    name: cluster ? String(pin.clusterCount ?? "") : pin.name || icon,
     category: cluster ? "cluster" : icon,
     createdAt: 0,
     clusterCount: pin.clusterCount,
@@ -230,6 +232,7 @@ export function placeAsPin(p: MerchantPlace): ShopPin {
     lat: p.lat,
     lon: p.lon,
     icon: isShopCluster(p) ? "cluster" : p.category || "lugar",
+    name: p.name,
     clusterCount: p.clusterCount,
   };
 }

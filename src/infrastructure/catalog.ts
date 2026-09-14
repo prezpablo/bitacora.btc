@@ -25,11 +25,13 @@ function readSeed<T>(name: string): T[] {
 }
 
 function asPin(row: Record<string, unknown>): ShopPin {
+  const icon = String(row.category || "lugar");
   return {
     id: String(row.id || ""),
     lat: Number(row.lat),
     lon: Number(row.lon),
-    icon: String(row.category || "lugar"),
+    icon: icon === "other" ? "lugar" : icon,
+    name: String(row.name || row.id || ""),
   };
 }
 
@@ -39,7 +41,7 @@ function asShop(row: Record<string, unknown>): MerchantPlace {
     lat: Number(row.lat),
     lon: Number(row.lon),
     name: String(row.name || row.id || ""),
-    category: String(row.category || "lugar"),
+    category: String(row.category === "other" ? "lugar" : row.category || "lugar"),
     createdAt: Number(row.created) || Date.now(),
     logo: String(row.logo || "") || undefined,
     description: String(row.description || "") || undefined,
@@ -209,7 +211,7 @@ export function catalogShopPins(): ShopPin[] {
   ensureCatalog();
   try {
     return openSqlite()
-      .prepare("SELECT id, lat, lon, category FROM catalog WHERE tipo = 'shop'")
+      .prepare("SELECT id, lat, lon, category, name FROM catalog WHERE tipo = 'shop'")
       .all()
       .map(asPin)
       .filter((p) => p.id);
