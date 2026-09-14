@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
-import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust } from "@/domain";
+import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust, refineShopIcon } from "@/domain";
 import { pickListingLogo } from "@/domain/community-dedupe";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
@@ -108,9 +108,11 @@ export function PlaceCard({
   const [proofErr, setProofErr] = useState("");
   const [proofBusy, setProofBusy] = useState(false);
   const needsCarga = Boolean(local?.verifyToken && !(local?.verifiedAt ?? 0) && onVerified);
+  const kind = refineShopIcon(place.category, place.name || local?.name);
+  const kindLabel = kind === "shop" ? t("filterShops") : kind === "atm" ? "ATM" : kind;
   return (
     <>
-      <p className="text-xs tracking-wide text-muted-foreground uppercase">{place.category}</p>
+      {kindLabel ? <p className="text-xs tracking-wide text-muted-foreground uppercase">{kindLabel}</p> : null}
       <div className="flex items-center gap-3">
         {logo ? (
           <img src={imgSrc(logo)} alt="" className="size-14 rounded-full object-cover" />

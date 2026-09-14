@@ -200,21 +200,36 @@ export function isShopCluster(p: { id: string; icon?: string; category?: string;
   return (p.clusterCount ?? 0) > 1 || p.icon === "cluster" || p.category === "cluster" || p.id.startsWith("cluster:");
 }
 
+/** BTC Map usa `other` para kioscos y minisupers. El nombre manda. */
+export function refineShopIcon(icon: string, name = "") {
+  const raw = (icon || "").trim().toLowerCase();
+  if (raw && raw !== "other" && raw !== "lugar" && raw !== "yes" && raw !== "cluster") return raw;
+  const n = name.toLowerCase();
+  if (/atm|cajero|crypto house/.test(n)) return "atm";
+  if (/minisuper|super\b|supermercado|almac[eé]n|kiosco|market|tienda/.test(n)) return "shop";
+  if (/caf[eé]|cafeteria/.test(n)) return "cafe";
+  if (/\bhotel\b|hostel/.test(n)) return "hotel";
+  if (/restau|parrilla|pizz|burger|asado/.test(n)) return "restaurant";
+  if (/\bbar\b|\bpub\b/.test(n)) return "bar";
+  if (/gym|crossfit|boulder|fitness|sport/.test(n)) return "sport";
+  return "";
+}
+
 export function pinAsPlace(p: ShopPin | MerchantPlace): MerchantPlace {
   if (p && "category" in p && typeof (p as MerchantPlace).createdAt === "number") {
     const place = p as MerchantPlace;
-    const cat = place.category === "other" ? "lugar" : place.category || "lugar";
+    const cat = refineShopIcon(place.category, place.name) || (place.category === "other" ? "" : place.category) || "lugar";
     return {
       ...place,
       name: place.name || cat || place.id,
-      category: cat,
+      category: cat === "" ? "lugar" : cat,
       lat: Number(place.lat),
       lon: Number(place.lon),
     };
   }
   const pin = p as ShopPin;
   const cluster = isShopCluster(pin);
-  const icon = pin.icon && pin.icon !== "other" ? pin.icon : "lugar";
+  const icon = refineShopIcon(pin.icon, pin.name) || "lugar";
   return {
     id: pin.id || "pin",
     lat: Number(pin.lat) || 0,

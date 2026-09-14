@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
-import { pinAsPlace } from "@/domain";
+import { pinAsPlace, refineShopIcon } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
@@ -808,15 +808,18 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           }
         });
         const logo = escapeHtml(imgSrc(pin.logo || "")).replace(/"/g, "");
+        const kind = refineShopIcon(pin.place?.category || "", pin.name);
         const sub =
           pin.kind === "community"
             ? `@${escapeHtml(pin.slug || pin.id)}`
             : pin.kind === "city"
               ? `${pin.count || 1}`
-              : escapeHtml(pin.place?.category || "");
+              : kind && kind !== "shop"
+                ? escapeHtml(kind)
+                : "";
         const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
           ${logo ? `<img src="${logo}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
-          <div><strong>${escapeHtml(pin.name)}</strong><br/><span style="opacity:.7">${sub}</span></div>
+          <div><strong>${escapeHtml(pin.name)}</strong>${sub ? `<br/><span style="opacity:.7">${sub}</span>` : ""}</div>
         </div>`;
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);

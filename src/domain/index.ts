@@ -33,7 +33,7 @@ export type {
   CommunityLink,
 } from "./entities";
 
-export { eventIsLive, isShopCluster, pinAsPlace, placeAsPin } from "./entities";
+export { eventIsLive, isShopCluster, pinAsPlace, placeAsPin, refineShopIcon } from "./entities";
 export {
   EVENT_PAGE,
   EVENT_PAGE_MOBILE,

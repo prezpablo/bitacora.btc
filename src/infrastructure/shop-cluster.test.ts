@@ -38,7 +38,10 @@ test("continent zoom clusters nearby shops; street zoom lists them", () => {
 test("pinAsPlace uses the shop name, not the BTC Map other tag", () => {
   const a = pinAsPlace({ id: "node:1", lat: -34.89, lon: -56.16, icon: "other", name: "Roderichs Crypto House" });
   assert.equal(a.name, "Roderichs Crypto House");
-  assert.equal(a.category, "lugar");
+  assert.equal(a.category, "atm");
+  const m = pinAsPlace({ id: "node:2", lat: -34.9, lon: -56.2, icon: "other", name: "El Minisuper De Las Piedras" });
+  assert.equal(m.name, "El Minisuper De Las Piedras");
+  assert.equal(m.category, "shop");
   const b = pinAsPlace({ id: "y", lat: 1, lon: 2, name: "Cafe", category: "cafe", createdAt: 1 });
   assert.equal(b.name, "Cafe");
 });
