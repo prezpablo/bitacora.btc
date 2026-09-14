@@ -766,9 +766,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           ? `<span style="position:absolute;right:-3px;bottom:-3px;width:${badge}px;height:${badge}px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : pin.kind === "city" && (pin.count || 0) > 1
             ? `<span style="position:absolute;right:-4px;bottom:-4px;min-width:${badge}px;height:${badge}px;padding:0 3px;border-radius:${Math.ceil(badge / 2)}px;background:#f7931a;color:#fff;font:700 ${Math.max(8, badge - 4)}px/${badge}px Ubuntu,sans-serif">${pin.count}</span>`
-            : pin.slots && pin.slots > 1
-              ? `<span style="position:absolute;right:-4px;bottom:-4px;min-width:${badge}px;height:${badge}px;padding:0 3px;border-radius:${Math.ceil(badge / 2)}px;background:#f7931a;color:#fff;font:700 ${Math.max(8, badge - 4)}px/${badge}px Ubuntu,sans-serif">${pin.slots}</span>`
-              : "";
+            : "";
         const ring = size < 14 ? 1 : 1.5;
         const icon = L.divIcon({
           className: "",
