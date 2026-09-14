@@ -57,6 +57,13 @@ const DEFAULT_MA: Record<MaKey, boolean> = {
   ema6m: true,
 };
 
+function defaultMa(): Record<MaKey, boolean> {
+  if (typeof window !== "undefined" && window.matchMedia("(max-width: 39.99rem)").matches) {
+    return { ema1d: true, ema1w: false, ema1m: false, ema6m: false };
+  }
+  return DEFAULT_MA;
+}
+
 function fgLabel(classification: string, t: (k: "fgExtFear" | "fgExtGreed" | "fgFear" | "fgGreed" | "fgNeutral") => string) {
   if (classification === "Extreme Fear") return t("fgExtFear");
   if (classification === "Extreme Greed") return t("fgExtGreed");
@@ -79,8 +86,8 @@ function formatClock(ts: number) {
 
 export function Desk() {
   const [range, setRange] = useState<ChartRange>("1w");
-  const [ma, setMa] = useState(DEFAULT_MA);
-  const [heatOn, setHeatOn] = useState(() => !slowNet());
+  const [ma, setMa] = useState(defaultMa);
+  const [heatOn, setHeatOn] = useState(true);
   const liq = asLiq(range);
   const uiLang = useAppLang();
   const t = useT();

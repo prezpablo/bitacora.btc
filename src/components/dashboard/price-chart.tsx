@@ -758,11 +758,13 @@ export function PriceChart({
     lastKind && !isDojiKind(lastKind) ? lastKind : market.change24h >= 0 ? "bull" : "bear";
   const liveColor = kindColor(liveKind);
   const liveY = Math.min(PAD.t + layout.mainH - 14, Math.max(PAD.t + 14, priceY));
-  const emaGuard = MA_META.flatMap((m) => {
-    if (!enabled[m.key]) return [];
-    const v = lastMaValue(layout.ma[m.key]);
-    return v == null ? [] : [layout.yOf(v)];
-  });
+  const emaGuard = slim
+    ? []
+    : MA_META.flatMap((m) => {
+        if (!enabled[m.key]) return [];
+        const v = lastMaValue(layout.ma[m.key]);
+        return v == null ? [] : [layout.yOf(v)];
+      });
 
   useLayoutEffect(() => {
     const heat = heatCv.current;
@@ -959,13 +961,14 @@ export function PriceChart({
             );
             if (!d) return null;
             const tight = Math.min(1, Math.max(0, (layout.slot - 4) / 12));
-            const glowW = 2.1 + (1 - tight) * 1.1;
-            const haloW = 1.35 + (1 - tight) * 0.45;
-            const coreW = m.key === "ema6m" ? 1.22 + (1 - tight) * 0.18 : m.width;
+            const slimMa = layout.vbW < 540;
+            const glowW = slimMa ? 0 : 2.1 + (1 - tight) * 1.1;
+            const haloW = slimMa ? 0 : 1.35 + (1 - tight) * 0.45;
+            const coreW = slimMa ? 1 : m.key === "ema6m" ? 1.22 + (1 - tight) * 0.18 : m.width;
             const glowOp = 0.22 + (1 - tight) * 0.12;
             return (
-              <g key={m.key} filter={!lite && m.key === "ema6m" && tight < 0.55 ? "url(#ema-neon)" : undefined}>
-                {m.key === "ema6m" ? (
+              <g key={m.key} filter={!lite && !slimMa && m.key === "ema6m" && tight < 0.55 ? "url(#ema-neon)" : undefined}>
+                {!slimMa && m.key === "ema6m" ? (
                   <>
                     <path
                       d={d}
@@ -1031,6 +1034,7 @@ export function PriceChart({
           ) : null}
         </g>
 
+        {slim ? null : (
         <MaEndLabels
           enabled={enabled}
           ma={layout.ma}
@@ -1041,6 +1045,7 @@ export function PriceChart({
           vbW={layout.vbW}
           labelW={layout.labelW}
         />
+        )}
 
         <line
           x1={layout.heatX}
