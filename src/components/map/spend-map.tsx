@@ -809,17 +809,22 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         });
         const logo = escapeHtml(imgSrc(pin.logo || "")).replace(/"/g, "");
         const kind = refineShopIcon(pin.place?.category || "", pin.name);
+        const clusterN = pin.count || 1;
+        const title =
+          pin.kind === "city"
+            ? escapeHtml(t("mapCluster", { n: clusterN }))
+            : escapeHtml(pin.name);
         const sub =
           pin.kind === "community"
             ? `@${escapeHtml(pin.slug || pin.id)}`
             : pin.kind === "city"
-              ? `${pin.count || 1}`
+              ? ""
               : kind && kind !== "shop"
                 ? escapeHtml(kind)
                 : "";
         const tip = `<div style="display:flex;gap:8px;align-items:center;min-width:140px">
           ${logo ? `<img src="${logo}" alt="" width="32" height="32" referrerpolicy="no-referrer" style="border-radius:50%;object-fit:cover" onerror="this.remove()" />` : ""}
-          <div><strong>${escapeHtml(pin.name)}</strong>${sub ? `<br/><span style="opacity:.7">${sub}</span>` : ""}</div>
+          <div><strong>${title}</strong>${sub ? `<br/><span style="opacity:.7">${sub}</span>` : ""}</div>
         </div>`;
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);
@@ -827,7 +832,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     } catch {
       /* un pin malo no deja el mapa en blanco */
     }
-  }, [places, store, visibleComms, hit, mapReady, zoom]);
+  }, [places, store, visibleComms, hit, mapReady, zoom, t]);
 
   useEffect(() => {
     const map = mapRef.current;
