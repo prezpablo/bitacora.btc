@@ -35,6 +35,22 @@ test("continent zoom clusters nearby shops; street zoom lists them", () => {
   assert.equal(leaf!.icon, "cafe");
 });
 
+test("cluster count is shops inside the box, not Buenos Aires on a Montevideo street", () => {
+  const mvd = Array.from({ length: 8 }, (_, i) => shop(`mvd${i}`, -34.90 + i * 0.002, -56.17 + i * 0.002));
+  const ba = Array.from({ length: 94 }, (_, i) => shop(`ba${i}`, -34.60 + (i % 10) * 0.004, -58.42 + Math.floor(i / 10) * 0.004));
+  const index = loadShopIndex([...mvd, ...ba]);
+  const street: [number, number, number, number] = [-56.22, -34.93, -56.12, -34.87];
+  const atStreet = placesFromClusters(index, street, 14);
+  assert.ok(atStreet.every((p) => p.icon !== "cluster" || (p.clusterCount ?? 0) <= mvd.length));
+  assert.ok(
+    atStreet.filter((p) => p.icon !== "cluster").length <= mvd.length,
+    `street leaves ${atStreet.length}`,
+  );
+  const far = placesFromClusters(index, street, 8);
+  const fat = far.find((p) => (p.clusterCount ?? 0) > 20);
+  assert.equal(fat, undefined, "MVD box must not inherit BA cluster size");
+});
+
 test("pinAsPlace uses the shop name, not the BTC Map other tag", () => {
   const a = pinAsPlace({ id: "node:1", lat: -34.89, lon: -56.16, icon: "other", name: "Roderichs Crypto House" });
   assert.equal(a.name, "Roderichs Crypto House");

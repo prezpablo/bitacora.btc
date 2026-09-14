@@ -71,7 +71,6 @@ export function useMapMerchants(bbox: MapBbox | null, zoom = 4) {
       return shops;
     },
     staleTime: STALE.merchants,
-    placeholderData: keepPreviousData,
     enabled: Boolean(qBox) && cached == null,
   });
   const data = useMemo(() => {

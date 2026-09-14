@@ -5,7 +5,7 @@ import { catalogCount, catalogShopPins, ensureCatalog } from "./catalog.ts";
 export type ShopPointProps = { id: string; icon: string; name: string };
 
 export function loadShopIndex(shops: ShopPin[]) {
-  const index = new Supercluster<ShopPointProps>({ radius: 72, maxZoom: 16, minPoints: 3 });
+  const index = new Supercluster<ShopPointProps>({ radius: 48, maxZoom: 16, minPoints: 3 });
   index.load(
     shops
       .filter((s) => s.id && Number.isFinite(s.lat) && Number.isFinite(s.lon))
@@ -31,8 +31,24 @@ export function placesFromClusters(
     const [lon, lat] = f.geometry.coordinates;
     const p = f.properties;
     if (p && "cluster" in p && p.cluster) {
-      const n = Number(p.point_count) || 0;
-      out.push({ id: `cluster:${p.cluster_id}`, lat, lon, icon: "cluster", clusterCount: n });
+      const cid = Number(p.cluster_id);
+      const leaves = index.getLeaves(cid, Infinity);
+      const inView = leaves.filter((leaf) => {
+        const [x, y] = leaf.geometry.coordinates;
+        return x >= bbox[0] && y >= bbox[1] && x <= bbox[2] && y <= bbox[3];
+      });
+      const n = inView.length || Number(p.point_count) || 0;
+      // Calle / grupo chico / la mayoría del cluster está fuera: listar fichas, no un 93 mentiroso.
+      if (z >= 12 || n <= 8 || n < (Number(p.point_count) || 0) * 0.5) {
+        for (const leaf of inView.length ? inView : leaves) {
+          const [x, y] = leaf.geometry.coordinates;
+          const prop = leaf.properties as ShopPointProps;
+          if (!prop?.id) continue;
+          out.push({ id: prop.id, lat: y, lon: x, icon: prop.icon || "lugar", name: prop.name || prop.id });
+        }
+        continue;
+      }
+      out.push({ id: `cluster:${cid}`, lat, lon, icon: "cluster", name: String(n), clusterCount: n });
       continue;
     }
     const leaf = p as ShopPointProps;
