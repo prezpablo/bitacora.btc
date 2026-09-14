@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Community, MerchantPlace } from "@/domain";
+import type { Community, MerchantPlace, ShopPin } from "@/domain";
 import type { SocialLink } from "@/domain/socials";
 import { metaGet, metaSet, openSqlite, sqlTx } from "./sqlite.ts";
 
@@ -22,6 +22,15 @@ function readSeed<T>(name: string): T[] {
     }
   }
   return [];
+}
+
+function asPin(row: Record<string, unknown>): ShopPin {
+  return {
+    id: String(row.id || ""),
+    lat: Number(row.lat),
+    lon: Number(row.lon),
+    icon: String(row.category || "lugar"),
+  };
 }
 
 function asShop(row: Record<string, unknown>): MerchantPlace {
@@ -193,6 +202,36 @@ export function catalogShopsInBox(b: { west: number; south: number; east: number
     return rows.map(asShop).filter((p) => p.id);
   } catch {
     return [];
+  }
+}
+
+export function catalogShopPins(): ShopPin[] {
+  ensureCatalog();
+  try {
+    return openSqlite()
+      .prepare("SELECT id, lat, lon, category FROM catalog WHERE tipo = 'shop'")
+      .all()
+      .map(asPin)
+      .filter((p) => p.id);
+  } catch {
+    return [];
+  }
+}
+
+export function catalogShopById(id: string): MerchantPlace | null {
+  if (!id || id.startsWith("cluster:")) return null;
+  ensureCatalog();
+  try {
+    const row = openSqlite()
+      .prepare(
+        `SELECT id, name, lat, lon, category, logo, description, created FROM catalog WHERE id = ? LIMIT 1`,
+      )
+      .get(id);
+    if (!row) return null;
+    const place = asShop(row);
+    return place.id ? place : null;
+  } catch {
+    return null;
   }
 }
 

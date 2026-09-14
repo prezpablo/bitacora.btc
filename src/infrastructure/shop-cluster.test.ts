@@ -1,20 +1,19 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isShopCluster, loadShopIndex, placesFromClusters } from "./shop-cluster.ts";
-import type { MerchantPlace } from "@/domain";
+import { loadShopIndex, placesFromClusters } from "./shop-cluster.ts";
+import { isShopCluster } from "../domain/entities.ts";
+import type { ShopPin } from "@/domain";
 
-const shop = (id: string, lat: number, lon: number): MerchantPlace => ({
+const shop = (id: string, lat: number, lon: number): ShopPin => ({
   id,
   lat,
   lon,
-  name: id,
-  category: "cafe",
-  createdAt: 1,
+  icon: "cafe",
 });
 
 test("isShopCluster detects cluster placeholders", () => {
-  assert.equal(isShopCluster({ id: "cluster:9", category: "cluster", clusterCount: 12 }), true);
-  assert.equal(isShopCluster({ id: "btcmap:1", category: "cafe" }), false);
+  assert.equal(isShopCluster({ id: "cluster:9", icon: "cluster", clusterCount: 12 }), true);
+  assert.equal(isShopCluster({ id: "btcmap:1", icon: "cafe" }), false);
 });
 
 test("continent zoom clusters nearby shops; street zoom lists them", () => {
@@ -24,9 +23,12 @@ test("continent zoom clusters nearby shops; street zoom lists them", () => {
   const far = placesFromClusters(index, box, 4);
   const near = placesFromClusters(index, box, 16);
   assert.ok(far.length < shops.length, `far ${far.length} vs ${shops.length}`);
-  assert.ok(far.some((p) => p.category === "cluster"));
+  assert.ok(far.some((p) => p.icon === "cluster"));
   assert.equal(
-    near.filter((p) => p.category !== "cluster").length,
+    near.filter((p) => p.icon !== "cluster").length,
     shops.length,
   );
+  const leaf = near.find((p) => p.icon !== "cluster");
+  assert.ok(leaf);
+  assert.deepEqual(Object.keys(leaf!).sort(), ["icon", "id", "lat", "lon"]);
 });

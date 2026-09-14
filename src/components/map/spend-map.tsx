@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
+import { pinAsPlace } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
 import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
@@ -9,7 +10,7 @@ import { coinPinSize, pinBadgeSize } from "@/domain/map-pin-size";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
 import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } from "@/application/map-listings";
-import { getCityFrame, saveMapCsv, submitMapListing, cancelMapListing, verifyMapListing, reverseAddress } from "@/infrastructure/server-fns";
+import { getCityFrame, getMerchant, saveMapCsv, submitMapListing, cancelMapListing, verifyMapListing, reverseAddress } from "@/infrastructure/server-fns";
 import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore, type MapBbox } from "@/lib/map-query";
@@ -450,12 +451,13 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       .filter((p) => !store[p.id]?.removed && !seen.has(p.id))
       .map((p) => {
         const local = store[p.id];
+        const place = pinAsPlace(p);
         return {
-          ...p,
+          ...place,
           lat: local?.lat ?? p.lat,
           lon: local?.lon ?? p.lon,
-          name: local?.name || p.name,
-          logo: pickListingLogo(local?.logo, p.logo),
+          name: local?.name || place.name,
+          logo: pickListingLogo(local?.logo),
         };
       });
     return dedupeShops([...extra, ...api]);
@@ -533,6 +535,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (place) {
       setSel(place);
       setSelComm(null);
+      if (!place.id.startsWith("local:") && !place.id.startsWith("cluster:")) {
+        void getMerchant({ data: { id: place.id } }).then((full) => {
+          if (full) setSel(full);
+        });
+      }
     }
   }, [focus?.id, allComms, places]);
 
@@ -785,9 +792,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             setSelComm({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 });
             setSel(null);
           } else if (pin.place) {
-            setSel({ ...pin.place, lat: pin.lat0, lon: pin.lon0, logo: pin.logo });
+            const stub = { ...pin.place, lat: pin.lat0, lon: pin.lon0, logo: pin.logo };
+            setSel(stub);
             setSelComm(null);
             setDraft(store[pin.id]?.description || "");
+            if (!pin.place.id.startsWith("cluster:") && !pin.place.id.startsWith("local:")) {
+              void getMerchant({ data: { id: pin.id } }).then((full) => {
+                if (!full) return;
+                setSel({ ...full, lat: pin.lat0, lon: pin.lon0, logo: pin.logo || full.logo });
+              });
+            }
           }
         });
         const logo = escapeHtml(imgSrc(pin.logo || "")).replace(/"/g, "");
@@ -891,7 +905,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   function persist(nextStore: Record<string, MerchantLocal>, nextComms: Community[]) {
     saveStore(nextStore);
     saveCommunities(nextComms);
-    const csv = dumpMapCsv(nextStore, nextComms, query.data ?? []);
+    const csv = dumpMapCsv(nextStore, nextComms, places);
     writeExtra(CSV_CACHE, csv);
     return saveMapCsv({ data: { csv, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce } }).then(
       (r) => {
@@ -1740,6 +1754,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   setVoteOpen(false);
                   setDrop(null);
                   setDraft(store[p.id]?.description || "");
+                  if (!p.id.startsWith("cluster:") && !p.id.startsWith("local:")) {
+                    void getMerchant({ data: { id: p.id } }).then((full) => {
+                      if (full) setSel(full);
+                    });
+                  }
                 }}
               >
                 {p.name}

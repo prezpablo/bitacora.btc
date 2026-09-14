@@ -63,9 +63,9 @@
     {
       "id": "D-PIN-03",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "payload flaco id,lat,lon al cluster"
+      "done": "payload flaco id,lat,lon,icon al cluster; getMerchant al clic"
     },
     {
       "id": "D-SMOKE-12",

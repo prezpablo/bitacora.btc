@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, EventBoardPage, EventBoardQuery, LiqRange, MarketPayload, MarketTick, MerchantPlace, OnchainPayload, PulsePayload } from "@/domain";
+import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, EventBoardPage, EventBoardQuery, LiqRange, MarketPayload, MarketTick, MerchantPlace, OnchainPayload, PulsePayload, ShopPin } from "@/domain";
 import type { GlobeStats } from "@/domain/globe";
 import { fetchLiveMarket, fetchTick } from "./compose";
 import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
 import { withLastKnown, readLast } from "./last-known.server";
-import { fetchBtcCommunities, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
+import { fetchBtcCommunities, fetchMerchant, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
@@ -116,11 +116,21 @@ export const getBtcCommunities = createServerFn({ method: "POST" }).handler(asyn
 
 export const getMerchants = createServerFn({ method: "POST" })
   .validator((input: { west: number; south: number; east: number; north: number; zoom?: number }) => input)
-  .handler(async ({ data }): Promise<MerchantPlace[]> => {
+  .handler(async ({ data }): Promise<ShopPin[]> => {
     try {
       return await fetchMerchants(data);
     } catch {
       return [];
+    }
+  });
+
+export const getMerchant = createServerFn({ method: "POST" })
+  .validator((input: { id: string }) => input)
+  .handler(async ({ data }): Promise<MerchantPlace | null> => {
+    try {
+      return await fetchMerchant(data.id);
+    } catch {
+      return null;
     }
   });
 

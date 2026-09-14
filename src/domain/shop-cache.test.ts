@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { MerchantPlace } from "./entities.ts";
+import type { ShopPin } from "./entities.ts";
 import {
   boxContains,
   quantizeBox,
@@ -11,13 +11,11 @@ import {
 } from "./shop-cache.ts";
 
 const box = (w: number, s: number, e: number, n: number): ShopBbox => ({ west: w, south: s, east: e, north: n });
-const shop = (id: string, lat: number, lon: number): MerchantPlace => ({
+const shop = (id: string, lat: number, lon: number): ShopPin => ({
   id,
   lat,
   lon,
-  name: id,
-  category: "cafe",
-  createdAt: 1,
+  icon: "cafe",
 });
 
 test("zoom-in view is contained by the parent box", () => {

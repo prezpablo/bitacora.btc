@@ -1,10 +1,11 @@
 import { mkdirSync, readFileSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
-import type { Community, MerchantPlace } from "@/domain";
+import type { Community, MerchantPlace, ShopPin } from "@/domain";
+import { placeAsPin } from "@/domain";
 import { logoUrl, parseMapCsv } from "@/domain/map-csv";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 import { loadMapCsvText } from "./map-csv-io";
-import { catalogAllShops, catalogCommunities, catalogShopsInBox, searchCatalogShops } from "./catalog";
+import { catalogAllShops, catalogCommunities, catalogShopById, catalogShopsInBox, searchCatalogShops } from "./catalog";
 import { clusteredCatalogShops } from "./shop-cluster";
 
 type RawEl = {
@@ -210,15 +211,16 @@ export async function fetchMerchants(bbox: {
   east: number;
   north: number;
   zoom?: number;
-}): Promise<MerchantPlace[]> {
-  const map = new Map<string, MerchantPlace>();
+}): Promise<ShopPin[]> {
+  // D-PIN-03 payload: id,lat,lon,icon
+  const map = new Map<string, ShopPin>();
   const zoom = Number.isFinite(bbox.zoom) ? Number(bbox.zoom) : 4;
   for (const p of clusteredCatalogShops(bbox, zoom)) map.set(p.id, p);
   if (!map.size) {
-    for (const p of catalogShopsInBox(bbox)) map.set(p.id, p);
+    for (const p of catalogShopsInBox(bbox)) map.set(p.id, placeAsPin(p));
   }
   if (!map.size) {
-    for (const p of readSnap()) if (inBox(p, bbox)) map.set(p.id, p);
+    for (const p of readSnap()) if (inBox(p, bbox)) map.set(p.id, placeAsPin(p));
   }
   try {
     const csv = await loadMapCsvText();
@@ -230,20 +232,44 @@ export async function fetchMerchants(bbox: {
         id: r.id,
         lat: r.lat,
         lon: r.lon,
-        name: r.name || prev?.name || r.id,
-        category: prev?.category && prev.category !== "cluster" ? prev.category : "propuesta",
-        createdAt: r.created || prev?.createdAt || Date.now(),
-        logo: r.logo || prev?.logo,
-        description: r.description || prev?.description,
+        icon: prev && prev.icon !== "cluster" ? prev.icon : "propuesta",
       });
     }
   } catch {
     /* sqlite/csv optional */
   }
   if (!map.size) {
-    for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, p);
+    for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, placeAsPin(p));
   }
   return [...map.values()];
+}
+
+export async function fetchMerchant(id: string): Promise<MerchantPlace | null> {
+  if (!id || id.startsWith("cluster:")) return null;
+  let place = catalogShopById(id);
+  try {
+    const csv = await loadMapCsvText();
+    for (const r of parseMapCsv(csv)) {
+      if (r.id !== id || r.tipo === "community") continue;
+      place = {
+        id: r.id,
+        lat: r.lat,
+        lon: r.lon,
+        name: r.name || place?.name || r.id,
+        category: place?.category && place.category !== "cluster" ? place.category : "propuesta",
+        createdAt: r.created || place?.createdAt || Date.now(),
+        logo: r.logo || place?.logo,
+        description: r.description || place?.description,
+      };
+      break;
+    }
+  } catch {
+    /* csv optional */
+  }
+  if (place) return place;
+  const snap = readSnap().find((p) => p.id === id);
+  if (snap) return snap;
+  return FALLBACK.find((p) => p.id === id) ?? null;
 }
 
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {

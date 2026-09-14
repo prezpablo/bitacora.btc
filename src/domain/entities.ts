@@ -186,6 +186,42 @@ export type MerchantPlace = {
   clusterCount?: number;
 };
 
+/** D-PIN-03: punto de cluster. Ficha rica = MerchantPlace al clic. */
+export type ShopPin = {
+  id: string;
+  lat: number;
+  lon: number;
+  icon: string;
+  clusterCount?: number;
+};
+
+export function isShopCluster(p: { id: string; icon?: string; category?: string; clusterCount?: number }) {
+  return (p.clusterCount ?? 0) > 1 || p.icon === "cluster" || p.category === "cluster" || p.id.startsWith("cluster:");
+}
+
+export function pinAsPlace(p: ShopPin): MerchantPlace {
+  const cluster = isShopCluster(p);
+  return {
+    id: p.id,
+    lat: p.lat,
+    lon: p.lon,
+    name: cluster ? String(p.clusterCount ?? "") : p.icon,
+    category: cluster ? "cluster" : p.icon,
+    createdAt: 0,
+    clusterCount: p.clusterCount,
+  };
+}
+
+export function placeAsPin(p: MerchantPlace): ShopPin {
+  return {
+    id: p.id,
+    lat: p.lat,
+    lon: p.lon,
+    icon: isShopCluster(p) ? "cluster" : p.category || "lugar",
+    clusterCount: p.clusterCount,
+  };
+}
+
 export type MerchantVote = { stars: 1 | 2 | 3 | 4 | 5; at: number; by: string };
 
 export type MerchantLocal = {

@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 process.env.BITACORA_CATALOG_SYNC = "0";
 
-import { catalogShopsInBox, mergeNewCatalog, replaceCatalog } from "./catalog.ts";
+import { catalogShopById, catalogShopsInBox, mergeNewCatalog, replaceCatalog } from "./catalog.ts";
 
 test("catalog bbox returns seeded shops and skips outsiders", () => {
   replaceCatalog(
@@ -17,6 +17,9 @@ test("catalog bbox returns seeded shops and skips outsiders", () => {
   const mvd = catalogShopsInBox({ west: -56.4, south: -35.1, east: -55.9, north: -34.7 });
   assert.ok(mvd.some((p) => p.id === "test:uy-cat"));
   assert.ok(!mvd.some((p) => p.id === "test:ar-cat"));
+  const one = catalogShopById("test:uy-cat");
+  assert.equal(one?.name, "MVD Cafe");
+  assert.equal(catalogShopById("cluster:1"), null);
 });
 
 test("weekly merge inserts only new ids and keeps existing", () => {

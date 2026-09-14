@@ -32,8 +32,8 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **2** | **D-PIN-02** | Supercluster en el VPS. Sin `LIMIT 800` ciego. | **Cerrado.** Live: `/data/btcmap-shops.json` 200 (2,9 MB, 13 set 23:16 UTC). **No** existe `/data/shops.json`. | Quitar paquete |
 | **—** | **UX 13 set** | Globo 280 px / chips wrap+click · eventos 2×6. | **En `.org` `4e9dd76`.** | N/A |
 | **—** | **D-VIZ-EMA** | Móvil: calor ON, solo EMA 1D, sin pastillas. | **Repo `622baf9`.** Falta ZIP. | 4 EMA + heat off 3G |
-| **3** | **D-PIN-03** | **Siguiente ZIP de producto (16 set).** Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic**. | Red tab: comercios < ~50 KB gzip | Restaurar `MerchantPlace` completo |
-| **4** | **D-STATS** | Totales globo: **Latam** vs **BTC Map mundial**. i18n 3 idiomas. | Globo y FAQ dos líneas | Revertir strings |
+| **3** | **D-PIN-03** | Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic** (`getMerchant`). | **Este ZIP.** Red tab: comercios sin name/logo/desc. | Restaurar `MerchantPlace` en el GET |
+| **4** | **D-STATS** | **Siguiente ZIP.** Totales globo: **Latam** vs **BTC Map mundial**. i18n 3 idiomas. | Globo y FAQ dos líneas | Revertir strings |
 | **5** | **D-CTA** | “Sumate” ≠ “Apoyá con sats”. | Un CTA mapa; donación pie/`#aportes` | QR en header |
 | **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | Consola `.org` sin #418 | Solo si se reproduce |
 | **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | CSP sin `arcgisonline` | Volver a Esri |
@@ -53,7 +53,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-VIZ 01–03 y D-PIN-01/02 **cerrados.** **Siguiente ZIP de producto: D-PIN-03.** No fusionar con D-STATS ni con D-VIZ-EMA. D-FOSS = Settings GitHub (sin ZIP).
+**Prioridad:** D-PIN-01…03 y D-VIZ 01–03 **cerrados.** **Siguiente ZIP: D-STATS.** No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
@@ -218,7 +218,7 @@ flowchart TB
 | **P1** | Lazy viewport + mercado al `#mercado` | **Cerrado** | `in-view` + `LazyMount` |
 | **P2** | D-TILE teselas sin OSMF/Carto | **Cerrado en `.org`** | D-TILE-01/02 + ZIP. Siguiente soberana = D-TILE-03 |
 | **P2** | **D-PIN-01** bbox real · **D-PIN-02** Supercluster | **Cerrado 13 set** | **Siguiente: D-PIN-03** payload flaco |
-| **P2** | **D-PIN-03** `id,lat,lon,icon` al cluster | **Abierto · 16 set** | Un ZIP. Ficha rica al clic |
+| **P2** | **D-PIN-03** `id,lat,lon,icon` al cluster | **Cerrado este ZIP** | Ficha rica `getMerchant` al clic |
 | **P2** | **D-STATS** Latam vs mundial en el globo | **Abierto · 16 set** | Informe 11 set §3.2 |
 | **P2** | **D-CTA** Sumate ≠ donar | **Abierto · 16 set** | QR sale del header |
 | **P1** | **D-418** hidratación lang | Verificar 16 set | Solo si consola `.org` muestra #418 |
@@ -278,7 +278,7 @@ OSMF y Carto devuelven PNG 200 con franja. El fallback a Esri **nunca** corría.
 |---|---|
 | **D-PIN-01** bbox `moveend` antes de `setView` | **Cerrado** |
 | **D-PIN-02** Supercluster VPS, sin LIMIT 800 | **Cerrado** (`shop-cluster.ts`) |
-| **D-PIN-03** payload flaco al cluster; ficha al clic | **Siguiente ZIP · 16 set** |
+| **D-PIN-03** payload flaco al cluster; ficha al clic | **Cerrado este ZIP** |
 
 No partir `spend-map.tsx` en la misma fase que D-PIN-03. Dominio no importa Leaflet.
 

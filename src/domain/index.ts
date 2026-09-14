@@ -26,13 +26,14 @@ export type {
   SeriesPoint,
   GradeBand,
   MerchantPlace,
+  ShopPin,
   MerchantVote,
   MerchantLocal,
   Community,
   CommunityLink,
 } from "./entities";
 
-export { eventIsLive } from "./entities";
+export { eventIsLive, isShopCluster, pinAsPlace, placeAsPin } from "./entities";
 export {
   EVENT_PAGE,
   EVENT_PAGE_MOBILE,

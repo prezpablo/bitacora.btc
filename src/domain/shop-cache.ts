@@ -1,8 +1,8 @@
-import type { MerchantPlace } from "./entities";
+import type { ShopPin } from "./entities";
 
 export type ShopBbox = { west: number; south: number; east: number; north: number };
 
-export type ShopBoxCache = { box: ShopBbox; shops: MerchantPlace[]; at: number; zoom: number };
+export type ShopBoxCache = { box: ShopBbox; shops: ShopPin[]; at: number; zoom: number };
 
 export const SHOP_CACHE_TTL_MS = 60_000;
 
@@ -31,7 +31,7 @@ export function quantizeBox(b: ShopBbox): ShopBbox {
   };
 }
 
-export function shopsInView(shops: MerchantPlace[], view: ShopBbox, pad = 0.05) {
+export function shopsInView(shops: ShopPin[], view: ShopBbox, pad = 0.05) {
   const box = padBox(view, pad);
   return shops.filter((p) => inShopBox(p, box));
 }
@@ -42,7 +42,7 @@ export function shopsFromCache(
   now: number,
   ttl = SHOP_CACHE_TTL_MS,
   zoom?: number,
-): MerchantPlace[] | null {
+): ShopPin[] | null {
   const live = cache.filter((e) => now - e.at < ttl);
   const cover = live.find((e) => boxContains(e.box, view) && (zoom == null || e.zoom === zoom));
   if (!cover) return null;
@@ -52,7 +52,7 @@ export function shopsFromCache(
 export function rememberShopBox(
   cache: ShopBoxCache[],
   box: ShopBbox,
-  shops: MerchantPlace[],
+  shops: ShopPin[],
   now: number,
   ttl = SHOP_CACHE_TTL_MS,
   zoom = 0,
