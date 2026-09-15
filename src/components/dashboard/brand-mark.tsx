@@ -36,9 +36,9 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
       </p>
       {compact ? null : (
         <p className="mt-2 text-base text-pretty text-muted-foreground sm:text-xl">
-          {t("tagline").split("Bitcoin")[0]}
-          <span className="font-medium text-foreground">Bitcoin</span>
-          {t("tagline").includes("Bitcoin") ? t("tagline").split("Bitcoin")[1] : ""}
+          {t("tagline").split("Bircoiner")[0]}
+          <span className="font-medium text-foreground">Bircoiner</span>
+          {t("tagline").includes("Bircoiner") ? t("tagline").split("Bircoiner")[1] : ""}
         </p>
       )}
     </div>

@@ -46,7 +46,7 @@ export function LabifDossier() {
         <p className="kicker">Proyecto escrito · Latin America Bitcoin Impact Fund</p>
         <h1 className="mt-2">Bitácora.btc</h1>
         <p className="mt-3 text-lg text-[#5c6370]">
-          El nodo que te une al mundo Bitcoin. Iniciativa de Consciencia Bitcoin, Colonia del Sacramento, Uruguay.
+          El nodo que te une al mundo Bircoiner. Iniciativa de Consciencia Bitcoin, Colonia del Sacramento, Uruguay.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-6 border border-[#e6e6e6] bg-[#f6f6f6] px-5 py-4">

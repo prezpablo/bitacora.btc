@@ -72,8 +72,8 @@ const es = {
   zoomNeedFocus: "Clic acá para usar la rueda (zoom).",
   dataAsOf: "último dato: {when}",
   dataStale: "último dato: {when} — fuente caída, se muestra el valor guardado",
-  tagline: "El nodo que te une al mundo Bitcoin",
-  taglineShort: "el nodo que te une al mundo Bitcoin",
+  tagline: "El nodo que te une al mundo Bircoiner",
+  taglineShort: "el nodo que te une al mundo Bircoiner",
   initiative: "Una iniciativa de Consciencia Bitcoin by LATAM Cripto Mom",
   dataOrigin: "Origen de los datos",
   contactTitle: "Contacto",
@@ -607,8 +607,8 @@ const en: Record<keyof typeof es, string> = {
   zoomNeedFocus: "Click here to use the wheel (zoom).",
   dataAsOf: "last data: {when}",
   dataStale: "last data: {when} — source down, showing the stored value",
-  tagline: "The node that connects you to the Bitcoin world",
-  taglineShort: "the node that connects you to the Bitcoin world",
+  tagline: "The node that connects you to the Bircoiner world",
+  taglineShort: "the node that connects you to the Bircoiner world",
   initiative: "An initiative of Consciencia Bitcoin by LATAM Cripto Mom",
   dataOrigin: "Data sources",
   contactTitle: "Contact",
@@ -1142,8 +1142,8 @@ const pt: Record<keyof typeof es, string> = {
   zoomNeedFocus: "Clica aqui para usar a roda (zoom).",
   dataAsOf: "último dado: {when}",
   dataStale: "último dado: {when} — fonte caída, mostra-se o valor guardado",
-  tagline: "O nó que te une ao mundo Bitcoin",
-  taglineShort: "o nó que te une ao mundo Bitcoin",
+  tagline: "O nó que te une ao mundo Bircoiner",
+  taglineShort: "o nó que te une ao mundo Bircoiner",
   initiative: "Uma iniciativa de Consciencia Bitcoin by LATAM Cripto Mom",
   dataOrigin: "Origem dos dados",
   contactTitle: "Contato",
@@ -2173,7 +2173,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
   es: [
     {
       title: "El desk",
-      body: "bitacora.btc es el nodo que te une al mundo Bitcoin. Un solo gráfico: los botones 1D / 1S / 1M / 6M fijan el intervalo de cada vela (día, semana, mes, semestre) y no cambian al panear o hacer zoom. Velas sólidas estilo Binance; el mapa de calor es el promedio ponderado de los 10 perps más grandes, resampleado a ese intervalo.",
+      body: "bitacora.btc es el nodo que te une al mundo Bircoiner. Un solo gráfico: los botones 1D / 1S / 1M / 6M fijan el intervalo de cada vela (día, semana, mes, semestre) y no cambian al panear o hacer zoom. Velas sólidas estilo Binance; el mapa de calor es el promedio ponderado de los 10 perps más grandes, resampleado a ese intervalo.",
     },
     {
       title: "Velas y precio",
@@ -2231,7 +2231,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
   en: [
     {
       title: "The desk",
-      body: "bitacora.btc is the node that ties you to the Bitcoin world. One chart: 1D / 1W / 1M / 6M lock the candle interval and do not change when you pan or zoom. Solid Binance-style candles; the heatmap is a weighted average of the ten largest perps, resampled to that interval.",
+      body: "bitacora.btc is the node that ties you to the Bircoiner world. One chart: 1D / 1W / 1M / 6M lock the candle interval and do not change when you pan or zoom. Solid Binance-style candles; the heatmap is a weighted average of the ten largest perps, resampled to that interval.",
     },
     {
       title: "Candles and price",
@@ -2289,7 +2289,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
   pt: [
     {
       title: "O desk",
-      body: "bitacora.btc é o nodo que te liga ao mundo Bitcoin. Um gráfico: 1D / 1S / 1M / 6M fixam o intervalo de cada vela e não mudam ao panear ou fazer zoom. Velas sólidas estilo Binance; o mapa de calor é a média ponderada dos 10 perps maiores, resampleada para esse intervalo.",
+      body: "bitacora.btc é o nodo que te liga ao mundo Bircoiner. Um gráfico: 1D / 1S / 1M / 6M fixam o intervalo de cada vela e não mudam ao panear ou fazer zoom. Velas sólidas estilo Binance; o mapa de calor é a média ponderada dos 10 perps maiores, resampleada para esse intervalo.",
     },
     {
       title: "Velas e preço",
