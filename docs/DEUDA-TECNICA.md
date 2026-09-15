@@ -39,7 +39,8 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | **Repo.** `.org` aún D-CTA (`index-O6tgqllA`). | Volver a leer `bitacora-lang` |
 | **6b** | **D-GLOBE-INIT** | Timeout 8 s mataba el chunk 1,9 MB. Prefetch + WebGL. | **Este ZIP.** Loading hasta import; sin WebGL → mapa. | Restaurar timer 8000 |
 | **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | **Este ZIP.** Capa = OFM liberty (MapLibre-Leaflet). Reserva OTM. CSP sin `arcgisonline`. | Restaurar Esri |
-| **8** | **P3 lote** | Skip 404 · sitemap `lastmod` (**sigue 2026-09-07**) · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | Por ítem | Por ítem |
+| **8** | **P3 lote** | Skip 404 · **D-SITEMAP** · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | **Por ítem.** | Por ítem |
+| **8a** | **D-SITEMAP** | `lastmod` del sitemap = día del build. | **Este ZIP.** `stamp-sitemap.mjs` en `build`/`build:vps`. | Congelar 2026-09-07 |
 
 **Referentes públicos (13 set) — qué clonar, qué no**
 
@@ -55,7 +56,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-TILE-03 **este ZIP.** **Siguiente: P3 lote** (skip 404, sitemap lastmod, LICENSE…). No fusionar.
+**Prioridad:** D-SITEMAP **este ZIP.** **Siguiente: skip 404** (P3). No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
@@ -72,7 +73,7 @@ Informe: DEGRADA · barra 4 destinos · habitaciones SI · TTFB 0,65 s · feeds_
 | **D-MP-FEE / TIP / NINJA** timeout | Este runner también mudo a mempool.space/ninja. VPS: ninja+emzy+blockstream+last-known. | On-chain no verificable *aquí*. No CAÍDA. | Avisar solo si probe **VPS** vacío 2–3 días. |
 | **P2-03b** `*.tile.opentopomap.org` «no listado» | **Está** en `connect-src` del origen (Caddy). `img-src` ya es `https:`. Capa activa = Esri, fallback OpenTopo (D-TILE-ZIP). | Allowlist del probe desactualizada (P2-03 del protocolo **sí** nombra OpenTopo). | No abrir hueco CSP. |
 | Navegación / UX | skip 4/4 · h1 5/5 · barra_contrato SI · i18n_h1 SI · habitaciones SI | Encaja. | — |
-| D-FOSS / D-SITEMAP | GitHub 404 anónimo · sitemap `lastmod` 2026-09-07 | Siguen. | Cola 16 set, no P0. |
+| D-FOSS | GitHub 404 anónimo | Sigue. LICENSE con D-FOSS. | Cola, no P0. |
 
 Ninguna de estas alertas cambia la cola: **no hay P0 de mapa ni de CSP.** Siguiente fase = **D-STATS** tras el ZIP pendiente.
 
@@ -99,7 +100,7 @@ Informe: DEGRADA · P0 19/20 · i18n 7/7 · barra 4 destinos · habitaciones SI 
 - HTML: `Aprender`, `chip-row`, `bit-stage`, `/?lang=pt` → `lang=pt` + Boas-vindas. `/healthz` `{ok:true}`.
 - JS `routes-2yBNM1db.js`: `chip-row`, `inert`, `grid-cols-2`. `/data/btcmap-shops.json` Last-Modified 13 set 23:16 UTC.
 - CSP: Esri + OpenTopo; sin OSMF, Carto, Google Fonts.
-- `sitemap lastmod` **sigue 2026-09-07** (D-SITEMAP).
+- `sitemap lastmod` **D-SITEMAP este ZIP** (stamp al build).
 - GitHub `prezpablo/bitacora.btc` **404 anónimo** (D-FOSS).
 - Runner Binance 451 — no reabrir como CAÍDA.
 - Sandbox a veces pisa `scripts/grok-pwa-shared.mjs`; `git checkout HEAD --` si `npm test` falla. No es deuda de producto.
@@ -230,7 +231,7 @@ flowchart TB
 | **P1** | `html lang` + title SSR | **Cerrado en `.org`** | `/?lang=pt` → `lang=pt` |
 | **P1** | Copy SSR (H1 / legal / contacto) | **Cerrado en `.org`** | H1 pt Boas-vindas / en Welcome |
 | **P1** | Head SEO por ruta (canonical, hreflang, JSON-LD, 404 noindex, H1 único) | **Cerrado en `.org`** | `npm run test:seo` |
-| **P1** | sitemap `lastmod` | **Abierto** | Sigue 2026-09-07 |
+| **P1** | sitemap `lastmod` | **Este ZIP** | Stamp al build, no 2026-09-07 |
 | **P1** | URCDP | Presentada 2 set | Revisión, no código |
 | **P1** | Backup SQLite semanal fuera del VPS | Operador | `scp` a disco local |
 | **P1** | Probe live en el VPS | Hecho en repo | `probe-live.mjs` · cron 08:20 |

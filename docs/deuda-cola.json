@@ -147,9 +147,9 @@
     {
       "id": "D-SITEMAP",
       "pri": "P1",
-      "open": true,
-      "kind": "live",
-      "done": "sitemap.xml lastmod = fecha del último ZIP, no 2026-09-07"
+      "open": false,
+      "kind": "repo",
+      "done": "sitemap lastmod = día del ZIP/build, no 2026-09-07"
     }
   ],
   "guards": [
