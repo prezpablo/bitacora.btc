@@ -36,7 +36,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **3** | **D-PIN-03** | Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic** (`getMerchant`). | **Este ZIP.** Red tab: comercios sin name/logo/desc. | Restaurar `MerchantPlace` en el GET |
 | **4** | **D-STATS** | Totales globo: **Latam** vs **BTC Map mundial**. i18n 3 idiomas. | **Este ZIP.** Números grandes = Latam; línea 2 = mundial. FAQ dos fuentes. | Revertir strings |
 | **5** | **D-CTA** | “Sumate” ≠ “Apoyá con sats”. | **Este ZIP.** Header = join mapa. QR en pie `#aportes`. | QR otra vez al lado de Sumate |
-| **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | Consola `.org` sin #418 | Solo si se reproduce |
+| **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | **Este ZIP.** `/` sin query = `es`. Idioma solo con `?lang=`. | Volver a leer `bitacora-lang` |
 | **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | CSP sin `arcgisonline` | Volver a Esri |
 | **8** | **P3 lote** | Skip 404 · sitemap `lastmod` (**sigue 2026-09-07**) · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | Por ítem | Por ítem |
 
@@ -54,7 +54,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-CTA **este ZIP.** **Siguiente: D-418** (solo si se reproduce). No fusionar.
+**Prioridad:** D-418 **este ZIP.** **Siguiente: D-TILE-03.** No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 

@@ -67,20 +67,18 @@ export function langIsExplicit(...candidates: unknown[]): boolean {
   return candidates.some((c) => langFromQuery(c) != null);
 }
 
+/** D-418: sin `?lang=` el cliente queda en es (SSR). Ni localStorage ni navigator. */
+export function resolveClientLang(search = ""): AppLang {
+  return langFromQuery(search) || "es";
+}
+
 function readLang(): AppLang {
   if (typeof window === "undefined") return "es";
   try {
-    const q = langFromQuery(window.location.search);
-    if (q) return q;
+    return resolveClientLang(window.location.search);
   } catch {
-    /* ignore */
+    return "es";
   }
-  const stored = window.localStorage.getItem("bitacora-lang");
-  if (stored === "es" || stored === "en" || stored === "pt") return stored;
-  const nav = window.navigator.language.slice(0, 2);
-  if (nav === "pt") return "pt";
-  if (nav === "en") return "en";
-  return "es";
 }
 
 export const useLocale = create<{ lang: AppLang; setLang: (lang: AppLang) => void; hydrate: () => void }>(
@@ -88,7 +86,6 @@ export const useLocale = create<{ lang: AppLang; setLang: (lang: AppLang) => voi
     lang: "es",
     setLang: (lang) => {
       try {
-        window.localStorage.setItem("bitacora-lang", lang);
         const url = new URL(window.location.href);
         url.searchParams.set("lang", lang);
         window.history.replaceState(null, "", url.pathname + url.search + url.hash);
