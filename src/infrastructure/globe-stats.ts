@@ -1,5 +1,5 @@
 import type { GlobeCountryStat, GlobeDot, GlobeStats } from "@/domain/globe";
-import { FOUNDING_UY } from "@/domain/globe";
+import { FOUNDING_UY, LATAM_ISO, tallyCountries } from "@/domain/globe";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { logoUrl, parseMapCsv } from "@/domain/map-csv";
@@ -68,7 +68,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 24;
+const STATS_VER = 25;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -377,12 +377,8 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       .map((p) => ({ ...p, id: p.id as string, name: p.name || (p.id as string) })),
   );
   const data: GlobeStats = {
-    world: {
-      shops: countries.reduce((s, c) => s + c.shops, 0),
-      comms: countries.reduce((s, c) => s + c.comms, 0),
-      events: countries.reduce((s, c) => s + c.events, 0),
-      cities: countries.reduce((s, c) => s + c.cities, 0),
-    },
+    world: tallyCountries(countries),
+    latam: tallyCountries(countries, LATAM_ISO),
     countries,
     points,
     overlay,

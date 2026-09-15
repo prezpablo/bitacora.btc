@@ -1378,8 +1378,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           </p>
         ) : globe.data ? (
           <p className="font-mono text-sm text-muted-foreground">
-            {globe.data.world.cities.toLocaleString()} {t("globeCities")} · {globe.data.world.shops.toLocaleString()} {t("globeShops")} · {globe.data.world.comms.toLocaleString()} {t("globeComms")} ·{" "}
-            {globe.data.world.events.toLocaleString()} {t("globeEvents")}
+            {t("globeLatam")} · {(globe.data.latam ?? globe.data.world).cities.toLocaleString()} {t("globeCities")} ·{" "}
+            {(globe.data.latam ?? globe.data.world).shops.toLocaleString()} {t("globeShops")} ·{" "}
+            {(globe.data.latam ?? globe.data.world).comms.toLocaleString()} {t("globeComms")}
+            <br />
+            {t("globeWorld", {
+              shops: globe.data.world.shops.toLocaleString(),
+              comms: globe.data.world.comms.toLocaleString(),
+              events: globe.data.world.events.toLocaleString(),
+              cities: globe.data.world.cities.toLocaleString(),
+            })}
           </p>
         ) : null}
         <p className={cn("text-xs", sync === "fail" ? "text-primary" : "text-muted-foreground")}>

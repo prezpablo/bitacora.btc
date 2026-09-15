@@ -77,7 +77,7 @@
     {
       "id": "D-STATS",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "copy globo Latam vs mundial en i18n es/pt/en"
     },

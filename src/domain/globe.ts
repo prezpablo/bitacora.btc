@@ -18,6 +18,8 @@ export const FOUNDING_UY = {
   logo: "/logos/conciencia-bitcoin.png",
 };
 
+export type GlobeTally = { shops: number; comms: number; events: number; cities: number };
+
 export type GlobeCountryStat = {
   iso: string;
   lat: number;
@@ -29,11 +31,54 @@ export type GlobeCountryStat = {
 };
 
 export type GlobeStats = {
-  world: { shops: number; comms: number; events: number; cities: number };
+  world: GlobeTally;
+  latam: GlobeTally;
   countries: GlobeCountryStat[];
   points: GlobeDot[];
   overlay: GlobeDot[];
   asOf: number;
 };
+
+export const EMPTY_TALLY: GlobeTally = { shops: 0, comms: 0, events: 0, cities: 0 };
+
+/** ISO 3166-1 alpha-2 del recorte Bitácora (Latam + Caribe hispano/lusófono). */
+export const LATAM_ISO = new Set([
+  "AR",
+  "BO",
+  "BR",
+  "BZ",
+  "CL",
+  "CO",
+  "CR",
+  "CU",
+  "DO",
+  "EC",
+  "SV",
+  "GT",
+  "GY",
+  "HN",
+  "HT",
+  "MX",
+  "NI",
+  "PA",
+  "PE",
+  "PR",
+  "PY",
+  "SR",
+  "UY",
+  "VE",
+]);
+
+export function tallyCountries(rows: GlobeCountryStat[], iso?: Set<string>): GlobeTally {
+  const out: GlobeTally = { shops: 0, comms: 0, events: 0, cities: 0 };
+  for (const c of rows) {
+    if (iso && !iso.has(c.iso)) continue;
+    out.shops += c.shops;
+    out.comms += c.comms;
+    out.events += c.events;
+    out.cities += c.cities;
+  }
+  return out;
+}
 
 export type GlobeFocus = { lat: number; lon: number; zoom: number; iso?: string; id?: string; kind?: "shop" | "community"; join?: boolean };

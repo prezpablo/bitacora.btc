@@ -146,7 +146,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "¿Dónde encuentro comunidades Bitcoin cerca de mí?",
-      a: "En el mapa de Bitácora.btc. Pedí tu ubicación o buscá por ciudad, comercio o comunidad. El globo muestra totales por país; al hacer zoom ves pines de comercios y comunidades verificadas.",
+      a: "En el mapa de Bitácora.btc. Pedí tu ubicación o buscá por ciudad, comercio o comunidad. El globo cuenta primero Latinoamérica; debajo, el total mundial de BTC Map. Al hacer zoom ves pines de comercios y comunidades verificadas.",
     },
     {
       q: "¿Cómo sumo mi comunidad o comercio al mapa?",
@@ -164,7 +164,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "Where do I find Bitcoin communities near me?",
-      a: "On the Bitácora.btc map. Allow location or search by city, merchant or community. The globe shows country totals; zooming reveals verified merchant and community pins.",
+      a: "On the Bitácora.btc map. Allow location or search by city, merchant or community. The globe counts Latin America first; below, the worldwide BTC Map total. Zooming reveals verified merchant and community pins.",
     },
     {
       q: "How do I add my community or shop to the map?",
@@ -182,7 +182,7 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "Onde encontro comunidades Bitcoin perto de mim?",
-      a: "No mapa da Bitácora.btc. Pede a tua localização ou pesquisa por cidade, comércio ou comunidade. O globo mostra totais por país; ao fazer zoom vês os pinos verificados.",
+      a: "No mapa da Bitácora.btc. Pede a tua localização ou pesquisa por cidade, comércio ou comunidade. O globo conta primeiro a América Latina; abaixo, o total mundial do BTC Map. Ao fazer zoom vês os pinos verificados.",
     },
     {
       q: "Como somo a minha comunidade ou comércio ao mapa?",
