@@ -38,7 +38,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **5** | **D-CTA** | “Sumate” ≠ “Apoyá con sats”. | **Este ZIP.** Header = join mapa. QR en pie `#aportes`. | QR otra vez al lado de Sumate |
 | **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | **Repo.** `.org` aún D-CTA (`index-O6tgqllA`). | Volver a leer `bitacora-lang` |
 | **6b** | **D-GLOBE-INIT** | Timeout 8 s mataba el chunk 1,9 MB. Prefetch + WebGL. | **Este ZIP.** Loading hasta import; sin WebGL → mapa. | Restaurar timer 8000 |
-| **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | CSP sin `arcgisonline` | Volver a Esri |
+| **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | **Este ZIP.** Capa = OFM liberty (MapLibre-Leaflet). Reserva OTM. CSP sin `arcgisonline`. | Restaurar Esri |
 | **8** | **P3 lote** | Skip 404 · sitemap `lastmod` (**sigue 2026-09-07**) · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | Por ítem | Por ítem |
 
 **Referentes públicos (13 set) — qué clonar, qué no**
@@ -55,7 +55,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-GLOBE-INIT **este ZIP** (trae D-418 si el VPS no lo tenía). **Siguiente: D-TILE-03.** No fusionar.
+**Prioridad:** D-TILE-03 **este ZIP.** **Siguiente: P3 lote** (skip 404, sitemap lastmod, LICENSE…). No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 

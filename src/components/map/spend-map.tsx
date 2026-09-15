@@ -15,6 +15,7 @@ import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore, type MapBbox } from "@/lib/map-query";
 import { boxAround } from "@/domain";
+import { OFM_ATTR, OFM_STYLE, OTM_ATTR, OTM_URL } from "@/domain/map-tiles";
 import { geoBannerKey } from "@/domain/geo-fix";
 import { locateBest } from "@/infrastructure/geo";
 import { applyFix } from "./leaflet-fix";
@@ -568,25 +569,26 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       map.on("moveend", pushBbox);
       map.setView(focus ? [focus.lat, focus.lon] : [20, -40], focus?.zoom ?? 4);
       pushBbox();
-      // Teselas sin API key: OSMF y Carto marcan «blocked/key» con PNG 200 (Leaflet no ve error).
-      const streets = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution:
-            'Esri · &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://btcmap.org">BTC Map</a>',
-          maxZoom: 19,
-        },
-      ).addTo(map);
-      streets.on("tileerror", () => {
+      const addOtm = () => {
         if (!map || (map as { _bitacoraFb?: boolean })._bitacoraFb) return;
         (map as { _bitacoraFb?: boolean })._bitacoraFb = true;
-        L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://opentopomap.org">OpenTopoMap</a> · BTC Map',
+        L.tileLayer(OTM_URL, {
+          attribution: OTM_ATTR,
           subdomains: "abc",
           maxZoom: 17,
         }).addTo(map);
-      });
+      };
+      void import("maplibre-gl/dist/maplibre-gl.css");
+      void import("maplibre-gl")
+        .then(async () => {
+          const plugin = await import("@maplibre/maplibre-gl-leaflet");
+          if (dead || !map) return;
+          const gl = plugin.default || plugin.maplibreGL;
+          if (typeof gl !== "function") throw new Error("maplibreGL");
+          gl({ style: OFM_STYLE, attributionControl: false }).addTo(map);
+          map.attributionControl?.addAttribution(OFM_ATTR);
+        })
+        .catch(addOtm);
       L.control.zoom({ position: "topright" }).addTo(map);
       leafletRef.current = L;
       const group = L.layerGroup().addTo(map);

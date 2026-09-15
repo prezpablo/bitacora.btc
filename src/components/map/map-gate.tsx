@@ -7,31 +7,31 @@ import { onJoinMap, takeJoinIntent } from "@/application/join-map";
 import { prefetchGlobe, prefetchMapPins } from "@/lib/map-query";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { locateBest } from "@/infrastructure/geo";
+import { OFM_ORIGIN, OFM_STYLE } from "@/domain/map-tiles";
 import { MapCrash } from "./map-crash";
 
 const WorldGlobe = lazy(() => import("./world-globe").then((m) => ({ default: m.WorldGlobe })));
 const SpendMap = lazy(() => import("./spend-map").then((m) => ({ default: m.SpendMap })));
 
-const ESRI = "https://server.arcgisonline.com";
+const OFM = OFM_ORIGIN;
 let mapEngineWarm = false;
 
 /** DNS/TLS a teselas + chunk Leaflet mientras se ve el globo (sin pelear con eventos). */
 function warmMapEngine() {
   if (typeof document === "undefined" || mapEngineWarm) return;
   mapEngineWarm = true;
-  if (!document.head.querySelector(`link[rel="preconnect"][href="${ESRI}"]`)) {
+  if (!document.head.querySelector(`link[rel="preconnect"][href="${OFM}"]`)) {
     const link = document.createElement("link");
     link.rel = "preconnect";
-    link.href = ESRI;
+    link.href = OFM;
     document.head.appendChild(link);
   }
   void import("leaflet/dist/leaflet.css");
   void import("leaflet");
+  void import("maplibre-gl");
+  void import("@maplibre/maplibre-gl-leaflet");
   void import("./spend-map");
-  const img = new Image();
-  img.referrerPolicy = "no-referrer";
-  img.decoding = "async";
-  img.src = `${ESRI}/ArcGIS/rest/services/World_Street_Map/MapServer/tile/3/2/2`;
+  void fetch(OFM_STYLE, { mode: "cors", credentials: "omit" }).catch(() => undefined);
 }
 
 /** El chunk de react-globe.gl pesa ~1,9 MB: empezarlo ya, no a los 8 s. */

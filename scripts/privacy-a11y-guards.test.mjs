@@ -99,17 +99,22 @@ test("legal copy lives on /legal, not on the home desk", () => {
   assert.match(read("src/components/site-header.tsx"), /LEGAL_NAV/);
 });
 
-test("map tiles are Esri then OpenTopoMap, never OSMF or Carto keys", () => {
+test("map tiles are OpenFreeMap then OpenTopoMap, never OSMF or Carto keys", () => {
   const map = read("src/components/map/spend-map.tsx");
+  const tiles = read("src/domain/map-tiles.ts");
   const caddy = read("deploy/Caddyfile");
-  assert.match(map, /World_Street_Map/);
-  assert.match(map, /tile\.opentopomap\.org/);
+  assert.match(tiles, /tiles\.openfreemap\.org/);
+  assert.match(map, /OFM_STYLE/);
+  assert.match(map, /OTM_URL/);
+  assert.doesNotMatch(map, /arcgisonline/);
+  assert.doesNotMatch(map, /World_Street_Map/);
   assert.doesNotMatch(map, /tile\.openstreetmap\.org/);
   assert.doesNotMatch(map, /basemaps\.cartocdn/);
   assert.match(read("src/components/map/map-gate.tsx"), /rel="preconnect"/);
   assert.match(read("src/lib/map-query.ts"), /prefetchMapPins/);
-  assert.match(caddy, /server\.arcgisonline\.com/);
+  assert.match(caddy, /tiles\.openfreemap\.org/);
   assert.match(caddy, /tile\.opentopomap\.org/);
+  assert.doesNotMatch(caddy, /arcgisonline/);
   assert.doesNotMatch(caddy, /tile\.openstreetmap\.org/);
   assert.doesNotMatch(caddy, /basemaps\.cartocdn/);
 });

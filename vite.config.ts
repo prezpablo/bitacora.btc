@@ -210,7 +210,7 @@ export default defineConfig(({ command, isPreview }) => ({
     include: ["three", "react-globe.gl", "three-globe"],
   },
   ssr: {
-    external: ["react-globe.gl", "three", "three-globe", "node:sqlite"],
+    external: ["react-globe.gl", "three", "three-globe", "maplibre-gl", "@maplibre/maplibre-gl-leaflet", "node:sqlite"],
   },
   plugins: [
     globeStubOnServer(),

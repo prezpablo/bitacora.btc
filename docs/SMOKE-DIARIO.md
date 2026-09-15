@@ -76,7 +76,7 @@ P1 Producto
 P2 Seguridad
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer-policy no-referrer, permissions-policy
 - P2-02 object-src none; form-action self + formsubmit.co
-- P2-03 connect-src allowlist: geojs, ipwho.is, nominatim, Esri (`server.arcgisonline.com`), OpenTopo (`*.tile.opentopomap.org`), btcmap. Velas NO van en connect-src (son server-fn). Un host de esa lista en CSP **no** es P2-03b.
+- P2-03 connect-src allowlist: geojs, ipwho.is, nominatim, OpenFreeMap (`tiles.openfreemap.org`), OpenTopo (`*.tile.opentopomap.org`), btcmap. Velas NO van en connect-src (son server-fn). Un host de esa lista en CSP **no** es P2-03b. `arcgisonline` en connect-src es **regresión D-TILE-03**.
 - P2-04 sin gtag/fbq/pixel/hotjar
 - P2-06 sin login / wallet-connect / depósito
 - P2-07 /api y /__grok no exponen admin, keys ni CARGA-
@@ -93,7 +93,7 @@ P3 Dependencias — 1 GET/HEAD c/u
 Mapa
 - D-BTCMAP-E https://api.btcmap.org/v2/elements
 - D-BTCMAP-A https://api.btcmap.org/v2/areas
-- D-ESRI 1 tesela https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/4/5/6
+- D-OFM 1 estilo https://tiles.openfreemap.org/styles/liberty
 - D-OTM 1 tesela https://a.tile.opentopomap.org/4/5/6.png
 - D-NOM https://nominatim.openstreetmap.org/
 - D-GEOJS https://get.geojs.io/v1/ip/geo.json

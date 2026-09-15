@@ -70,7 +70,7 @@ function repoCheck(id) {
     return { pass: !donateInHeader, detail: donateInHeader ? "QR donar en header" : "header sin QR donar" };
   }
   if (id === "D-TILE-03") {
-    const map = read("src/components/map/spend-map.tsx");
+    const map = read("src/components/map/spend-map.tsx") + read("src/domain/map-tiles.ts") + read("deploy/Caddyfile");
     const esri = /arcgisonline|World_Street_Map/.test(map);
     const off = /openfreemap|pmtiles/i.test(map);
     return { pass: !esri && off, detail: esri ? "sigue Esri" : off ? "OpenFreeMap/PMTiles" : "sin tesela soberana" };
@@ -118,11 +118,12 @@ async function liveCheck(id) {
     const r = await pull(ORIGIN + "/");
     const csp = r.csp.toLowerCase();
     const ok =
-      csp.includes("arcgisonline") &&
+      csp.includes("openfreemap") &&
       csp.includes("opentopomap") &&
+      !csp.includes("arcgisonline") &&
       !csp.includes("tile.openstreetmap") &&
       !csp.includes("cartocdn");
-    return { pass: ok, detail: ok ? "CSP teselas Esri+OTM" : `csp osm=${csp.includes("tile.openstreetmap")} esri=${csp.includes("arcgisonline")}` };
+    return { pass: ok, detail: ok ? "CSP teselas OFM+OTM" : `csp osm=${csp.includes("tile.openstreetmap")} ofm=${csp.includes("openfreemap")} esri=${csp.includes("arcgisonline")}` };
   }
   if (id === "D-FOSS") {
     const r = await pull("https://github.com/prezpablo/bitacora.btc");

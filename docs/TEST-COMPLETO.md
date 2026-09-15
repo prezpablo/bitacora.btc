@@ -167,7 +167,7 @@ K) P2 SEGURIDAD
 - P2-19 404 sin stack, sin /var/www, sin env
 
 L) P3 FEEDS — 1 GET/HEAD
-Mapa: D-BTCMAP-E D-BTCMAP-A D-ESRI D-OTM D-NOM D-GEOJS D-IPWHO
+Mapa: D-BTCMAP-E D-BTCMAP-A D-OFM D-OTM D-NOM D-GEOJS D-IPWHO
 Desk (1 de 4 = precio_ok SI): D-BN D-BN-VISION D-OKX D-HL (HL 405/404 = N/D, no DEGRADA; NO POST)
 On-chain: D-MP-FEE D-MP-TIP D-MP-NINJA D-FNG D-BITBO D-POLY (404 poly = N/D)
 Contacto: D-FS HEAD formsubmit.co

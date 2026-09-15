@@ -105,9 +105,9 @@
     {
       "id": "D-TILE-03",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "teselas OpenFreeMap/PMTiles; CSP sin arcgisonline"
+      "done": "teselas OpenFreeMap público + OTM; CSP sin arcgisonline"
     },
     {
       "id": "D-PWA",
