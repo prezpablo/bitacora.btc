@@ -76,7 +76,7 @@ P1 Producto
 P2 Seguridad
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer-policy no-referrer, permissions-policy
 - P2-02 object-src none; form-action self + formsubmit.co
-- P2-03 connect-src allowlist: geojs, ipwho.is, nominatim, Esri/OpenTopoMap, btcmap. Velas NO van en connect-src (son server-fn)
+- P2-03 connect-src allowlist: geojs, ipwho.is, nominatim, Esri (`server.arcgisonline.com`), OpenTopo (`*.tile.opentopomap.org`), btcmap. Velas NO van en connect-src (son server-fn). Un host de esa lista en CSP **no** es P2-03b.
 - P2-04 sin gtag/fbq/pixel/hotjar
 - P2-06 sin login / wallet-connect / depósito
 - P2-07 /api y /__grok no exponen admin, keys ni CARGA-

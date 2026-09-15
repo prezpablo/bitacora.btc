@@ -1,8 +1,9 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 14 de setiembre de 2026 · **Retomar el 16 set 2026**  
+**Fecha:** 15 de setiembre de 2026 · **Retomar el 16 set 2026**  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` **`622baf9`** · **ZIP en `.org` 13 set ~20:16 -03 = `4e9dd76`** (chip-row, inert, grid 2×6, CSP Esri+OpenTopo, `/healthz` ok). Velas móvil (622baf9) **aún no** en VPS.  
+**Repo:** `prezpablo/bitacora.btc` `main` **`bb5fde1`** (nombre vs `other`, cluster honesto, sin badge `slots=2`).  
+**ZIP en `.org`:** 14 set ~18:11 -03 ≈ **`668739d`** (`map-gate-UBd3MUoy.js`, D-PIN-03 + MapCrash). **Falta subir** `ec53f9d`…`bb5fde1` (Roderich/other, 93≠MVD, badge 2).  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -53,9 +54,26 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-PIN-01…03 y D-VIZ 01–03 **cerrados.** **Siguiente ZIP: D-STATS.** No fusionar.
+**Prioridad:** D-PIN-01…03 y D-VIZ 01–03 **cerrados en repo.** **Ops:** ZIP `bb5fde1` al VPS. **Siguiente fase producto: D-STATS.** No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
+
+---
+
+**Smoke 15 set 06:14 -03 (Grok diario) — cotejo**
+
+Informe: DEGRADA · barra 4 destinos · habitaciones SI · TTFB 0,65 s · feeds_ok 13/18. **Sin CAÍDA ni incidente.**
+
+| Ítem | ¿Activo en origen? | Veredicto | Deuda |
+|---|---|---|---|
+| **P0-12** shops/comms locales 404 | **No.** `/data/btcmap-shops.json` 200 (2,9 MB) · `/data/btcmap-comms.json` 200 · `map.csv` 200. 404 solo `/data/shops.json` (alias que **no existe**). | Falso positivo. Mismo del 14 set. | No abrir. D-SMOKE-12 cerrado. |
+| **D-BN** Binance 451 | Runner 451. **Vision 200 + OKX 200.** Desk pinta. | DEGRADA-feed del probe, no mercado caído. | No reabrir. |
+| **D-MP-FEE / TIP / NINJA** timeout | Este runner también mudo a mempool.space/ninja. VPS: ninja+emzy+blockstream+last-known. | On-chain no verificable *aquí*. No CAÍDA. | Avisar solo si probe **VPS** vacío 2–3 días. |
+| **P2-03b** `*.tile.opentopomap.org` «no listado» | **Está** en `connect-src` del origen (Caddy). `img-src` ya es `https:`. Capa activa = Esri, fallback OpenTopo (D-TILE-ZIP). | Allowlist del probe desactualizada (P2-03 del protocolo **sí** nombra OpenTopo). | No abrir hueco CSP. |
+| Navegación / UX | skip 4/4 · h1 5/5 · barra_contrato SI · i18n_h1 SI · habitaciones SI | Encaja. | — |
+| D-FOSS / D-SITEMAP | GitHub 404 anónimo · sitemap `lastmod` 2026-09-07 | Siguen. | Cola 16 set, no P0. |
+
+Ninguna de estas alertas cambia la cola: **no hay P0 de mapa ni de CSP.** Siguiente fase = **D-STATS** tras el ZIP pendiente.
 
 ---
 
