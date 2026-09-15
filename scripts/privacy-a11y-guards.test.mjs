@@ -47,6 +47,9 @@ test("footer and banner link the four legal texts", () => {
   assert.match(header, /SkipLink/);
   assert.match(labif, /SkipLink/);
   assert.match(labif, /id="contenido"/);
+  const nf = read("src/lib/error-component.tsx");
+  assert.match(nf, /SkipLink/);
+  assert.match(nf, /id="contenido"/);
   assert.match(read("src/styles.css"), /:focus-visible/);
 });
 

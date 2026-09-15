@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { TriangleAlert } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { SkipLink } from "@/components/skip-link";
 
 function isChunkMiss(error: unknown) {
   const msg = error instanceof Error ? error.message : String(error || "");
@@ -52,7 +53,12 @@ export function AppNotFound() {
     document.title = t("notFoundTitle");
   }, [t]);
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
+    <>
+      <SkipLink />
+      <main
+        id="contenido"
+        className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50"
+      >
       <h1 className="text-lg font-semibold">{t("notFoundHeading")}</h1>
       <p className="max-w-md text-sm text-zinc-500 dark:text-zinc-400">{t("notFoundLead")}</p>
       <div className="mt-2 flex flex-wrap items-center justify-center gap-4">
@@ -63,6 +69,7 @@ export function AppNotFound() {
           {t("notFoundMap")}
         </a>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

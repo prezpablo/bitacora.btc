@@ -110,6 +110,13 @@
       "done": "teselas OpenFreeMap público + OTM; CSP sin arcgisonline"
     },
     {
+      "id": "D-SKIP-404",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "404 tiene SkipLink + main#contenido"
+    },
+    {
       "id": "D-PWA",
       "pri": "P3",
       "open": true,

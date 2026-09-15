@@ -40,7 +40,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **6b** | **D-GLOBE-INIT** | Timeout 8 s mataba el chunk 1,9 MB. Prefetch + WebGL. | **Este ZIP.** Loading hasta import; sin WebGL → mapa. | Restaurar timer 8000 |
 | **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | **Este ZIP.** Capa = OFM liberty (MapLibre-Leaflet). Reserva OTM. CSP sin `arcgisonline`. | Restaurar Esri |
 | **8** | **P3 lote** | Skip 404 · **D-SITEMAP** · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | **Por ítem.** | Por ítem |
-| **8a** | **D-SITEMAP** | `lastmod` del sitemap = día del build. | **Este ZIP.** `stamp-sitemap.mjs` en `build`/`build:vps`. | Congelar 2026-09-07 |
+| **8b** | **D-SKIP-404** | Skip `#contenido` en 404. | **Este ZIP.** `AppNotFound` + SkipLink. | Quitar SkipLink |
 
 **Referentes públicos (13 set) — qué clonar, qué no**
 
@@ -56,7 +56,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-SITEMAP **este ZIP.** **Siguiente: skip 404** (P3). No fusionar.
+**Prioridad:** D-SKIP-404 **este ZIP.** **Siguiente: D-A11Y-24** (`#datos` ≥ 24 px). No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
