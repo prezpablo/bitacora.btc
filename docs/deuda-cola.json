@@ -84,7 +84,7 @@
     {
       "id": "D-CTA",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "QR donar fuera del header Sumate"
     },

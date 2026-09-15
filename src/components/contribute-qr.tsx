@@ -224,7 +224,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
         )}
       />
       {compact ? (
-        <span className="hidden text-sm font-medium text-foreground sm:inline">{t("contribute")}</span>
+        <span className="text-[11px] font-medium text-foreground sm:text-xs">{t("navAportes")}</span>
       ) : (
         <span className="max-w-40 text-center text-sm text-pretty text-muted-foreground">{t("contributeCaption")}</span>
       )}

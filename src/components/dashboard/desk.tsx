@@ -28,7 +28,6 @@ import { slowNet } from "@/lib/net";
 import { scrollDeskTo } from "@/lib/desk-scroll";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
-const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
 const CommunityPinsBoard = lazy(() => import("./community-pins").then((m) => ({ default: m.CommunityPinsBoard })));
 const CommunityFeedPanel = lazy(() => import("./community-feed").then((m) => ({ default: m.CommunityFeedPanel })));
 const NetworkEvents = lazy(() => import("./network-events").then((m) => ({ default: m.NetworkEvents })));
@@ -261,9 +260,6 @@ export function Desk() {
         <LearnIndex />
         <section id="conciencia" className="scroll-mt-[4.5rem] space-y-4">
           <ConcienciaBlock />
-          <Suspense fallback={<Soft />}>
-            <ContributeQr />
-          </Suspense>
         </section>
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="12rem">

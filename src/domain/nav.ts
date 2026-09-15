@@ -5,6 +5,7 @@
  * D-NAV-02: Aprender = #aprender (conciencia + historia + pulso).
  * D-NAV-03: Red vive dentro de Mercado.
  * D-NAV-04: Sumate es CTA de aplicación (`requestJoinMap`), no un ítem de barra.
+ * D-CTA: QR / Apoyá con sats vive en el pie `#aportes`, no junto a Sumate.
  */
 
 export type NavItem = {

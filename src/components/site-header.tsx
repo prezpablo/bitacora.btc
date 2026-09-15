@@ -179,11 +179,6 @@ export function SiteHeader() {
           >
             {labels.navSumate}
           </button>
-          <div className="hidden sm:block">
-            <Suspense fallback={null}>
-              <ContributeQr compact />
-            </Suspense>
-          </div>
           <LangButtons />
         </div>
       </div>
@@ -265,6 +260,11 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                 {t(NAV_COPY[item.id] || "navContacto")}
               </a>
             ))}
+            <span id="aportes" className="inline-flex min-h-6 scroll-mt-[var(--header-offset)] items-center">
+              <Suspense fallback={null}>
+                <ContributeQr compact />
+              </Suspense>
+            </span>
             <a href="/#datos" className="inline-flex min-h-6 items-center text-foreground">
               {t("dataOrigin")}
             </a>

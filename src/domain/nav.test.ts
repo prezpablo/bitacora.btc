@@ -53,6 +53,12 @@ test("D-NAV-04 Sumate is not a nav destination", () => {
   assert.ok(!UTILITY_NAV.some((n) => n.id === "sumate"));
 });
 
+test("D-CTA donate is pie #aportes, not Sumate and not the bar", () => {
+  assert.ok(!PRIMARY_NAV.some((n) => n.id === "aportes"));
+  assert.ok(!UTILITY_NAV.some((n) => n.id === "aportes"));
+  assert.equal(sectorOf("aportes"), "pie");
+});
+
 test("desk sectors: Mapa+Aprender share llegar; comunidad and mercado are own rooms; pie is footer hashes", () => {
   assert.equal(sectorOf(""), "llegar");
   assert.equal(sectorOf("mapa"), "llegar");
