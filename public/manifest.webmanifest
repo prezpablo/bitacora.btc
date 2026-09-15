@@ -1,0 +1,20 @@
+{
+  "name": "Bitácora.btc",
+  "short_name": "Bitácora",
+  "description": "El nodo que te une al mundo Bircoiner",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "lang": "es",
+  "background_color": "#f6f4ef",
+  "theme_color": "#f7931a",
+  "icons": [
+    {
+      "src": "/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -50,8 +50,8 @@ function headFor(path: string, lang: AppLang, explicitLang: boolean) {
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/__grok/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icon-180.png" },
       { rel: "canonical", href: canonical },
       { rel: "author", href: "/humans.txt" },
       { rel: "alternate", href: hreflangHref(ORIGIN, path, "es"), hrefLang: "es" },

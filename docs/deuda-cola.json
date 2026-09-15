@@ -119,9 +119,9 @@
     {
       "id": "D-PWA",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "manifest fuera de /__grok/"
+      "done": "manifest /manifest.webmanifest + /icon-180.png; no /__grok/ en __root"
     },
     {
       "id": "D-MKT",

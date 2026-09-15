@@ -23,8 +23,7 @@ test("repo probes: PIN-01 closed, FOSS still open", async () => {
   const pwa = rows.find((r) => r.id === "D-PWA");
   assert.equal(pin.state, "CERRADO");
   assert.equal(foss.state, "ABIERTO");
-  assert.equal(pwa.state, "ABIERTO");
-  assert.match(pwa.detail, /__grok/);
+  assert.equal(pwa.state, "CERRADO");
 });
 
 test("guards are not run without --live", async () => {
