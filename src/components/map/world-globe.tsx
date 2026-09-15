@@ -15,6 +15,7 @@ import { ClientOnly } from "@/components/dashboard/client-only";
 import { boxAround } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { locateBest } from "@/infrastructure/geo";
+import { hasWebGL } from "@/lib/webgl";
 
 const GEO_URL = "/data/ne-110m-countries.json";
 
@@ -134,25 +135,22 @@ function GlobeCanvas({
   }, [reduceMotion, Globe]);
 
   useEffect(() => {
+    if (!hasWebGL()) {
+      setLoadErr("webgl");
+      return;
+    }
     let stop = false;
-    const timer = window.setTimeout(() => {
-      if (!stop) setLoadErr((e) => e || "timeout");
-    }, 8000);
     void import("react-globe.gl")
       .then((m) => {
         const g = (m as { default?: unknown }).default ?? m;
         const Cmp = (g as { default?: unknown }).default ?? g;
-        if (!stop) {
-          window.clearTimeout(timer);
-          setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
-        }
+        if (!stop) setGlobe(() => Cmp as ComponentType<Record<string, unknown>>);
       })
       .catch((err: Error) => {
         if (!stop) setLoadErr(err.message || "globe");
       });
     return () => {
       stop = true;
-      window.clearTimeout(timer);
     };
   }, []);
 
@@ -351,7 +349,7 @@ function GlobeCanvas({
           globeImageUrl={WHITE}
           showAtmosphere={false}
           animateIn={false}
-          rendererConfig={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
+          rendererConfig={{ antialias: false, alpha: false, powerPreference: "default" }}
           pointOfView={{ lat: -15, lng: -58, altitude: 2.35 }}
           polygonsData={features}
           polygonGeoJsonGeometry="geometry"

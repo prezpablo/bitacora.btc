@@ -34,6 +34,12 @@ function warmMapEngine() {
   img.src = `${ESRI}/ArcGIS/rest/services/World_Street_Map/MapServer/tile/3/2/2`;
 }
 
+/** El chunk de react-globe.gl pesa ~1,9 MB: empezarlo ya, no a los 8 s. */
+function warmGlobeEngine() {
+  void import("react-globe.gl");
+  void import("./world-globe");
+}
+
 function MapFallback() {
   return (
     <div className="bit-stage flex items-center justify-center rounded-lg bg-white shadow-[var(--shadow-border)]">
@@ -62,6 +68,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
   modeRef.current = mode;
 
   useEffect(() => {
+    warmGlobeEngine();
     void prefetchGlobe(qc);
     if (modeRef.current === "map") {
       warmMapEngine();

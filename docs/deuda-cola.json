@@ -96,6 +96,13 @@
       "done": "/ sin ?lang= no hidrata otro idioma desde localStorage"
     },
     {
+      "id": "D-GLOBE-INIT",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "sin timeout 8s; prefetch 1.9MB; hasWebGL"
+    },
+    {
       "id": "D-TILE-03",
       "pri": "P2",
       "open": true,
