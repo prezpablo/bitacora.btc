@@ -147,9 +147,9 @@
     {
       "id": "D-A11Y-24",
       "pri": "P3",
-      "open": true,
-      "kind": "live",
-      "done": "axe target-size: a[href$='/#datos'] ≥24px en /, /mapa, /legal. Contraste .kicker en /labif"
+      "open": false,
+      "kind": "repo",
+      "done": "a[href$='/#datos'] min-h-6 min-w-6; .kicker LABIF #9a5600"
     },
     {
       "id": "D-SITEMAP",

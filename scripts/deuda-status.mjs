@@ -106,6 +106,13 @@ function repoCheck(id) {
     const menu = /<details/.test(seg);
     return { pass: ticks && hit && menu, detail: !menu ? "EMA chips" : !hit ? "sin hit 24" : !ticks ? "ticks fijos" : "ticks + hit 24 + menú EMA" };
   }
+  if (id === "D-A11Y-24") {
+    const header = read("src/components/site-header.tsx");
+    const labif = read("src/components/labif-dossier.tsx");
+    const hitDatos = /href="\/#datos"[^>]*min-w-6/.test(header);
+    const kick = /\.kicker \{ color: #9a5600/.test(labif);
+    return { pass: hitDatos && kick, detail: !hitDatos ? "#datos sin min-w-6" : kick ? "datos 24px + kicker" : "kicker naranja claro" };
+  }
   if (id === "D-FOSS") {
     const lic = existsSync(join(ROOT, "LICENSE"));
     return { pass: false, detail: lic ? "LICENSE en disco; falta 200 anónimo" : "sin LICENSE y repo 404 anónimo" };

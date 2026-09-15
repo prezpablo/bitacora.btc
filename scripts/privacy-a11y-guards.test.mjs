@@ -45,8 +45,10 @@ test("footer and banner link the four legal texts", () => {
   assert.match(read("src/components/skip-link.tsx"), /skipToContent/);
   assert.match(header, /id="contenido"/);
   assert.match(header, /SkipLink/);
+  assert.match(header, /href="\/#datos"[^>]*min-w-6/);
   assert.match(labif, /SkipLink/);
   assert.match(labif, /id="contenido"/);
+  assert.match(labif, /\.kicker \{ color: #9a5600/);
   const nf = read("src/lib/error-component.tsx");
   assert.match(nf, /SkipLink/);
   assert.match(nf, /id="contenido"/);

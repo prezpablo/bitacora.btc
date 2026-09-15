@@ -256,34 +256,34 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
             className="flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-0 text-[11px] leading-none sm:text-xs"
           >
             {UTILITY_NAV.map((item) => (
-              <a key={item.id} href={navHref(item, "/")} className="inline-flex min-h-6 items-center text-foreground">
+              <a key={item.id} href={navHref(item, "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                 {t(NAV_COPY[item.id] || "navContacto")}
               </a>
             ))}
-            <span id="aportes" className="inline-flex min-h-6 scroll-mt-[var(--header-offset)] items-center">
+            <span id="aportes" className="inline-flex min-h-6 min-w-6 scroll-mt-[var(--header-offset)] items-center">
               <Suspense fallback={null}>
                 <ContributeQr compact />
               </Suspense>
             </span>
-            <a href="/#datos" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/#datos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("dataOrigin")}
             </a>
-            <a href="/#soberania" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/#soberania" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("sovTitle")}
             </a>
-            <a href="/legal#aviso" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/legal#aviso" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("legalAviso")}
             </a>
-            <a href="/legal#privacidad" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/legal#privacidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("legalPrivacy")}
             </a>
-            <a href="/legal#cookies" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/legal#cookies" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("legalCookies")}
             </a>
-            <a href="/legal#accesibilidad" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/legal#accesibilidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("legalA11y")}
             </a>
-            <a href="/legal#terminos" className="inline-flex min-h-6 items-center text-foreground">
+            <a href="/legal#terminos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
               {t("legalTerms")}
             </a>
           </nav>

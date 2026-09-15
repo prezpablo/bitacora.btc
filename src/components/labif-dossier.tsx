@@ -10,7 +10,7 @@ export function LabifDossier() {
         .labif-doc h1 { font-size: clamp(1.618rem, 4vw, 2.618rem); }
         .labif-doc h2 { font-size: 1.272rem; color: #1d1d1b; border-bottom: 2px solid #F7931A; padding-bottom: 0.382rem; margin: 2.618rem 0 1rem; }
         .labif-doc h3 { font-size: 1.1rem; margin: 1.618rem 0 0.618rem; }
-        .labif-doc .kicker { color: #F7931A; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+        .labif-doc .kicker { color: #9a5600; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
         .labif-doc table { width: 100%; border-collapse: collapse; font-size: 0.95rem; margin: 0.618rem 0 1.618rem; }
         .labif-doc th, .labif-doc td { border-bottom: 1px solid #e6e6e6; padding: 0.5rem 0.618rem; text-align: left; vertical-align: top; }
         .labif-doc th { color: #5c6370; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
