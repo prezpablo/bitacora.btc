@@ -5,7 +5,7 @@ import { defineEventHandler, getQuery, setHeader, setResponseStatus } from "h3";
 import { isPublicHttp, urlResolvesPublic } from "../../src/infrastructure/safe-fetch";
 
 const DIR = join(process.cwd(), "data", "logo-cache");
-const MAX = 400_000;
+const MAX = 2_000_000;
 
 const logoHits = new Map<string, number[]>();
 
@@ -34,6 +34,10 @@ function unwrap(raw: string) {
     if (u.hostname === "btcmap.org" && u.pathname.includes("netlify/images")) {
       const inner = u.searchParams.get("url");
       if (inner) return unwrap(inner);
+    }
+    if (u.hostname === "img.evbuc.com") {
+      const inner = u.pathname.replace(/^\//, "");
+      if (inner.startsWith("https://")) return unwrap(inner);
     }
     if (!isPublicHttp(u.toString())) return "";
     return u.toString();

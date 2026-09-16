@@ -71,6 +71,10 @@ function fmtRange(start: number, end: number | undefined, tz: string | undefined
 
 function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
   const t = useT();
+  const [imgFail, setImgFail] = useState(false);
+  useEffect(() => {
+    setImgFail(false);
+  }, [ev.image]);
   const online = ev.kind === "online";
   const place = online
     ? t("netKindOnline")
@@ -81,7 +85,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-elevated shadow-[var(--shadow-border)]">
       <div className="relative aspect-[4/3] bg-plot sm:aspect-[16/10]">
-        {ev.image ? (
+        {ev.image && !imgFail ? (
           <img
             src={imgSrc(ev.image)}
             alt={ev.title}
@@ -90,6 +94,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
             decoding="async"
             width={480}
             height={300}
+            onError={() => setImgFail(true)}
           />
         ) : (
           <span className="flex size-full items-center justify-center text-2xl text-primary sm:text-3xl">₿</span>

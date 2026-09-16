@@ -13,6 +13,10 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(src, /u\.startsWith\("\/"\) \|\| u\.startsWith\("data:"\)/);
   const events = read("src/components/dashboard/network-events.tsx");
   assert.match(events, /imgSrc\(ev\.image\)/);
+  assert.match(events, /onError=\{\(\) => setImgFail\(true\)\}/);
+  const logo = read("server/routes/logo.get.ts");
+  assert.match(logo, /MAX = 2_000_000/);
+  assert.match(logo, /img\.evbuc\.com/);
   const caddy = read("deploy/Caddyfile");
   assert.match(caddy, /img-src 'self'/);
   assert.doesNotMatch(caddy, /img-src[^"]*\shttps:\s/);
