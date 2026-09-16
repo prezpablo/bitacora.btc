@@ -43,9 +43,10 @@ test("D-NAV-03 Red is nested inside Mercado", () => {
 
 test("D-NAV-04 header Sumate is a CTA, not a fifth destination", () => {
   const head = read("src/components/site-header.tsx");
-  assert.match(head, /requestJoinMap/);
+  assert.match(head, /TELEGRAM_COMMUNITY/);
   assert.match(head, /navSumate/);
   assert.match(head, /data-destinos/);
+  assert.doesNotMatch(head, /requestJoinMap/);
   assert.doesNotMatch(read("src/domain/nav.ts"), /id: "sumate"/);
 });
 

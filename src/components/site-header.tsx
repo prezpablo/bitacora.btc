@@ -8,7 +8,6 @@ import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
-import { requestJoinMap } from "@/application/join-map";
 import { scrollDeskTo } from "@/lib/desk-scroll";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
@@ -151,20 +150,6 @@ export function SiteHeader() {
 
   const activeHash = spy || items[0]!.hash;
 
-  function goJoin() {
-    requestJoinMap();
-    if (pathname !== "/") {
-      window.location.assign("/#mapa");
-      return;
-    }
-    history.replaceState(null, "", `${pathname || "/"}${window.location.search || ""}#mapa`);
-    window.dispatchEvent(new Event("bitacora-desk"));
-    setSpy("mapa");
-    window.setTimeout(() => {
-      scrollDeskTo("mapa");
-    }, 40);
-  }
-
   return (
     <header ref={headRef} className="site-head sticky top-0 z-[80] isolate border-b border-border bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-[0.618rem] px-4 py-[0.618rem] sm:px-[1.618rem]">
@@ -172,13 +157,14 @@ export function SiteHeader() {
           <BrandMark compact />
         </Link>
         <div className="flex items-center gap-[0.618rem]">
-          <button
-            type="button"
-            onClick={goJoin}
-            className="inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-white sm:h-9 sm:text-sm"
+          <a
+            href={TELEGRAM_COMMUNITY}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-8 items-center rounded-md bg-primary px-2 py-1 text-center text-[11px] leading-tight font-medium text-white sm:h-9 sm:px-3 sm:text-sm"
           >
             {labels.navSumate}
-          </button>
+          </a>
           <LangButtons />
         </div>
       </div>
