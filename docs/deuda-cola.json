@@ -117,6 +117,13 @@
       "done": "404 tiene SkipLink + main#contenido"
     },
     {
+      "id": "D-LIC",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "LICENSE AGPL-3.0 en raíz y /LICENSE; ancla legal#codigo; 404 enlaza"
+    },
+    {
       "id": "D-PWA",
       "pri": "P3",
       "open": false,

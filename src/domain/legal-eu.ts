@@ -94,6 +94,11 @@ const es: { lead: string; blocks: LegalBlock[] } = {
       title: "Menores",
       body: "El sitio no está dirigido a niños. La Ley 18.331 no fija una edad de consentimiento digital: rige el Código de la Niñez y la Adolescencia y la capacidad progresiva; en general el consentimiento lo presta el representante legal. Para visitantes del EEE, además aplica el umbral de 16 años del art. 8 RGPD. No verificamos edad. Si un adulto acredita que recabamos datos de un menor, los suprimimos.",
     },
+    {
+      title: "Código · licencia",
+      id: "codigo",
+      body: "El programa de Bitácora.btc se publica bajo la GNU Affero General Public License v3 (AGPL-3.0). El texto íntegro está en /LICENSE. El repositorio es https://github.com/prezpablo/bitacora.btc — hasta que el clone anónimo responda 200, el código oponible es el que sirve este sitio. Los datos del mapa de OSM y BTC Map siguen ODbL.",
+    },
   ],
 };
 
@@ -184,6 +189,11 @@ const en: { lead: string; blocks: LegalBlock[] } = {
       title: "Children",
       body: "The site is not directed at children. Act 18.331 does not set a digital-consent age: the Code on Children and Adolescents and evolving capacity apply; as a rule a legal representative consents. For EEA visitors, GDPR art. 8’s age 16 also applies. We do not verify age. If an adult shows that we collected a child’s data, we erase it.",
     },
+    {
+      title: "Source · license",
+      id: "codigo",
+      body: "Bitácora.btc’s program is published under the GNU Affero General Public License v3 (AGPL-3.0). The full text is at /LICENSE. The repository is https://github.com/prezpablo/bitacora.btc — until an anonymous clone returns 200, the enforceable source is what this site serves. OSM and BTC Map data remain under ODbL.",
+    },
   ],
 };
 
@@ -273,6 +283,11 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Menores",
       body: "O sítio não se dirige a crianças. A Lei 18.331 não fixa uma idade de consentimento digital: aplica-se o Código da Infância e da Adolescência e a capacidade progressiva; em regra consente o representante legal. Para visitantes do EEE, aplica-se também o limiar de 16 anos do art. 8.º RGPD. Não verificamos idade. Se um adulto provar que recolhemos dados de um menor, apagamo-los.",
+    },
+    {
+      title: "Código · licença",
+      id: "codigo",
+      body: "O programa da Bitácora.btc publica-se sob a GNU Affero General Public License v3 (AGPL-3.0). O texto integral está em /LICENSE. O repositório é https://github.com/prezpablo/bitacora.btc — até o clone anónimo responder 200, o código oponível é o que este sítio serve. Os dados OSM e BTC Map seguem ODbL.",
     },
   ],
 };

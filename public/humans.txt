@@ -3,6 +3,7 @@ Org: Consciencia Bitcoin
 Place: Colonia del Sacramento, Uruguay
 Site: https://bitacorabtc.org/
 Git: https://github.com/prezpablo/bitacora.btc
+License: AGPL-3.0
 
 /* THANKS */
 LATAM Cripto Mom

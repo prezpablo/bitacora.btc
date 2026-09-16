@@ -21,7 +21,7 @@ test("no Google Fonts in app source or Caddy", () => {
 
 test("legal anchors exist in LEGAL_EU", () => {
   const src = read("src/domain/legal-eu.ts");
-  for (const id of ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"]) {
+  for (const id of ["aviso", "privacidad", "cookies", "accesibilidad", "terminos", "codigo"]) {
     assert.match(src, new RegExp(`id: "${id}"`));
   }
   assert.match(src, /Ley n\.º 18\.331/);

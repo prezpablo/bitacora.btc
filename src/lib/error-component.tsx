@@ -68,6 +68,9 @@ export function AppNotFound() {
         <a href="/mapa" className="text-sm font-medium text-orange-600 hover:underline">
           {t("notFoundMap")}
         </a>
+        <a href="/LICENSE" className="text-sm font-medium text-orange-600 hover:underline">
+          {t("notFoundLicense")}
+        </a>
       </div>
       </main>
     </>
