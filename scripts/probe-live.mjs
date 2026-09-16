@@ -197,7 +197,7 @@ for (const p of firstParty) {
 
 {
   const luma =
-    "https://images.lumacdn.com/cdn-cgi/image/width=960,quality=72,format=jpeg/uploads/az/44234a81-2d45-4379-8ebb-710b3d76e97c.jpg";
+    "https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/uploads/az/44234a81-2d45-4379-8ebb-710b3d76e97c.jpg";
   const r = await pull(`/logo?u=${encodeURIComponent(luma)}`, { bin: true });
   add(
     core,

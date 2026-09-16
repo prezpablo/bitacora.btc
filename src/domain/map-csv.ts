@@ -190,7 +190,7 @@ export function eventFlyerSrc(raw: string) {
     const url = new URL(u);
     if (url.hostname === "images.lumacdn.com" && !url.pathname.includes("/cdn-cgi/image/")) {
       const path = url.pathname.replace(/^\//, "");
-      if (path) return `https://images.lumacdn.com/cdn-cgi/image/width=960,quality=72,format=jpeg/${path}`;
+      if (path) return `https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
     }
     if (FLYER_HOST.test(url.hostname)) return u;
   } catch {

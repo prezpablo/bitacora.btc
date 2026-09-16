@@ -34,7 +34,7 @@ function lumaCompact(href: string) {
     if (u.pathname.includes("/cdn-cgi/image/")) return href;
     const path = u.pathname.replace(/^\//, "");
     if (!path) return href;
-    return `https://images.lumacdn.com/cdn-cgi/image/width=960,quality=72,format=jpeg/${path}`;
+    return `https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
   } catch {
     return href;
   }

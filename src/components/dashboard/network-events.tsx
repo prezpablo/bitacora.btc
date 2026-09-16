@@ -84,16 +84,17 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
   const eventTz = fmtRange(ev.startAt, ev.endAt, ev.timezone, lang);
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-elevated shadow-[var(--shadow-border)]">
-      <div className="relative aspect-[4/3] overflow-hidden bg-plot sm:aspect-[16/10]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-plot">
         {ev.image && !imgFail ? (
           <img
             src={eventFlyerSrc(ev.image)}
             alt=""
-            className="absolute inset-0 size-full object-cover object-center"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "center center" }}
             loading="lazy"
             decoding="async"
             width={960}
-            height={600}
+            height={720}
             onError={(e) => {
               const el = e.currentTarget;
               const orig = ev.image;

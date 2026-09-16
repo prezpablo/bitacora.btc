@@ -13,10 +13,13 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(src, /u\.startsWith\("\/"\) \|\| u\.startsWith\("data:"\)/);
   const events = read("src/components/dashboard/network-events.tsx");
   assert.match(events, /eventFlyerSrc\(ev\.image\)/);
-  assert.match(events, /object-cover object-center/);
+  assert.match(events, /object-cover/);
   const flyer = read("src/domain/map-csv.ts");
   assert.match(flyer, /export function eventFlyerSrc/);
-  assert.match(flyer, /cdn-cgi\/image\/width=960/);
+  assert.match(flyer, /cdn-cgi\/image\/width=960,height=720,fit=cover,gravity=center/);
+  const eventsUi = read("src/components/dashboard/network-events.tsx");
+  assert.match(eventsUi, /object-cover/);
+  assert.match(eventsUi, /objectPosition: "center center"/);
   const caddy = read("deploy/Caddyfile");
   assert.match(caddy, /img-src 'self'/);
   assert.doesNotMatch(caddy, /img-src[^"]*\shttps:\s/);
@@ -27,7 +30,7 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   const logo = read("server/routes/logo.get.ts");
   assert.match(logo, /MAX = 2_000_000/);
   assert.match(logo, /img\.evbuc\.com/);
-  assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=960,quality=72,format=jpeg/);
+  assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/);
 });
 
 test("smoke diario cubre /logo, img-src y Luma compacto", () => {
