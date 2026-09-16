@@ -232,7 +232,7 @@ export async function runSeoProbe({ origin = ORIGIN, fetchPage = pull } = {}) {
   {
     const r = await fetchPage(`${origin}/sitemap.xml`);
     const locs = sitemapLocs(r.text);
-    add(core, "sitemap rutas", ["/mapa", "/legal", "/labif"].every((p) => locs.some((l) => l.endsWith(p))), locs.join(" "));
+    add(core, "sitemap rutas", ["/mapa", "/legal", "/labif", "/LICENSE"].every((p) => locs.some((l) => l.endsWith(p))), locs.join(" "));
     add(core, "sitemap hreflang mapa", r.text.includes(`${origin}/mapa?lang=pt`), "mapa?lang=pt");
     add(warn, "sitemap no duplica ?lang= como loc", !locs.includes(`${origin}/?lang=es`) && !locs.includes(`${origin}/?lang=pt`), locs.filter((l) => l.includes("?lang=")).join(" ") || "ok");
     add(warn, "sitemap lastmod fresco", /2026-09-0[7-9]|2026-09-1|2026-1/.test(r.text), (r.text.match(/<lastmod>([^<]+)/) || [])[1] || "?");
