@@ -99,7 +99,7 @@ P2 Seguridad
 - P2-17 CSV público sin tokens CARGA- / BIT- (secreto de verificación)
 - P2-18 sin reCAPTCHA, Turnstile, Google Fonts remoto (CSP font-src self; no fonts.googleapis.com)
 - P2-19 404 sin stack, sin /var/www, sin env
-- P2-20 img-src **sin** comodín `https:`. Allowlist: self, data, blob, static.btcmap.org, *.btcmap.org, tiles.openfreemap.org, *.tile.opentopomap.org. Logos/flyers por `/logo`
+- P2-20 img-src **sin** comodín `https:`. Allowlist: self, data, blob, btcmap, teselas OFM/OTM, **Luma/Meetup/Eventbrite/Unsplash** (flyers). Logos de comercios por `/logo`
 - P2-21 GET /logo?u=https://127.0.0.1/ → 404 (SSRF). GET /logo sin `u` → 404
 
 P3 Dependencias — 1 GET/HEAD c/u

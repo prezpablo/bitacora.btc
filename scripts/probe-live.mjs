@@ -175,7 +175,7 @@ for (const p of firstParty) {
   add(core, "desk HTML", desk, "origen renderiza; D-BN/D-MP del runner no es CAÍDA");
   const csp = es.csp || "";
   const img = (csp.match(/img-src[^;]*/i) || [""])[0];
-  add(core, "P2-20 img-src allowlist", /img-src/.test(csp) && !/\simg-src[^;]*\shttps:\s/.test(` ${csp}`) && /tiles\.openfreemap\.org/.test(csp) && /tile\.opentopomap\.org/.test(csp), img.slice(0, 180) || "sin img-src");
+  add(core, "P2-20 img-src allowlist", /img-src/.test(csp) && !/\simg-src[^;]*\shttps:\s/.test(` ${csp}`) && /tiles\.openfreemap\.org/.test(csp) && /tile\.opentopomap\.org/.test(csp) && /lumacdn/.test(csp), img.slice(0, 220) || "sin img-src");
   add(core, "P2-18 CSP sin Google Fonts", !/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(csp), /fonts\.googleapis/.test(csp) ? "fonts google" : "self");
   add(core, "P2-03 sin Esri", !/arcgisonline/.test(csp) && /openfreemap/.test(csp), /arcgisonline/.test(csp) ? "regresión Esri" : "OFM");
   const idx = (es.text.match(/\/assets\/index-[^"' ]+\.js/) || [])[0] || "";

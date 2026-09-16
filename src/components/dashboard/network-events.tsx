@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
 import type { ContinentId, EventBoardQuery, EventKind, NetworkEvent } from "@/domain";
-import { EVENT_PAGE, EVENT_PAGE_MOBILE, imgSrc } from "@/domain";
+import { EVENT_PAGE, EVENT_PAGE_MOBILE, eventFlyerSrc } from "@/domain";
 import { applyEventQuery, continentOf, eventQueryFromSearch } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
@@ -84,17 +84,26 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
   const eventTz = fmtRange(ev.startAt, ev.endAt, ev.timezone, lang);
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-elevated shadow-[var(--shadow-border)]">
-      <div className="relative aspect-[4/3] bg-plot sm:aspect-[16/10]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-plot sm:aspect-[16/10]">
         {ev.image && !imgFail ? (
           <img
-            src={imgSrc(ev.image)}
-            alt={ev.title}
-            className="size-full object-cover"
+            src={eventFlyerSrc(ev.image)}
+            alt=""
+            className="absolute inset-0 size-full object-cover object-center"
             loading="lazy"
             decoding="async"
-            width={480}
-            height={300}
-            onError={() => setImgFail(true)}
+            width={960}
+            height={600}
+            onError={(e) => {
+              const el = e.currentTarget;
+              const orig = ev.image;
+              if (orig && el.dataset.tried !== "1" && el.src !== orig) {
+                el.dataset.tried = "1";
+                el.src = orig;
+                return;
+              }
+              setImgFail(true);
+            }}
           />
         ) : (
           <span className="flex size-full items-center justify-center text-2xl text-primary sm:text-3xl">₿</span>
