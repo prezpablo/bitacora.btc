@@ -1380,8 +1380,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           </p>
         ) : globe.data ? (
           <p className="font-mono text-sm text-muted-foreground">
-            <span className="font-semibold text-primary">{t("globeWorldShort")}</span>
-            {" · "}
             <span className="font-semibold text-foreground">{globe.data.world.cities.toLocaleString()}</span> {t("globeCities")} ·{" "}
             <span className="font-semibold text-foreground">{globe.data.world.shops.toLocaleString()}</span> {t("globeShops")} ·{" "}
             <span className="font-semibold text-foreground">{globe.data.world.comms.toLocaleString()}</span> {t("globeComms")} ·{" "}

@@ -309,29 +309,21 @@ function GlobeCanvas({
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeEvents")}</span>
             </span>
           </p>
-          <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5 text-[10px] sm:text-xs">
-            <span className="font-semibold tracking-wide text-primary uppercase">{t("globeWorldShort")}</span>
-            {latam ? (
-              <>
-                <span className="text-neutral-300" aria-hidden>
-                  ·
-                </span>
-                <span>
-                  <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>
-                  <span className="text-neutral-600">
-                    {": "}
-                    <span className="font-bold text-neutral-900">{latam.cities.toLocaleString()}</span> {t("globeCities")}
-                    {" · "}
-                    <span className="font-bold text-neutral-900">{latam.shops.toLocaleString()}</span> {t("globeShops")}
-                    {" · "}
-                    <span className="font-bold text-neutral-900">{latam.comms.toLocaleString()}</span> {t("globeComms")}
-                    {" · "}
-                    <span className="font-bold text-neutral-900">{latam.events.toLocaleString()}</span> {t("globeEvents")}
-                  </span>
-                </span>
-              </>
-            ) : null}
-          </p>
+          {latam ? (
+            <p className="mt-1 text-[10px] sm:text-xs">
+              <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>
+              <span className="text-neutral-600">
+                {": "}
+                <span className="font-bold text-neutral-900">{latam.cities.toLocaleString()}</span> {t("globeCities")}
+                {" · "}
+                <span className="font-bold text-neutral-900">{latam.shops.toLocaleString()}</span> {t("globeShops")}
+                {" · "}
+                <span className="font-bold text-neutral-900">{latam.comms.toLocaleString()}</span> {t("globeComms")}
+                {" · "}
+                <span className="font-bold text-neutral-900">{latam.events.toLocaleString()}</span> {t("globeEvents")}
+              </span>
+            </p>
+          ) : null}
           </>
         ) : null}
       </header>
