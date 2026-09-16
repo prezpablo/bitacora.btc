@@ -1,5 +1,6 @@
 import type { GlobeCountryStat, GlobeDot, GlobeStats } from "@/domain/globe";
-import { FOUNDING_UY, LATAM_ISO, tallyCountries } from "@/domain/globe";
+import { FOUNDING_UY, LATAM_ISO, tallyCountries, tallyEvents } from "@/domain/globe";
+import { isoFromCountryName } from "@/domain";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
 import { logoUrl, parseMapCsv } from "@/domain/map-csv";
@@ -68,7 +69,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 25;
+const STATS_VER = 26;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -365,7 +366,8 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   bump("UY", "comms");
   markCity("UY", founding.lat, founding.lon);
   for (const e of ev.events) {
-    if (e.countryCode) bump(e.countryCode, "events");
+    const iso = ((e.countryCode || isoFromCountryName(e.country || "") || "").toUpperCase());
+    if (iso.length === 2) bump(iso, "events");
   }
   const countries = [...byIso.values()];
   for (const row of countries) {
@@ -376,9 +378,14 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
       .filter((p) => p.kind === "community" && p.id)
       .map((p) => ({ ...p, id: p.id as string, name: p.name || (p.id as string) })),
   );
+  const evN = tallyEvents(ev.events);
+  const world = tallyCountries(countries);
+  const latam = tallyCountries(countries, LATAM_ISO);
+  world.events = evN.world;
+  latam.events = evN.latam;
   const data: GlobeStats = {
-    world: tallyCountries(countries),
-    latam: tallyCountries(countries, LATAM_ISO),
+    world,
+    latam,
     countries,
     points,
     overlay,

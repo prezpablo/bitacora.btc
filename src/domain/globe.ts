@@ -81,4 +81,16 @@ export function tallyCountries(rows: GlobeCountryStat[], iso?: Set<string>): Glo
   return out;
 }
 
+/** Total del calendario (con o sin ISO). Latam = código en LATAM_ISO. */
+export function tallyEvents(rows: { countryCode?: string }[]): { world: number; latam: number } {
+  let world = 0;
+  let latam = 0;
+  for (const e of rows) {
+    world += 1;
+    const iso = (e.countryCode || "").toUpperCase();
+    if (LATAM_ISO.has(iso)) latam += 1;
+  }
+  return { world, latam };
+}
+
 export type GlobeFocus = { lat: number; lon: number; zoom: number; iso?: string; id?: string; kind?: "shop" | "community"; join?: boolean };

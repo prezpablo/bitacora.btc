@@ -305,7 +305,7 @@ function GlobeCanvas({
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeComms")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-primary sm:text-3xl">{latam.events.toLocaleString()}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{(world?.events ?? latam.events).toLocaleString()}</span>
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeEvents")}</span>
             </span>
           </p>

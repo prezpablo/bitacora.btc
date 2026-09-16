@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { LATAM_ISO, tallyCountries, type GlobeCountryStat } from "./globe.ts";
+import { LATAM_ISO, tallyCountries, tallyEvents, type GlobeCountryStat } from "./globe.ts";
 
 function row(iso: string, shops: number): GlobeCountryStat {
   return { iso, lat: 0, lon: 0, shops, comms: 1, events: 0, cities: 2 };
@@ -21,4 +21,17 @@ test("tallyCountries splits Latam from the world", () => {
   assert.equal(world.shops, 4903);
   assert.equal(latam.shops, 103);
   assert.ok(latam.shops < world.shops);
+});
+
+test("tallyEvents counts every row, Latam only with ISO in LATAM_ISO", () => {
+  const rows = [
+    { countryCode: "UY" },
+    { countryCode: "AR" },
+    { countryCode: "US" },
+    { countryCode: "" },
+    { countryCode: "ID" },
+  ];
+  const n = tallyEvents(rows);
+  assert.equal(n.world, 5);
+  assert.equal(n.latam, 2);
 });
