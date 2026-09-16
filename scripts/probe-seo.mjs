@@ -222,6 +222,8 @@ export async function runSeoProbe({ origin = ORIGIN, fetchPage = pull } = {}) {
     const homeCanon = h.canonical === `${origin}/` || h.canonical === `${origin}`;
     add(core, "404 sin canonical home", !homeCanon, h.canonical || "(sin canonical)");
     add(warn, "404 title propio", /encontrado|not found|404/i.test(h.title) || !/Latinoam|Latin America/i.test(h.title), h.title || "(vacío)");
+    add(warn, "404 skip #contenido", /href=["']#contenido["']/.test(r.text) && /id=["']contenido["']/.test(r.text), /#contenido/.test(r.text) ? "skip" : "sin skip");
+    add(warn, "404 link LICENSE", r.text.includes("/LICENSE"), r.text.includes("/LICENSE") ? "/LICENSE" : "no");
   }
 
   {
@@ -235,7 +237,9 @@ export async function runSeoProbe({ origin = ORIGIN, fetchPage = pull } = {}) {
     add(core, "sitemap rutas", ["/mapa", "/legal", "/labif", "/LICENSE"].every((p) => locs.some((l) => l.endsWith(p))), locs.join(" "));
     add(core, "sitemap hreflang mapa", r.text.includes(`${origin}/mapa?lang=pt`), "mapa?lang=pt");
     add(warn, "sitemap no duplica ?lang= como loc", !locs.includes(`${origin}/?lang=es`) && !locs.includes(`${origin}/?lang=pt`), locs.filter((l) => l.includes("?lang=")).join(" ") || "ok");
-    add(warn, "sitemap lastmod fresco", /2026-09-0[7-9]|2026-09-1|2026-1/.test(r.text), (r.text.match(/<lastmod>([^<]+)/) || [])[1] || "?");
+    const last = (r.text.match(/<lastmod>([^<]+)/) || [])[1] || "?";
+    add(core, "sitemap lastmod no-07", last !== "2026-09-07", last);
+    add(warn, "sitemap lastmod fresco", /2026-09-1|2026-1/.test(r.text), last);
   }
 
   {

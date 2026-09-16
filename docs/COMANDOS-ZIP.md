@@ -21,10 +21,11 @@ Si ves `bitacora@Bitacora:~$`:
 sudo -i
 ```
 
-Cuando el prompt sea `root@Bitacora`, pegar **un solo bloque** (no partirlo):
+Cuando el prompt sea `root@Bitacora`, pegar **un solo bloque** (heredoc: no rompe comillas):
 
 ```bash
-sudo bash -lc 'set -euo pipefail
+bash <<'EOF'
+set -euo pipefail
 ZIP=/tmp/bitacora.btc-main.zip
 APP=/var/www/bitacora
 [ -f "$ZIP" ] || { echo "falta $ZIP — volvé a scp"; exit 1; }
@@ -49,10 +50,11 @@ systemctl reload caddy
 curl -s https://bitacorabtc.org/healthz
 echo
 curl -s https://bitacorabtc.org | grep -a -o Aprender | head
-'
+curl -s https://bitacorabtc.org/sitemap.xml | grep -E 'lastmod|LICENSE'
+EOF
 ```
 
-Listo si `/healthz` responde `{"ok":true}` y aparece `Aprender`.
+Listo si `/healthz` responde `{"ok":true}` y el sitemap muestra `LICENSE`.
 
 ---
 

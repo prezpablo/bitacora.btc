@@ -37,7 +37,7 @@ CANÓNICO: https://bitacorabtc.org
 WWW → 301 https://bitacorabtc.org/
 Rutas: /  /mapa  /legal  /labif  /?lang=es  /?lang=pt  /?lang=en
 First-party: /data/map.csv /data/pins.csv /data/btcmap-shops.json /data/btcmap-comms.json /data/ne-110m-countries.json /data/ne-cities-10m.json
-También: /healthz /robots.txt /sitemap.xml /.well-known/security.txt /favicon.svg /humans.txt /llms.txt /og.jpg /contribuir-qr.png /contribuir-ln.png /assets/index-*.js
+También: /healthz /robots.txt /sitemap.xml /LICENSE /manifest.webmanifest /icon-180.png /.well-known/security.txt /favicon.svg /humans.txt /llms.txt /og.jpg /contribuir-qr.png /contribuir-ln.png /assets/index-*.js
 BTC inmutable: bc1qe2f3fu7nwqnl00ankn2g22r8zv2frs4ckkk83t
 Cert LE: vence 2026-11-30. Alerta si <21 días.
 
@@ -66,7 +66,7 @@ B) P0 INFRA ORIGEN (CAÍDA si falla)
 - P0-06 HSTS max-age=31536000 includeSubDomains + HTTP/2
 - P0-07 /mapa /legal /labif = 200
 - P0-08 /data/map.csv 200, header id,tipo,name,lat,lon, ≥1 fila
-- P0-09 robots Allow:/ + sitemap con /, /mapa, /legal y hreflang es/pt/en
+- P0-09 robots Allow:/ + sitemap con /, /mapa, /legal, /labif, /LICENSE y hreflang es/pt/en
 - P0-10 security.txt Contact=/legal#contacto y Expires futuro
 - P0-11 JS principal /assets/index-*.js 200
 - P0-12 pins.csv, btcmap-shops.json, btcmap-comms.json, ne-110m-countries.json (200; 404 = DEGRADA mapa/globo)
@@ -75,10 +75,13 @@ B) P0 INFRA ORIGEN (CAÍDA si falla)
 - P0-15 /contribuir-qr.png y /contribuir-ln.png 200
 - P0-16 /llms.txt 200 y menciona /mapa
 - P0-17 /data/ne-cities-10m.json 200 (404 = DEGRADA globo)
-- P0-18 GET /no-existe-bitacora → 404, noindex, title No encontrado/Not found. 200 con home = CAÍDA de identidad
+- P0-18 GET /no-existe-bitacora → 404, noindex, title No encontrado/Not found, skip #contenido, links / /mapa /LICENSE. 200 con home = CAÍDA de identidad
+- P0-19 /manifest.webmanifest 200 name Bitácora.btc; HTML no usa /__grok/manifest
+- P0-20 sitemap lastmod ≠ 2026-09-07
+- P0-21 /LICENSE 200 AGPL-3.0
 
 C) CHROME (header + pie)
-- C1 Skip link href="#contenido" en /, /mapa, /legal, /labif
+- C1 Skip link href="#contenido" en /, /mapa, /legal, /labif y 404
 - C2 Un solo H1 visible por ruta
 - C3 Barra 4 destinos EN ESTE ORDEN: Mapa, Aprender, Comunidad, Mercado (es) / Map, Learn, Community, Market (en) / Mapa, Aprender, Comunidade, Mercado (pt)
 - C4 NO en la barra: Consciencia, Roadmap, Pulso, Red, Historia, Networking, Contacto, Privacidad

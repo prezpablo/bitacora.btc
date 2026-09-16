@@ -81,6 +81,41 @@ for (const p of pages) {
   const r = await pull("/sitemap.xml");
   const has = ["/?lang=es", "/?lang=pt", "/?lang=en", "/mapa", "/legal"].every((s) => r.text.includes(s));
   add(core, "sitemap hreflang", r.status === 200 && has, `${r.status} ${r.bytes}b`);
+  add(core, "sitemap LICENSE", r.status === 200 && r.text.includes("/LICENSE"), r.text.includes("/LICENSE") ? "loc /LICENSE" : "sin LICENSE");
+  add(core, "sitemap lastmod fresco", r.status === 200 && /<lastmod>2026-/.test(r.text) && !r.text.includes("<lastmod>2026-09-07</lastmod>"), (r.text.match(/<lastmod>([^<]+)/) || [])[1] || "?");
+}
+
+{
+  const r = await pull("/LICENSE");
+  add(core, "LICENSE AGPL", r.status === 200 && /GNU AFFERO GENERAL PUBLIC LICENSE/.test(r.text), `${r.status} ${r.bytes}b`);
+}
+
+{
+  const r = await pull("/manifest.webmanifest");
+  let name = "";
+  try {
+    name = JSON.parse(r.text).name || "";
+  } catch {
+    name = "";
+  }
+  add(core, "PWA manifest", r.status === 200 && /Bitácora/.test(name) && !r.text.includes("__grok"), `${r.status} name=${name || "?"}`);
+}
+
+{
+  const home = await pull("/");
+  add(core, "PWA link first-party", home.text.includes("/manifest.webmanifest") && !home.text.includes("/__grok/manifest"), home.text.includes("/__grok/manifest") ? "aún /__grok/" : "/manifest.webmanifest");
+  add(warn, "tagline Bircoiner", /Bircoiner/.test(home.text), /Bircoiner/.test(home.text) ? "sí" : "sin Bircoiner");
+}
+
+{
+  const nf = await pull("/no-existe-bitacora");
+  add(core, "404 skip", nf.status === 404 && nf.text.includes('href="#contenido"') && nf.text.includes('id="contenido"'), `${nf.status} skip=${nf.text.includes("#contenido")}`);
+  add(warn, "404 LICENSE", nf.text.includes("/LICENSE"), nf.text.includes("/LICENSE") ? "link /LICENSE" : "sin /LICENSE");
+}
+
+{
+  const legal = await pull("/legal");
+  add(core, "legal#codigo", /id="codigo"/.test(legal.text) && /AGPL/.test(legal.text), /id="codigo"/.test(legal.text) ? "codigo+AGPL" : "sin #codigo");
 }
 
 for (const p of ["/og.jpg", "/favicon.svg", "/contribuir-qr.png", "/contribuir-ln.png", "/humans.txt", "/llms.txt"]) {

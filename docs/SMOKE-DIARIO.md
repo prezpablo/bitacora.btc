@@ -2,7 +2,7 @@
 
 Pegar el bloque de abajo en el agente (Grok u otro). No pentest. Complementa `npm run test:live` y `npm run test:seo`; no los reemplaza.
 
-Fecha del prompt: 10 set 2026. Hallazgos: copy SSR cerrado en repo; IA D-NAV 01–05 (barra de 4 + Sumate + destinos). Sesión completa de todos los componentes: [`TEST-COMPLETO.md`](TEST-COMPLETO.md). Funcionamiento (más corto): [`SMOKE-FUNCIONAL.md`](SMOKE-FUNCIONAL.md).
+Fecha del prompt: 15 set 2026. Hallazgos: D-PWA `/manifest.webmanifest`; D-LIC AGPL `/LICENSE`; sitemap 5 locs + lastmod del ZIP; skip en 404; tagline Bircoiner.
 
 ---
 
@@ -20,7 +20,7 @@ CANÓNICO: https://bitacorabtc.org
 WWW debe 301 a https://bitacorabtc.org/
 Rutas: / /mapa /legal /labif /?lang=es /?lang=pt /?lang=en
 First-party: /data/map.csv /data/pins.csv /data/btcmap-shops.json /data/btcmap-comms.json /data/ne-110m-countries.json /data/ne-cities-10m.json
-También: /healthz /robots.txt /sitemap.xml /.well-known/security.txt /favicon.svg /humans.txt /llms.txt /og.jpg /contribuir-qr.png /contribuir-ln.png y el JS /assets/index-*.js del HTML.
+También: /healthz /robots.txt /sitemap.xml /LICENSE /manifest.webmanifest /icon-180.png /.well-known/security.txt /favicon.svg /humans.txt /llms.txt /og.jpg /contribuir-qr.png /contribuir-ln.png y el JS /assets/index-*.js del HTML.
 Dirección BTC inmutable: bc1qe2f3fu7nwqnl00ankn2g22r8zv2frs4ckkk83t
 Cert LE: vence 2026-11-30. Alerta si <21 días.
 
@@ -40,7 +40,7 @@ P0 Infra origen
 - P0-06 HSTS max-age=31536000 includeSubDomains + HTTP/2
 - P0-07 /mapa /legal /labif = 200
 - P0-08 /data/map.csv 200, header id,tipo,name,lat,lon, ≥1 fila
-- P0-09 robots Allow:/ + sitemap con /, /mapa, /legal y hreflang es/pt/en
+- P0-09 robots Allow:/ + sitemap con /, /mapa, /legal, /labif, /LICENSE y hreflang es/pt/en
 - P0-10 security.txt Contact=/legal#contacto y Expires futuro
 - P0-11 JS principal /assets/index-*.js 200
 - P0-12 first-party: pins.csv, btcmap-shops.json, btcmap-comms.json, ne-110m-countries.json (200; 404 = DEGRADA mapa/globo, no CAÍDA)
@@ -49,7 +49,10 @@ P0 Infra origen
 - P0-15 /contribuir-qr.png y /contribuir-ln.png 200
 - P0-16 /llms.txt 200 y menciona /mapa
 - P0-17 /data/ne-cities-10m.json 200 (404 = DEGRADA globo, no CAÍDA)
-- P0-18 GET /no-existe-bitacora → 404, robots noindex (meta o header), title con «No encontrado» o Not found. 200 con home = CAÍDA de identidad
+- P0-18 GET /no-existe-bitacora → 404, robots noindex, title No encontrado/Not found, skip href="#contenido" + main#contenido, link a / y /mapa y /LICENSE. 200 con home = CAÍDA de identidad
+- P0-19 GET /manifest.webmanifest 200 JSON name Bitácora.btc, start_url /, icons /icon-180.png. HTML rel=manifest a esa URL (NO /__grok/manifest)
+- P0-20 sitemap lastmod ≠ 2026-09-07 (sello del ZIP; DEGRADA SEO si vuelve al 07)
+- P0-21 GET /LICENSE 200 y «GNU AFFERO GENERAL PUBLIC LICENSE»
 
 P1 Producto
 - P1-01 home con anclas mapa, aprender, comunidad, mercado (pulso y red pueden ser internas; texto o href, no hace falta Leaflet)
@@ -60,18 +63,19 @@ P1 Producto
 - P1-11 CSV lat/lon numéricos, name no vacío
 - P1-12 ficha Consciencia Bitcoin / Colonia del Sacramento en map.csv
 - P1-13 un solo <h1> visible por ruta /, /mapa, /legal, /labif
-- P1-14 skip href="#contenido" en /, /mapa, /legal, /labif
+- P1-14 skip href="#contenido" en /, /mapa, /legal, /labif y 404
 - P1-15 /legal: captcha con control de audio/Escuchar + casilla de privacidad. NO enviar
 - P1-16 primer byte de / y /mapa: canonical, hreflang es+pt+en, JSON-LD
 - P1-20 sección Mercado + disclaimer educativo en el HTML (no exijas el número de precio en el primer byte)
 - P1-30 BTC address exacta + URI bitcoin: coherente
 - P1-33 form contacto visible (NO enviar)
-- P1-40 /legal anclas vivas (#aviso #privacidad #cookies #accesibilidad #contacto)
+- P1-40 /legal anclas vivas (#aviso #privacidad #cookies #accesibilidad #terminos #contacto #codigo)
 - P1-50 barra 4 destinos en orden Mapa, Aprender, Comunidad, Mercado (en/pt equivalentes). No Roadmap/Red/Pulso/Historia/Networking en la barra
 - P1-51 CTA Sumate en header (Join / Junta-te)
 - P1-52 Aprender: índice Qué es Bitácora · Historia de Bitcoin · Bitcoin hoy
 - P1-53 pie sin Privacidad duplicada; rumbo y contacto en el pie, no en la barra
 - P1-54 #red ancla interna de #mercado
+- P1-55 tagline «mundo Bircoiner». «Consciencia Bitcoin» no se traduce ni se cambia
 
 P2 Seguridad
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer-policy no-referrer, permissions-policy
@@ -117,7 +121,7 @@ Si hoy es LUNES, renglón SEMANAL (1 GET c/u, solo DEGRADA): https://mempool.emz
 
 SEMÁFORO
 CAÍDA = apex 5xx, /healthz no ok, TLS inválido, redirect roto, defacement, BTC address cambiada, /legal 404, 404 de ruta inventada sirve el home, headers de seguridad desaparecidos, aparece conectá wallet / enviá fondos.
-DEGRADA mapa = elements Y areas de BTC Map down, o OSM+Esri down, o geojson/pins/cities first-party 404.
+DEGRADA mapa = elements Y areas de BTC Map down, o OpenFreeMap+OpenTopo down, o geojson/pins/cities first-party 404.
 DEGRADA desk = BN + Vision + OKX + HL los 4 down (HL N/D no cuenta como down).
 DEGRADA on-chain = mempool.space fee Y tip down Y ninja down.
 DEGRADA i18n = P1-03b (H1 home en es con ?lang=pt).
@@ -133,7 +137,7 @@ P1 producto: n/n
 P2 seguridad: n/n
 P3 deps: n/n
 Desk feeds: BN=/VISION=/OKX=/HL= → precio_ok SI/NO (regla 1-de-4)
-Mapa feeds: btcmap-e=/btcmap-a=/osm=/esri=
+Mapa feeds: btcmap-e=/btcmap-a=/ofm=/otm=
 On-chain: mempool-fee=/mempool-tip=/ninja=/fng=/bitbo=
 Cert: vence YYYY-MM-DD (N días)
 map.csv filas: N | pins.csv: N | btcmap-shops.json: OK/404 | btcmap-comms.json: OK/404
