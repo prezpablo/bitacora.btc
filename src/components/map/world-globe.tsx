@@ -289,34 +289,34 @@ function GlobeCanvas({
       <header className="rounded-lg bg-white px-3 py-2 text-center shadow-[var(--shadow-border)] sm:px-4 sm:py-3">
         <p className="font-display text-lg text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
         <p className="mt-0.5 text-[11px] text-neutral-600 sm:mt-1 sm:text-base">{t("globeTitle")}</p>
-        {latam ? (
+        {world ? (
           <>
           <p className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:mt-3 sm:grid-cols-4 sm:justify-items-center sm:gap-x-5 sm:gap-y-2">
             <span>
-              <span className="text-lg font-bold text-primary sm:text-3xl">{latam.cities.toLocaleString()}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.cities.toLocaleString()}</span>
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeCities")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-primary sm:text-3xl">{latam.shops.toLocaleString()}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.shops.toLocaleString()}</span>
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeShops")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-primary sm:text-3xl">{latam.comms.toLocaleString()}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.comms.toLocaleString()}</span>
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeComms")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-primary sm:text-3xl">{(world?.events ?? latam.events).toLocaleString()}</span>
+              <span className="text-lg font-bold text-primary sm:text-3xl">{world.events.toLocaleString()}</span>
               <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeEvents")}</span>
             </span>
           </p>
-          <p className="mt-1 text-[10px] font-medium text-neutral-500 sm:text-xs">{t("globeLatam")}</p>
-          {world ? (
+          <p className="mt-1 text-[10px] font-medium text-neutral-500 sm:text-xs">{t("globeWorldShort")}</p>
+          {latam ? (
             <p className="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">
-              {t("globeWorld", {
-                shops: world.shops.toLocaleString(),
-                comms: world.comms.toLocaleString(),
-                events: world.events.toLocaleString(),
-                cities: world.cities.toLocaleString(),
+              {t("globeLatamLine", {
+                shops: latam.shops.toLocaleString(),
+                comms: latam.comms.toLocaleString(),
+                events: latam.events.toLocaleString(),
+                cities: latam.cities.toLocaleString(),
               })}
             </p>
           ) : null}

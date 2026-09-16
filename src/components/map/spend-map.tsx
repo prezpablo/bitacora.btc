@@ -1380,15 +1380,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           </p>
         ) : globe.data ? (
           <p className="font-mono text-sm text-muted-foreground">
-            {t("globeLatam")} · {(globe.data.latam ?? globe.data.world).cities.toLocaleString()} {t("globeCities")} ·{" "}
-            {(globe.data.latam ?? globe.data.world).shops.toLocaleString()} {t("globeShops")} ·{" "}
-            {(globe.data.latam ?? globe.data.world).comms.toLocaleString()} {t("globeComms")}
+            {t("globeWorldShort")} · {globe.data.world.cities.toLocaleString()} {t("globeCities")} ·{" "}
+            {globe.data.world.shops.toLocaleString()} {t("globeShops")} ·{" "}
+            {globe.data.world.comms.toLocaleString()} {t("globeComms")} ·{" "}
+            {globe.data.world.events.toLocaleString()} {t("globeEvents")}
             <br />
-            {t("globeWorld", {
-              shops: globe.data.world.shops.toLocaleString(),
-              comms: globe.data.world.comms.toLocaleString(),
-              events: globe.data.world.events.toLocaleString(),
-              cities: globe.data.world.cities.toLocaleString(),
+            {t("globeLatamLine", {
+              shops: (globe.data.latam ?? globe.data.world).shops.toLocaleString(),
+              comms: (globe.data.latam ?? globe.data.world).comms.toLocaleString(),
+              events: (globe.data.latam ?? globe.data.world).events.toLocaleString(),
+              cities: (globe.data.latam ?? globe.data.world).cities.toLocaleString(),
             })}
           </p>
         ) : null}
