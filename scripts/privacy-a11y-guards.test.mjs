@@ -17,6 +17,9 @@ test("no Google Fonts in app source or Caddy", () => {
   assert.doesNotMatch(src, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
   assert.match(read("src/styles.css"), /@fontsource\/ubuntu/);
   assert.match(read("deploy/Caddyfile"), /font-src 'self'/);
+  const caddy = read("deploy/Caddyfile");
+  assert.match(caddy, /img-src 'self'/);
+  assert.doesNotMatch(caddy, /img-src[^"]*\shttps:\s/);
 });
 
 test("legal anchors exist in LEGAL_EU", () => {

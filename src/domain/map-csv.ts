@@ -170,12 +170,12 @@ export function logoUrl(raw: string) {
   }
 }
 
-/** Direct HTTPS: CSP ya permite `img-src https:`. `/logo` solo si el VPS tiene la ruta. */
+/** Remote logos go through first-party `/logo` so CSP need not allow `https:`. */
 export function imgSrc(raw: string) {
   const u = logoUrl(raw);
   if (!u) return "";
   if (u.startsWith("/") || u.startsWith("data:")) return u;
-  return u;
+  return `/logo?u=${encodeURIComponent(u)}`;
 }
 
 function cell(v: string | number) {

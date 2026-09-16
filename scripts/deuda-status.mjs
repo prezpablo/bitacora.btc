@@ -85,6 +85,13 @@ function repoCheck(id) {
     const grok = /\/__grok\//.test(root);
     return { pass: !grok, detail: grok ? "manifest /__grok/" : "PWA propio" };
   }
+  if (id === "D-CSP-IMG") {
+    const caddy = read("deploy/Caddyfile");
+    const img = read("src/domain/map-csv.ts");
+    const wild = /img-src[^"]*\shttps:\s/.test(caddy);
+    const proxy = /\/logo\?u=/.test(img);
+    return { pass: !wild && proxy, detail: wild ? "img-src https:" : proxy ? "allowlist + /logo" : "sin proxy /logo" };
+  }
   if (id === "D-VIZ-01") {
     const chart = read("src/components/dashboard/price-chart.tsx");
     const pkg = read("package.json");

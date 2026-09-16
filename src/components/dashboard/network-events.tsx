@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
 import type { ContinentId, EventBoardQuery, EventKind, NetworkEvent } from "@/domain";
-import { EVENT_PAGE, EVENT_PAGE_MOBILE } from "@/domain";
+import { EVENT_PAGE, EVENT_PAGE_MOBILE, imgSrc } from "@/domain";
 import { applyEventQuery, continentOf, eventQueryFromSearch } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
@@ -83,7 +83,7 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
       <div className="relative aspect-[4/3] bg-plot sm:aspect-[16/10]">
         {ev.image ? (
           <img
-            src={ev.image}
+            src={imgSrc(ev.image)}
             alt={ev.title}
             className="size-full object-cover"
             loading="lazy"

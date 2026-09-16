@@ -69,6 +69,17 @@ async function dnsPublic(host: string) {
   }
 }
 
+export async function urlResolvesPublic(raw: string) {
+  if (!isPublicHttp(raw)) return false;
+  let host = "";
+  try {
+    host = new URL(raw).hostname.replace(/^\[|\]$/g, "");
+  } catch {
+    return false;
+  }
+  return dnsPublic(host);
+}
+
 export async function fetchPublic(url: string, hops = 0): Promise<string> {
   if (hops > 2 || !isPublicHttp(url)) return "";
   let host = "";

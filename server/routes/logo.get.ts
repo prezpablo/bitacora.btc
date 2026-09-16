@@ -2,31 +2,10 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { defineEventHandler, getQuery, setHeader, setResponseStatus } from "h3";
+import { isPublicHttp, urlResolvesPublic } from "../../src/infrastructure/safe-fetch";
 
 const DIR = join(process.cwd(), "data", "logo-cache");
 const MAX = 400_000;
-const ALLOW = [
-  /(^|\.)btcmap\.org$/i,
-  /(^|\.)wikimedia\.org$/i,
-  /(^|\.)twimg\.com$/i,
-  /(^|\.)githubusercontent\.com$/i,
-  /(^|\.)ibb\.co$/i,
-  /(^|\.)imgur\.com$/i,
-  /(^|\.)nostr\.build$/i,
-  /(^|\.)meetupstatic\.com$/i,
-  /(^|\.)telegram\.org$/i,
-  /(^|\.)cdn-telegram\.org$/i,
-  /(^|\.)einundzwanzig\.space$/i,
-  /(^|\.)fbcdn\.net$/i,
-  /(^|\.)googleusercontent\.com$/i,
-  /(^|\.)primal\.net$/i,
-  /(^|\.)b-cdn\.net$/i,
-  /(^|\.)evbuc\.com$/i,
-];
-
-function hostOk(h: string) {
-  return ALLOW.some((re) => re.test(h));
-}
 
 const logoHits = new Map<string, number[]>();
 
@@ -56,7 +35,7 @@ function unwrap(raw: string) {
       const inner = u.searchParams.get("url");
       if (inner) return unwrap(inner);
     }
-    if (!hostOk(u.hostname)) return "";
+    if (!isPublicHttp(u.toString())) return "";
     return u.toString();
   } catch {
     return "";
@@ -70,7 +49,7 @@ export default defineEventHandler(async (event) => {
     return "";
   }
   const href = unwrap(String(getQuery(event).u || ""));
-  if (!href) {
+  if (!href || !(await urlResolvesPublic(href))) {
     setResponseStatus(event, 404);
     return "";
   }

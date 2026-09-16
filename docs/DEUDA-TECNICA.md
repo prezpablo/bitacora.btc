@@ -40,7 +40,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **6b** | **D-GLOBE-INIT** | Timeout 8 s mataba el chunk 1,9 MB. Prefetch + WebGL. | **Este ZIP.** Loading hasta import; sin WebGL → mapa. | Restaurar timer 8000 |
 | **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | **Este ZIP.** Capa = OFM liberty (MapLibre-Leaflet). Reserva OTM. CSP sin `arcgisonline`. | Restaurar Esri |
 | **8** | **P3 lote** | Skip 404 · **D-SITEMAP** · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | **Por ítem.** | Por ítem |
-| **8e** | **D-LIC** | Archivo LICENSE AGPL-3.0. | **Este ZIP.** `/LICENSE` + legal#codigo + 404. D-FOSS (repo público) sigue ops GitHub. | Quitar LICENSE |
+| **8f** | **D-CSP-IMG** | `img-src` allowlist, logos por `/logo`. | **Este ZIP.** Sin `https:` comodín. Teselas OFM/OTM. | Restaurar `img-src https:` |
 
 **Referentes públicos (13 set) — qué clonar, qué no**
 
@@ -56,7 +56,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-LIC **este ZIP.** **Siguiente: D-CSP-IMG** (`img-src` allowlist). D-FOSS = visibilidad GitHub (ops). No fusionar.
+**Prioridad:** D-CSP-IMG **este ZIP.** **Siguiente: D-MKT** (widgets Mercado vacíos). D-FOSS = visibilidad GitHub (ops). No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 

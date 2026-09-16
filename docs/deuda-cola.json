@@ -131,6 +131,13 @@
       "done": "manifest /manifest.webmanifest + /icon-180.png; no /__grok/ en __root"
     },
     {
+      "id": "D-CSP-IMG",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "img-src sin https: comodín; logos/eventos vía /logo"
+    },
+    {
       "id": "D-MKT",
       "pri": "P2",
       "open": true,
