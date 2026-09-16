@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
 import type { ContinentId, EventBoardQuery, EventKind, NetworkEvent } from "@/domain";
-import { EVENT_PAGE, EVENT_PAGE_MOBILE, eventFlyerSrc } from "@/domain";
+import { EVENT_PAGE, EVENT_PAGE_MOBILE, eventFlyerSrc, imgSrc } from "@/domain";
 import { applyEventQuery, continentOf, eventQueryFromSearch } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
@@ -97,10 +97,10 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
             height={720}
             onError={(e) => {
               const el = e.currentTarget;
-              const orig = ev.image;
-              if (orig && el.dataset.tried !== "1" && el.src !== orig) {
+              const fallback = imgSrc(ev.image);
+              if (fallback && el.dataset.tried !== "1" && el.src !== fallback) {
                 el.dataset.tried = "1";
-                el.src = orig;
+                el.src = fallback;
                 return;
               }
               setImgFail(true);

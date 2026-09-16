@@ -16,7 +16,7 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(events, /object-cover/);
   const flyer = read("src/domain/map-csv.ts");
   assert.match(flyer, /export function eventFlyerSrc/);
-  assert.match(flyer, /cdn-cgi\/image\/width=960,height=720,fit=cover,gravity=center/);
+  assert.match(flyer, /fit=thumb/);
   const eventsUi = read("src/components/dashboard/network-events.tsx");
   assert.match(eventsUi, /object-cover/);
   assert.match(eventsUi, /objectPosition: "center center"/);
@@ -31,6 +31,8 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(logo, /MAX = 2_000_000/);
   assert.match(logo, /img\.evbuc\.com/);
   assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/);
+  assert.match(logo, /fit: "cover"/);
+  assert.match(logo, /position: "centre"/);
 });
 
 test("smoke diario cubre /logo, img-src y Luma compacto", () => {

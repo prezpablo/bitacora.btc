@@ -178,25 +178,12 @@ export function imgSrc(raw: string) {
   return `/logo?u=${encodeURIComponent(u)}`;
 }
 
-const FLYER_HOST =
-  /(^|\.)lumacdn\.com$|(^|\.)meetupstatic\.com$|(^|\.)evbuc\.com$|(^|\.)unsplash\.com$|(^|\.)luma\.com$/i;
-
-/** Event covers: original (or Luma 960px JPEG) so the grid can object-fit them. */
+/** Flyers: same proxy, auto 4:3 cover centrado (`fit=thumb`). */
 export function eventFlyerSrc(raw: string) {
   const u = logoUrl(raw);
   if (!u) return "";
   if (u.startsWith("/") || u.startsWith("data:")) return u;
-  try {
-    const url = new URL(u);
-    if (url.hostname === "images.lumacdn.com" && !url.pathname.includes("/cdn-cgi/image/")) {
-      const path = url.pathname.replace(/^\//, "");
-      if (path) return `https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
-    }
-    if (FLYER_HOST.test(url.hostname)) return u;
-  } catch {
-    /* fall through */
-  }
-  return imgSrc(raw);
+  return `/logo?u=${encodeURIComponent(u)}&fit=thumb`;
 }
 
 function cell(v: string | number) {

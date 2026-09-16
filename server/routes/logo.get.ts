@@ -27,6 +27,19 @@ function logoLimited(ip: string) {
   return false;
 }
 
+async function toThumb(buf: Buffer) {
+  try {
+    const sharp = (await import("sharp")).default;
+    return await sharp(buf)
+      .rotate()
+      .resize(960, 720, { fit: "cover", position: "centre" })
+      .jpeg({ quality: 72, mozjpeg: true })
+      .toBuffer();
+  } catch {
+    return null;
+  }
+}
+
 function lumaCompact(href: string) {
   try {
     const u = new URL(href);
@@ -65,12 +78,14 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 429);
     return "";
   }
-  const href = lumaCompact(unwrap(String(getQuery(event).u || "")));
+  const q = getQuery(event);
+  const href = lumaCompact(unwrap(String(q.u || "")));
   if (!href || !(await urlResolvesPublic(href))) {
     setResponseStatus(event, 404);
     return "";
   }
-  const id = createHash("sha256").update(href).digest("hex").slice(0, 32);
+  const thumb = String(q.fit || "") === "thumb";
+  const id = createHash("sha256").update(`${thumb ? "t1:" : ""}${href}`).digest("hex").slice(0, 32);
   const file = join(DIR, id);
   const meta = `${file}.type`;
   try {
@@ -116,16 +131,25 @@ export default defineEventHandler(async (event) => {
       setResponseStatus(event, 404);
       return "";
     }
+    let out: Buffer = buf;
+    let outType = type.startsWith("image/") ? type : "image/jpeg";
+    if (thumb) {
+      const cut = await toThumb(buf);
+      if (cut?.length) {
+        out = cut;
+        outType = "image/jpeg";
+      }
+    }
     try {
       mkdirSync(DIR, { recursive: true });
-      writeFileSync(file, buf);
-      writeFileSync(meta, type.startsWith("image/") ? type : "image/jpeg");
+      writeFileSync(file, out);
+      writeFileSync(meta, outType);
     } catch {
       /* disk optional */
     }
-    setHeader(event, "content-type", type.startsWith("image/") ? type : "image/jpeg");
+    setHeader(event, "content-type", outType);
     setHeader(event, "cache-control", "public, max-age=604800, immutable");
-    return buf;
+    return out;
   } catch {
     setResponseStatus(event, 404);
     return "";
