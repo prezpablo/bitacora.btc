@@ -1380,17 +1380,19 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           </p>
         ) : globe.data ? (
           <p className="font-mono text-sm text-muted-foreground">
-            {t("globeWorldShort")} · {globe.data.world.cities.toLocaleString()} {t("globeCities")} ·{" "}
-            {globe.data.world.shops.toLocaleString()} {t("globeShops")} ·{" "}
-            {globe.data.world.comms.toLocaleString()} {t("globeComms")} ·{" "}
-            {globe.data.world.events.toLocaleString()} {t("globeEvents")}
+            <span className="font-semibold text-primary">{t("globeWorldShort")}</span>
+            {" · "}
+            <span className="font-semibold text-foreground">{globe.data.world.cities.toLocaleString()}</span> {t("globeCities")} ·{" "}
+            <span className="font-semibold text-foreground">{globe.data.world.shops.toLocaleString()}</span> {t("globeShops")} ·{" "}
+            <span className="font-semibold text-foreground">{globe.data.world.comms.toLocaleString()}</span> {t("globeComms")} ·{" "}
+            <span className="font-semibold text-foreground">{globe.data.world.events.toLocaleString()}</span> {t("globeEvents")}
             <br />
-            {t("globeLatamLine", {
-              shops: (globe.data.latam ?? globe.data.world).shops.toLocaleString(),
-              comms: (globe.data.latam ?? globe.data.world).comms.toLocaleString(),
-              events: (globe.data.latam ?? globe.data.world).events.toLocaleString(),
-              cities: (globe.data.latam ?? globe.data.world).cities.toLocaleString(),
-            })}
+            <span className="font-semibold text-primary">{t("globeLatamName")}</span>
+            {": "}
+            <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).cities.toLocaleString()}</span> {t("globeCities")} ·{" "}
+            <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).shops.toLocaleString()}</span> {t("globeShops")} ·{" "}
+            <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).comms.toLocaleString()}</span> {t("globeComms")} ·{" "}
+            <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).events.toLocaleString()}</span> {t("globeEvents")}
           </p>
         ) : null}
         <p className={cn("text-xs", sync === "fail" ? "text-primary" : "text-muted-foreground")}>
