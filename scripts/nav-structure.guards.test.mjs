@@ -124,3 +124,14 @@ test("i18n nav labels exist in es en pt", () => {
     assert.match(copy, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
 });
+
+test("footer links Telegram Consciencia Bitcoin once", () => {
+  const head = read("src/components/site-header.tsx");
+  assert.match(head, /TELEGRAM_COMMUNITY/);
+  assert.match(head, /joinTelegram/);
+  assert.match(read("src/domain/nav.ts"), /t\.me\/\+hdBuy78MUuZiYjhh/);
+  const copy = read("src/lib/i18n.ts");
+  assert.match(copy, /Unite a Consciencia Bitcoin/);
+  assert.match(copy, /Join Consciencia Bitcoin/);
+  assert.match(copy, /Junta-te à Consciencia Bitcoin/);
+});

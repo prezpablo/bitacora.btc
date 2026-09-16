@@ -27,6 +27,9 @@ export const UTILITY_NAV: readonly NavItem[] = [
   { id: "contacto", hash: "contacto" },
 ];
 
+/** Telegram de Consciencia Bitcoin (pie). */
+export const TELEGRAM_COMMUNITY = "https://t.me/+hdBuy78MUuZiYjhh";
+
 export const LEGAL_NAV: readonly NavItem[] = [
   { id: "privacidad", hash: "privacidad" },
   { id: "contacto", hash: "contacto" },

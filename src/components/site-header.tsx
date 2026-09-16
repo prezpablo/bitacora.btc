@@ -7,7 +7,7 @@ import { SkipLink } from "@/components/skip-link";
 import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
-import { LEGAL_NAV, PRIMARY_NAV, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
+import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
 import { requestJoinMap } from "@/application/join-map";
 import { scrollDeskTo } from "@/lib/desk-scroll";
 
@@ -260,6 +260,14 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                 {t(NAV_COPY[item.id] || "navContacto")}
               </a>
             ))}
+            <a
+              href={TELEGRAM_COMMUNITY}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-6 min-w-6 items-center text-foreground"
+            >
+              {t("joinTelegram")}
+            </a>
             <span id="aportes" className="inline-flex min-h-6 min-w-6 scroll-mt-[var(--header-offset)] items-center">
               <Suspense fallback={null}>
                 <ContributeQr compact />
