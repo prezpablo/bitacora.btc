@@ -27,6 +27,7 @@ function fill(value: number) {
 
 export function FearGreedPanel({ data }: { data: FearGreedPayload | null }) {
   const t = useT();
+  if (!data) return null;
   const value = data?.value ?? null;
   const label = data ? t(LABELS[data.classification] ?? "fgNeutral") : "—";
   const hist = data?.history.map((p) => p.v) ?? [];

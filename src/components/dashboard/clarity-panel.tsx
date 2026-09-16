@@ -6,6 +6,7 @@ import { StaleStamp } from "./stale-stamp";
 
 export function ClarityPanel({ data }: { data: ClarityPayload | null }) {
   const t = useT();
+  if (!data) return null;
   const yes = data ? data.yes * 100 : null;
   const no = data ? data.no * 100 : null;
   const hist = data?.history.map((p) => p.v) ?? [];

@@ -62,6 +62,7 @@ export function OnchainPanel({
   priceDelta: number | null;
 }) {
   const t = useT();
+  if (!data) return null;
   const scale = Math.max(
     8,
     Math.abs(priceDelta ?? 0),

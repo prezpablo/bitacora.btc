@@ -240,6 +240,11 @@ export function Desk() {
     return ((last.close - first.close) / first.close) * 100;
   }, [market.candles, market.lookbackMs]);
 
+  const onchainPanel = extras.data?.onchain
+    ? { ...extras.data.onchain, ...onchainLive.data }
+    : extras.data?.onchain ?? null;
+  const showRed = Boolean(liqData || onchainPanel || fg || extras.data?.clarity);
+
   return (
     <SiteShell fill>
       <div
@@ -435,25 +440,22 @@ export function Desk() {
         </div>
         <p className="border-t border-border px-3 py-2 text-xs text-pretty text-muted-foreground">{t("chartDisclaimer")}</p>
       </section>
-      <Suspense fallback={<Soft />}>
+      <Suspense fallback={null}>
         <EtfFlowPanel data={etfFlows.data ?? null} />
       </Suspense>
+      {showRed ? (
       <section id="red" className="scroll-mt-[4.5rem] space-y-3">
         <h3 className="font-display text-xl font-medium tracking-tight text-foreground sm:text-2xl">{t("redTitle")}</h3>
         <LiquidityPanel data={liqData} />
         <div className="grid gap-3 lg:grid-cols-3">
-          <OnchainPanel
-            data={
-              extras.data?.onchain
-                ? { ...extras.data.onchain, ...onchainLive.data }
-                : extras.data?.onchain ?? null
-            }
-            priceDelta={priceDelta}
-          />
+          <OnchainPanel data={onchainPanel} priceDelta={priceDelta} />
           <FearGreedPanel data={fg} />
           <ClarityPanel data={extras.data?.clarity ?? null} />
         </div>
       </section>
+      ) : (
+        <span id="red" className="sr-only" />
+      )}
       </section>
 
       {query.isError && (

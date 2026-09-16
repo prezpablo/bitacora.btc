@@ -140,9 +140,9 @@
     {
       "id": "D-MKT",
       "pri": "P2",
-      "open": true,
-      "kind": "manual",
-      "done": "widget Mercado vacío no se pinta"
+      "open": false,
+      "kind": "repo",
+      "done": "ETF/FG/liq/clarity/onchain null si vacío; precio+fees siguen"
     },
     {
       "id": "D-QA",

@@ -146,6 +146,7 @@ export function EtfFlowPanel({ data }: { data: EtfFlowPayload | null }) {
   const keys = useMemo(() => keyStats(series), [series]);
   const total = useMemo(() => (data?.series ?? []).reduce((s, p) => s + p.v, 0), [data?.series]);
   const inFlow = (data?.lastUsdM ?? 0) >= 0;
+  if (!data?.series?.length) return null;
   return (
     <section className="overflow-hidden rounded-lg bg-card shadow-[var(--shadow-border)]">
       <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">

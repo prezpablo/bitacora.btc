@@ -14,6 +14,7 @@ export function OnchainLiveBar({ data }: { data: Partial<OnchainPayload> | null 
   const t = useT();
   const lang = useAppLang();
   if (!data) return null;
+  if (data.height == null && data.feeFast == null && data.hashrateEh == null) return null;
   const mb = data.mempoolVsize != null ? data.mempoolVsize / 1e6 : null;
   const rows = [
     {
