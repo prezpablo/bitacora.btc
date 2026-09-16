@@ -7,6 +7,7 @@ import { formatGuideStep, geodesicLine, kmBetween, type GuideStep } from "@/doma
 import { getApproxFix, getCityFrame, getGuidePath } from "@/infrastructure/server-fns";
 import { locateBest, requestIpFix, startGpsFromGesture } from "@/infrastructure/geo";
 import { guideMarker } from "@/infrastructure/leaflet-router";
+import type { CopyKey } from "@/lib/i18n";
 import type { AppLang } from "@/lib/locale";
 import { prefersReducedMotion } from "@/lib/motion";
 import { applyFix } from "./leaflet-fix";
@@ -14,7 +15,7 @@ import { applyFix } from "./leaflet-fix";
 type LeafletMap = import("leaflet").Map;
 type LeafletMod = typeof import("leaflet");
 
-export function useMapGuide(lang: AppLang, t: (k: string) => string) {
+export function useMapGuide(lang: AppLang, t: (k: CopyKey) => string) {
   const mapRef = useRef<LeafletMap | null>(null);
   const leafletRef = useRef<LeafletMod | null>(null);
   const userMark = useRef<import("leaflet").LayerGroup | null>(null);

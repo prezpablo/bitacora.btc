@@ -21,7 +21,7 @@ function hayToken(blob: string, code: string) {
   const up = blob.toUpperCase();
   if (up.includes(code)) return true;
   const compact = code.replace("-", "");
-  return up.replace(/[\s_\-]/g, "").includes(compact);
+  return up.replace(/[\s_-]/g, "").includes(compact);
 }
 
 /** Mirrors that actually return HTML/JSON when the silo blocks bots.

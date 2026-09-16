@@ -1633,7 +1633,6 @@ export function useAppLang(): AppLang {
     langFromQuery(location.search) ||
     langFromQuery(location.searchStr) ||
     langFromQuery(location.href) ||
-    langFromQuery(location.url) ||
     ssrLang ||
     storeLang
   );

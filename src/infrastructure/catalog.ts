@@ -43,8 +43,8 @@ function asShop(row: Record<string, unknown>): MerchantPlace {
     name: String(row.name || row.id || ""),
     category: String(row.category === "other" ? "lugar" : row.category || "lugar"),
     createdAt: Number(row.created) || Date.now(),
-    logo: String(row.logo || "") || undefined,
-    description: String(row.description || "") || undefined,
+    logo: String(row.logo || ""),
+    description: String(row.description || ""),
   };
 }
 
@@ -63,8 +63,8 @@ function asComm(row: Record<string, unknown>): Community {
     name: String(row.name || id),
     lat: Number(row.lat),
     lon: Number(row.lon),
-    logo: String(row.logo || "") || undefined,
-    description: String(row.description || "") || undefined,
+    logo: String(row.logo || ""),
+    description: String(row.description || ""),
     links,
     createdAt: Number(row.created) || 0,
   };

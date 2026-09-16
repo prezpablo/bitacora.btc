@@ -102,7 +102,7 @@ export const getGlobeStats = createServerFn({ method: "POST" }).handler(async ()
   try {
     return await fetchGlobeStats();
   } catch {
-    return { world: { shops: 0, comms: 0, events: 0, cities: 0 }, countries: [], points: [], overlay: [], asOf: Date.now() };
+    return { world: { shops: 0, comms: 0, events: 0, cities: 0 }, latam: { shops: 0, comms: 0, events: 0, cities: 0 }, countries: [], points: [], overlay: [], asOf: Date.now() };
   }
 });
 
@@ -151,7 +151,11 @@ export const getCommunityFeed = createServerFn({ method: "POST" })
     const timer = setTimeout(() => ctrl.abort(), 12_000);
     try {
       const { rows } = await translateFeed(raw.posts, lang, ctrl.signal);
-      return { ...raw, posts: rows };
+      const posts = raw.posts.map((p, i) => {
+        const tr = rows[i];
+        return tr ? { ...p, title: tr.title || p.title, body: tr.body || p.body } : p;
+      });
+      return { ...raw, posts };
     } catch {
       return raw;
     } finally {

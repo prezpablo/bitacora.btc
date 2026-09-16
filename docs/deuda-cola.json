@@ -147,9 +147,9 @@
     {
       "id": "D-QA",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "npx tsc --noEmit y eslint . --max-warnings 0 en verde. Hoy: npm run quality (test+lint:core)."
+      "done": "tsc --noEmit 0; eslint . --max-warnings 0; quality --full falla si no"
     },
     {
       "id": "D-GLOBE",

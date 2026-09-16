@@ -69,7 +69,6 @@ try {
     await page.screenshot({ path: `${OUT}/privacy-banner.png`, fullPage: false });
   } else bad("storage banner", "not visible on first visit");
 
-  const footerNav = page.locator("footer nav[aria-label]");
   for (const href of ["/legal#aviso", "/legal#privacidad", "/legal#cookies", "/legal#accesibilidad", "/legal#terminos"]) {
     const n = await page.locator(`footer a[href="${href}"]`).count();
     if (n < 1) bad("home footer", href);

@@ -243,7 +243,7 @@ function locateOrNearest(lon: number, lat: number, idx: CountryIdx[]) {
 
 export async function fetchGlobeStats(): Promise<GlobeStats> {
   if (statsCache && statsCache.ver === STATS_VER && Date.now() - statsCache.at < 2 * 60_000) return statsCache.data;
-  const empty = { events: [] as { countryCode: string }[] };
+  const empty = { events: [] as { countryCode: string; country?: string }[] };
   const [idx, shops, comms, ev, csv, places] = await Promise.all([
     countryIndex().catch(() => [] as CountryIdx[]),
     fetchAllMerchants().catch(() => []),
@@ -357,7 +357,7 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     logo: FOUNDING_UY.logo,
   };
   addListing(founding);
-  listings.set(founding.id, founding);
+  listings.set(FOUNDING_UY.id, founding);
   if (!overlay.some((o) => o.id === founding.id)) overlay.push(founding);
   else {
     const i = overlay.findIndex((o) => o.id === founding.id);

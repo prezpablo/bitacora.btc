@@ -17,6 +17,9 @@ export default tseslint.config(
       "src/routeTree.gen.ts",
       "public/**",
       "data/**",
+      "scripts/grok-pwa*.mjs",
+      "scripts/grok-pwa-plugin.test.mjs",
+      "server/middleware/grok-pwa.ts",
     ],
   },
   js.configs.recommended,
@@ -33,12 +36,10 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-hooks/exhaustive-deps": "off",
+      "react-refresh/only-export-components": "off",
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "off",

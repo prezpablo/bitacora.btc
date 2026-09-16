@@ -1,14 +1,13 @@
 import { useMemo } from "react";
 import { useQuery, useQueryClient, keepPreviousData, type QueryClient } from "@tanstack/react-query";
 import type { GlobeStats } from "@/domain/globe";
-import type { EventBoardQuery, ShopPin } from "@/domain";
+import type { EventBoardQuery } from "@/domain";
 import { quantizeBox, rememberShopBox, shopsFromCache, shopsInView, type ShopBoxCache } from "@/domain/shop-cache";
 import {
   getBtcCommunities,
   getGlobeStats,
   getMapCsv,
   getMerchants,
-  getMerchant,
   getNetworkEvents,
 } from "@/infrastructure/server-fns";
 

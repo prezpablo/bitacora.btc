@@ -98,7 +98,7 @@ function kindColor(kind: ReturnType<typeof candleKind>) {
   return "var(--color-doji)";
 }
 
-function heatFill(t: number) {
+function _heatFill(t: number) {
   const c = Math.max(0, Math.min(1, t));
   for (let i = 1; i < HEAT_STOPS.length; i++) {
     const [t1, col1] = HEAT_STOPS[i]!;
@@ -111,7 +111,7 @@ function heatFill(t: number) {
   return HEAT_STOPS[HEAT_STOPS.length - 1]![1];
 }
 
-function robustPeak(values: number[]) {
+function _robustPeak(values: number[]) {
   const xs = values.filter((v) => v > 0).sort((a, b) => a - b);
   if (xs.length === 0) return 1;
   const p98 = xs[Math.floor((xs.length - 1) * 0.98)]!;
@@ -228,7 +228,7 @@ const TF_STEPS = [
   7 * 86_400_000,
 ];
 
-function pickStep(span: number, maxBars: number, medianDt: number, maxDt: number) {
+function _pickStep(span: number, maxBars: number, medianDt: number, maxDt: number) {
   const day = 86_400_000;
   if (span >= 70 * day && span <= 420 * day) return day;
   let minStep = Math.max(medianDt * 0.7, 60_000);
@@ -248,7 +248,7 @@ function pickStep(span: number, maxBars: number, medianDt: number, maxDt: number
 }
 
 /** Agrega a intervalos de tiempo iguales. No mezcla 15m con diarias en un mismo bucket indexado. */
-function resampleTime(candles: Candle[], t0: number, t1: number, step: number): Candle[] {
+function _resampleTime(candles: Candle[], t0: number, t1: number, step: number): Candle[] {
   const n = candles.length;
   if (n === 0 || step <= 0) return [];
   if (n <= 3) return candles;
@@ -1056,7 +1056,7 @@ export function PriceChart({
           vectorEffect="non-scaling-stroke"
         />
 
-        {layout.candles.map((c, i) => {
+        {layout.candles.map((c) => {
           const x = layout.xOf(c.t);
           const hw = Math.max(layout.bodyW, 24) / 2;
           return (
@@ -1696,13 +1696,13 @@ function HeatRail({
   clusters,
   yOf,
   heatX,
-  pMin,
-  pMax,
+  pMin: _pMin,
+  pMax: _pMax,
   maxCluster,
   mainH,
   price,
   pocPrice,
-  active,
+  active: _active,
   heatW,
 }: {
   clusters: MarketPayload["clusters"];
@@ -1938,7 +1938,7 @@ function MaEndLabels({
   );
 }
 
-function VolumeBar({
+function _VolumeBar({
   c,
   layout,
   active,
@@ -1968,7 +1968,7 @@ function VolumeBar({
   );
 }
 
-function CandleShape({
+function _CandleShape({
   c,
   layout,
   active,

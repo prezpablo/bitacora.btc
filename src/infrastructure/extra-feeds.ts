@@ -11,7 +11,7 @@ import type {
   SeriesPoint,
 } from "@/domain/entities";
 
-const DAY = 86_400_000;
+const _DAY = 86_400_000;
 const LOOKBACK: Record<ChartRange, number> = {
   "1d": homeLookback("1d"),
   "1w": homeLookback("1w"),

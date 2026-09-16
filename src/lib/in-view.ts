@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 /** Latch true on first intersect. Disconnects. SSR / no IO → show after mount. */
 export function useInView(rootMargin = "240px") {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [shown, setShown] = useState(false);
 
   useEffect(() => {

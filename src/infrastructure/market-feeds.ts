@@ -67,7 +67,7 @@ function parseKline(row: unknown[]): Candle {
   };
 }
 
-async function fetchKlines(interval: string, limit: number, signal: AbortSignal, startTime?: number) {
+async function _fetchKlines(interval: string, limit: number, signal: AbortSignal, startTime?: number) {
   const cap = Math.min(1000, Math.max(limit, 24));
   let path = `/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${cap}`;
   if (startTime != null) path += `&startTime=${startTime}`;

@@ -60,7 +60,7 @@ export function CommunityPinsBoard() {
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [_copied, setCopied] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
   const [generating, setGenerating] = useState(false);
   const [formOpen, setFormOpen] = useState(false);

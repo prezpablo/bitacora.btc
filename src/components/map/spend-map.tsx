@@ -36,7 +36,7 @@ import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
 import { EMPTY_COMM_FORM, MapComposeForm, type CommForm } from "./map-compose-form";
 import { EMPTY_HOURS, type WeekHours } from "@/domain/hours";
 import type { PayKey } from "@/domain/pays";
-import { CaptchaBox, type CaptchaTicket } from "./captcha";
+import { type CaptchaTicket } from "./captcha";
 import { formatStreet, type StreetHit } from "@/infrastructure/address";
 import { onJoinMap } from "@/application/join-map";
 import {
@@ -144,7 +144,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     guideWait,
     guideErr,
     guideSteps,
-    pickOrigin,
+    pickOrigin: _pickOrigin,
     clearRoute,
     goToUser,
     startGuide,
@@ -1351,7 +1351,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const local = sel ? store[sel.id] : undefined;
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
-  const hasPin = Boolean(sel || selComm || pendingCarga);
+  const _hasPin = Boolean(sel || selComm || pendingCarga);
 
   const body = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">

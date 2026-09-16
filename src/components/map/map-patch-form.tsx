@@ -36,8 +36,8 @@ export function ListingPatchForm({
   const [nextName, setNextName] = useState(name);
   const [nextDesc, setNextDesc] = useState(description || "");
   const [nextAddr, setNextAddr] = useState(address || "");
-  const [nextNotes, setNextNotes] = useState(notes || "");
-  const [nextLogo, setNextLogo] = useState(logo || "");
+  const [nextNotes] = useState(notes || "");
+  const [nextLogo] = useState(logo || "");
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);

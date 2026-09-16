@@ -315,5 +315,5 @@ export function fanLon<T extends { lat: number; lon: number; slot: number; slots
   rows: T[],
   gapDeg: number,
 ): (T & { lat0: number; lon0: number })[] {
-  return layoutCityLogos(rows as T & NamedPin, gapDeg) as (T & { lat0: number; lon0: number })[];
+  return layoutCityLogos(rows as unknown as (T & NamedPin)[], gapDeg) as (T & { lat0: number; lon0: number })[];
 }

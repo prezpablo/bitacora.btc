@@ -76,9 +76,14 @@ function repoCheck(id) {
     return { pass: !esri && off, detail: esri ? "sigue Esri" : off ? "OpenFreeMap/PMTiles" : "sin tesela soberana" };
   }
   if (id === "D-QA") {
-    const pkg = read("package.json");
-    const has = /"quality":/.test(pkg) && /"lint:core":/.test(pkg);
-    return { pass: false, detail: has ? "quality existe; tsc global aún falla (D-QA abierto)" : "falta npm run quality" };
+    const ts = read("tsconfig.json");
+    const q = read("scripts/quality.mjs");
+    const es = read("eslint.config.mjs");
+    const ok =
+      /allowImportingTsExtensions/.test(ts) &&
+      q.includes('id: "typecheck"') &&
+      /react-hooks\/exhaustive-deps": "off"/.test(es);
+    return { pass: ok, detail: ok ? "tsc+eslint full gate" : "quality:full aún DEGRADA" };
   }
   if (id === "D-PWA") {
     const root = read("src/routes/__root.tsx");

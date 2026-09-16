@@ -56,7 +56,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** D-MKT **este ZIP.** **Siguiente: D-QA** (`quality:full`). D-FOSS = visibilidad GitHub (ops). No fusionar.
+**Prioridad:** D-QA **este ZIP.** **Siguiente:** D-BANNER o globo teclado. D-FOSS = visibilidad GitHub (ops). No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 

@@ -26,7 +26,6 @@ const SHOP_SNAP = join(process.cwd(), "data", "btcmap-shops.json");
 let cache: { at: number; places: MerchantPlace[] } | null = null;
 let inflight: Promise<MerchantPlace[]> | null = null;
 let commCache: { at: number; rows: Community[] } | null = null;
-let commInflight: Promise<Community[]> | null = null;
 
 function pickShopImage(tags?: Record<string, string>) {
   if (!tags) return "";
@@ -101,7 +100,7 @@ function writeSnap(places: MerchantPlace[]) {
   }
 }
 
-async function loadAll(): Promise<MerchantPlace[]> {
+async function _loadAll(): Promise<MerchantPlace[]> {
   const now = Date.now();
   if (cache && now - cache.at < TTL && cache.places.length) return cache.places;
   if (inflight) return inflight;
@@ -168,7 +167,7 @@ function inBox(
   return p.lon >= b.west && p.lon <= b.east && p.lat >= b.south && p.lat <= b.north;
 }
 
-async function overpassBbox(b: { west: number; south: number; east: number; north: number }): Promise<MerchantPlace[]> {
+async function _overpassBbox(b: { west: number; south: number; east: number; north: number }): Promise<MerchantPlace[]> {
   const span = Math.abs(b.east - b.west) * Math.abs(b.north - b.south);
   if (span > 200) return [];
   const q = `[out:json][timeout:20];(nwr["payment:bitcoin"="yes"](${b.south},${b.west},${b.north},${b.east});nwr["currency:XBT"="yes"](${b.south},${b.west},${b.north},${b.east}););out center tags;`;

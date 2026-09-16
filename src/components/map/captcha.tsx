@@ -94,7 +94,6 @@ export function CaptchaBox({
       mineAbort.current?.abort();
       if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -104,7 +103,6 @@ export function CaptchaBox({
     if (Date.now() - born < 400) return;
     onOk(true);
     onTicket?.({ id, answer: typed.trim().toUpperCase(), nonce });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nonce]);
 
   function pass() {

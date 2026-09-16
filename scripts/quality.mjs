@@ -2,7 +2,7 @@
 /**
  * Gate local de calidad. No sustituye el smoke del .org.
  * Falla si tests, lint de dominio/aplicación o el invariante auth fallan.
- * typecheck y eslint global son D-QA (informativos hasta que el tsc esté limpio).
+ * typecheck y eslint global entran en --full y fallan el gate.
  *
  *   node scripts/quality.mjs
  *   node scripts/quality.mjs --full
@@ -41,7 +41,8 @@ for (const step of GATE) {
 if (FULL) {
   for (const step of INFO) {
     const r = run(step);
-    console.log(`${r.pass ? "OK  " : "DEGRADA"}  ${r.id.padEnd(12)} ${r.tail || `exit ${r.status}`} (D-QA)`);
+    if (!r.pass) fail += 1;
+    console.log(`${r.pass ? "OK  " : "FAIL"}  ${r.id.padEnd(12)} ${r.tail || `exit ${r.status}`}`);
   }
 }
 if (fail) process.exit(1);
