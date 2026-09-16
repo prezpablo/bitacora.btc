@@ -26,9 +26,17 @@ async function pull(path, extra = {}) {
     });
     const buf = Buffer.from(await res.arrayBuffer());
     const text = extra.bin ? "" : buf.toString("utf8");
-    return { ok: res.ok, status: res.status, ms: Date.now() - t0, type: res.headers.get("content-type") || "", text, bytes: buf.length };
+    return {
+      ok: res.ok,
+      status: res.status,
+      ms: Date.now() - t0,
+      type: res.headers.get("content-type") || "",
+      csp: res.headers.get("content-security-policy") || "",
+      text,
+      bytes: buf.length,
+    };
   } catch (err) {
-    return { ok: false, status: 0, ms: Date.now() - t0, type: "", text: "", bytes: 0, err: err instanceof Error ? err.message : "fail" };
+    return { ok: false, status: 0, ms: Date.now() - t0, type: "", csp: "", text: "", bytes: 0, err: err instanceof Error ? err.message : "fail" };
   } finally {
     clearTimeout(timer);
   }
@@ -118,7 +126,7 @@ for (const p of pages) {
   add(core, "legal#codigo", /id="codigo"/.test(legal.text) && /AGPL/.test(legal.text), /id="codigo"/.test(legal.text) ? "codigo+AGPL" : "sin #codigo");
 }
 
-for (const p of ["/og.jpg", "/favicon.svg", "/contribuir-qr.png", "/contribuir-ln.png", "/humans.txt", "/llms.txt"]) {
+for (const p of ["/og.jpg", "/favicon.svg", "/contribuir-qr.png", "/contribuir-ln.png", "/humans.txt", "/llms.txt", "/icon-180.png", "/logos/conciencia-bitcoin.png"]) {
   const r = await pull(p, { bin: !p.endsWith(".txt") });
   add(core, `static ${p}`, r.status === 200 && r.bytes > 32, `${r.status} ${r.bytes}b ${r.type}`);
 }
@@ -165,6 +173,42 @@ for (const p of firstParty) {
   add(STRICT ? core : warn, "P2-16 sin grok.com/extensions.js", !grokJs, grokJs ? "residual grok.com script" : "limpio");
   const desk = /bit[aá]cora/i.test(es.text) && (es.text.includes("Pulso") || es.text.includes("Mercado") || es.text.includes("mapa"));
   add(core, "desk HTML", desk, "origen renderiza; D-BN/D-MP del runner no es CAÍDA");
+  const csp = es.csp || "";
+  const img = (csp.match(/img-src[^;]*/i) || [""])[0];
+  add(core, "P2-20 img-src allowlist", /img-src/.test(csp) && !/\simg-src[^;]*\shttps:\s/.test(` ${csp}`) && /tiles\.openfreemap\.org/.test(csp) && /tile\.opentopomap\.org/.test(csp), img.slice(0, 180) || "sin img-src");
+  add(core, "P2-18 CSP sin Google Fonts", !/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(csp), /fonts\.googleapis/.test(csp) ? "fonts google" : "self");
+  add(core, "P2-03 sin Esri", !/arcgisonline/.test(csp) && /openfreemap/.test(csp), /arcgisonline/.test(csp) ? "regresión Esri" : "OFM");
+  const idx = (es.text.match(/\/assets\/index-[^"' ]+\.js/) || [])[0] || "";
+  if (idx) {
+    const js = await pull(idx);
+    add(core, "P0-11 JS index", js.status === 200 && js.bytes > 1000, `${js.status} ${js.bytes}b`);
+  }
+  const assets = [...es.text.matchAll(/\/assets\/[^"' ]+\.js/g)].map((m) => m[0]);
+  let hasLogo = false;
+  let hasLatam = false;
+  for (const s of [...new Set(assets)].slice(0, 12)) {
+    const js = await pull(s);
+    if (js.text.includes("/logo?u=")) hasLogo = true;
+    if (/Latinoam|Latin America|América Latina/.test(js.text)) hasLatam = true;
+  }
+  add(core, "P0-22 bundle /logo", hasLogo, hasLogo ? "imgSrc proxy" : "sin /logo?u= en chunks");
+  add(warn, "P1-56 globo Latam copy", hasLatam, hasLatam ? "Latam en bundle" : "N/D-SSR");
+}
+
+{
+  const luma =
+    "https://images.lumacdn.com/cdn-cgi/image/width=960,quality=72,format=jpeg/uploads/az/44234a81-2d45-4379-8ebb-710b3d76e97c.jpg";
+  const r = await pull(`/logo?u=${encodeURIComponent(luma)}`, { bin: true });
+  add(
+    core,
+    "P0-25 /logo Luma JPEG",
+    r.status === 200 && /image\/(jpeg|jpg|webp|png)/i.test(r.type) && r.bytes > 800 && r.bytes < 400_000,
+    `${r.status} ${r.type} ${r.bytes}b`,
+  );
+  const ssrf = await pull(`/logo?u=${encodeURIComponent("https://127.0.0.1/")}`, { bin: true });
+  add(core, "P2-21 /logo SSRF", ssrf.status === 404 || ssrf.status === 400, `${ssrf.status} ${ssrf.bytes}b`);
+  const empty = await pull("/logo", { bin: true });
+  add(warn, "P2-21 /logo sin u", empty.status === 404, `${empty.status}`);
 }
 
 async function third(id, url) {
@@ -199,6 +243,8 @@ await third("binance.api", "https://api.binance.com/api/v3/ticker/24hr?symbol=BT
 await third("binance.vision", "https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT");
 await third("okx", "https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP");
 await third("formsubmit", "https://formsubmit.co/");
+await third("openfreemap", "https://tiles.openfreemap.org/styles/liberty");
+await third("opentopo", "https://a.tile.opentopomap.org/4/5/6.png");
 
 const coreFail = core.filter((x) => !x.pass);
 const warnFail = warn.filter((x) => !x.pass);

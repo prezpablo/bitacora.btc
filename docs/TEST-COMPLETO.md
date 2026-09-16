@@ -4,7 +4,7 @@ Pegar el bloque de abajo en el agente. Cubre **todos** los componentes de la web
 
 No pentest. Complementa `npm test`, `npm run test:live`, `npm run test:seo`, `npm run test:a11y`. Diario corto: [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md).
 
-Fecha: 10 set 2026. IA: D-NAV-01…05.
+Fecha: 16 set 2026. IA: D-CSP-IMG · /logo · globo mundial · D-MKT.
 
 ---
 
@@ -79,6 +79,10 @@ B) P0 INFRA ORIGEN (CAÍDA si falla)
 - P0-19 /manifest.webmanifest 200 name Bitácora.btc; HTML no usa /__grok/manifest
 - P0-20 sitemap lastmod ≠ 2026-09-07
 - P0-21 /LICENSE 200 AGPL-3.0
+- P0-22 chunks `/logo?u=`
+- P0-23 /icon-180.png 200
+- P0-24 /logos/conciencia-bitcoin.png 200
+- P0-25 /logo JPEG Luma compacto 200 1–400 KB
 
 C) CHROME (header + pie)
 - C1 Skip link href="#contenido" en /, /mapa, /legal, /labif y 404
@@ -156,7 +160,7 @@ J) i18n + SEO
 K) P2 SEGURIDAD
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer no-referrer, permissions-policy
 - P2-02 object-src none; form-action self + formsubmit.co
-- P2-03 connect-src: geojs, ipwho.is, nominatim, Esri/OpenTopoMap, btcmap. Velas NO en connect-src
+- P2-03 connect-src: geojs, ipwho.is, nominatim, OpenFreeMap, OpenTopoMap, btcmap. Velas NO en connect-src. `arcgisonline` = regresión
 - P2-04 sin gtag/fbq/pixel/hotjar
 - P2-06 sin login / wallet-connect / depósito / «enviá fondos»
 - P2-07 /api y /__grok no exponen admin, keys ni CARGA-
@@ -168,6 +172,8 @@ K) P2 SEGURIDAD
 - P2-17 CSV público sin tokens CARGA- / BIT-
 - P2-18 sin reCAPTCHA, Turnstile, Google Fonts remoto
 - P2-19 404 sin stack, sin /var/www, sin env
+- P2-20 img-src sin `https:` comodín; teselas OFM/OTM; logos por `/logo`
+- P2-21 /logo SSRF 127.0.0.1 → 404
 
 L) P3 FEEDS — 1 GET/HEAD
 Mapa: D-BTCMAP-E D-BTCMAP-A D-OFM D-OTM D-NOM D-GEOJS D-IPWHO

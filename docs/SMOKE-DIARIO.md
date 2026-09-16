@@ -2,7 +2,7 @@
 
 Pegar el bloque de abajo en el agente (Grok u otro). No pentest. Complementa `npm run test:live` y `npm run test:seo`; no los reemplaza.
 
-Fecha del prompt: 15 set 2026. Hallazgos: D-PWA `/manifest.webmanifest`; D-LIC AGPL `/LICENSE`; sitemap 5 locs + lastmod del ZIP; skip en 404; tagline Bircoiner.
+Fecha del prompt: 16 set 2026. Hallazgos: D-CSP-IMG img-src sin `https:` + `/logo`; flyers Luma JPEG 960px; globo totales mundiales + línea Latinoamérica; D-MKT extras vacíos ocultos.
 
 ---
 
@@ -20,7 +20,8 @@ CANÓNICO: https://bitacorabtc.org
 WWW debe 301 a https://bitacorabtc.org/
 Rutas: / /mapa /legal /labif /?lang=es /?lang=pt /?lang=en
 First-party: /data/map.csv /data/pins.csv /data/btcmap-shops.json /data/btcmap-comms.json /data/ne-110m-countries.json /data/ne-cities-10m.json
-También: /healthz /robots.txt /sitemap.xml /LICENSE /manifest.webmanifest /icon-180.png /.well-known/security.txt /favicon.svg /humans.txt /llms.txt /og.jpg /contribuir-qr.png /contribuir-ln.png y el JS /assets/index-*.js del HTML.
+También: /healthz /robots.txt /sitemap.xml /LICENSE /manifest.webmanifest /icon-180.png /logos/conciencia-bitcoin.png /.well-known/security.txt /favicon.svg /humans.txt /llms.txt /og.jpg /contribuir-qr.png /contribuir-ln.png y el JS /assets/*.js del HTML.
+GET /logo?u= (proxy first-party de flyers/logos). NO pedir Luma/Meetup/Eventbrite API.
 Dirección BTC inmutable: bc1qe2f3fu7nwqnl00ankn2g22r8zv2frs4ckkk83t
 Cert LE: vence 2026-11-30. Alerta si <21 días.
 
@@ -53,6 +54,10 @@ P0 Infra origen
 - P0-19 GET /manifest.webmanifest 200 JSON name Bitácora.btc, start_url /, icons /icon-180.png. HTML rel=manifest a esa URL (NO /__grok/manifest)
 - P0-20 sitemap lastmod ≠ 2026-09-07 (sello del ZIP; DEGRADA SEO si vuelve al 07)
 - P0-21 GET /LICENSE 200 y «GNU AFFERO GENERAL PUBLIC LICENSE»
+- P0-22 chunks /assets/*.js contienen `/logo?u=` (imgSrc proxy)
+- P0-23 GET /icon-180.png 200
+- P0-24 GET /logos/conciencia-bitcoin.png 200
+- P0-25 GET /logo?u= JPEG Luma ya compacto (cdn-cgi width=960) → 200 image/jpeg, 1–400 KB. 404 = DEGRADA flyers (no CAÍDA)
 
 P1 Producto
 - P1-01 home con anclas mapa, aprender, comunidad, mercado (pulso y red pueden ser internas; texto o href, no hace falta Leaflet)
@@ -76,6 +81,8 @@ P1 Producto
 - P1-53 pie sin Privacidad duplicada; rumbo y contacto en el pie, no en la barra
 - P1-54 #red ancla interna de #mercado
 - P1-55 tagline «mundo Bircoiner». «Consciencia Bitcoin» no se traduce ni se cambia
+- P1-56 globo: dígitos grandes = totales mundiales; línea chica «Latinoamérica» (N/D-sin-browser si no hay DOM hidratado; el chunk debe traer copy Latam)
+- P1-57 Mercado: disclaimer educativo presente. Widgets ETF/FG/liq/clarity/onchain ausentes si el proxy trae vacío — no exige tick >0 (P1-20)
 
 P2 Seguridad
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer-policy no-referrer, permissions-policy
@@ -90,8 +97,10 @@ P2 Seguridad
 - P2-15 días de cert
 - P2-16 grok.com/grok-app-builder/extensions.js en el HTML es residuo; CSP script-src self lo bloquea. NO es dependencia de producto. Si aparece en connect-src o script-src, ALERTA
 - P2-17 CSV público sin tokens CARGA- / BIT- (secreto de verificación)
-- P2-18 sin reCAPTCHA, Turnstile, Google Fonts remoto
+- P2-18 sin reCAPTCHA, Turnstile, Google Fonts remoto (CSP font-src self; no fonts.googleapis.com)
 - P2-19 404 sin stack, sin /var/www, sin env
+- P2-20 img-src **sin** comodín `https:`. Allowlist: self, data, blob, static.btcmap.org, *.btcmap.org, tiles.openfreemap.org, *.tile.opentopomap.org. Logos/flyers por `/logo`
+- P2-21 GET /logo?u=https://127.0.0.1/ → 404 (SSRF). GET /logo sin `u` → 404
 
 P3 Dependencias — 1 GET/HEAD c/u
 Mapa
@@ -116,7 +125,8 @@ On-chain / extras
 - D-POLY https://gamma-api.polymarket.com/markets?limit=1  (si 404, probar https://polymarket.com y marcar N/D no CAÍDA)
 Contacto
 - D-FS HEAD/GET https://formsubmit.co/
-NO pingear diario: 10 perps de liquidaciones, Luma/Meetup/Eventbrite, RSS, traductores (googleapis/lingva/mymemory), Firebase, GitHub token, BlockHorizon.
+NO pingear diario: 10 perps de liquidaciones, Luma/Meetup/Eventbrite **API**, RSS, traductores (googleapis/lingva/mymemory), Firebase, GitHub token, BlockHorizon.
+SÍ medir first-party `/logo` con un JPEG Luma ya compacto (1 GET a bitacorabtc.org, el VPS tira del CDN).
 Si hoy es LUNES, renglón SEMANAL (1 GET c/u, solo DEGRADA): https://mempool.emzy.de/api/v1/fees/recommended  y  https://blockstream.info/api/blocks/tip/height
 
 SEMÁFORO
@@ -132,9 +142,9 @@ FORMATO (español, corto):
 1) CHECKLIST
 Bitácora.btc — smoke YYYY-MM-DD HH:MM TZ
 Semáforo: OK | DEGRADA | CAÍDA
-P0 infra: n/n
-P1 producto: n/n
-P2 seguridad: n/n
+P0 infra: n/n (incl. P0-22 /logo bundle · P0-25 /logo JPEG)
+P1 producto: n/n (incl. P1-56 globo · P1-57 Mercado)
+P2 seguridad: n/n (incl. P2-20 img-src · P2-21 SSRF /logo)
 P3 deps: n/n
 Desk feeds: BN=/VISION=/OKX=/HL= → precio_ok SI/NO (regla 1-de-4)
 Mapa feeds: btcmap-e=/btcmap-a=/ofm=/otm=
