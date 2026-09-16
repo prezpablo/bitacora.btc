@@ -27,6 +27,19 @@ function logoLimited(ip: string) {
   return false;
 }
 
+function lumaCompact(href: string) {
+  try {
+    const u = new URL(href);
+    if (u.hostname !== "images.lumacdn.com") return href;
+    if (u.pathname.includes("/cdn-cgi/image/")) return href;
+    const path = u.pathname.replace(/^\//, "");
+    if (!path) return href;
+    return `https://images.lumacdn.com/cdn-cgi/image/width=960,quality=72,format=jpeg/${path}`;
+  } catch {
+    return href;
+  }
+}
+
 function unwrap(raw: string) {
   try {
     const u = new URL(raw);
@@ -52,7 +65,7 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 429);
     return "";
   }
-  const href = unwrap(String(getQuery(event).u || ""));
+  const href = lumaCompact(unwrap(String(getQuery(event).u || "")));
   if (!href || !(await urlResolvesPublic(href))) {
     setResponseStatus(event, 404);
     return "";

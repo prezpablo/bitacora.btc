@@ -17,6 +17,7 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   const logo = read("server/routes/logo.get.ts");
   assert.match(logo, /MAX = 2_000_000/);
   assert.match(logo, /img\.evbuc\.com/);
+  assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=960,quality=72,format=jpeg/);
   const caddy = read("deploy/Caddyfile");
   assert.match(caddy, /img-src 'self'/);
   assert.doesNotMatch(caddy, /img-src[^"]*\shttps:\s/);
