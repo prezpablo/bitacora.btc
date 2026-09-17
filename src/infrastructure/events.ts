@@ -368,7 +368,9 @@ async function fetchEventbrite(): Promise<NetworkEvent[]> {
       id: `eb:${e.id || e.url}`,
       title: e.name.trim(),
       description: (e.summary || "").replace(/\s+/g, " ").slice(0, 180),
-      image: e.image_id ? `https://img.evbuc.com/https://cdn.evbuc.com/images/${e.image_id}/original.jpg` : "",
+      image: e.image_id
+        ? `https://img.evbuc.com/https://cdn.evbuc.com/images/${e.image_id}/original.jpg?w=940&auto=format`
+        : "",
       startAt,
       endAt: Number.isFinite(endAt) ? endAt : undefined,
       timezone: e.timezone,

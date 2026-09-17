@@ -14,7 +14,7 @@ function logoLimited(ip: string) {
   const windowMs = 10 * 60_000;
   const arr = (logoHits.get(ip) || []).filter((t) => now - t < windowMs);
   const all = [...logoHits.values()].reduce((n, a) => n + a.filter((t) => now - t < windowMs).length, 0);
-  if (arr.length >= 80 || all >= 800) return true;
+  if (arr.length >= 240 || all >= 1200) return true;
   arr.push(now);
   logoHits.set(ip, arr);
   if (logoHits.size > 4000) {
@@ -74,12 +74,9 @@ function unwrap(raw: string) {
 
 export default defineEventHandler(async (event) => {
   const ip = String(event.node?.req?.headers?.["x-real-ip"] || event.node?.req?.socket?.remoteAddress || "anon");
-  if (logoLimited(ip)) {
-    setResponseStatus(event, 429);
-    return "";
-  }
   const q = getQuery(event);
-  const href = lumaCompact(unwrap(String(q.u || "")));
+  const rawHref = unwrap(String(q.u || ""));
+  const href = lumaCompact(rawHref);
   if (!href || !(await urlResolvesPublic(href))) {
     setResponseStatus(event, 404);
     return "";
@@ -97,8 +94,13 @@ export default defineEventHandler(async (event) => {
   } catch {
     /* miss */
   }
-  try {
-    const res = await fetch(href, {
+  if (logoLimited(ip)) {
+    setResponseStatus(event, 429);
+    return "";
+  }
+
+  async function pull(url: string) {
+    const res = await fetch(url, {
       headers: { Accept: "image/*,*/*;q=0.8", "User-Agent": "Mozilla/5.0 Bitacora.btc" },
       signal: AbortSignal.timeout(10_000),
       redirect: "manual",
@@ -106,35 +108,33 @@ export default defineEventHandler(async (event) => {
     let final = res;
     if (res.status >= 300 && res.status < 400) {
       const loc = res.headers.get("location");
-      const next = loc ? unwrap(new URL(loc, href).toString()) : "";
-      if (!next) {
-        setResponseStatus(event, 404);
-        return "";
-      }
+      const next = loc ? unwrap(new URL(loc, url).toString()) : "";
+      if (!next) return null;
       final = await fetch(next, {
         headers: { Accept: "image/*,*/*;q=0.8", "User-Agent": "Mozilla/5.0 Bitacora.btc" },
         signal: AbortSignal.timeout(10_000),
         redirect: "manual",
       });
     }
-    if (!final.ok) {
-      setResponseStatus(event, 404);
-      return "";
-    }
+    if (!final.ok) return null;
     const type = (final.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
-    if (!/^image\//i.test(type) && type !== "application/octet-stream") {
-      setResponseStatus(event, 404);
-      return "";
-    }
+    if (!/^image\//i.test(type) && type !== "application/octet-stream") return null;
     const buf = Buffer.from(await final.arrayBuffer());
-    if (!buf.length || buf.length > MAX) {
+    if (!buf.length || buf.length > MAX) return null;
+    return { buf, type };
+  }
+
+  try {
+    let got = await pull(href);
+    if (!got && rawHref && rawHref !== href) got = await pull(rawHref);
+    if (!got) {
       setResponseStatus(event, 404);
       return "";
     }
-    let out: Buffer = buf;
-    let outType = type.startsWith("image/") ? type : "image/jpeg";
+    let out: Buffer = got.buf;
+    let outType = got.type.startsWith("image/") ? got.type : "image/jpeg";
     if (thumb) {
-      const cut = await toThumb(buf);
+      const cut = await toThumb(got.buf);
       if (cut?.length) {
         out = cut;
         outType = "image/jpeg";

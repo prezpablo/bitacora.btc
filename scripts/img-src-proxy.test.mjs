@@ -16,7 +16,8 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(events, /object-cover/);
   const flyer = read("src/domain/map-csv.ts");
   assert.match(flyer, /export function eventFlyerSrc/);
-  assert.match(flyer, /fit=thumb/);
+  assert.match(flyer, /FLYER_HOST/);
+  assert.match(flyer, /lumaFlyerUrl/);
   const eventsUi = read("src/components/dashboard/network-events.tsx");
   assert.match(eventsUi, /object-cover/);
   assert.match(eventsUi, /objectPosition: "center center"/);

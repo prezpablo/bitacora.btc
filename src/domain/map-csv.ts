@@ -178,12 +178,35 @@ export function imgSrc(raw: string) {
   return `/logo?u=${encodeURIComponent(u)}`;
 }
 
-/** Flyers: same proxy, auto 4:3 cover centrado (`fit=thumb`). */
+const FLYER_HOST =
+  /(^|\.)lumacdn\.com$|(^|\.)meetupstatic\.com$|(^|\.)evbuc\.com$|(^|\.)unsplash\.com$|(^|\.)luma\.com$|(^|\.)lu\.ma$/i;
+
+/** Luma CDN already crops 4:3; other flyers use CSS object-cover. */
+export function lumaFlyerUrl(href: string) {
+  try {
+    const u = new URL(href);
+    if (u.hostname !== "images.lumacdn.com") return href;
+    if (u.pathname.includes("/cdn-cgi/image/")) return href;
+    const path = u.pathname.replace(/^\//, "");
+    if (!path) return href;
+    return `https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
+  } catch {
+    return href;
+  }
+}
+
+/** Event flyers: browser → CDN (CSP allowlist). `/logo` only for unknown hosts. */
 export function eventFlyerSrc(raw: string) {
   const u = logoUrl(raw);
   if (!u) return "";
   if (u.startsWith("/") || u.startsWith("data:")) return u;
-  return `/logo?u=${encodeURIComponent(u)}&fit=thumb`;
+  try {
+    const url = new URL(u);
+    if (FLYER_HOST.test(url.hostname)) return lumaFlyerUrl(u);
+  } catch {
+    /* proxy */
+  }
+  return imgSrc(u);
 }
 
 function cell(v: string | number) {
