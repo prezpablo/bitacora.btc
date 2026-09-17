@@ -5,6 +5,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
 import { COMMUNITY_HUB, MARKET_HUB, sectorOf } from "@/domain/nav";
 import { HubIndex } from "./hub-index";
+import { LabitconfBanner } from "./labitconf-banner";
 import { buildModelMarket } from "@/application";
 import { getDeskExtras, getEtfFlows, getMarket, getOnchainLive, getPulse, getTick } from "@/infrastructure/server-fns";
 import { cn, formatPct, formatUsd } from "@/lib/utils";
@@ -295,6 +296,7 @@ export function Desk() {
           fallbackHash="anuncios"
           parentHash="comunidad"
         />
+        <LabitconfBanner />
         <section id="anuncios" className="scroll-mt-[4.5rem]">
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="12rem">
