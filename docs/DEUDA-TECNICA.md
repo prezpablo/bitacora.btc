@@ -1,9 +1,8 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 15 de setiembre de 2026 · **Retomar el 16 set 2026**  
+**Fecha:** 17 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` · **D-STATS este ZIP.**  
-**ZIP en `.org`:** 15 set ~16:21 -03 (`map-gate-4sb9EBeM.js`, `mapCluster` en index). **Siguiente subida:** D-STATS.
+**Repo:** `prezpablo/bitacora.btc` `main` · **ZIP en `.org`:** `fe530c4` (CTA Telegram + `/logo?fit=thumb`).
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -59,6 +58,20 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 **Prioridad:** D-QA **este ZIP.** **Siguiente:** D-BANNER o globo teclado. D-FOSS = visibilidad GitHub (ops). No fusionar.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
+
+---
+
+**Smoke 17 set (Grok diario) — cotejo**
+
+Informe: DEGRADA · barra 4 destinos + CTA Telegram · habitaciones SI · TTFB 0,39 s · feeds_ok 12/16 · license SI · pwa SI. **Sin CAÍDA ni incidente.**
+
+| Ítem | ¿Activo en origen? | Veredicto | Deuda |
+|---|---|---|---|
+| **P0-12** shops/comms 404 | **No.** `/data/btcmap-shops.json` 200 (2,9 MB) · `/data/btcmap-comms.json` 200 · `pins.csv` 200. 404 **solo** `/data/shops.json` y `/data/comms.json` (alias que no existen). | Falso positivo. Igual que 14–15 set. | No abrir. No inventar alias. |
+| **D-BN** 451 | Este runner 451. **Vision 200 + OKX 200.** Desk HTML pinta Mercado. | DEGRADA-feed del probe, no mercado caído. | No reabrir. |
+| **D-MP-*** timeout | Este runner mudo a mempool.space y ninja (8 s). VPS: ninja+emzy+blockstream+last-known. | On-chain no verificable *aquí*. No CAÍDA. | Avisar solo si el VPS queda vacío 2–3 días. |
+
+**Prioridad:** ninguna de estas alertas entra a cola. Siguiente producto = D-FOSS (ops GitHub) o ítems P3 abiertos (globo teclado / D-418). No fusionar.
 
 ---
 
