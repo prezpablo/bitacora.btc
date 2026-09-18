@@ -61,6 +61,22 @@ OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host 
 
 ---
 
+**Smoke 18 set (Grok diario) — cotejo**
+
+Informe: DEGRADA-low · TTFB 0,4 s · feeds_ok 12/16 · license/pwa SI · habitaciones N/D (sin clics). **Sin CAÍDA ni incidente.** `.org` ya tiene `7a5d4ec` (banner LABITCONF + flyers CDN).
+
+| Ítem | ¿Activo en origen? | Veredicto | Deuda |
+|---|---|---|---|
+| **P0-12** shops/comms geojson | **No.** `/data/btcmap-shops.json` 200 (2,9 MB) · `/data/btcmap-comms.json` 200. 404 solo `/data/shops.json` y `/data/comms.json`. | Falso positivo. Igual 14–17 set. | No abrir. No alias. |
+| **D-BN** 451 | Runner. **Vision 200 + OKX 200.** | DEGRADA-feed, no mercado caído. | No reabrir. |
+| **D-MP-*** timeout | Este runner mudo a mempool.space. VPS: ninja+emzy+blockstream+last-known. | On-chain no verificable *aquí*. | Avisar solo si el VPS queda vacío 2–3 días. |
+| **h1 4/5** | **5/5 aquí:** `/` `/pt` `/en` `/mapa` `/legal`. | Hueco del probe (ruta no parseada), no copy. | No abrir. |
+| **habitaciones N/D** | Sin browser. Contrato 4 destinos SSR SI. | N/D, no falla. | — |
+
+Ninguna alerta entra a cola.
+
+---
+
 **Smoke 17 set (Grok diario) — cotejo**
 
 Informe: DEGRADA · barra 4 destinos + CTA Telegram · habitaciones SI · TTFB 0,39 s · feeds_ok 12/16 · license SI · pwa SI. **Sin CAÍDA ni incidente.**
