@@ -79,6 +79,19 @@ test("wheel zoom waits for focus on map, globe and chart", () => {
   assert.match(read("src/components/dashboard/desk.tsx"), /chartDisclaimer/);
 });
 
+test("globe keyboard rotates zooms and enters", () => {
+  const globe = read("src/components/map/world-globe.tsx");
+  assert.match(globe, /ArrowLeft/);
+  assert.match(globe, /Escape/);
+  assert.match(globe, /globeKeys/);
+  assert.match(globe, /role="application"/);
+  assert.match(globe, /el.tabIndex = -1/);
+  const copy = read("src/lib/i18n.ts");
+  assert.match(copy, /Flechas giran/);
+  assert.match(copy, /Arrows spin/);
+  assert.match(copy, /Setas giram/);
+});
+
 test("D-VIZ-01 candles share bit-stage and recharts is gone", () => {
   assert.match(read("src/components/dashboard/price-chart.tsx"), /bit-stage/);
   assert.match(read("src/components/dashboard/desk.tsx"), /bit-stage bg-plot/);

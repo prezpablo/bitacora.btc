@@ -68,7 +68,7 @@ function GlobeCanvas({
   const wrap = useRef<HTMLDivElement>(null);
   const globeRef = useRef<{
     controls: () => { autoRotate: boolean; autoRotateSpeed: number; enableZoom: boolean };
-    pointOfView: () => { lat: number; lng: number; altitude: number };
+    pointOfView: (pov?: { lat?: number; lng?: number; altitude?: number }, ms?: number) => { lat: number; lng: number; altitude: number };
   } | null>(null);
   const entered = useRef(false);
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
@@ -256,6 +256,7 @@ function GlobeCanvas({
       const sizePx = d.px ?? globeCoinSize(2.35, d.id === FOUNDING_UY.id);
       const ring = sizePx < 14 ? 1 : 1.5;
       el.type = "button";
+      el.tabIndex = -1;
       el.title = d.name || "";
       el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
       const logo = d.face === "logo" ? imgSrc(d.logo || "") : "";
@@ -332,6 +333,8 @@ function GlobeCanvas({
       <div
         ref={wrap}
         tabIndex={0}
+        role="application"
+        aria-label={t("globeKeys")}
         title={t("zoomNeedFocus")}
         onPointerDown={() => wrap.current?.focus({ preventScroll: true })}
         onFocus={() => {
@@ -340,7 +343,55 @@ function GlobeCanvas({
         }}
         onBlur={() => {
           const g = globeRef.current;
-          if (g) g.controls().enableZoom = false;
+          if (!g) return;
+          g.controls().enableZoom = false;
+          g.controls().autoRotate = !reduceMotion;
+        }}
+        onKeyDown={(e) => {
+          const g = globeRef.current;
+          if (!g) return;
+          const pov = g.pointOfView() || { lat: -15, lng: -58, altitude: alt };
+          const turn = e.shiftKey ? 14 : 7;
+          const z = e.shiftKey ? 0.28 : 0.14;
+          const go = (next: { lat?: number; lng?: number; altitude?: number }) => {
+            g.controls().autoRotate = false;
+            g.pointOfView({ lat: pov.lat, lng: pov.lng, altitude: pov.altitude, ...next }, 90);
+          };
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            go({ lng: pov.lng - turn });
+          } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            go({ lng: pov.lng + turn });
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            go({ lat: Math.min(80, pov.lat + turn) });
+          } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            go({ lat: Math.max(-80, pov.lat - turn) });
+          } else if (e.key === "+" || e.key === "=") {
+            e.preventDefault();
+            go({ altitude: Math.max(0.35, pov.altitude - z) });
+          } else if (e.key === "-" || e.key === "_") {
+            e.preventDefault();
+            go({ altitude: Math.min(4, pov.altitude + z) });
+          } else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (hover) {
+              const cap = capitalOf(hover.iso);
+              if (cap) enter(cap.lat, cap.lon, 11, hover.iso);
+              else {
+                const row = stats.data?.countries.find((c) => c.iso === hover.iso);
+                const c = row && row.lat ? row : featCenter(hover.geometry);
+                enter(c.lat, c.lon, 6, hover.iso);
+              }
+            } else {
+              onSkip();
+            }
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            onSkip();
+          }
         }}
         className="bit-stage relative z-0 overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)]"
       >

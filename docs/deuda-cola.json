@@ -159,6 +159,13 @@
       "done": "juicio de producto: globo-first salvo CARGA pendiente. No apagar."
     },
     {
+      "id": "D-GLOBE-KEYS",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "globo: flechas giran, +/- zoom, Enter entra, Esc mapa; pines html tabIndex -1"
+    },
+    {
       "id": "D-A11Y-24",
       "pri": "P3",
       "open": false,
