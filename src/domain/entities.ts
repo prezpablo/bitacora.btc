@@ -194,6 +194,8 @@ export type ShopPin = {
   icon: string;
   name?: string;
   clusterCount?: number;
+  /** Solo zoom calle (≥13). Cluster sigue flaco. */
+  logo?: string;
 };
 
 export function isShopCluster(p: { id: string; icon?: string; category?: string; clusterCount?: number }) {
@@ -238,6 +240,7 @@ export function pinAsPlace(p: ShopPin | MerchantPlace): MerchantPlace {
     category: cluster ? "cluster" : icon,
     createdAt: 0,
     clusterCount: pin.clusterCount,
+    logo: cluster ? undefined : pin.logo,
   };
 }
 
@@ -249,6 +252,7 @@ export function placeAsPin(p: MerchantPlace): ShopPin {
     icon: isShopCluster(p) ? "cluster" : p.category || "lugar",
     name: p.name,
     clusterCount: p.clusterCount,
+    logo: isShopCluster(p) ? undefined : p.logo,
   };
 }
 

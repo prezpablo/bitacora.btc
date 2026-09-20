@@ -236,10 +236,19 @@ export async function fetchMerchants(bbox: {
         lat: r.lat,
         lon: r.lon,
         icon: prev && prev.icon !== "cluster" ? prev.icon : "propuesta",
+        name: r.name || prev?.name,
+        logo: r.logo || prev?.logo,
       });
     }
   } catch {
     /* sqlite/csv optional */
+  }
+  if (zoom >= 13) {
+    for (const s of catalogShopsInBox(bbox)) {
+      const prev = map.get(s.id);
+      if (!prev || prev.icon === "cluster" || prev.id.startsWith("cluster:")) continue;
+      if (s.logo) map.set(s.id, { ...prev, logo: prev.logo || s.logo, name: prev.name || s.name });
+    }
   }
   if (!map.size) {
     for (const p of FALLBACK) if (inBox(p, bbox)) map.set(p.id, placeAsPin(p));

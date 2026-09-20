@@ -92,6 +92,20 @@ test("globe keyboard rotates zooms and enters", () => {
   assert.match(copy, /Setas giram/);
 });
 
+test("globe keeps overlay community logos when far", () => {
+  const globe = read("src/components/map/world-globe.tsx");
+  assert.match(globe, /FOUNDING_UY\.id/);
+  assert.match(globe, /own.has\(p.id\)/);
+});
+
+test("street-zoom shop pins can carry logo", () => {
+  const ent = read("src/domain/entities.ts");
+  assert.match(ent, /logo\?: string/);
+  const fetch = read("src/infrastructure/btc-map.ts");
+  assert.match(fetch, /zoom >= 13/);
+  assert.match(fetch, /catalogShopsInBox/);
+});
+
 test("D-VIZ-01 candles share bit-stage and recharts is gone", () => {
   assert.match(read("src/components/dashboard/price-chart.tsx"), /bit-stage/);
   assert.match(read("src/components/dashboard/desk.tsx"), /bit-stage bg-plot/);

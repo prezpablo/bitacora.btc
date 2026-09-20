@@ -241,12 +241,19 @@ function GlobeCanvas({
   const far = alt > 1.48;
   const htmlPins = useMemo(() => {
     const pxFor = (id?: string) => globeCoinSize(alt, id === FOUNDING_UY.id);
-    if (far) return coinPins.map((p) => ({ ...p, face: "btc" as const, px: pxFor(p.id) }));
+    const own = new Set(
+      overlayPins.filter((p) => p.kind === "community" && p.id).map((p) => String(p.id)),
+    );
+    own.add(FOUNDING_UY.id);
     return [
-      ...coinPins.map((p) => ({ ...p, face: "logo" as const, px: pxFor(p.id) })),
-      ...ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const, px: pxFor(p.id) })),
+      ...coinPins.map((p) => ({
+        ...p,
+        face: !far || own.has(p.id) ? ("logo" as const) : ("btc" as const),
+        px: pxFor(p.id),
+      })),
+      ...(!far ? ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const, px: pxFor(p.id) })) : []),
     ];
-  }, [coinPins, ownShops, far, alt]);
+  }, [coinPins, ownShops, far, alt, overlayPins]);
 
   const enterRef = useRef(enter);
   enterRef.current = enter;
