@@ -2,7 +2,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts, useRouterState } from "@
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppQueryProvider } from "@/lib/query";
-import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, hreflangHref, pageCanonical, pagePath, pageSeo } from "@/lib/seo";
+import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, hreflangHref, pageCanonical, pagePath, pageSeo, robotsFor } from "@/lib/seo";
 import { langFromLocation, langFromQuery, pickLang, langIsExplicit, retainLangSearch, type AppLang } from "@/lib/locale";
 import { SsrLangProvider } from "@/lib/ssr-lang";
 import { getRequestLang } from "@/infrastructure/request-lang";
@@ -23,7 +23,7 @@ function headFor(path: string, lang: AppLang, explicitLang: boolean) {
       { name: "keywords", content: seo.keywords },
       { name: "author", content: "Consciencia Bitcoin" },
       { name: "google-site-verification", content: "w4NkiP98t6wqRqMRrpXgVAY4Q3n82dCclvOV4AVw9uc" },
-      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1" },
+      { name: "robots", content: robotsFor(path) },
       { name: "theme-color", content: "#f7931a" },
       { name: "geo.region", content: "UY-CO" },
       { name: "geo.placename", content: "Colonia del Sacramento, Uruguay" },

@@ -166,6 +166,20 @@
       "done": "globo: flechas giran, +/- zoom, Enter entra, Esc mapa; pines html tabIndex -1"
     },
     {
+      "id": "D-BANNER",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "banner storage compacto tras 1ª visita (sessionStorage); --storage-pad en pie"
+    },
+    {
+      "id": "D-LABIF",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "/labif robots noindex,follow (SSR + SeoHead)"
+    },
+    {
       "id": "D-A11Y-24",
       "pri": "P3",
       "open": false,

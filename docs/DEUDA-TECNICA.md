@@ -55,7 +55,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** **D-GLOBE-KEYS este ZIP.** Siguiente: D-BANNER (storage compacto). D-FOSS = visibilidad GitHub (ops). No fusionar.
+**Prioridad:** ZIP único 19 set: D-GLOBE-KEYS + D-BANNER + D-LABIF. Siguiente: D-FOSS (ops GitHub). No D-DARK en este ZIP.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
@@ -275,9 +275,9 @@ flowchart TB
 | **P2** | **D-MKT** ocultar widgets Mercado vacíos | Abierto | No apagar precio+fees |
 | **P3** | **D-PWA** `/__grok/` → manifest propio | Abierto | robots ya Disallow |
 | **P3** | **D-LIC** archivo LICENSE | **Va con D-FOSS** | Inútil si el repo sigue 404 |
-| **P3** | **D-BANNER** storage compacto | Abierto | Tras 1ª decisión |
+| **P3** | **D-BANNER** storage compacto | **Cerrado este ZIP** | Compacto tras 1ª visita |
 | **P3** | **D-DARK** modo oscuro | Abierto | No bloquea |
-| **P3** | **D-LABIF** sitemap editorial | Abierto | noindex opcional |
+| **P3** | **D-LABIF** sitemap editorial | **Cerrado este ZIP** | `/labif` noindex |
 | **P2** | Teselas soberanas (no Esri US) | Abierto · después de D-PIN | D-TILE-03 OpenFreeMap / PMTiles |
 | **P2** | Lighthouse mobile 3G/4G en `.org` | Abierto | Meta ≥ 80 4G / ≥ 50 3G |
 | **P2** | Cluster pines · fuente 400 | **Supersede** | Lo cubre D-PIN-02. No Leaflet.markercluster |

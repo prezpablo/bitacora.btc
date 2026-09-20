@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { FAQ, GEO, OG_IMAGE_PATH, SITE_NAME, hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo, siteOrigin } from "@/lib/seo";
+import { FAQ, GEO, OG_IMAGE_PATH, SITE_NAME, hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo, robotsFor, siteOrigin } from "@/lib/seo";
 import { langFromQuery, type AppLang } from "@/lib/locale";
 import { useAppLang } from "@/lib/i18n";
 
@@ -46,7 +46,7 @@ export function SeoHead() {
     document.documentElement.lang = lang;
     upsertMeta("name", "description", seo.description);
     upsertMeta("name", "keywords", seo.keywords);
-    upsertMeta("name", "robots", "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
+    upsertMeta("name", "robots", robotsFor(path));
     upsertMeta("name", "author", "Consciencia Bitcoin");
     upsertMeta("name", "google-site-verification", "w4NkiP98t6wqRqMRrpXgVAY4Q3n82dCclvOV4AVw9uc");
     upsertMeta("name", "geo.region", GEO.region);

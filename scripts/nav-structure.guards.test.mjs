@@ -164,3 +164,17 @@ test("Comunidad features LABITCONF 26 banner above anuncios", () => {
   assert.match(copy, /Get tickets/);
   assert.match(copy, /Comprar ingresso/);
 });
+
+test("D-BANNER storage compacts after first visit", () => {
+  const banner = read("src/components/storage-banner.tsx");
+  assert.match(banner, /bitacora-storage-seen/);
+  assert.match(banner, /data-compact/);
+  assert.match(banner, /--storage-pad/);
+  assert.match(read("src/components/site-header.tsx"), /--storage-pad/);
+});
+
+test("D-LABIF robots noindex", () => {
+  assert.match(read("src/lib/seo.ts"), /noindex,follow/);
+  assert.match(read("src/routes/__root.tsx"), /robotsFor/);
+  assert.match(read("src/components/seo-head.tsx"), /robotsFor/);
+});

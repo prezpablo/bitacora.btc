@@ -203,7 +203,10 @@ export function SiteHeader() {
 export function SiteShell({ children, fill = false }: { children: ReactNode; fill?: boolean }) {
   const t = useT();
   return (
-    <div className={cn("flex min-h-dvh flex-col bg-background", fill && "h-dvh overflow-hidden")}>
+    <div
+      className={cn("flex min-h-dvh flex-col bg-background", fill && "h-dvh overflow-hidden")}
+      style={{ paddingBottom: "var(--storage-pad, 0px)" }}
+    >
       <SkipLink />
       <SeoHead />
       <SiteHeader />

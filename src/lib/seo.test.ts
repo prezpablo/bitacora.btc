@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo } from "./seo.ts";
+import { hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo, robotsFor } from "./seo.ts";
 
 test("pageSeo is per path and language", () => {
   assert.match(pageSeo("/", "es").title, /Latinoamérica/);
@@ -8,6 +8,12 @@ test("pageSeo is per path and language", () => {
   assert.equal(pageSeo("/mapa", "es").title, "Mapa Bitcoin Latam | Bitácora.btc");
   assert.equal(pageSeo("/legal", "en").title, "Legal notice, privacy and cookies | Bitácora.btc");
   assert.match(pageSeo("/labif", "pt").title, /LABIF/);
+});
+
+test("D-LABIF robots is noindex", () => {
+  assert.equal(robotsFor("/labif"), "noindex,follow");
+  assert.match(robotsFor("/"), /^index,follow/);
+  assert.match(robotsFor("/mapa"), /^index,follow/);
 });
 
 test("canonical is self and hreflang is per path", () => {

@@ -118,6 +118,12 @@ export function pageSeo(path: string, lang: AppLang) {
   return extra ? { ...home, ...extra } : home;
 }
 
+/** D-LABIF: dossier editorial, noindex. */
+export function robotsFor(path: string) {
+  if (pagePath(path) === "/labif") return "noindex,follow";
+  return "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
+}
+
 export function pagePath(path: string) {
   if (!path || path === "/") return "/";
   return path.endsWith("/") ? path.slice(0, -1) : path;
