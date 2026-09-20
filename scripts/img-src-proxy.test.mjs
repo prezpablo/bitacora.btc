@@ -10,6 +10,8 @@ const read = (p) => readFileSync(join(root, p), "utf8");
 test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   const src = read("src/domain/map-csv.ts");
   assert.match(src, /\/logo\?u=\$\{encodeURIComponent/);
+  assert.match(src, /MAP_IMG_HOST/);
+  assert.match(src, /btcmap\.org/);
   assert.match(src, /u\.startsWith\("\/"\) \|\| u\.startsWith\("data:"\)/);
   const events = read("src/components/dashboard/network-events.tsx");
   assert.match(events, /eventFlyerSrc\(ev\.image\)/);

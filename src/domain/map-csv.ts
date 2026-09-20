@@ -170,16 +170,23 @@ export function logoUrl(raw: string) {
   }
 }
 
-/** Remote logos go through first-party `/logo` so CSP need not allow `https:`. */
+const FLYER_HOST =
+  /(^|\.)lumacdn\.com$|(^|\.)meetupstatic\.com$|(^|\.)evbuc\.com$|(^|\.)unsplash\.com$|(^|\.)luma\.com$|(^|\.)lu\.ma$/i;
+
+const MAP_IMG_HOST = /(^|\.)btcmap\.org$/i;
+
+/** Remote logos go through first-party `/logo` so CSP need not allow `https:`. BTC Map is already on img-src. */
 export function imgSrc(raw: string) {
   const u = logoUrl(raw);
   if (!u) return "";
   if (u.startsWith("/") || u.startsWith("data:")) return u;
+  try {
+    if (MAP_IMG_HOST.test(new URL(u).hostname)) return u;
+  } catch {
+    /* proxy */
+  }
   return `/logo?u=${encodeURIComponent(u)}`;
 }
-
-const FLYER_HOST =
-  /(^|\.)lumacdn\.com$|(^|\.)meetupstatic\.com$|(^|\.)evbuc\.com$|(^|\.)unsplash\.com$|(^|\.)luma\.com$|(^|\.)lu\.ma$/i;
 
 /** Luma CDN already crops 4:3; other flyers use CSS object-cover. */
 export function lumaFlyerUrl(href: string) {
