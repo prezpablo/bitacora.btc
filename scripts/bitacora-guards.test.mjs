@@ -57,6 +57,13 @@ test("public map snapshot strips tokens", () => {
   assert.match(pins, /stringifyPinsCsvPublic/);
 });
 
+test("Consciencia Bitcoin overlay describes LATAM Cripto Mom", () => {
+  const src = read("src/infrastructure/map-csv-io.ts");
+  assert.match(src, /educación y psicología financiera/);
+  assert.match(src, /youtube\.com\/@latamcriptomom/);
+  assert.match(read("public/data/map.csv"), /psicología financiera/);
+});
+
 test("verify endpoints are rate-limited", () => {
   const src = read("src/infrastructure/server-fns.ts");
   assert.match(src, /pin-verify-burst/);

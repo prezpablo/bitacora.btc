@@ -15,12 +15,13 @@ const FOUNDING: MapCsvRow = {
   lon: FOUNDING_UY.lon,
   address: "Colonia del Sacramento, Uruguay",
   description:
-    "Consciencia Bitcoin es una iniciativa comunitaria nacida en Colonia del Sacramento, Uruguay, impulsada por LATAM Cripto Mom —un espacio dedicado a la educación financiera familiar, la divulgación de Web3 y la soberanía digital de forma simple y humana—.",
+    "Esta es la comunidad Bitcoiner de LATAM Cripto Mom: educación y psicología financiera. Encontranos en las redes sociales o en nuestro canal de YouTube @latamcriptomom, y en X, TikTok e Instagram con el mismo nombre.",
   notes: "",
   score: 0,
   votes: 0,
   logo: FOUNDING_UY.logo,
-  socials: "",
+  socials:
+    "youtube:https://www.youtube.com/@latamcriptomom | x:https://x.com/latamcriptomom | tiktok:https://www.tiktok.com/@latamcriptomom | instagram:https://www.instagram.com/latamcriptomom | telegram:https://t.me/+hdBuy78MUuZiYjhh | web:https://lnk.bio/latamcriptomom",
   hours: "",
   pays: "",
   created: 1787790155172,
@@ -102,7 +103,7 @@ async function seedFromCsv() {
     for (const r of rows) {
       if (!have.has(r.id)) upsertMap(r);
     }
-    if (!have.has(FOUNDING.id)) upsertMap(FOUNDING);
+    upsertMap(FOUNDING);
   });
 }
 
