@@ -72,8 +72,9 @@ const es = {
   contributeBadAddr: "La dirección no es válida. No copies.",
   marketDisclaimer: "Información con fines educativos. No constituye asesoramiento financiero ni recomendación de inversión.",
   chartDisclaimer: "Este gráfico es solamente educativo. No es asesoramiento financiero ni señal de compra o venta.",
-  zoomNeedFocus: "Clic acá para usar la rueda (zoom).",
+  zoomNeedFocus: "Clic acá para usar la rueda o el teclado (zoom).",
   globeKeys: "Flechas giran · más/menos zoom · Enter entra · Esc mapa",
+  chartKeys: "Flechas recorren · más/menos zoom · Esc inicio",
   dataAsOf: "último dato: {when}",
   dataStale: "último dato: {when} — fuente caída, se muestra el valor guardado",
   tagline: "El nodo que te une al mundo Bircoiner",
@@ -616,8 +617,9 @@ const en: Record<keyof typeof es, string> = {
   contributeBadAddr: "The address is not valid. Do not copy.",
   marketDisclaimer: "Educational information. This is not financial advice or an investment recommendation.",
   chartDisclaimer: "This chart is for education only. It is not financial advice or a buy/sell signal.",
-  zoomNeedFocus: "Click here to use the wheel (zoom).",
+  zoomNeedFocus: "Click here to use the wheel or keyboard (zoom).",
   globeKeys: "Arrows spin · plus/minus zoom · Enter opens · Esc map",
+  chartKeys: "Arrows pan · plus/minus zoom · Esc home",
   dataAsOf: "last data: {when}",
   dataStale: "last data: {when} — source down, showing the stored value",
   tagline: "The node that connects you to the Bircoiner world",
@@ -1160,8 +1162,9 @@ const pt: Record<keyof typeof es, string> = {
   contributeBadAddr: "A morada não é válida. Não copies.",
   marketDisclaimer: "Informação com fins educativos. Não constitui aconselhamento financeiro nem recomendação de investimento.",
   chartDisclaimer: "Este gráfico é apenas educativo. Não é aconselhamento financeiro nem sinal de compra ou venda.",
-  zoomNeedFocus: "Clica aqui para usar a roda (zoom).",
+  zoomNeedFocus: "Clica aqui para usar a roda ou o teclado (zoom).",
   globeKeys: "Setas giram · mais/menos zoom · Enter entra · Esc mapa",
+  chartKeys: "Setas percorrem · mais/menos zoom · Esc início",
   dataAsOf: "último dado: {when}",
   dataStale: "último dado: {when} — fonte caída, mostra-se o valor guardado",
   tagline: "O nó que te une ao mundo Bircoiner",
@@ -2251,7 +2254,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
     },
     {
       title: "Zoom",
-      body: "Rueda o pellizco para acercar, arrastrar para mover, doble clic o maximizar para el periodo completo. El eje Y se reajusta en log. En el mapa, zoom mínimo = globo; clic en país = capital.",
+      body: "Rueda, teclado (flechas y más/menos) o pellizco para acercar, arrastrar para mover, doble clic o maximizar para el periodo completo. El eje Y se reajusta en log. En el mapa, zoom mínimo = globo; clic en país = capital.",
     },
   ],
   en: [
@@ -2309,7 +2312,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
     },
     {
       title: "Zoom",
-      body: "Wheel or pinch to zoom, drag to pan, double-click or maximize for the full range. Y axis re-fits on a log scale. On the map, minimum zoom = globe; country click = capital.",
+      body: "Wheel, keyboard (arrows and plus/minus) or pinch to zoom, drag to pan, double-click or maximize for the full range. Y axis re-fits on a log scale. On the map, minimum zoom = globe; country click = capital.",
     },
   ],
   pt: [
@@ -2367,7 +2370,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
     },
     {
       title: "Zoom",
-      body: "Roda ou pinça para aproximar, arrastar para mover, duplo clique ou maximizar para o período completo. O eixo Y reajusta em log. No mapa, zoom mínimo = globo; clique no país = capital.",
+      body: "Roda, teclado (setas e mais/menos) ou pinça para aproximar, arrastar para mover, duplo clique ou maximizar para o período completo. O eixo Y reajusta em log. No mapa, zoom mínimo = globo; clique no país = capital.",
     },
   ],
 };

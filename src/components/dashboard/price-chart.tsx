@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import {
   TF_SPEC,
@@ -721,6 +721,29 @@ export function PriceChart({
     setView(zoomAround(viewRef.current, 0.5, factor, layout.minSpan, layout.data));
   };
 
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const lay = layoutRef.current;
+    if (!lay) return;
+    const v = viewRef.current;
+    const span = Math.max(v.t1 - v.t0, 1);
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setView(clampView(v.t0 - 0.2 * span, v.t1 - 0.2 * span, lay.minSpan, lay.data));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setView(clampView(v.t0 + 0.2 * span, v.t1 + 0.2 * span, lay.minSpan, lay.data));
+    } else if (e.key === "+" || e.key === "=") {
+      e.preventDefault();
+      zoomBy(1 / 2);
+    } else if (e.key === "-" || e.key === "_") {
+      e.preventDefault();
+      zoomBy(2);
+    } else if (e.key === "Home" || e.key === "Escape") {
+      e.preventDefault();
+      setView(null);
+    }
+  };
+
   const hi = hover;
   const hc = hi != null ? layout.candles[hi] : null;
   const hk = hc ? candleKind(hc) : null;
@@ -800,6 +823,8 @@ export function PriceChart({
       ref={wrapRef}
       tabIndex={0}
       title={t("zoomNeedFocus")}
+      aria-label={t("chartKeys")}
+      onKeyDown={onKeyDown}
       onPointerDown={() => wrapRef.current?.focus({ preventScroll: true })}
     >
       <div className="absolute top-2 left-2 z-10 flex gap-1">

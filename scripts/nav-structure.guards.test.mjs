@@ -192,3 +192,14 @@ test("D-LABIF robots noindex", () => {
   assert.match(read("src/routes/__root.tsx"), /robotsFor/);
   assert.match(read("src/components/seo-head.tsx"), /robotsFor/);
 });
+
+test("price chart keyboard pans and zooms when focused", () => {
+  const chart = read("src/components/dashboard/price-chart.tsx");
+  assert.match(chart, /onKeyDown/);
+  assert.match(chart, /ArrowLeft/);
+  assert.match(chart, /chartKeys/);
+  const copy = read("src/lib/i18n.ts");
+  assert.match(copy, /Flechas recorren/);
+  assert.match(copy, /Arrows pan/);
+  assert.match(copy, /Setas percorrem/);
+});
