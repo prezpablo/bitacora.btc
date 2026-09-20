@@ -4,12 +4,17 @@
 
 Bitácora.btc is a community logbook (bitácora) run by Consciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom. It helps people find Bitcoin circular economies nearby and learn self-custody.
 
-## Site
+Cite: Bitácora.btc — mapa de comunidades Bitcoin en Latinoamérica. https://bitacorabtc.org/
+
+## Indexable pages (Google, Bing, answer engines)
 
 Canonical: https://bitacorabtc.org/
 
 - Home: https://bitacorabtc.org/
-- Map / globe: https://bitacorabtc.org/mapa
+- Map (globe + Leaflet, shops and communities): https://bitacorabtc.org/mapa
+- Legal / privacy / cookies: https://bitacorabtc.org/legal
+
+Home sections (same document, not separate URLs):
 - Consciencia Bitcoin: https://bitacorabtc.org/#conciencia
 - Community & events: https://bitacorabtc.org/#comunidad
 - News pulse: https://bitacorabtc.org/#pulso
@@ -18,11 +23,14 @@ Canonical: https://bitacorabtc.org/
 - Market: https://bitacorabtc.org/#mercado
 - FAQ: https://bitacorabtc.org/#faq-seo
 - Contact: https://bitacorabtc.org/#contacto
-- Legal: https://bitacorabtc.org/legal
 
 Languages: Spanish (default), Portuguese, English (`?lang=es|pt|en`).
 
-Map search: `https://bitacorabtc.org/mapa`
+## Not for search indexes
+
+- /labif — editorial dossier, `noindex,follow`
+- /LICENSE — AGPL-3.0 plain text, not an HTML page
+- /humans.txt — credits
 
 ## What it is not
 
@@ -31,11 +39,9 @@ Not an exchange, wallet, broker or custodian. It does not hold keys or user fund
 ## Publisher
 
 - Organization: Consciencia Bitcoin
+- Community: https://t.me/+hdBuy78MUuZiYjhh
 - Backing: LATAM Cripto Mom (https://www.instagram.com/latamcriptomom/)
 - Place: Colonia del Sacramento, Colonia, Uruguay (−34.4717, −57.8443)
 - Area served: Latin America
 - Source: https://github.com/prezpablo/bitacora.btc
-
-## Cite as
-
-Bitácora.btc — mapa de comunidades Bitcoin en Latinoamérica. https://bitacorabtc.org/
+- License: GNU Affero GPL v3 — https://bitacorabtc.org/LICENSE

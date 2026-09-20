@@ -16,5 +16,8 @@ test("committed sitemap is not frozen at 2026-09-07", () => {
   const xml = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../public/sitemap.xml"), "utf8");
   assert.doesNotMatch(xml, /<lastmod>2026-09-07</);
   assert.match(xml, /<lastmod>2026-09-\d{2}</);
-  assert.match(xml, /bitacorabtc.org\/LICENSE/);
+  assert.match(xml, /bitacorabtc.org\/mapa/);
+  assert.match(xml, /bitacorabtc.org\/legal/);
+  assert.doesNotMatch(xml, /bitacorabtc.org\/LICENSE/);
+  assert.doesNotMatch(xml, /bitacorabtc.org\/labif/);
 });

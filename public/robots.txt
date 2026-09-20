@@ -17,6 +17,10 @@ User-agent: Applebot-Extended
 Allow: /
 User-agent: Amazonbot
 Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: DuckDuckBot
+Allow: /
 User-agent: Bytespider
 Disallow: /
 

@@ -22,6 +22,7 @@ export const OG_IMAGE_PATH = "/og.jpg?v=20260903";
 export const SAME_AS = [
   "https://github.com/prezpablo/bitacora.btc",
   "https://www.instagram.com/latamcriptomom/",
+  "https://t.me/+hdBuy78MUuZiYjhh",
 ] as const;
 
 export function siteOrigin() {
@@ -64,19 +65,19 @@ export const PAGE_SEO: Record<
 > = {
   "/mapa": {
     es: {
-      title: "Mapa Bitcoin Latam | Bitácora.btc",
+      title: "Mapa de comercios y comunidades Bitcoin en Latinoamérica | Bitácora.btc",
       description:
-        "Mapa de comunidades y comercios que aceptan Bitcoin en Latinoamérica. Nodos, meetups y educación soberana. Sin cuentas ni custodia.",
+        "Encontrá nodos, meetups y comercios que aceptan Bitcoin en Latam. Sumá el tuyo. Sin cuentas ni custodia. Consciencia Bitcoin, Colonia.",
     },
     en: {
-      title: "Bitcoin map Latin America | Bitácora.btc",
+      title: "Bitcoin shops and communities map for Latin America | Bitácora.btc",
       description:
-        "Map of Bitcoin communities and merchants in Latin America. Nodes, meetups and sovereign education. No accounts, no custody.",
+        "Find nodes, meetups and Bitcoin-accepting merchants in Latam. Add yours. No accounts, no custody. Consciencia Bitcoin, Colonia.",
     },
     pt: {
-      title: "Mapa Bitcoin Latam | Bitácora.btc",
+      title: "Mapa de comércios e comunidades Bitcoin na América Latina | Bitácora.btc",
       description:
-        "Mapa de comunidades e comércios que aceitam Bitcoin na América Latina. Nós, meetups e educação soberana. Sem contas nem custódia.",
+        "Encontra nós, meetups e comércios que aceitam Bitcoin na Latam. Soma o teu. Sem contas nem custódia. Consciencia Bitcoin, Colonia.",
     },
   },
   "/legal": {
@@ -117,6 +118,24 @@ export function pageSeo(path: string, lang: AppLang) {
   const extra = PAGE_SEO[path]?.[lang];
   return extra ? { ...home, ...extra } : home;
 }
+
+export const MAPA_COPY: Record<AppLang, { lead: string; how: string; where: string }> = {
+  es: {
+    lead: "Mapa vivo de comunidades y comercios que aceptan Bitcoin en Latinoamérica: nodos, meetups y educación soberana. Lo impulsa Consciencia Bitcoin desde Colonia del Sacramento, Uruguay, con LATAM Cripto Mom.",
+    how: "Para sumar un punto: entrá al mapa, proponé el pin, cargá nombre y redes, y publicá el código CARGA en un enlace público. Sin cuentas y sin custodia de llaves.",
+    where: "El globo cuenta primero Latinoamérica; BTC Map suma el mundo. Con zoom ves los pines. Filtros: todas, comercios, comunidades.",
+  },
+  en: {
+    lead: "A live map of Bitcoin communities and merchants in Latin America: nodes, meetups and sovereign education. Run by Consciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom.",
+    how: "To add a pin: open the map, drop a point, add name and socials, and publish the CARGA code on a public link. No accounts and no key custody.",
+    where: "The globe counts Latin America first; BTC Map adds the world. Zoom to see pins. Filters: all, shops, communities.",
+  },
+  pt: {
+    lead: "Mapa vivo de comunidades e comércios que aceitam Bitcoin na América Latina: nós, meetups e educação soberana. Impulsionado pela Consciencia Bitcoin em Colonia del Sacramento, Uruguai, com a LATAM Cripto Mom.",
+    how: "Para somar um ponto: entra no mapa, propõe o pino, carrega nome e redes, e publica o código CARGA num link público. Sem contas e sem custódia de chaves.",
+    where: "O globo conta primeiro a América Latina; o BTC Map soma o mundo. Com zoom vês os pinos. Filtros: todas, comércios, comunidades.",
+  },
+};
 
 /** D-LABIF: dossier editorial, noindex. */
 export function robotsFor(path: string) {
@@ -300,6 +319,47 @@ export function jsonLd(lang: AppLang, origin: string, path = "/", canonical?: st
         name: f.q,
         acceptedAnswer: { "@type": "Answer", text: f.a },
       })),
+    });
+  }
+  if (pagePath(path) === "/mapa") {
+    (graph[2] as { speakable?: unknown }).speakable = {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["#mapa h1", "#mapa-seo"],
+    };
+    graph.push({
+      "@type": "Map",
+      "@id": `${base}#map`,
+      name: seo.title,
+      url: pageUrl,
+      description: seo.description,
+      isPartOf: { "@id": `${origin}/#site` },
+    });
+    graph.push({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${origin}/` },
+        { "@type": "ListItem", position: 2, name: seo.title, item: pageUrl },
+      ],
+    });
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${base}#faq`,
+      url: pageUrl,
+      inLanguage,
+      mainEntity: FAQ[lang].slice(0, 3).map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
+  if (pagePath(path) === "/legal") {
+    graph.push({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${origin}/` },
+        { "@type": "ListItem", position: 2, name: seo.title, item: pageUrl },
+      ],
     });
   }
   return { "@context": "https://schema.org", "@graph": graph };

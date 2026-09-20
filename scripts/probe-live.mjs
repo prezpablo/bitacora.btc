@@ -89,7 +89,8 @@ for (const p of pages) {
   const r = await pull("/sitemap.xml");
   const has = ["/?lang=es", "/?lang=pt", "/?lang=en", "/mapa", "/legal"].every((s) => r.text.includes(s));
   add(core, "sitemap hreflang", r.status === 200 && has, `${r.status} ${r.bytes}b`);
-  add(core, "sitemap LICENSE", r.status === 200 && r.text.includes("/LICENSE"), r.text.includes("/LICENSE") ? "loc /LICENSE" : "sin LICENSE");
+  add(core, "sitemap sin LICENSE", r.status === 200 && !r.text.includes("/LICENSE"), r.text.includes("/LICENSE") ? "loc /LICENSE" : "ok");
+  add(core, "sitemap sin labif", r.status === 200 && !r.text.includes("/labif"), r.text.includes("/labif") ? "loc /labif" : "ok");
   add(core, "sitemap lastmod fresco", r.status === 200 && /<lastmod>2026-/.test(r.text) && !r.text.includes("<lastmod>2026-09-07</lastmod>"), (r.text.match(/<lastmod>([^<]+)/) || [])[1] || "?");
 }
 

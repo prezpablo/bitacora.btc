@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { hreflangHref, jsonLd, pageCanonical, pagePath, pageSeo, robotsFor } from "./seo.ts";
+import { hreflangHref, jsonLd, MAPA_COPY, pageCanonical, pagePath, pageSeo, robotsFor } from "./seo.ts";
 
 test("pageSeo is per path and language", () => {
   assert.match(pageSeo("/", "es").title, /Latinoamérica/);
   assert.match(pageSeo("/", "pt").title, /América Latina/);
-  assert.equal(pageSeo("/mapa", "es").title, "Mapa Bitcoin Latam | Bitácora.btc");
+  assert.match(pageSeo("/mapa", "es").title, /comercios y comunidades Bitcoin/);
   assert.equal(pageSeo("/legal", "en").title, "Legal notice, privacy and cookies | Bitácora.btc");
   assert.match(pageSeo("/labif", "pt").title, /LABIF/);
 });
@@ -25,7 +25,7 @@ test("canonical is self and hreflang is per path", () => {
   assert.equal(hreflangHref(origin, "/legal", "x-default"), "https://bitacorabtc.org/legal");
 });
 
-test("jsonLd WebPage follows the route; FAQ only on home", () => {
+test("jsonLd WebPage follows the route; FAQ on home and mapa", () => {
   const origin = "https://bitacorabtc.org";
   const home = jsonLd("es", origin, "/", "https://bitacorabtc.org/");
   const types = home["@graph"].map((n: { "@type": string }) => n["@type"]);
@@ -36,8 +36,16 @@ test("jsonLd WebPage follows the route; FAQ only on home", () => {
 
   const mapa = jsonLd("pt", origin, "/mapa", "https://bitacorabtc.org/mapa?lang=pt");
   const mapaTypes = mapa["@graph"].map((n: { "@type": string }) => n["@type"]);
-  assert.equal(mapaTypes.includes("FAQPage"), false);
+  assert.equal(mapaTypes.includes("FAQPage"), true);
+  assert.equal(mapaTypes.includes("Map"), true);
+  assert.equal(mapaTypes.includes("BreadcrumbList"), true);
   const mapaPage = mapa["@graph"].find((n: { "@type": string }) => n["@type"] === "WebPage") as { url: string; name: string };
   assert.equal(mapaPage.url, "https://bitacorabtc.org/mapa?lang=pt");
-  assert.equal(mapaPage.name, "Mapa Bitcoin Latam | Bitácora.btc");
+  assert.match(mapaPage.name, /América Latina/);
+});
+
+test("MAPA_COPY has three languages", () => {
+  assert.match(MAPA_COPY.es.lead, /Latinoamérica/);
+  assert.match(MAPA_COPY.en.how, /CARGA/);
+  assert.match(MAPA_COPY.pt.where, /América Latina/);
 });

@@ -234,7 +234,8 @@ export async function runSeoProbe({ origin = ORIGIN, fetchPage = pull } = {}) {
   {
     const r = await fetchPage(`${origin}/sitemap.xml`);
     const locs = sitemapLocs(r.text);
-    add(core, "sitemap rutas", ["/mapa", "/legal", "/labif", "/LICENSE"].every((p) => locs.some((l) => l.endsWith(p))), locs.join(" "));
+    add(core, "sitemap rutas", ["/mapa", "/legal"].every((p) => locs.some((l) => l.endsWith(p))), locs.join(" "));
+    add(core, "sitemap sin LICENSE/labif", !locs.some((l) => /\/LICENSE$/.test(l)) && !locs.some((l) => /\/labif$/.test(l)), locs.filter((l) => /LICENSE|labif/.test(l)).join(" ") || "ok");
     add(core, "sitemap hreflang mapa", r.text.includes(`${origin}/mapa?lang=pt`), "mapa?lang=pt");
     add(warn, "sitemap no duplica ?lang= como loc", !locs.includes(`${origin}/?lang=es`) && !locs.includes(`${origin}/?lang=pt`), locs.filter((l) => l.includes("?lang=")).join(" ") || "ok");
     const last = (r.text.match(/<lastmod>([^<]+)/) || [])[1] || "?";
