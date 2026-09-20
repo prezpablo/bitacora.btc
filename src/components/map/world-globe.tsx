@@ -293,10 +293,8 @@ function GlobeCanvas({
   );
 
   return (
-    <div>
-      <div className="relative isolate overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-10 px-2 pt-2 sm:px-3 sm:pt-3">
-        <div className="mx-auto max-w-3xl rounded-md bg-white/90 px-2 py-1.5 text-center shadow-[var(--shadow-border)] backdrop-blur-[2px] sm:px-3 sm:py-2">
+    <div className="overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
+      <header className="border-b border-border px-2 py-1.5 text-center sm:px-3 sm:py-2">
         <p className="font-display text-sm text-neutral-900 sm:text-2xl">{t("globeKicker")}</p>
         <p className="hidden text-[11px] text-neutral-600 sm:mt-0.5 sm:block sm:text-sm">{t("globeTitle")}</p>
         {world ? (
@@ -336,7 +334,6 @@ function GlobeCanvas({
           ) : null}
           </>
         ) : null}
-        </div>
       </header>
 
       <div
@@ -510,7 +507,6 @@ function GlobeCanvas({
         >
           {t("globeSkip")}
         </button>
-      </div>
       </div>
     </div>
   );
