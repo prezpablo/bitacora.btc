@@ -4,7 +4,7 @@ import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import { pinAsPlace, refineShopIcon } from "@/domain";
 import type { GlobeFocus } from "@/domain/globe";
 import { FOUNDING_UY } from "@/domain/globe";
-import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic } from "@/domain";
+import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic, withFoundingProfile } from "@/domain";
 import { dedupeCommunities, dedupeShops, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { coinPinSize, pinBadgeSize } from "@/domain/map-pin-size";
 import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
@@ -485,7 +485,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       }
     }
     if (![...map.values()].some((c) => c.id === FOUNDING_UY.id || c.slug === FOUNDING_UY.slug)) {
-      map.set(FOUNDING_UY.id, {
+      map.set(FOUNDING_UY.id, withFoundingProfile({
         id: FOUNDING_UY.id,
         slug: FOUNDING_UY.slug,
         name: FOUNDING_UY.name,
@@ -498,9 +498,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         score: 0,
         voteCount: 0,
         verifiedAt: 1,
-      });
+      }));
     }
-    return dedupeCommunities([...map.values()]);
+    return dedupeCommunities([...map.values()].map(withFoundingProfile));
   }, [btcComms.data, overlayComms]);
 
   const visibleComms = useMemo(() => {
@@ -815,7 +815,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             return;
           }
           if (pin.kind === "community" && pin.comm) {
-            setSelComm({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 });
+            setSelComm(withFoundingProfile({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 }));
             setSel(null);
           } else if (pin.place) {
             const stub = { ...pin.place, lat: pin.lat0, lon: pin.lon0, logo: pin.logo };
@@ -927,7 +927,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setDropKind("pick");
     setVoteOpen(false);
     if (hit.kind === "community") {
-      setSelComm(hit.community);
+      setSelComm(withFoundingProfile(hit.community));
       setSel(null);
     } else if (hit.kind === "place") {
       setSel(hit.place);
@@ -1778,7 +1778,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 type="button"
                 className="text-left text-foreground underline-offset-2 hover:underline"
                 onClick={() => {
-                  setSelComm(c);
+                  setSelComm(withFoundingProfile(c));
                   setSel(null);
                   setVoteOpen(false);
                   setDrop(null);

@@ -1,6 +1,7 @@
 import { averageStars } from "./merchant-grade.ts";
 import { keyFromUrl } from "./socials.ts";
-import type { Community } from "./entities";
+import type { Community, CommunityLink } from "./entities";
+import { FOUNDING_DESCRIPTION, FOUNDING_LINKS, FOUNDING_UY } from "./globe.ts";
 
 const ID_KEYS = new Set(["web", "x", "nostr", "telegram", "github"]);
 
@@ -8,6 +9,20 @@ const FOUNDING = new Set(["cc-btc", "c:cc-btc", "conciencia-bitcoin", "conscienc
 
 function isFounding(c: { id?: string; slug?: string }) {
   return FOUNDING.has((c.slug || "").toLowerCase()) || FOUNDING.has((c.id || "").toLowerCase());
+}
+
+/** Ficha canónica de Consciencia Bitcoin: texto + redes, aunque el overlay viejo venga vacío. */
+export function withFoundingProfile<T extends { id?: string; slug?: string; description?: string; links?: CommunityLink[]; logo?: string }>(
+  c: T,
+): T {
+  if (!isFounding(c)) return c;
+  const links = c.links?.length ? c.links : FOUNDING_LINKS.map((l) => ({ ...l }));
+  return {
+    ...c,
+    description: (c.description || "").trim() || FOUNDING_DESCRIPTION,
+    links,
+    logo: c.logo || FOUNDING_UY.logo,
+  };
 }
 
 export function listingTrust(

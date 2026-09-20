@@ -18,6 +18,18 @@ export const FOUNDING_UY = {
   logo: "/logos/conciencia-bitcoin.png",
 };
 
+export const FOUNDING_DESCRIPTION =
+  "Esta es la comunidad Bitcoiner de LATAM Cripto Mom: educación y psicología financiera. Encontranos en las redes sociales o en nuestro canal de YouTube @latamcriptomom, y en X, TikTok e Instagram con el mismo nombre.";
+
+export const FOUNDING_LINKS: { key: string; label: string; url: string }[] = [
+  { key: "youtube", label: "YouTube", url: "https://www.youtube.com/@latamcriptomom" },
+  { key: "x", label: "X", url: "https://x.com/latamcriptomom" },
+  { key: "tiktok", label: "TikTok", url: "https://www.tiktok.com/@latamcriptomom" },
+  { key: "instagram", label: "Instagram", url: "https://www.instagram.com/latamcriptomom" },
+  { key: "telegram", label: "Telegram", url: "https://t.me/+hdBuy78MUuZiYjhh" },
+  { key: "web", label: "Web", url: "https://lnk.bio/latamcriptomom" },
+];
+
 export type GlobeTally = { shops: number; comms: number; events: number; cities: number };
 
 export type GlobeCountryStat = {

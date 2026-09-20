@@ -1,7 +1,8 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { applyPublicMapPatch, mergeMapRows, parseMapCsv, stringifyMapCsv, stringifyMapCsvPublic, type MapCsvRow } from "@/domain/map-csv";
-import { FOUNDING_UY } from "@/domain/globe";
+import { applyPublicMapPatch, mergeMapRows, parseMapCsv, stringifyMapCsv, stringifyMapCsvPublic, socialsToCsv, type MapCsvRow } from "@/domain/map-csv";
+import { FOUNDING_DESCRIPTION, FOUNDING_LINKS, FOUNDING_UY } from "@/domain/globe";
+import type { SocialLink } from "@/domain/socials";
 import { openSqlite, sqlTx } from "./sqlite";
 import { readFirstFile } from "./data-files";
 
@@ -14,14 +15,12 @@ const FOUNDING: MapCsvRow = {
   lat: FOUNDING_UY.lat,
   lon: FOUNDING_UY.lon,
   address: "Colonia del Sacramento, Uruguay",
-  description:
-    "Esta es la comunidad Bitcoiner de LATAM Cripto Mom: educación y psicología financiera. Encontranos en las redes sociales o en nuestro canal de YouTube @latamcriptomom, y en X, TikTok e Instagram con el mismo nombre.",
+  description: FOUNDING_DESCRIPTION,
   notes: "",
   score: 0,
   votes: 0,
   logo: FOUNDING_UY.logo,
-  socials:
-    "youtube:https://www.youtube.com/@latamcriptomom | x:https://x.com/latamcriptomom | tiktok:https://www.tiktok.com/@latamcriptomom | instagram:https://www.instagram.com/latamcriptomom | telegram:https://t.me/+hdBuy78MUuZiYjhh | web:https://lnk.bio/latamcriptomom",
+  socials: socialsToCsv(FOUNDING_LINKS as SocialLink[]),
   hours: "",
   pays: "",
   created: 1787790155172,

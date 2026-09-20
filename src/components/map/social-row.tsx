@@ -95,23 +95,26 @@ function Glyph({ k }: { k: SocialKey }) {
 export function SocialRow({ links }: { links: { label: string; url: string; key?: string }[] }) {
   if (!links.length) return null;
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+    <div className="mt-2 flex flex-wrap items-center gap-2">
       {links.map((l) => {
         const k = (l.key as SocialKey) || keyFromUrl(l.url);
+        const meta = SOCIALS.find((s) => s.key === k);
+        const label = meta?.label || l.label || k;
         return (
           <a
             key={l.url}
             href={l.url}
             target="_blank"
             rel="noopener noreferrer"
-            title={l.label}
-            aria-label={l.label}
+            title={label}
+            aria-label={label}
             className={cn(
-              "inline-flex size-7 items-center justify-center rounded-md text-primary no-underline",
-              "transition-opacity hover:opacity-80",
+              "inline-flex h-9 items-center gap-1.5 rounded-md bg-elevated px-2.5 text-xs font-medium text-foreground no-underline",
+              "shadow-[var(--shadow-border)] transition-opacity hover:opacity-80",
             )}
           >
             <Glyph k={k} />
+            <span>{label}</span>
           </a>
         );
       })}

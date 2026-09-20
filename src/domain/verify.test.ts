@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { communityIsPublic, communityTrust, listingTrust, normalizeProofUrl, shopIsPublic, overlayPending, cargaVerifyGate } from "./verify.ts";
+import { communityIsPublic, communityTrust, listingTrust, normalizeProofUrl, shopIsPublic, overlayPending, cargaVerifyGate, withFoundingProfile } from "./verify.ts";
 
 test("user shop is public only after scrape", () => {
   assert.equal(shopIsPublic("local:-34.4,-57.8", 0), false);
@@ -13,6 +13,31 @@ test("user community is public only after scrape; catalog and founding are not g
   assert.equal(communityIsPublic({ id: "c:nodo-x", slug: "nodo-x", verifiedAt: 1 }), true);
   assert.equal(communityIsPublic({ id: "btcmap:abc", slug: "abc" }), true);
   assert.equal(communityIsPublic({ id: "c:cc-btc", slug: "cc-btc" }), true);
+});
+
+test("Consciencia Bitcoin ficha fills description and socials if overlay is empty", () => {
+  const filled = withFoundingProfile({
+    id: "c:cc-btc",
+    slug: "cc-btc",
+    name: "Consciencia Bitcoin",
+    lat: -34.45,
+    lon: -57.81,
+    logo: "",
+    description: "",
+    links: [],
+    createdAt: 0,
+  });
+  assert.match(filled.description, /psicología financiera/);
+  assert.ok(filled.links.some((l) => l.key === "youtube" && l.url.includes("latamcriptomom")));
+  assert.ok(filled.links.some((l) => l.key === "telegram"));
+  const other = withFoundingProfile({
+    id: "c:nodo-x",
+    slug: "nodo-x",
+    description: "",
+    links: [],
+  });
+  assert.equal(other.description, "");
+  assert.equal(other.links.length, 0);
 });
 
 test("overlay listing is not verified by two socials until CARGA is scraped", () => {

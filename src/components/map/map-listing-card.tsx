@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
-import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust, refineShopIcon } from "@/domain";
+import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust, refineShopIcon, withFoundingProfile } from "@/domain";
 import { pickListingLogo } from "@/domain/community-dedupe";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
@@ -14,7 +14,7 @@ import { VerifiedStar } from "./verified-star";
 import { CargaProofStep } from "./carga-proof-step";
 
 export function CommunityCard({
-  community,
+  community: raw,
   onVerified,
 }: {
   community: Community;
@@ -22,6 +22,7 @@ export function CommunityCard({
   onPatched?: () => void;
 }) {
   const t = useT();
+  const community = withFoundingProfile(raw);
   const trust = communityTrust(community);
   const [imgOk, setImgOk] = useState(true);
   const [proofErr, setProofErr] = useState("");

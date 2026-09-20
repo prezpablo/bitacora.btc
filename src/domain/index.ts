@@ -97,7 +97,7 @@ export { DAY_MS, TF_SPEC, homeLookback, resampleToTf, bucketStart } from "./ohlc
 export { SOCIAL_KEYS, SOCIALS, linksFromPicked, urlFor, keyFromUrl } from "./socials";
 export { DAYS, EMPTY_HOURS, formatHours, isOpenNow, daySlots } from "./hours";
 export { PAY_KEYS, PAYS } from "./pays";
-export { communityTrust, listingTrust, hasScrapeLink, normalizeProofUrl, shopIsPublic, communityIsPublic, overlayPending, cargaVerifyGate } from "./verify";
+export { communityTrust, listingTrust, hasScrapeLink, normalizeProofUrl, shopIsPublic, communityIsPublic, overlayPending, cargaVerifyGate, withFoundingProfile } from "./verify";
 export { feesFromMempool, feesFromEsplora, feesFromBitcoiner, mergeLiveFees, quoteReady } from "./fees";
 export {
   addScore,
