@@ -152,18 +152,21 @@ export function SiteHeader() {
 
   return (
     <header ref={headRef} className="site-head sticky top-0 z-[80] isolate border-b border-border bg-background">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-[0.618rem] px-4 py-[0.618rem] sm:px-[1.618rem]">
-        <Link to="/" className="min-w-0 no-underline">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-[0.5rem] sm:gap-[0.618rem] sm:px-[1.618rem] sm:py-[0.618rem]">
+        <Link to="/" className="min-w-0 shrink no-underline">
           <BrandMark compact />
         </Link>
-        <div className="flex items-center gap-[0.618rem]">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-[0.618rem]">
           <a
             href={TELEGRAM_COMMUNITY}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-8 items-center rounded-md bg-primary px-2 py-1 text-center text-[11px] leading-tight font-medium text-white sm:h-9 sm:px-3 sm:text-sm"
+            aria-label={labels.navSumate}
+            title={labels.navSumate}
+            className="inline-flex h-8 items-center whitespace-nowrap rounded-md bg-primary px-2 text-[11px] font-medium text-white sm:h-9 sm:px-3 sm:text-sm"
           >
-            {labels.navSumate}
+            <span className="sm:hidden">{labels.navSumateShort}</span>
+            <span className="hidden sm:inline">{labels.navSumate}</span>
           </a>
           <LangButtons />
         </div>
