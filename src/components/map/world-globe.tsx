@@ -293,8 +293,8 @@ function GlobeCanvas({
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
+    <div>
+      <div className="relative isolate overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 px-2 pt-2 sm:px-3 sm:pt-3">
         <div className="mx-auto max-w-3xl rounded-md bg-white/90 px-2 py-1.5 text-center shadow-[var(--shadow-border)] backdrop-blur-[2px] sm:px-3 sm:py-2">
         <p className="font-display text-sm text-neutral-900 sm:text-2xl">{t("globeKicker")}</p>

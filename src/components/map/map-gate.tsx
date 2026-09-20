@@ -121,7 +121,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
 
   if (mode === "globe") {
     return (
-      <div className="flex min-h-0 w-full flex-1 flex-col">
+      <div className="w-full shrink-0">
         <MapCrash
           fallback={
             <Suspense fallback={<MapFallback />}>
@@ -137,7 +137,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
     );
   }
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col">
+    <div className="w-full shrink-0">
     <MapCrash fallback={<MapFallback />}>
     <Suspense fallback={<MapFallback />}>
       <SpendMap

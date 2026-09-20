@@ -120,7 +120,7 @@ test("globe is the hero stage with overlay stats", () => {
   assert.match(globe, /absolute inset-x-0 top-0/);
   assert.match(globe, /altitude: 2\.05/);
   assert.match(read("src/components/map/spend-map.tsx"), /bit-globe/);
-  assert.match(read("src/components/dashboard/desk.tsx"), /flex-1 flex-col/);
+  assert.doesNotMatch(read("src/components/map/world-globe.tsx"), /flex min-h-0 flex-1 flex-col/);
 });
 
 test("responsive queries use Tailwind rem cuts and short viewport", () => {
@@ -133,7 +133,7 @@ test("responsive queries use Tailwind rem cuts and short viewport", () => {
   assert.match(css, /flex-shrink: 0/);
   assert.match(css, /height: 280px/);
   assert.match(css, /\.bit-globe/);
-  assert.match(css, /calc\(100dvh - 14\.5rem\)/);
+  assert.match(css, /calc\(100dvh - 17rem\)/);
   assert.match(css, /\.chip-row/);
   assert.match(css, /\.chip \{/);
   assert.match(read("src/components/site-header.tsx"), /site-head/);
