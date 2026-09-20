@@ -20,11 +20,13 @@ let mapEngineWarm = false;
 function warmMapEngine() {
   if (typeof document === "undefined" || mapEngineWarm) return;
   mapEngineWarm = true;
-  if (!document.head.querySelector(`link[rel="preconnect"][href="${OFM}"]`)) {
-    const link = document.createElement("link");
-    link.rel = "preconnect";
-    link.href = OFM;
-    document.head.appendChild(link);
+  for (const href of [OFM, "https://a.tile.openstreetmap.fr"]) {
+    if (!document.head.querySelector(`link[rel="preconnect"][href="${href}"]`)) {
+      const link = document.createElement("link");
+      link.rel = "preconnect";
+      link.href = href;
+      document.head.appendChild(link);
+    }
   }
   void import("leaflet/dist/leaflet.css");
   void import("leaflet");

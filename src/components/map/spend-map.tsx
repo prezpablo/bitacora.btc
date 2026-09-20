@@ -15,7 +15,7 @@ import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore, type MapBbox } from "@/lib/map-query";
 import { boxAround } from "@/domain";
-import { OFM_ATTR, OFM_STYLE, OTM_ATTR, OTM_URL } from "@/domain/map-tiles";
+import { OFM_ATTR, OFM_STYLE, OSMFR_ATTR, OSMFR_URL, OTM_ATTR, OTM_URL } from "@/domain/map-tiles";
 import { geoBannerKey } from "@/domain/geo-fix";
 import { locateBest } from "@/infrastructure/geo";
 import { applyFix } from "./leaflet-fix";
@@ -578,6 +578,12 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           maxZoom: 17,
         }).addTo(map);
       };
+      const streets = L.tileLayer(OSMFR_URL, {
+        attribution: OSMFR_ATTR,
+        subdomains: "abc",
+        maxZoom: 19,
+      }).addTo(map);
+      streets.on("tileerror", addOtm);
       void import("maplibre-gl/dist/maplibre-gl.css");
       void import("maplibre-gl")
         .then(async () => {
@@ -585,10 +591,27 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           if (dead || !map) return;
           const gl = plugin.default || plugin.maplibreGL;
           if (typeof gl !== "function") throw new Error("maplibreGL");
-          gl({ style: OFM_STYLE, attributionControl: false }).addTo(map);
+          const layer = gl({ style: OFM_STYLE, attributionControl: false }).addTo(map);
+          const glMap = layer.getMaplibreMap?.();
+          glMap?.on("load", () => {
+            try {
+              if (glMap.getSource("openmaptiles")) streets.remove();
+            } catch {
+              /* keep raster streets */
+            }
+          });
+          glMap?.on("error", () => {
+            try {
+              map?.removeLayer(layer);
+            } catch {
+              /* raster stays */
+            }
+          });
           map.attributionControl?.addAttribution(OFM_ATTR);
         })
-        .catch(addOtm);
+        .catch(() => {
+          /* raster OSM-FR already on the map */
+        });
       L.control.zoom({ position: "topright" }).addTo(map);
       leafletRef.current = L;
       const group = L.layerGroup().addTo(map);

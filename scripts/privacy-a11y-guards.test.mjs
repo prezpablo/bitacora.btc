@@ -112,7 +112,9 @@ test("map tiles are OpenFreeMap then OpenTopoMap, never OSMF or Carto keys", () 
   const tiles = read("src/domain/map-tiles.ts");
   const caddy = read("deploy/Caddyfile");
   assert.match(tiles, /tiles\.openfreemap\.org/);
+  assert.match(tiles, /tile\.openstreetmap\.fr\/hot/);
   assert.match(map, /OFM_STYLE/);
+  assert.match(map, /OSMFR_URL/);
   assert.match(map, /OTM_URL/);
   assert.doesNotMatch(map, /arcgisonline/);
   assert.doesNotMatch(map, /World_Street_Map/);
@@ -122,6 +124,7 @@ test("map tiles are OpenFreeMap then OpenTopoMap, never OSMF or Carto keys", () 
   assert.match(read("src/lib/map-query.ts"), /prefetchMapPins/);
   assert.match(caddy, /tiles\.openfreemap\.org/);
   assert.match(caddy, /tile\.opentopomap\.org/);
+  assert.match(caddy, /tile\.openstreetmap\.fr/);
   assert.doesNotMatch(caddy, /arcgisonline/);
   assert.doesNotMatch(caddy, /tile\.openstreetmap\.org/);
   assert.doesNotMatch(caddy, /basemaps\.cartocdn/);
