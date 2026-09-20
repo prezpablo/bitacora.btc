@@ -117,7 +117,8 @@ test("globe is the hero stage with overlay stats", () => {
   const globe = read("src/components/map/world-globe.tsx");
   assert.match(globe, /bit-globe/);
   assert.match(globe, /globeCitiesShort/);
-  assert.match(globe, /border-b border-border/);
+  assert.match(globe, /grid-cols-2/);
+  assert.match(globe, /rgba\(29,29,27,0\.12\)/);
   assert.doesNotMatch(globe, /absolute inset-x-0 top-0/);
   assert.match(globe, /altitude: 2\.05/);
   assert.match(read("src/components/map/spend-map.tsx"), /bit-globe/);

@@ -294,34 +294,34 @@ function GlobeCanvas({
 
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
-      <header className="border-b border-border px-2 py-1.5 text-center sm:px-3 sm:py-2">
+      <header className="px-2 py-2 sm:px-4 sm:py-3">
+        <div className="mx-auto max-w-3xl rounded-lg bg-white/75 px-3 py-2 text-center shadow-[0_0_0_1px_rgba(29,29,27,0.12)] backdrop-blur-[2px] sm:px-5 sm:py-2.5">
         <p className="font-display text-sm text-neutral-900 sm:text-2xl">{t("globeKicker")}</p>
         <p className="hidden text-[11px] text-neutral-600 sm:mt-0.5 sm:block sm:text-sm">{t("globeTitle")}</p>
         {world ? (
           <>
-          <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-0.5 text-[11px] text-neutral-600 sm:mt-1.5 sm:gap-x-5 sm:text-sm">
-            <span>
+          <ul className="mt-1.5 grid grid-cols-2 justify-items-center gap-x-2 gap-y-1 sm:mt-2 sm:grid-cols-4 sm:gap-x-6">
+            <li className="text-[11px] text-neutral-600 sm:text-sm">
               <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.cities.toLocaleString()}</span>
               <span className="ml-1 font-medium">{t("globeCitiesShort")}</span>
-            </span>
-            <span>
+            </li>
+            <li className="text-[11px] text-neutral-600 sm:text-sm">
               <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.shops.toLocaleString()}</span>
               <span className="ml-1 font-medium">{t("globeShops")}</span>
-            </span>
-            <span>
+            </li>
+            <li className="text-[11px] text-neutral-600 sm:text-sm">
               <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.comms.toLocaleString()}</span>
               <span className="ml-1 font-medium">{t("globeComms")}</span>
-            </span>
-            <span>
+            </li>
+            <li className="text-[11px] text-neutral-600 sm:text-sm">
               <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.events.toLocaleString()}</span>
               <span className="ml-1 font-medium">{t("globeEvents")}</span>
-            </span>
-          </p>
+            </li>
+          </ul>
           {latam ? (
-            <p className="mt-0.5 text-[10px] sm:text-xs">
+            <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-1.5 text-[10px] text-neutral-600 sm:text-xs">
               <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>
-              <span className="text-neutral-600">
-                {": "}
+              <span>
                 <span className="font-bold text-neutral-900">{latam.cities.toLocaleString()}</span> {t("globeCitiesShort")}
                 {" · "}
                 <span className="font-bold text-neutral-900">{latam.shops.toLocaleString()}</span> {t("globeShops")}
@@ -334,6 +334,7 @@ function GlobeCanvas({
           ) : null}
           </>
         ) : null}
+        </div>
       </header>
 
       <div
