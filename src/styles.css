@@ -114,6 +114,27 @@ body {
   }
 }
 
+/* Globo/mapa al entrar: ocupa el hueco del viewport (header+pie+CTA aparte). */
+.bit-globe {
+  width: 100%;
+  flex-shrink: 0;
+  display: block;
+  height: min(66dvh, calc(100dvh - 14.5rem));
+  min-height: 300px;
+}
+@media (width >= 40rem) {
+  .bit-globe {
+    height: min(72dvh, calc(100dvh - 12rem));
+    min-height: 420px;
+  }
+}
+@media (max-height: 32rem) {
+  .bit-globe {
+    height: min(58dvh, 220px);
+    min-height: 180px;
+  }
+}
+
 /* ETF / sparks: misma escala, no h-[180px] suelto. */
 .bit-spark {
   height: 10.5rem;

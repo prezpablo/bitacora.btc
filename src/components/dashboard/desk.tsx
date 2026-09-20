@@ -256,8 +256,8 @@ export function Desk() {
         aria-hidden={sector !== "llegar" || undefined}
         {...(sector !== "llegar" ? { inert: true } : {})}
       >
-      <section id="mapa" className="relative shrink-0 scroll-mt-[var(--header-offset)]">
-        <ClientOnly fallback={<div className="bit-stage rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
+      <section id="mapa" className="relative flex min-h-0 flex-1 flex-col scroll-mt-[var(--header-offset)]">
+        <ClientOnly fallback={<div className="bit-globe rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
           <MapGate embedded />
         </ClientOnly>
       </section>

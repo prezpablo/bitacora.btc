@@ -74,9 +74,9 @@ function GlobeCanvas({
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
   const [loadErr, setLoadErr] = useState("");
   const [joining, setJoining] = useState(false);
-  const [size, setSize] = useState({ w: 360, h: 240 });
+  const [size, setSize] = useState({ w: 360, h: 360 });
   const [hover, setHover] = useState<Feat | null>(null);
-  const [alt, setAlt] = useState(2.35);
+  const [alt, setAlt] = useState(2.05);
 
   const stats = useGlobeStats();
   const geo = useQuery({
@@ -293,36 +293,38 @@ function GlobeCanvas({
   );
 
   return (
-    <div className="space-y-3">
-      <header className="rounded-lg bg-white px-3 py-2 text-center shadow-[var(--shadow-border)] sm:px-4 sm:py-3">
-        <p className="font-display text-lg text-neutral-900 sm:text-3xl">{t("globeKicker")}</p>
-        <p className="mt-0.5 text-[11px] text-neutral-600 sm:mt-1 sm:text-base">{t("globeTitle")}</p>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-10 px-2 pt-2 sm:px-3 sm:pt-3">
+        <div className="mx-auto max-w-3xl rounded-md bg-white/90 px-2 py-1.5 text-center shadow-[var(--shadow-border)] backdrop-blur-[2px] sm:px-3 sm:py-2">
+        <p className="font-display text-sm text-neutral-900 sm:text-2xl">{t("globeKicker")}</p>
+        <p className="hidden text-[11px] text-neutral-600 sm:mt-0.5 sm:block sm:text-sm">{t("globeTitle")}</p>
         {world ? (
           <>
-          <p className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:mt-3 sm:grid-cols-4 sm:justify-items-center sm:gap-x-5 sm:gap-y-2">
+          <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-0.5 text-[11px] text-neutral-600 sm:mt-1.5 sm:gap-x-5 sm:text-sm">
             <span>
-              <span className="text-lg font-bold text-neutral-900 sm:text-3xl">{world.cities.toLocaleString()}</span>
-              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeCities")}</span>
+              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.cities.toLocaleString()}</span>
+              <span className="ml-1 font-medium">{t("globeCitiesShort")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-neutral-900 sm:text-3xl">{world.shops.toLocaleString()}</span>
-              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeShops")}</span>
+              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.shops.toLocaleString()}</span>
+              <span className="ml-1 font-medium">{t("globeShops")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-neutral-900 sm:text-3xl">{world.comms.toLocaleString()}</span>
-              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeComms")}</span>
+              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.comms.toLocaleString()}</span>
+              <span className="ml-1 font-medium">{t("globeComms")}</span>
             </span>
             <span>
-              <span className="text-lg font-bold text-neutral-900 sm:text-3xl">{world.events.toLocaleString()}</span>
-              <span className="ml-1 text-xs font-medium text-neutral-600 sm:ml-1.5 sm:text-sm">{t("globeEvents")}</span>
+              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.events.toLocaleString()}</span>
+              <span className="ml-1 font-medium">{t("globeEvents")}</span>
             </span>
           </p>
           {latam ? (
-            <p className="mt-1 text-[10px] sm:text-xs">
+            <p className="mt-0.5 text-[10px] sm:text-xs">
               <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>
               <span className="text-neutral-600">
                 {": "}
-                <span className="font-bold text-neutral-900">{latam.cities.toLocaleString()}</span> {t("globeCities")}
+                <span className="font-bold text-neutral-900">{latam.cities.toLocaleString()}</span> {t("globeCitiesShort")}
                 {" · "}
                 <span className="font-bold text-neutral-900">{latam.shops.toLocaleString()}</span> {t("globeShops")}
                 {" · "}
@@ -334,9 +336,9 @@ function GlobeCanvas({
           ) : null}
           </>
         ) : null}
+        </div>
       </header>
 
-      <div className="isolate overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
       <div
         ref={wrap}
         tabIndex={0}
@@ -400,7 +402,7 @@ function GlobeCanvas({
             onSkip();
           }
         }}
-        className="bit-stage relative z-0 overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)]"
+        className="bit-globe relative z-0 overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)]"
       >
       {Globe ? (
         <Globe
@@ -412,7 +414,7 @@ function GlobeCanvas({
           showAtmosphere={false}
           animateIn={false}
           rendererConfig={{ antialias: false, alpha: false, powerPreference: "default" }}
-          pointOfView={{ lat: -15, lng: -58, altitude: 2.35 }}
+          pointOfView={{ lat: -15, lng: -58, altitude: 2.05 }}
           polygonsData={features}
           polygonGeoJsonGeometry="geometry"
           polygonCapCurvatureResolution={4}
@@ -472,7 +474,7 @@ function GlobeCanvas({
       )}
 
       {hover ? (
-        <div className="pointer-events-none absolute top-12 right-2 left-2 z-20 rounded-md bg-white/95 px-3 py-2 shadow-[var(--shadow-border)] sm:top-auto sm:right-auto sm:bottom-4 sm:left-1/2 sm:w-[min(92%,320px)] sm:-translate-x-1/2">
+        <div className="pointer-events-none absolute right-2 bottom-14 left-2 z-20 rounded-md bg-white/95 px-3 py-2 shadow-[var(--shadow-border)] sm:right-auto sm:bottom-4 sm:left-1/2 sm:w-[min(92%,320px)] sm:-translate-x-1/2">
           <p className="font-medium text-neutral-900">{names?.of(hover.iso) || hover.iso}</p>
           <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 font-mono text-xs text-neutral-700 sm:grid-cols-1 sm:text-sm">
             <li>
@@ -516,7 +518,7 @@ function GlobeCanvas({
 
 export function WorldGlobe({ onEnter, onSkip }: { onEnter: (focus: GlobeFocus) => void; onSkip: () => void }) {
   return (
-    <ClientOnly fallback={<div className="bit-stage rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
+    <ClientOnly fallback={<div className="bit-globe rounded-lg bg-white shadow-[var(--shadow-border)]" />}>
       <GlobeCanvas onEnter={onEnter} onSkip={onSkip} />
     </ClientOnly>
   );

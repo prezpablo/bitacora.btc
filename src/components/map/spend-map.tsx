@@ -1446,7 +1446,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             ref={mapEl}
             tabIndex={0}
             title={t("zoomNeedFocus")}
-            className="bit-stage"
+            className="bit-globe"
           />
           {geoBannerKey(geo) ? (
             <p className="pointer-events-none absolute bottom-2 left-3 z-[1500] max-w-[16rem] rounded-md bg-card px-2.5 py-1 text-xs text-muted-foreground shadow-[var(--shadow-border)]">

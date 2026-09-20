@@ -44,7 +44,7 @@ function warmGlobeEngine() {
 
 function MapFallback() {
   return (
-    <div className="bit-stage flex items-center justify-center rounded-lg bg-white shadow-[var(--shadow-border)]">
+    <div className="bit-globe flex items-center justify-center rounded-lg bg-white shadow-[var(--shadow-border)]">
       <span className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-white sm:size-12 sm:text-xl">₿</span>
     </div>
   );
@@ -121,7 +121,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
 
   if (mode === "globe") {
     return (
-      <div className="w-full shrink-0">
+      <div className="flex min-h-0 w-full flex-1 flex-col">
         <MapCrash
           fallback={
             <Suspense fallback={<MapFallback />}>
@@ -137,7 +137,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
     );
   }
   return (
-    <div className="w-full shrink-0">
+    <div className="flex min-h-0 w-full flex-1 flex-col">
     <MapCrash fallback={<MapFallback />}>
     <Suspense fallback={<MapFallback />}>
       <SpendMap

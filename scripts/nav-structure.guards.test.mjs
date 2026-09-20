@@ -113,6 +113,16 @@ test("D-VIZ-01 candles share bit-stage and recharts is gone", () => {
   assert.doesNotMatch(read("package.json"), /"recharts"/);
 });
 
+test("globe is the hero stage with overlay stats", () => {
+  const globe = read("src/components/map/world-globe.tsx");
+  assert.match(globe, /bit-globe/);
+  assert.match(globe, /globeCitiesShort/);
+  assert.match(globe, /absolute inset-x-0 top-0/);
+  assert.match(globe, /altitude: 2\.05/);
+  assert.match(read("src/components/map/spend-map.tsx"), /bit-globe/);
+  assert.match(read("src/components/dashboard/desk.tsx"), /flex-1 flex-col/);
+});
+
 test("responsive queries use Tailwind rem cuts and short viewport", () => {
   const css = read("src/styles.css");
   assert.match(css, /@media \(width >= 40rem\)/);
@@ -122,6 +132,8 @@ test("responsive queries use Tailwind rem cuts and short viewport", () => {
   assert.match(css, /min-height: 220px/);
   assert.match(css, /flex-shrink: 0/);
   assert.match(css, /height: 280px/);
+  assert.match(css, /\.bit-globe/);
+  assert.match(css, /calc\(100dvh - 14\.5rem\)/);
   assert.match(css, /\.chip-row/);
   assert.match(css, /\.chip \{/);
   assert.match(read("src/components/site-header.tsx"), /site-head/);
