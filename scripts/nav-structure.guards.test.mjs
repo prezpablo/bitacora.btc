@@ -56,8 +56,9 @@ test("footer does not list Privacidad twice", () => {
   assert.equal((head.match(/legalPrivacy/g) || []).length, 1);
   assert.match(head, /footerProject/);
   assert.match(head, /footerCommunity/);
-  assert.match(head, /sm:grid-cols-3/);
-  assert.match(head, /grid-cols-\[1\.5rem_minmax\(0,1fr\)_1\.5rem\]/);
+  assert.match(head, /sm:grid-cols-3|grid-cols-3/);
+  assert.match(head, /footerJoinShort/);
+  assert.match(head, /footerHaciaShort/);
   assert.match(read("src/components/contribute-qr.tsx"), /compact \? "size-6"/);
   assert.match(head, /min-h-6/);
   assert.match(head, /size-5/);
@@ -139,7 +140,7 @@ test("responsive queries use Tailwind rem cuts and short viewport", () => {
   assert.match(css, /flex-shrink: 0/);
   assert.match(css, /height: 280px/);
   assert.match(css, /\.bit-globe/);
-  assert.match(css, /calc\(100dvh - 17rem\)/);
+  assert.match(css, /calc\(100dvh - 14\.5rem\)/);
   assert.match(css, /\.chip-row/);
   assert.match(css, /\.chip \{/);
   assert.match(read("src/components/site-header.tsx"), /site-head/);

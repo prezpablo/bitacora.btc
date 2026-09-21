@@ -224,7 +224,7 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
       </main>
       <footer className={cn("border-t border-border", fill ? "shrink-0" : "mt-auto")}>
         <div className="mx-auto flex max-w-6xl flex-col gap-1.5 px-3 py-1.5 sm:px-[1.618rem] sm:py-2">
-          <p className="flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-center text-[11px] leading-tight text-muted-foreground sm:text-xs">
+          <p className="flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 px-1 text-center text-[11px] leading-tight text-muted-foreground sm:text-xs">
             <span className="font-display tracking-wide text-foreground">{t("initiative")}</span>
             <img
               src="/latam-cripto-mom.jpg"
@@ -235,7 +235,7 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
               decoding="async"
               className="size-5 rounded-full object-cover sm:size-6"
             />
-            <span>
+            <span className="hidden sm:inline">
               <a href="https://bitacorabtc.org" className="font-medium text-foreground underline underline-offset-2">
                 Bitácora.btc
               </a>
@@ -243,17 +243,18 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
               {t("taglineShort")}
             </span>
           </p>
-          <div className="grid grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] items-end gap-x-2">
-            <span className="size-6" aria-hidden="true" />
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-2 sm:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem]">
+            <span className="hidden size-6 sm:block" aria-hidden="true" />
             <nav
               aria-label={t("footerNavAria")}
-              className="grid w-full grid-cols-1 justify-items-center gap-y-1.5 text-[11px] leading-none sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:text-xs"
+              className="grid w-full grid-cols-3 items-start justify-items-center gap-x-2 gap-y-1 text-[10px] leading-tight sm:gap-x-4 sm:text-xs sm:leading-none"
             >
               <div className="flex flex-col items-center gap-0.5 text-center">
-                <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{t("footerProject")}</span>
-                <div className="flex flex-wrap items-center justify-center gap-x-2">
+                <span className="text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:text-[10px]">{t("footerProject")}</span>
+                <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
                   <a href={navHref(UTILITY_NAV[0], "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-                    {t("navHacia")}
+                    <span className="sm:hidden">{t("footerHaciaShort")}</span>
+                    <span className="hidden sm:inline">{t("navHacia")}</span>
                   </a>
                   <a href="/#datos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("footerDatos")}
@@ -264,8 +265,8 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                 </div>
               </div>
               <div className="flex flex-col items-center gap-0.5 text-center">
-                <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{t("footerCommunity")}</span>
-                <div className="flex flex-wrap items-center justify-center gap-x-2">
+                <span className="text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:text-[10px]">{t("footerCommunity")}</span>
+                <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
                   <a href={navHref(UTILITY_NAV[1], "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("navContacto")}
                   </a>
@@ -275,7 +276,8 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                     rel="noopener noreferrer"
                     className="inline-flex min-h-6 min-w-6 items-center text-foreground"
                   >
-                    {t("joinTelegram")}
+                    <span className="sm:hidden">{t("footerJoinShort")}</span>
+                    <span className="hidden sm:inline">{t("joinTelegram")}</span>
                   </a>
                   <a href="/#aportes" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("navAportes")}
@@ -283,8 +285,8 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                 </div>
               </div>
               <div className="flex flex-col items-center gap-0.5 text-center">
-                <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{t("footerLegal")}</span>
-                <div className="flex flex-wrap items-center justify-center gap-x-2">
+                <span className="text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:text-[10px]">{t("footerLegal")}</span>
+                <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
                   <a href="/legal#aviso" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalAviso")}
                   </a>
@@ -303,7 +305,7 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                 </div>
               </div>
             </nav>
-            <span id="aportes" className="flex size-6 items-end justify-end scroll-mt-[var(--header-offset)]">
+            <span id="aportes" className="flex size-6 shrink-0 items-end justify-end scroll-mt-[var(--header-offset)]">
               <Suspense fallback={null}>
                 <ContributeQr compact />
               </Suspense>

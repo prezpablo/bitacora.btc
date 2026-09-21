@@ -119,8 +119,8 @@ body {
   width: 100%;
   flex-shrink: 0;
   display: block;
-  height: min(48dvh, calc(100dvh - 17rem));
-  min-height: 260px;
+  height: min(52dvh, calc(100dvh - 14.5rem));
+  min-height: 240px;
 }
 @media (width >= 40rem) {
   .bit-globe {
