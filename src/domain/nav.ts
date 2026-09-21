@@ -21,7 +21,7 @@ export const PRIMARY_NAV: readonly NavItem[] = [
   { id: "mercado", hash: "mercado" },
 ];
 
-/** Pie: rumbo y contacto. Privacidad vive en la fila legal, no acá. */
+/** Pie: rumbo y contacto. Privacidad vive en el grupo Legal. */
 export const UTILITY_NAV: readonly NavItem[] = [
   { id: "hacia", hash: "roadmap" },
   { id: "contacto", hash: "contacto" },
@@ -34,6 +34,11 @@ export const LEGAL_NAV: readonly NavItem[] = [
   { id: "privacidad", hash: "privacidad" },
   { id: "contacto", hash: "contacto" },
 ];
+
+/** Tres grupos del pie (menos ruido; mismos destinos, un clic). */
+export const FOOTER_PROJECT = ["hacia", "datos", "soberania"] as const;
+export const FOOTER_COMMUNITY = ["contacto", "telegram", "aportes"] as const;
+export const FOOTER_LEGAL = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"] as const;
 
 export const LEARN_HUB: readonly NavItem[] = [
   { id: "conciencia", hash: "conciencia" },

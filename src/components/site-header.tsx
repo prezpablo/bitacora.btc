@@ -244,48 +244,58 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
             </span>
           </p>
           <nav
-            aria-label={t("legalNavAria")}
-            className="flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-0 text-[11px] leading-none sm:text-xs"
+            aria-label={t("footerNavAria")}
+            className="flex w-full flex-col items-center gap-1 text-[11px] leading-none sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-1 sm:text-xs"
           >
-            {UTILITY_NAV.map((item) => (
-              <a key={item.id} href={navHref(item, "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-                {t(NAV_COPY[item.id] || "navContacto")}
+            <div className="flex flex-wrap items-baseline justify-center gap-x-2">
+              <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{t("footerProject")}</span>
+              <a href={navHref(UTILITY_NAV[0], "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("navHacia")}
               </a>
-            ))}
-            <a
-              href={TELEGRAM_COMMUNITY}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-6 min-w-6 items-center text-foreground"
-            >
-              {t("joinTelegram")}
-            </a>
-            <span id="aportes" className="inline-flex min-h-6 min-w-6 scroll-mt-[var(--header-offset)] items-center">
-              <Suspense fallback={null}>
-                <ContributeQr compact />
-              </Suspense>
-            </span>
-            <a href="/#datos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("dataOrigin")}
-            </a>
-            <a href="/#soberania" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("sovTitle")}
-            </a>
-            <a href="/legal#aviso" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("legalAviso")}
-            </a>
-            <a href="/legal#privacidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("legalPrivacy")}
-            </a>
-            <a href="/legal#cookies" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("legalCookies")}
-            </a>
-            <a href="/legal#accesibilidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("legalA11y")}
-            </a>
-            <a href="/legal#terminos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
-              {t("legalTerms")}
-            </a>
+              <a href="/#datos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("footerDatos")}
+              </a>
+              <a href="/#soberania" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("sovTitle")}
+              </a>
+            </div>
+            <div className="flex flex-wrap items-baseline justify-center gap-x-2">
+              <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{t("footerCommunity")}</span>
+              <a href={navHref(UTILITY_NAV[1], "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("navContacto")}
+              </a>
+              <a
+                href={TELEGRAM_COMMUNITY}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-6 min-w-6 items-center text-foreground"
+              >
+                {t("joinTelegram")}
+              </a>
+              <span id="aportes" className="inline-flex min-h-6 min-w-6 scroll-mt-[var(--header-offset)] items-center">
+                <Suspense fallback={null}>
+                  <ContributeQr compact />
+                </Suspense>
+              </span>
+            </div>
+            <div className="flex flex-wrap items-baseline justify-center gap-x-2">
+              <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{t("footerLegal")}</span>
+              <a href="/legal#aviso" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("legalAviso")}
+              </a>
+              <a href="/legal#privacidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("legalPrivacy")}
+              </a>
+              <a href="/legal#cookies" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("legalCookies")}
+              </a>
+              <a href="/legal#accesibilidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("legalA11y")}
+              </a>
+              <a href="/legal#terminos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                {t("legalTerms")}
+              </a>
+            </div>
           </nav>
         </div>
       </footer>

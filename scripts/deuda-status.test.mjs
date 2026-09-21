@@ -9,10 +9,10 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 test("cola JSON has unique ids and a resume date", () => {
   const doc = loadCola(readFileSync(join(ROOT, "docs/deuda-cola.json"), "utf8"));
-  assert.match(doc.resume, /^2026-09-16$/);
+  assert.match(doc.resume, /^2026-09-21$/);
   const ids = doc.items.map((i) => i.id);
   assert.equal(new Set(ids).size, ids.length);
-  assert.ok(ids.includes("D-FOSS") && ids.includes("D-PIN-01"));
+  assert.ok(ids.includes("D-FOSS") && ids.includes("D-PIN-03+"));
   assert.ok(doc.guards.some((g) => g.id === "G-HEALTHZ"));
 });
 

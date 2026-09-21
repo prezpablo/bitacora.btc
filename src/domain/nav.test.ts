@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { COMMUNITY_HUB, LEARN_HUB, LEGAL_NAV, MARKET_HUB, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, sectorOf, spyOf } from "./nav.ts";
+import { COMMUNITY_HUB, FOOTER_COMMUNITY, FOOTER_LEGAL, FOOTER_PROJECT, LEARN_HUB, LEGAL_NAV, MARKET_HUB, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, sectorOf, spyOf } from "./nav.ts";
 
 test("D-NAV-01 primary bar is four destinations", () => {
   assert.deepEqual(
@@ -80,4 +80,10 @@ test("desk sectors: Mapa+Aprender share llegar; comunidad and mercado are own ro
 test("footer Telegram joins Consciencia Bitcoin", () => {
   assert.equal(TELEGRAM_COMMUNITY, "https://t.me/+hdBuy78MUuZiYjhh");
   assert.ok(!PRIMARY_NAV.some((n) => n.id === "telegram"));
+});
+
+test("footer groups project, community and legal", () => {
+  assert.deepEqual([...FOOTER_PROJECT], ["hacia", "datos", "soberania"]);
+  assert.deepEqual([...FOOTER_COMMUNITY], ["contacto", "telegram", "aportes"]);
+  assert.deepEqual([...FOOTER_LEGAL], ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"]);
 });

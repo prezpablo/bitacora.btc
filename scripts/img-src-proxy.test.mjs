@@ -40,10 +40,10 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
 
 test("smoke diario cubre /logo, img-src y Luma compacto", () => {
   const smoke = read("docs/SMOKE-DIARIO.md");
-  for (const id of ["P0-22", "P0-25", "P2-20", "P2-21", "P1-56", "P1-57"]) {
-    assert.match(smoke, new RegExp(id));
-  }
-  assert.match(smoke, /cdn-cgi/);
+  assert.match(smoke, /\/logo/);
+  assert.match(smoke, /img-src/);
+  assert.match(smoke, /btcmap-shops/);
+  assert.match(smoke, /127\.0\.0\.1/);
   const live = read("scripts/probe-live.mjs");
   assert.match(live, /P2-20 img-src allowlist/);
   assert.match(live, /P0-25 \/logo Luma JPEG/);
