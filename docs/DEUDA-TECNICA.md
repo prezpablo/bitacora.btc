@@ -57,6 +57,22 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 
 **Prioridad:** ZIP único 19 set: D-GLOBE-KEYS + D-BANNER + D-LABIF. Siguiente: D-FOSS (ops GitHub). No D-DARK en este ZIP.
 
+**Referentes 21 set — actualizaciones útiles (no fusionar)**
+
+| Objetivo | Repo / release | Encaje en Bitácora | No |
+|---|---|---|---|
+| **Estabilidad pines D-PIN-03** | [mapbox/supercluster **v9.1.0**](https://github.com/mapbox/supercluster/releases/tag/v9.1.0) (3 set) | Ya estamos en `^9.1.0`. v9 recorta heap ~57% y `getTileRaw`. Servir cluster por bbox/zoom en vez del JSON 2,9 MB. | Leaflet.markercluster |
+| **Catálogo flaco** | [teambtcmap/btcmap-api](https://github.com/teambtcmap/btcmap-api) v4 `places?fields=` · [btcmap.org#276](https://github.com/teambtcmap/btcmap.org/issues/276) | API actualizada 18 set. Un dump `id,lat,lon,icon` + ficha al clic. Encaja educación+unión de comercios. | REST v1 propio; Nostr-login (#903) |
+| **Teselas soberanas** | [protomaps/PMTiles 3.8.1](https://pypi.org/project/pmtiles/) (16 set) + [go-pmtiles extract](https://github.com/protomaps/go-pmtiles) | Recorte Latam `maxzoom=12` en un archivo en el VPS. Leaflet raster **sin** MapLibre. Caddy ya sirve estáticos. | OFM self-host 300 GB; Protomaps API de pago |
+| **Calles si OFM muda** | [hyperknot/openfreemap](https://github.com/hyperknot/openfreemap) instancia pública | Seguir `tiles.openfreemap.org/styles/liberty`. Sin key/cookies = ethos Njalla. | linux_host en este VPS |
+| **Globo móvil** | [vasturiano/react-globe.gl](https://github.com/vasturiano/react-globe.gl) `pointsMerge` · [zakky8/web-optimization](https://github.com/zakky8/web-optimization) (may 2026) | `pointsMerge`, `antialias:false` en 3G, DPR ≤2, curvature más gruesa. three ya 0.185. | R3F/drei (otro runtime) |
+| **Cumplimiento / supply chain** | CVE-2026-45321 TanStack May 2026 | Lockfile + `npm ci`. No bump `@tanstack/*` a ciegas. CSRF de Start ya cubre server-fn. | Firebase/better-auth en producto (scaffold; recortar = D-DEPS) |
+| **FLOSS oponible** | [teambtcmap/btcmap.org](https://github.com/teambtcmap/btcmap.org) AGPL, commit 20 set | D-FOSS: repo Public + AGPL. Ellos listan 200 anónimo; nosotros aún no. | LICENSE sin visibilidad |
+| **Velas educativas** | [leeoniya/uPlot 1.6.32](https://github.com/leeoniya/uPlot/releases) OHLC | Solo si el canvas propio se vuelve frágil. ~45 KB MIT. | TradingView / Recharts v3 |
+| **PWA** | manifest estático | Sin cambio. vite-plugin-pwa sigue peleando con Start. | Workbox ahora |
+
+Siguiente producto real: **D-PIN-03** (payload flaco, patrón supercluster 9.1) o **D-TILE extract Latam** si las calles vuelven a fallar. D-FOSS sigue ops GitHub.
+
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
 ---
