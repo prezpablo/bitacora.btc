@@ -208,23 +208,24 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
       onClick={() => setOpen(true)}
       className={cn(
         "group text-left",
-        compact ? "inline-flex items-center gap-2" : "flex shrink-0 flex-col items-center gap-2",
+        compact ? "inline-flex items-center" : "flex shrink-0 flex-col items-center gap-2",
       )}
       aria-expanded={open}
       aria-controls={titleId}
+      aria-label={compact ? t("navAportes") : undefined}
     >
       <img
         src={SRC[rail]}
         alt={rail === "ln" ? t("contributeAltLn") : t("contributeAlt")}
-        width={compact ? 44 : 168}
-        height={compact ? 44 : 168}
+        width={compact ? 24 : 168}
+        height={compact ? 24 : 168}
         className={cn(
           "rounded-md bg-card shadow-[var(--shadow-border)] transition-transform duration-[var(--motion-quick)] group-hover:scale-[1.03]",
-          compact ? "size-11" : "size-36 sm:size-40",
+          compact ? "size-6" : "size-36 sm:size-40",
         )}
       />
       {compact ? (
-        <span className="text-[11px] font-medium text-foreground sm:text-xs">{t("navAportes")}</span>
+        <span className="sr-only">{t("navAportes")}</span>
       ) : (
         <span className="max-w-40 text-center text-sm text-pretty text-muted-foreground">{t("contributeCaption")}</span>
       )}

@@ -56,7 +56,9 @@ test("footer does not list Privacidad twice", () => {
   assert.equal((head.match(/legalPrivacy/g) || []).length, 1);
   assert.match(head, /footerProject/);
   assert.match(head, /footerCommunity/);
-  assert.match(head, /footerLegal/);
+  assert.match(head, /sm:grid-cols-3/);
+  assert.match(head, /absolute right-2 bottom-1.5/);
+  assert.match(read("src/components/contribute-qr.tsx"), /compact \? "size-6"/);
   assert.match(head, /min-h-6/);
   assert.match(head, /size-5/);
   assert.doesNotMatch(read("src/domain/nav.ts").slice(
