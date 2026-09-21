@@ -66,7 +66,7 @@ B) P0 INFRA ORIGEN (CAÍDA si falla)
 - P0-06 HSTS max-age=31536000 includeSubDomains + HTTP/2
 - P0-07 /mapa /legal /labif = 200
 - P0-08 /data/map.csv 200, header id,tipo,name,lat,lon, ≥1 fila
-- P0-09 robots Allow:/ + sitemap con /, /mapa, /legal, /labif, /LICENSE y hreflang es/pt/en
+- P0-09 robots Allow:/ + sitemap loc `/` `/mapa` `/legal` + hreflang es/pt/en. Sin `/labif` ni `/LICENSE` (noindex). LICENSE `X-Robots-Tag noindex`. `/labif` meta noindex
 - P0-10 security.txt Contact=/legal#contacto y Expires futuro
 - P0-11 JS principal /assets/index-*.js 200
 - P0-12 pins.csv, btcmap-shops.json, btcmap-comms.json, ne-110m-countries.json (200; 404 = DEGRADA mapa/globo)

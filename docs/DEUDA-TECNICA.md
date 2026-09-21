@@ -1,8 +1,8 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 17 de setiembre de 2026  
+**Fecha:** 21 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` · **ZIP en `.org`:** `fe530c4` (CTA Telegram + `/logo?fit=thumb`).
+**Repo:** `prezpablo/bitacora.btc` `main` · **ZIP en `.org`:** `index-4W2ZuAE3` (globo overlay; repo ya en `7d3f6a3`).
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -58,6 +58,21 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 **Prioridad:** ZIP único 19 set: D-GLOBE-KEYS + D-BANNER + D-LABIF. Siguiente: D-FOSS (ops GitHub). No D-DARK en este ZIP.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
+
+---
+
+**Smoke 21 set (Grok diario) — cotejo**
+
+Informe: DEGRADA SEO/mapa/feed · TTFB 0,37 s · feeds_ok 14/18 · skip 5/5 · h1 4/5 · barra/habitaciones SI · license/pwa SI. Addr MATCH. **Sin CAÍDA ni incidente.**
+
+| Ítem | ¿Activo en origen? | Veredicto | Prioridad |
+|---|---|---|---|
+| **P0-09** sitemap sin `/labif` y `/LICENSE` | **A propósito.** Sitemap = `/` `/mapa` `/legal`. `/labif` meta `noindex,follow`. `/LICENSE` `X-Robots-Tag: noindex, follow`. GSC 19 set: esas URLs «descubierta sin indexar». | Falso positivo del protocolo viejo. **No** reponer loc. | **P3 D-SMOKE-09** — actualizar prompt Grok. No producto. |
+| **P0-12** shops.json+comms.json 404 | **No.** `/data/btcmap-shops.json` 200 (2,9 MB) · `/data/btcmap-comms.json` 200 · `pins.csv` 200. 404 solo alias cortos. | Falso positivo. Igual 14–18 set. | No abrir. No alias. |
+| **D-BN+D-MP-*** 451/timeout | Este runner. **OKX 200.** Desk HTML pinta. VPS: Vision+OKX+ninja/emzy. | DEGRADA-feed del probe, no mercado caído. | No reabrir. |
+| **h1 4/5** | **6/6 aquí:** `/` `/pt` `/en` `/mapa` `/legal` `/labif`. | Hueco del probe. | No abrir. |
+
+**Prioridad real:** ninguna de estas alertas entra a cola de producto. Siguiente = ZIP pendiente (`7d3f6a3`: globo héroe + ficha Consciencia) si `.org` aún es `4W2ZuAE3`. D-FOSS sigue ops GitHub.
 
 ---
 

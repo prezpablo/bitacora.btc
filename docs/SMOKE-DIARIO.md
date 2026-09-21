@@ -41,7 +41,7 @@ P0 Infra origen
 - P0-06 HSTS max-age=31536000 includeSubDomains + HTTP/2
 - P0-07 /mapa /legal /labif = 200
 - P0-08 /data/map.csv 200, header id,tipo,name,lat,lon, ≥1 fila
-- P0-09 robots Allow:/ + sitemap con /, /mapa, /legal, /labif, /LICENSE y hreflang es/pt/en
+- P0-09 robots Allow:/ + sitemap loc **solo** `/` `/mapa` `/legal` (hreflang es/pt/en). `/labif` y `/LICENSE` **no** van al sitemap (noindex a propósito: GSC «descubierta sin indexar»). LICENSE 200 + `X-Robots-Tag: noindex, follow`. `/labif` meta `noindex,follow`. Si el probe exige loc /labif|/LICENSE = plantilla vieja, no DEGRADA SEO
 - P0-10 security.txt Contact=/legal#contacto y Expires futuro
 - P0-11 JS principal /assets/index-*.js 200
 - P0-12 first-party: pins.csv, btcmap-shops.json, btcmap-comms.json, ne-110m-countries.json (200; 404 = DEGRADA mapa/globo, no CAÍDA)
