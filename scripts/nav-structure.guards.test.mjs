@@ -57,7 +57,7 @@ test("footer does not list Privacidad twice", () => {
   assert.match(head, /footerProject/);
   assert.match(head, /footerCommunity/);
   assert.match(head, /sm:grid-cols-3/);
-  assert.match(head, /absolute right-2 bottom-1.5/);
+  assert.match(head, /grid-cols-\[1\.5rem_minmax\(0,1fr\)_1\.5rem\]/);
   assert.match(read("src/components/contribute-qr.tsx"), /compact \? "size-6"/);
   assert.match(head, /min-h-6/);
   assert.match(head, /size-5/);
