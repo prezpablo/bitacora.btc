@@ -1,5 +1,5 @@
 {
-  "resume": "2026-09-16",
+  "resume": "2026-09-21",
   "canonical": "https://bitacorabtc.org",
   "repo": "https://github.com/prezpablo/bitacora.btc",
   "human": "docs/DEUDA-TECNICA.md",
@@ -192,6 +192,62 @@
       "open": false,
       "kind": "repo",
       "done": "sitemap lastmod = día del ZIP/build, no 2026-09-07"
+    },
+    {
+      "id": "D-SMOKE-09",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "prompt corto SMOKE-DIARIO: sitemap sin labif/LICENSE; P0-12 = btcmap-shops.json"
+    },
+    {
+      "id": "D-GLOBE-HERO",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "cifras en recuadro encima del lienzo; planeta no tapado; bit-globe con altura propia"
+    },
+    {
+      "id": "D-FOUNDING",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "Consciencia Bitcoin: descripción educación/psicología + iconos YT/X/TikTok/IG/Telegram"
+    },
+    {
+      "id": "D-CTA-SHORT",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "CTA móvil navSumateShort; href Telegram; no tapa wordmark"
+    },
+    {
+      "id": "D-PIN-03+",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "snapshot/cluster flaco id,lat,lon,icon; getTileRaw o bbox; no JSON 2.9MB al cliente"
+    },
+    {
+      "id": "D-GLOBE-PERF",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "pointsMerge + antialias off 3G + DPR<=2 en react-globe.gl"
+    },
+    {
+      "id": "D-TILE-LATAM",
+      "pri": "P3",
+      "open": true,
+      "kind": "manual",
+      "done": "PMTiles extract Latam maxzoom=12 first-party solo si OFM/OSM-FR mudos"
+    },
+    {
+      "id": "D-DEPS",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "package.json sin firebase ni better-auth; npm ci; no bump tanstack a ciegas"
     }
   ],
   "guards": [

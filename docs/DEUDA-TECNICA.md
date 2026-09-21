@@ -2,44 +2,58 @@
 
 **Fecha:** 21 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` · **ZIP en `.org`:** `index-4W2ZuAE3` (globo overlay; repo ya en `7d3f6a3`).
-**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · cotejo informe [`INFORME-REFUTACION-2026-09-11.md`](INFORME-REFUTACION-2026-09-11.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
+**Repo:** `prezpablo/bitacora.btc` `main` `bfdca8e`  
+**ZIP en `.org`:** `index-4W2ZuAE3` — **atrasado**. Repo ya tiene globo no tapado + ficha Consciencia + Sumate corto + smoke 2,9 k (`7d3f6a3`…`0b86f93`).  
+**Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
 ## Acuerdo 11 set (tarde) — congelado
 
 Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponible hoy: sitio + CSV + snapshots + `/healthz` + `/legal`. FLOSS oponible **solo** cuando el repo liste 200 anónimo.
 
-**Seguimiento automático:** cola [`deuda-cola.json`](deuda-cola.json). `npm run deuda:status` · `npm run deuda:live`. **Calidad:** `npm run quality` (test + eslint dominio/aplicación + auth + deuda). `npm run quality:full` = tsc + eslint global (D-QA, aún DEGRADA). Cron VPS 08:22; Grok 08:10 -03.
+**Seguimiento:** cola [`deuda-cola.json`](deuda-cola.json). `npm run deuda:status` · `npm run deuda:live`. **Calidad:** `npm run quality`. Cron VPS 08:22; Grok Automations = prompt corto de `SMOKE-DIARIO.md` (~2,9 k).
 
-| Retirado (no backlog P0) | Queda (severidad justa) |
+| Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token como fuga, snapshot ausente, lang fijo sin `?lang=`, legal por API, serverFn CVE, www/SAN, Geo-IP, `/privacidad` 404, SSRF P0, Mercado = down, globo = no hay mapa, FormSubmit oculto, REST v1 ya | **D-FOSS** · **D-PIN** · **D-STATS** · **D-CTA** · **D-418** · **D-MKT** UX · globo-first · D-A11Y-24 · D-SITEMAP · PWA / LICENSE |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo | **D-FOSS** (ops GitHub) · **D-GLOBE** (juicio producto) · **D-DEPS** · **D-TILE-LATAM** (si calles fallan) · **D-GLOBE-PERF** · ZIP `.org` atrasado |
 
 ---
 
-## Cola desde el 16 set — una fase por ZIP
+## Cola vigente — 21 set
 
-No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Carto.
+No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no TradingView.
 
-| Orden | Id | Qué | Verificación | Cómo volver |
-|---|---|---|---|---|
-| **0** | **D-TILE-ZIP** | CSP Esri + OpenTopoMap, sin OSMF/Carto. | **Cerrado en `.org` 13 set.** | N/A |
-| **0b** | **D-FOSS** | GitHub: visibilidad **Public**. Clone anónimo 200. `LICENSE` MIT o AGPL. Link en `/legal` y 404. Hasta entonces no oponer «FOSS» a BTC Map. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 · **sigue 404 anónimo 13 set noche** | Settings → Change visibility |
-| **1** | **D-PIN-01** | `moveend` **antes** de `setView`. Bbox inicial = `null`. | **Cerrado repo + `.org` 13 set.** | Restaurar `west: -56.35` |
-| **1c** | **D-VIZ-01** | Velas = `.bit-stage`. Sin `recharts`. | **Cerrado 13 set.** | 58dvh + recharts |
-| **1d** | **D-VIZ-02** | ETF y calor al ancho real. | **Cerrado 13 set.** | SVG 720/920 |
-| **1e** | **D-VIZ-03** | 3 ticks slim, hit ≥ 24 px, EMA menú. | **Cerrado 13 set.** | chips + 7 ticks |
-| **2** | **D-PIN-02** | Supercluster en el VPS. Sin `LIMIT 800` ciego. | **Cerrado.** Live: `/data/btcmap-shops.json` 200 (2,9 MB, 13 set 23:16 UTC). **No** existe `/data/shops.json`. | Quitar paquete |
-| **—** | **UX 13 set** | Globo 280 px / chips wrap+click · eventos 2×6. | **En `.org` `4e9dd76`.** | N/A |
-| **—** | **D-VIZ-EMA** | Móvil: calor ON, solo EMA 1D, sin pastillas. | **Repo `622baf9`.** Falta ZIP. | 4 EMA + heat off 3G |
-| **3** | **D-PIN-03** | Payload flaco `id,lat,lon,icon` al cluster; ficha rica **al clic** (`getMerchant`). | **Este ZIP.** Red tab: comercios sin name/logo/desc. | Restaurar `MerchantPlace` en el GET |
-| **4** | **D-STATS** | Totales globo: **Latam** vs **BTC Map mundial**. i18n 3 idiomas. | **Este ZIP.** Números grandes = Latam; línea 2 = mundial. FAQ dos fuentes. | Revertir strings |
-| **5** | **D-CTA** | “Sumate” ≠ “Apoyá con sats”. | **Este ZIP.** Header = join mapa. QR en pie `#aportes`. | QR otra vez al lado de Sumate |
-| **6** | **D-418** | `lang` SSR vs `localStorage` sin `?lang=`. | **Repo.** `.org` aún D-CTA (`index-O6tgqllA`). | Volver a leer `bitacora-lang` |
-| **6b** | **D-GLOBE-INIT** | Timeout 8 s mataba el chunk 1,9 MB. Prefetch + WebGL. | **Este ZIP.** Loading hasta import; sin WebGL → mapa. | Restaurar timer 8000 |
-| **7** | **D-TILE-03** | Teselas propias OpenFreeMap / PMTiles. | **Este ZIP.** Capa = OFM liberty (MapLibre-Leaflet). Reserva OTM. CSP sin `arcgisonline`. | Restaurar Esri |
-| **8** | **P3 lote** | Skip 404 · **D-SITEMAP** · D-A11Y-24 `#datos` · contraste `/labif` · globo teclado · PWA · LICENSE · `img-src` | **Por ítem.** | Por ítem |
-| **8g** | **D-GLOBE-KEYS** | Teclado en el globo: flechas, zoom, Enter, Esc. | **Este ZIP.** Pines html `tabIndex=-1`. | Quitar onKeyDown |
+### ZIP pendiente (ops, no código)
+
+Subir `bitacora.btc-main.zip` de **`bfdca8e`** (o al menos `7d3f6a3`) con [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md). Trae: globo héroe, cifras **arriba** del planeta (recuadro vidrio), CTA móvil «Sumate», ficha Consciencia + redes, prompt smoke corto.
+
+### Abiertos
+
+| Orden | Id | Pri | Qué | Verificación | Cómo volver |
+|---|---|---|---|---|---|
+| **0** | **D-FOSS** | P1 | GitHub **Public**. Clone anónimo 200. LICENSE AGPL ya en disco y `/LICENSE`. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → visibilidad |
+| **1** | **D-PIN-03+** | P2 | Snapshot público sigue ~2,9 MB. Supercluster 9.1 ya está: servir bbox/`getTileRaw` o dump `id,lat,lon,icon`. Ficha rica al clic. | Red tab: GET cluster flaco; clic = getMerchant | Restaurar JSON completo al cluster |
+| **2** | **D-GLOBE-PERF** | P3 | `pointsMerge`, `antialias:false` en 3G, DPR ≤2 ([react-globe.gl](https://github.com/vasturiano/react-globe.gl), [web-optimization](https://github.com/zakky8/web-optimization)) | FPS móvil; globo no blanco | Quitar flags |
+| **3** | **D-TILE-LATAM** | P3 | Solo si OFM/OSM-FR mudos: [PMTiles 3.8.1](https://github.com/protomaps/PMTiles) `extract` Latam `maxzoom=12` en el VPS. Leaflet raster, sin MapLibre extra. | Calles 200 first-party | Volver a OFM público |
+| **4** | **D-DEPS** | P3 | Recortar `firebase` y `better-auth` del scaffold. Menos superficie (CVE-2026-45321 TanStack: lockfile + `npm ci`, no bump a ciegas). | `package.json` sin esos; `npm ci` verde | Restaurar deps |
+| **—** | **D-GLOBE** | P3 | Juicio: globo-first al entrar. No apagar. | Manual | — |
+
+### Cerrados en repo (no reabrir)
+
+D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 (OFM+OTM, CSP sin Esri) · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 (prompt corto: sitemap **sin** labif/LICENSE; catálogo `btcmap-*`) · D-GLOBE-HERO (cifras no tapan el planeta) · D-FOUNDING (texto + redes Consciencia) · D-CTA-SHORT (Sumate móvil).
+
+**Siguiente fase de código, si se acepta:** **D-PIN-03+** (payload flaco). Antes: ZIP del globo. D-FOSS es ops GitHub, no un commit.
+
+---
+
+## Cola histórica 16 set (referencia)
+
+| Orden | Id | Estado 21 set |
+|---|---|---|
+| 0 D-TILE-ZIP | Cerrado `.org` 13 set | — |
+| 0b D-FOSS | **Sigue abierto** | clone anónimo 404 |
+| 1–2 D-PIN-01/02, D-VIZ-* | Cerrados | — |
+| 3 D-PIN-03 | Código flaco en server-fn; **snapshot 2,9 MB sigue** | reabre como D-PIN-03+ |
+| 4–8g D-STATS … D-GLOBE-KEYS | Cerrados en repo | falta ZIP héroe en `.org` |
 
 **Referentes públicos (13 set) — qué clonar, qué no**
 
@@ -55,8 +69,6 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **D-QA** | eslint 9 + tsc ya en `npm run quality` | `quality:full` cuando se limpien imports `.ts` de tests | knip, Sonar, Codecov |
 | **D-VIZ-01/02** | [leeoniya/uPlot](https://github.com/leeoniya/uPlot) MIT · [airbnb/visx](https://github.com/airbnb/visx) `ParentSize` | Gesto y ancho. **No paquete** si el canvas propio ya pinta | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) (atribución TV) · ECharts/Nivo/Recharts v3 (peso) · Highcharts |
 
-**Prioridad:** ZIP único 19 set: D-GLOBE-KEYS + D-BANNER + D-LABIF. Siguiente: D-FOSS (ops GitHub). No D-DARK en este ZIP.
-
 **Referentes 21 set — actualizaciones útiles (no fusionar)**
 
 | Objetivo | Repo / release | Encaje en Bitácora | No |
@@ -71,7 +83,7 @@ No fusionar. Estilos: tokens actuales. No Mapbox GL, no API keys, no OSMF, no Ca
 | **Velas educativas** | [leeoniya/uPlot 1.6.32](https://github.com/leeoniya/uPlot/releases) OHLC | Solo si el canvas propio se vuelve frágil. ~45 KB MIT. | TradingView / Recharts v3 |
 | **PWA** | manifest estático | Sin cambio. vite-plugin-pwa sigue peleando con Start. | Workbox ahora |
 
-Siguiente producto real: **D-PIN-03** (payload flaco, patrón supercluster 9.1) o **D-TILE extract Latam** si las calles vuelven a fallar. D-FOSS sigue ops GitHub.
+Siguiente producto de código: **D-PIN-03+**. Ops: ZIP `bfdca8e` y D-FOSS.
 
 OpenFreeMap público: mismo ethos que Njalla (sin registro, sin key). Self-host OFM **no entra** en esta VPS.
 
@@ -83,12 +95,12 @@ Informe: DEGRADA SEO/mapa/feed · TTFB 0,37 s · feeds_ok 14/18 · skip 5/5 · h
 
 | Ítem | ¿Activo en origen? | Veredicto | Prioridad |
 |---|---|---|---|
-| **P0-09** sitemap sin `/labif` y `/LICENSE` | **A propósito.** Sitemap = `/` `/mapa` `/legal`. `/labif` meta `noindex,follow`. `/LICENSE` `X-Robots-Tag: noindex, follow`. GSC 19 set: esas URLs «descubierta sin indexar». | Falso positivo del protocolo viejo. **No** reponer loc. | **P3 D-SMOKE-09** — actualizar prompt Grok. No producto. |
+| **P0-09** sitemap sin `/labif` y `/LICENSE` | **A propósito.** Sitemap = `/` `/mapa` `/legal`. `/labif` meta `noindex,follow`. `/LICENSE` `X-Robots-Tag: noindex, follow`. | Falso positivo del protocolo viejo. **No** reponer loc. | **D-SMOKE-09 cerrado en repo** (`SMOKE-DIARIO.md` ~2,9 k). Pegar en Grok Automations. |
 | **P0-12** shops.json+comms.json 404 | **No.** `/data/btcmap-shops.json` 200 (2,9 MB) · `/data/btcmap-comms.json` 200 · `pins.csv` 200. 404 solo alias cortos. | Falso positivo. Igual 14–18 set. | No abrir. No alias. |
 | **D-BN+D-MP-*** 451/timeout | Este runner. **OKX 200.** Desk HTML pinta. VPS: Vision+OKX+ninja/emzy. | DEGRADA-feed del probe, no mercado caído. | No reabrir. |
 | **h1 4/5** | **6/6 aquí:** `/` `/pt` `/en` `/mapa` `/legal` `/labif`. | Hueco del probe. | No abrir. |
 
-**Prioridad real:** ninguna de estas alertas entra a cola de producto. Siguiente = ZIP pendiente (`7d3f6a3`: globo héroe + ficha Consciencia) si `.org` aún es `4W2ZuAE3`. D-FOSS sigue ops GitHub.
+**Prioridad real:** ninguna alerta del smoke entra a cola de producto. Ops: ZIP `bfdca8e` (`.org` sigue `4W2ZuAE3`). Código siguiente = D-PIN-03+. D-FOSS = GitHub Public.
 
 ---
 
