@@ -23,7 +23,7 @@ Internos (repo): `npm test` — dominio, CSV, fees, i18n, parches, pines, SEO pa
 | A4 | LABIF | `/labif` | 200 |
 | A5 | Health | `/healthz` | 200 `{ ok: true }` |
 | A6 | Robots | `/robots.txt` | Sitemap `bitacorabtc.org/sitemap.xml`, `Disallow: /api/` |
-| A7 | Sitemap | `/sitemap.xml` | hreflang es/pt/en + `/mapa` `/legal` |
+| A7 | Sitemap | `/sitemap.xml` | hreflang es/pt/en + loc `/` `/mapa` `/legal` (sin `/labif` ni `/LICENSE`) |
 | A8 | OG | `/og.jpg` | 200, JPEG (no el recorte de Velar) |
 | A9 | Favicon | `/favicon.svg` | 200 |
 | A10 | QR on-chain / LN | `/contribuir-qr.png` `/contribuir-ln.png` | 200 |
