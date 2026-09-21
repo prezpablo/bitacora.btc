@@ -1,6 +1,6 @@
 # Prompt completo de verificación — Bitácora.btc
 
-Pegar el bloque de abajo en el agente (Grok Automations u otro). Cubre **estabilidad, dinámica de habitaciones y accesibilidad**.
+Pegar **solo** [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) en Grok Automations (el bloque de abajo no entra). Este archivo es la corrida **manual** completa.
 
 No pentest. Complementa `npm test`, `npm run test:live`, `npm run test:seo`, `npm run test:a11y`. Diario corto: [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md).
 
