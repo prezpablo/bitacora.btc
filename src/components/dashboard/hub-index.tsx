@@ -37,10 +37,8 @@ export function HubIndex({
                 window.setTimeout(() => scrollDeskTo(item.hash), 50);
               }}
               className={cn(
-                "chip no-underline shadow-[var(--shadow-border)]",
-                on
-                  ? "bg-card font-medium text-foreground"
-                  : "bg-elevated text-muted-foreground hover:text-foreground",
+                "chip no-underline",
+                on ? "chip-on" : "chip-idle hover:text-foreground",
               )}
             >
               {t(labels[item.id] || kicker)}

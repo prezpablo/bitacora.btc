@@ -232,3 +232,15 @@ test("price chart keyboard pans and zooms when focused", () => {
   assert.match(copy, /Arrows pan/);
   assert.match(copy, /Setas percorrem/);
 });
+
+test("event chips orange only when selected; load overlay holds height", () => {
+  const ev = read("src/components/dashboard/network-events.tsx");
+  assert.match(ev, /platform === name \? chipOn : chipIdle/);
+  assert.match(ev, /kind === k.key \? chipOn : chipIdle/);
+  assert.match(ev, /bit-spin/);
+  assert.match(ev, /min-h-\[28rem\]/);
+  assert.match(ev, /box\.scrollTop = y/);
+  assert.doesNotMatch(ev, /chip bg-primary text-white/);
+  assert.match(read("src/styles.css"), /\.chip-idle/);
+  assert.match(read("src/components/dashboard/hub-index.tsx"), /chip-on/);
+});

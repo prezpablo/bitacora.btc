@@ -185,6 +185,26 @@ body {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+.chip-idle {
+  background: #ffffff;
+  color: #1d1d1b;
+  box-shadow: var(--shadow-border);
+}
+.chip-on {
+  background: #9a5600;
+  color: #fff;
+}
+.bit-spin {
+  display: inline-block;
+  color: #f7931a;
+  animation: bit-spin 0.9s linear infinite;
+  transform-origin: center;
+}
+@keyframes bit-spin {
+  to {
+    transform: rotateY(360deg);
+  }
+}
 .chip svg {
   width: 0.75rem;
   height: 0.75rem;
@@ -332,6 +352,9 @@ main#contenido h2.font-display {
   .bitacora-hit-pulse {
     animation: none;
     opacity: 0.25;
+  }
+  .bit-spin {
+    animation: none;
   }
 }
 

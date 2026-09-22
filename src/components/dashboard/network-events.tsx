@@ -155,7 +155,10 @@ function EventCard({ ev, lang }: { ev: NetworkEvent; lang: AppLang }) {
 }
 
 const selectClass =
-  "chip shrink-0 bg-elevated text-foreground shadow-[var(--shadow-border)] disabled:opacity-40";
+  "chip chip-idle shrink-0 disabled:opacity-40";
+
+const chipOn = "chip chip-on";
+const chipIdle = "chip chip-idle";
 
 function GeoMenu({
   label,
@@ -189,7 +192,7 @@ function GeoMenu({
     <div ref={box} className="relative shrink-0">
       <button
         type="button"
-        className={cn(selectClass, "max-w-[10rem] gap-1 sm:max-w-none sm:min-w-40")}
+        className={cn(selectClass, (continent || country) && "chip-on", "max-w-[10rem] gap-1 sm:max-w-none sm:min-w-40")}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
@@ -217,9 +220,7 @@ function GeoMenu({
                 type="button"
                 className={cn(
                   "block w-full px-3 py-1.5 text-left text-sm font-bold",
-                  continent === g.key && !country
-                    ? "bg-primary text-white"
-                    : "text-foreground hover:bg-elevated",
+                  continent === g.key && !country ? "bg-primary text-white" : "text-foreground hover:bg-elevated",
                 )}
                 onClick={() => {
                   onContinent(g.key);
@@ -356,7 +357,12 @@ export function NetworkEvents() {
     applyEventQuery(url.searchParams, query);
     const next = `${url.pathname}${url.search}${url.hash}`;
     const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    if (next !== cur) window.history.replaceState(null, "", next);
+    if (next === cur) return;
+    const box = document.getElementById("eventos")?.closest(".scroll-free");
+    const y = box instanceof HTMLElement ? box.scrollTop : window.scrollY;
+    window.history.replaceState(null, "", next);
+    if (box instanceof HTMLElement) box.scrollTop = y;
+    else window.scrollTo({ top: y, left: 0, behavior: "instant" as ScrollBehavior });
   }, [page, dateDir, kind, platform, country, continent]);
 
   useEffect(() => {
@@ -443,12 +449,10 @@ export function NetworkEvents() {
       <div className="relative z-[2] chip-row mt-3">
         <button
           type="button"
-          className={cn(
-            "chip",
-            near ? "bg-primary text-white" : "bg-card text-foreground shadow-[var(--shadow-border)]",
-          )}
+          className={cn(near ? chipOn : chipIdle)}
           onClick={() => void nearYou()}
           disabled={locating}
+          aria-pressed={near}
         >
           <Locate />
           {locating ? t("geoWait") : near ? t("netNearOn", { c: countryLabel || country }) : t("netNear")}
@@ -457,7 +461,7 @@ export function NetworkEvents() {
           <button
             key={name}
             type="button"
-            className={cn("chip bg-primary text-white", platform === name ? "ring-1 ring-white" : "opacity-90")}
+            className={cn(platform === name ? chipOn : chipIdle)}
             onClick={() => setPlatform((cur) => (cur === name ? "" : name))}
             aria-pressed={platform === name}
           >
@@ -490,7 +494,7 @@ export function NetworkEvents() {
           onCountry={pickCountry}
         />
         {dirty ? (
-          <button type="button" className="chip text-primary" onClick={() => {
+          <button type="button" className={chipIdle} onClick={() => {
             setCountry("");
             setKind("");
             setContinent("");
@@ -507,14 +511,15 @@ export function NetworkEvents() {
       </div>
 
       <div className="relative z-[2] chip-row mt-2">
-        {KIND_COPY.filter((k) => (kindCounts[k.key] || 0) > 0).map((k) => (
+        {KIND_COPY.map((k) => (
           <button
             key={k.key}
             type="button"
             onClick={() => setKind((cur) => (cur === k.key ? "" : k.key))}
-            className={cn("chip", kind === k.key ? "bg-primary text-white" : "bg-elevated text-muted-foreground")}
+            className={cn(kind === k.key ? chipOn : chipIdle, !(kindCounts[k.key] || 0) && kind !== k.key && "opacity-50")}
+            aria-pressed={kind === k.key}
           >
-            {t(k.label)} · {kindCounts[k.key]}
+            {t(k.label)} · {kindCounts[k.key] || 0}
           </button>
         ))}
         <span className="chip flex-none text-muted-foreground shadow-none">
@@ -529,18 +534,26 @@ export function NetworkEvents() {
 
       {q.isError ? (
         <p className="mt-4 text-sm text-short">{t("netFail")}</p>
-      ) : total === 0 && !q.isFetching && !rows.length ? (
-        <p className="mt-4 text-sm text-muted-foreground">{q.isPending ? t("netLoading") : t("netEmpty")}</p>
-      ) : rows.length === 0 && q.isPending ? (
-        <p className="mt-4 text-sm text-muted-foreground">{t("netLoading")}</p>
       ) : (
-        <>
-          <div className={cn("mt-4 grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2", q.isFetching && "opacity-70")}>
-            {rows.map((ev) => (
-              <EventCard key={ev.id} ev={ev} lang={lang} />
-            ))}
-          </div>
-          {pages > 1 ? (
+        <div className="relative mt-4 min-h-[28rem]" aria-busy={q.isFetching || undefined}>
+          {rows.length ? (
+            <div className={cn("grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2", q.isFetching && "opacity-40")}>
+              {rows.map((ev) => (
+                <EventCard key={ev.id} ev={ev} lang={lang} />
+              ))}
+            </div>
+          ) : !q.isFetching ? (
+            <p className="text-sm text-muted-foreground">{t("netEmpty")}</p>
+          ) : null}
+          {q.isFetching ? (
+            <div className="absolute inset-0 z-[1] flex items-center justify-center bg-card/40">
+              <span className="bit-spin text-4xl" aria-hidden>
+                ₿
+              </span>
+              <span className="sr-only">{t("netLoading")}</span>
+            </div>
+          ) : null}
+          {pages > 1 && rows.length ? (
             <div className="mt-3 flex items-center justify-center gap-2">
               <Button
                 type="button"
@@ -568,7 +581,7 @@ export function NetworkEvents() {
               </Button>
             </div>
           ) : null}
-        </>
+        </div>
       )}
       <p className="mt-4 flex items-center gap-1 text-xs text-muted-foreground">
         <MapPin className="size-3.5" />
