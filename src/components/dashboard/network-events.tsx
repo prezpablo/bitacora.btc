@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Locate, MapPin } from "lucide-react";
 import type { ContinentId, EventBoardQuery, EventKind, NetworkEvent } from "@/domain";
 import { EVENT_PAGE, EVENT_PAGE_MOBILE, eventFlyerSrc } from "@/domain";
-import { applyEventQuery, continentOf, eventQueryFromSearch } from "@/domain";
+import { continentOf, eventQueryFromSearch } from "@/domain";
+import { pinDeskScroll } from "@/lib/desk-scroll";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { prefetchEventPage, useMapEvents } from "@/lib/map-query";
 import { locateBest } from "@/infrastructure/geo";
@@ -346,24 +347,12 @@ export function NetworkEvents() {
     setPage(1);
   }, [country, continent, platform, kind, near, dateDir, pageSize]);
 
+  useEffect(() => pinDeskScroll(), [country, continent, platform, kind, near, dateDir, page, q.isFetching]);
+
   useEffect(() => {
     if (q.isFetching || !board) return;
     if (board.page !== page) setPage(board.page);
   }, [board, page, q.isFetching]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const url = new URL(window.location.href);
-    applyEventQuery(url.searchParams, query);
-    const next = `${url.pathname}${url.search}${url.hash}`;
-    const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    if (next === cur) return;
-    const box = document.getElementById("eventos")?.closest(".scroll-free");
-    const y = box instanceof HTMLElement ? box.scrollTop : window.scrollY;
-    window.history.replaceState(null, "", next);
-    if (box instanceof HTMLElement) box.scrollTop = y;
-    else window.scrollTo({ top: y, left: 0, behavior: "instant" as ScrollBehavior });
-  }, [page, dateDir, kind, platform, country, continent]);
 
   useEffect(() => {
     if (!board || pageNow >= pages) return;
@@ -457,18 +446,21 @@ export function NetworkEvents() {
           <Locate />
           {locating ? t("geoWait") : near ? t("netNearOn", { c: countryLabel || country }) : t("netNear")}
         </button>
-        {(platforms.length ? platforms : platform ? [[platform, 0] as [string, number]] : []).map(([name, n]) => (
+        {(platforms.length ? platforms : platform ? [[platform, 0] as [string, number]] : []).map(([name, n]) => {
+          const on = !platform || platform === name;
+          return (
           <button
             key={name}
             type="button"
-            className={cn(platform === name ? chipOn : chipIdle)}
+            className={cn(on ? chipOn : chipIdle)}
             onClick={() => setPlatform((cur) => (cur === name ? "" : name))}
-            aria-pressed={platform === name}
+            aria-pressed={on}
           >
             {name}
             <span className="font-mono tabular-nums">{n}</span>
           </button>
-        ))}
+          );
+        })}
         <select
           className={selectClass}
           value={dateDir}

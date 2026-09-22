@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
 import { COMMUNITY_HUB, MARKET_HUB, sectorOf } from "@/domain/nav";
 import { HubIndex } from "./hub-index";
@@ -117,9 +117,12 @@ export function Desk() {
     const n = window.setTimeout(() => setLiveOk(true), slowNet() ? 2800 : 400);
     return () => window.clearTimeout(n);
   }, []);
+  const lastScroll = useRef(deskHash);
   useEffect(() => {
     const id = deskHash;
     if (!id) return;
+    if (lastScroll.current === id) return;
+    lastScroll.current = id;
     const t = window.setTimeout(() => scrollDeskTo(id), 80);
     return () => window.clearTimeout(t);
   }, [deskHash, sector]);

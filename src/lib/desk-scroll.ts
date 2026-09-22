@@ -13,3 +13,28 @@ export function scrollDeskTo(id: string) {
   node.scrollIntoView({ behavior: "smooth", block: "start" });
   return true;
 }
+
+export function deskRoom(): HTMLElement | null {
+  const box = document.getElementById("eventos")?.closest(".scroll-free");
+  return box instanceof HTMLElement ? box : document.querySelector(".scroll-free:not([inert])");
+}
+
+/** Keep the room where it is across filter fetches / history writes. */
+export function pinDeskScroll() {
+  const box = deskRoom();
+  if (!box) return () => {};
+  const y = box.scrollTop;
+  const stick = () => {
+    box.scrollTop = y;
+  };
+  stick();
+  const a = requestAnimationFrame(() => {
+    stick();
+    requestAnimationFrame(stick);
+  });
+  const t = window.setTimeout(stick, 100);
+  return () => {
+    cancelAnimationFrame(a);
+    window.clearTimeout(t);
+  };
+}
