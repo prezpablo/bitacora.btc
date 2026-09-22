@@ -30,18 +30,21 @@ interface GrokPwaEvent {
   req: { method: string; headers: Headers };
 }
 
+function skipOgInject(host: string) {
+  const h = host.split(":")[0]?.toLowerCase() ?? "";
+  return h === "bitacorabtc.org" || h === "www.bitacorabtc.org";
+}
+
 function requestHost(event: GrokPwaEvent): string {
   return (
     event.req.headers.get("x-forwarded-host") ?? event.req.headers.get("host") ?? event.url.host
   );
 }
 
-function injectHeadStreaming(response: Response, host: string, search = "", status = 200): Response {
+function injectHeadStreaming(response: Response, host: string): Response {
   const injector = createHeadInjector({
     host,
     site: grokOgIdentity.site,
-    search,
-    status,
   });
   const transformed = response.body!.pipeThrough(
     new TransformStream<Uint8Array, Uint8Array>({
@@ -105,9 +108,10 @@ export default async function grokPwaMiddleware(
     result instanceof Response &&
     result.body &&
     String(result.headers.get("content-type") ?? "").includes("text/html") &&
-    !result.headers.get("content-encoding")
+    !result.headers.get("content-encoding") &&
+    !skipOgInject(requestHost(event))
   ) {
-    return injectHeadStreaming(result, requestHost(event), `${event.url.pathname}${event.url.search}`, result.status);
+    return injectHeadStreaming(result, requestHost(event));
   }
   return result;
 }

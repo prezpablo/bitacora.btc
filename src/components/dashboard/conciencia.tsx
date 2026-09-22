@@ -43,7 +43,7 @@ export function ConcienciaBlock() {
         <h2 className="text-lg font-medium text-foreground">{c.joinTitle}</h2>
         <p className="text-sm text-pretty leading-relaxed text-muted-foreground sm:text-base">{c.join}</p>
         <a
-          href="#mapa"
+          href="/mapa"
           className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline hover:opacity-90"
         >
           {t("navMapa")}

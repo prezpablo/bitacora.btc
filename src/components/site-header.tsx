@@ -252,6 +252,9 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
               <div className="flex flex-col items-center gap-0.5 text-center">
                 <span className="text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:text-[10px]">{t("footerProject")}</span>
                 <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
+                  <a href="/mapa" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                    {t("navMapa")}
+                  </a>
                   <a href={navHref(UTILITY_NAV[0], "/")} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     <span className="sm:hidden">{t("footerHaciaShort")}</span>
                     <span className="hidden sm:inline">{t("navHacia")}</span>

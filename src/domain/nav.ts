@@ -36,7 +36,7 @@ export const LEGAL_NAV: readonly NavItem[] = [
 ];
 
 /** Tres grupos del pie (menos ruido; mismos destinos, un clic). */
-export const FOOTER_PROJECT = ["hacia", "datos", "soberania"] as const;
+export const FOOTER_PROJECT = ["mapa", "hacia", "datos", "soberania"] as const;
 export const FOOTER_COMMUNITY = ["contacto", "telegram", "aportes"] as const;
 export const FOOTER_LEGAL = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"] as const;
 

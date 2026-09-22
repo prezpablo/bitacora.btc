@@ -83,7 +83,7 @@ test("footer Telegram joins Consciencia Bitcoin", () => {
 });
 
 test("footer groups project, community and legal", () => {
-  assert.deepEqual([...FOOTER_PROJECT], ["hacia", "datos", "soberania"]);
+  assert.deepEqual([...FOOTER_PROJECT], ["mapa", "hacia", "datos", "soberania"]);
   assert.deepEqual([...FOOTER_COMMUNITY], ["contacto", "telegram", "aportes"]);
   assert.deepEqual([...FOOTER_LEGAL], ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"]);
 });

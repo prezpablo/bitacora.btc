@@ -22,6 +22,9 @@ export const OG_IMAGE_PATH = "/og.jpg?v=20260903";
 export const SAME_AS = [
   "https://github.com/prezpablo/bitacora.btc",
   "https://www.instagram.com/latamcriptomom/",
+  "https://www.youtube.com/@latamcriptomom",
+  "https://x.com/latamcriptomom",
+  "https://www.tiktok.com/@latamcriptomom",
   "https://t.me/+hdBuy78MUuZiYjhh",
 ] as const;
 
@@ -123,17 +126,17 @@ export const MAPA_COPY: Record<AppLang, { lead: string; how: string; where: stri
   es: {
     lead: "Mapa vivo de comunidades y comercios que aceptan Bitcoin en Latinoamérica: nodos, meetups y educación soberana. Lo impulsa Consciencia Bitcoin desde Colonia del Sacramento, Uruguay, con LATAM Cripto Mom.",
     how: "Para sumar un punto: entrá al mapa, proponé el pin, cargá nombre y redes, y publicá el código CARGA en un enlace público. Sin cuentas y sin custodia de llaves.",
-    where: "El globo cuenta primero Latinoamérica; BTC Map suma el mundo. Con zoom ves los pines. Filtros: todas, comercios, comunidades.",
+    where: "El globo cuenta primero Latinoamérica (Uruguay, Argentina, Brasil, Chile, Paraguay, Colombia, México y el resto de la región); BTC Map suma el mundo. Con zoom ves los pines. Filtros: todas, comercios, comunidades.",
   },
   en: {
     lead: "A live map of Bitcoin communities and merchants in Latin America: nodes, meetups and sovereign education. Run by Consciencia Bitcoin from Colonia del Sacramento, Uruguay, with LATAM Cripto Mom.",
     how: "To add a pin: open the map, drop a point, add name and socials, and publish the CARGA code on a public link. No accounts and no key custody.",
-    where: "The globe counts Latin America first; BTC Map adds the world. Zoom to see pins. Filters: all, shops, communities.",
+    where: "The globe counts Latin America first (Uruguay, Argentina, Brazil, Chile, Paraguay, Colombia, Mexico and the rest of the region); BTC Map adds the world. Zoom to see pins. Filters: all, shops, communities.",
   },
   pt: {
     lead: "Mapa vivo de comunidades e comércios que aceitam Bitcoin na América Latina: nós, meetups e educação soberana. Impulsionado pela Consciencia Bitcoin em Colonia del Sacramento, Uruguai, com a LATAM Cripto Mom.",
     how: "Para somar um ponto: entra no mapa, propõe o pino, carrega nome e redes, e publica o código CARGA num link público. Sem contas e sem custódia de chaves.",
-    where: "O globo conta primeiro a América Latina; o BTC Map soma o mundo. Com zoom vês os pinos. Filtros: todas, comércios, comunidades.",
+    where: "O globo conta primeiro a América Latina (Uruguai, Argentina, Brasil, Chile, Paraguai, Colômbia, México e o resto da região); o BTC Map soma o mundo. Com zoom vês os pinos. Filtros: todas, comércios, comunidades.",
   },
 };
 
@@ -181,6 +184,10 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
       q: "¿Bitácora.btc es una empresa o un exchange?",
       a: "Ninguna de las dos. Es una bitácora comunitaria, sin custodia de fondos. Educación, mapa y datos públicos de la red Bitcoin. No vendemos cuentas ni guardamos tus llaves.",
     },
+    {
+      q: "¿Hay mapa de Bitcoin en Uruguay y el resto de Latam?",
+      a: "Sí. Bitácora.btc nace en Colonia del Sacramento y cubre Latinoamérica: Montevideo, Buenos Aires, São Paulo, Santiago, Asunción, Bogotá, Ciudad de México y más. El pin de Consciencia Bitcoin está en el mapa; el resto de comercios llega de BTC Map y de cargas verificadas.",
+    },
   ],
   en: [
     {
@@ -199,6 +206,10 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
       q: "Is Bitácora.btc a company or an exchange?",
       a: "Neither. It is a community logbook with no custody of funds. Education, a map and public Bitcoin-network data. We do not sell accounts or hold your keys.",
     },
+    {
+      q: "Is there a Bitcoin map for Uruguay and the rest of Latam?",
+      a: "Yes. Bitácora.btc started in Colonia del Sacramento and covers Latin America: Montevideo, Buenos Aires, São Paulo, Santiago, Asunción, Bogotá, Mexico City and more. Consciencia Bitcoin is on the map; other shops come from BTC Map and verified submissions.",
+    },
   ],
   pt: [
     {
@@ -216,6 +227,10 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     {
       q: "A Bitácora.btc é uma empresa ou um exchange?",
       a: "Nenhuma das duas. É uma bitácora comunitária, sem custódia de fundos. Educação, mapa e dados públicos da rede Bitcoin. Não vendemos contas nem guardamos as tuas chaves.",
+    },
+    {
+      q: "Há mapa de Bitcoin no Uruguai e no resto da Latam?",
+      a: "Sim. A Bitácora.btc nasce em Colonia del Sacramento e cobre a América Latina: Montevidéu, Buenos Aires, São Paulo, Santiago, Assunção, Bogotá, Cidade do México e mais. O pin da Consciencia Bitcoin está no mapa; os outros comércios vêm do BTC Map e de cargas verificadas.",
     },
   ],
 };

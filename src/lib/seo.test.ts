@@ -46,6 +46,14 @@ test("jsonLd WebPage follows the route; FAQ on home and mapa", () => {
 
 test("MAPA_COPY has three languages", () => {
   assert.match(MAPA_COPY.es.lead, /Latinoamérica/);
+  assert.match(MAPA_COPY.es.where, /Uruguay/);
   assert.match(MAPA_COPY.en.how, /CARGA/);
   assert.match(MAPA_COPY.pt.where, /América Latina/);
+});
+
+test("entity sameAs includes public socials", () => {
+  const graph = jsonLd("es", "https://bitacorabtc.org", "/")["@graph"] as { "@type": string; sameAs?: string[] }[];
+  const org = graph.find((n) => n["@type"] === "Organization");
+  assert.ok(org?.sameAs?.some((u) => u.includes("youtube.com/@latamcriptomom")));
+  assert.ok(org?.sameAs?.some((u) => u.includes("t.me")));
 });

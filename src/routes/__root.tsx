@@ -54,7 +54,7 @@ function headFor(path: string, lang: AppLang, explicitLang: boolean) {
       { rel: "apple-touch-icon", href: "/icon-180.png" },
       { rel: "canonical", href: canonical },
       { rel: "author", href: "/humans.txt" },
-      { rel: "alternate", type: "text/plain", href: "/llms.txt", title: "llms.txt" },
+      { rel: "sitemap", type: "application/xml", href: `${ORIGIN}/sitemap.xml` },
       { rel: "alternate", href: hreflangHref(ORIGIN, path, "es"), hrefLang: "es" },
       { rel: "alternate", href: hreflangHref(ORIGIN, path, "pt"), hrefLang: "pt" },
       { rel: "alternate", href: hreflangHref(ORIGIN, path, "en"), hrefLang: "en" },

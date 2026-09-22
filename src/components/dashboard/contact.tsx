@@ -185,13 +185,13 @@ export function ContactBlock() {
       <p className="text-sm text-muted-foreground">{t("contactPlace")}</p>
       <div className="flex flex-wrap gap-2">
         <a
-          href="#mapa"
+          href="/mapa"
           className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline hover:opacity-90"
         >
           {t("contactMap")}
         </a>
         <a
-          href="#mapa"
+          href="/mapa"
           className="inline-flex h-9 items-center rounded-md bg-elevated px-3 text-sm font-medium text-foreground no-underline shadow-[var(--shadow-border)] hover:text-primary"
         >
           {t("contactJoin")}

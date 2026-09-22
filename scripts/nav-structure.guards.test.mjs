@@ -51,6 +51,13 @@ test("D-NAV-04 header Sumate is a CTA, not a fifth destination", () => {
   assert.doesNotMatch(read("src/domain/nav.ts"), /id: "sumate"/);
 });
 
+test("home and contact point crawlers at /mapa", () => {
+  assert.match(read("src/components/dashboard/conciencia.tsx"), /href="\/mapa"/);
+  assert.match(read("src/components/dashboard/contact.tsx"), /href="\/mapa"/);
+  assert.match(read("src/components/site-header.tsx"), /href="\/mapa"/);
+  assert.match(read("server/middleware/grok-pwa.ts"), /bitacorabtc\.org/);
+});
+
 test("footer does not list Privacidad twice", () => {
   const head = read("src/components/site-header.tsx");
   assert.equal((head.match(/legalPrivacy/g) || []).length, 1);
