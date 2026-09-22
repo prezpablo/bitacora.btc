@@ -72,7 +72,7 @@ B) P0 ESTABILIDAD DE ORIGEN
 - P0-06 HSTS includeSubDomains + HTTP/2 (max-age ≥ 31536000)
 - P0-07 /mapa /legal /labif = 200
 - P0-08 /data/map.csv 200, header id,tipo,name,lat,lon, ≥1 fila
-- P0-09 robots Allow:/ + Allow Bingbot/DuckDuckBot + Disallow /api/ /__grok/. Sitemap loc SOLO / /mapa /legal (hreflang es/pt/en). /labif meta robots noindex,follow. /LICENSE 200 + header X-Robots-Tag: noindex, follow. lastmod ≠ 2026-09-07. Si el sitemap INCLUYE /labif o /LICENSE = DEGRADA SEO (regresión GSC).
+- P0-09 robots Allow:/ + Allow Bingbot/DuckDuckBot + Disallow /api/ /__grok/. Sitemap loc SOLO / /mapa /legal (hreflang es/pt/en). /labif meta robots noindex,follow + header X-Robots-Tag: noindex, follow. /LICENSE 200 + header X-Robots-Tag: noindex, follow. lastmod ≠ 2026-09-07. Si el sitemap INCLUYE /labif o /LICENSE = DEGRADA SEO (regresión GSC).
 - P0-10 security.txt Contact=/legal#contacto y Expires futuro
 - P0-11 JS principal /assets/index-*.js 200
 - P0-12 /data/pins.csv + /data/btcmap-shops.json + /data/btcmap-comms.json + /data/ne-110m-countries.json = 200. 404 de esos = DEGRADA mapa, no CAÍDA. NO medir shops.json/comms.json.

@@ -218,6 +218,8 @@ test("D-LABIF robots noindex", () => {
   assert.match(read("src/lib/seo.ts"), /noindex,follow/);
   assert.match(read("src/routes/__root.tsx"), /robotsFor/);
   assert.match(read("src/components/seo-head.tsx"), /robotsFor/);
+  assert.match(read("deploy/Caddyfile"), /path \/LICENSE \/humans.txt \/labif/);
+  assert.match(read("server/middleware/robots-tag.ts"), /X-Robots-Tag/);
 });
 
 test("price chart keyboard pans and zooms when focused", () => {
