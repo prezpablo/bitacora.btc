@@ -241,7 +241,7 @@ test("event chips orange only when selected; load overlay holds height", () => {
   assert.match(ev, /min-h-\[28rem\]/);
   assert.match(ev, /pinDeskScroll/);
   assert.doesNotMatch(ev, /history\.replaceState/);
+  assert.match(read("src/lib/desk-scroll.ts"), /cancelPinDeskScroll/);
   assert.match(read("src/styles.css"), /\.chip-idle/);
   assert.match(read("src/components/dashboard/hub-index.tsx"), /chip-on/);
-  assert.match(read("src/components/dashboard/desk.tsx"), /lastScroll/);
 });

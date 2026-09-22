@@ -1,5 +1,17 @@
 /** Scroll inside the active desk room (.scroll-free), not the window. */
+let pinToken = 0;
+
+export function cancelPinDeskScroll() {
+  pinToken += 1;
+}
+
+export function visibleDeskRoom(): HTMLElement | null {
+  const box = document.querySelector(".scroll-free:not([inert])");
+  return box instanceof HTMLElement ? box : null;
+}
+
 export function scrollDeskTo(id: string) {
+  cancelPinDeskScroll();
   const node = document.getElementById(id);
   if (!node) return false;
   const box = node.closest(".scroll-free");
@@ -14,17 +26,14 @@ export function scrollDeskTo(id: string) {
   return true;
 }
 
-export function deskRoom(): HTMLElement | null {
-  const box = document.getElementById("eventos")?.closest(".scroll-free");
-  return box instanceof HTMLElement ? box : document.querySelector(".scroll-free:not([inert])");
-}
-
-/** Keep the room where it is across filter fetches / history writes. */
+/** Keep the visible room still across a filter click. Nav cancels this. */
 export function pinDeskScroll() {
-  const box = deskRoom();
+  const box = visibleDeskRoom();
   if (!box) return () => {};
+  const token = ++pinToken;
   const y = box.scrollTop;
   const stick = () => {
+    if (token !== pinToken) return;
     box.scrollTop = y;
   };
   stick();
@@ -32,7 +41,7 @@ export function pinDeskScroll() {
     stick();
     requestAnimationFrame(stick);
   });
-  const t = window.setTimeout(stick, 100);
+  const t = window.setTimeout(stick, 80);
   return () => {
     cancelAnimationFrame(a);
     window.clearTimeout(t);

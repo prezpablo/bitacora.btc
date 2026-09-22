@@ -347,8 +347,6 @@ export function NetworkEvents() {
     setPage(1);
   }, [country, continent, platform, kind, near, dateDir, pageSize]);
 
-  useEffect(() => pinDeskScroll(), [country, continent, platform, kind, near, dateDir, page, q.isFetching]);
-
   useEffect(() => {
     if (q.isFetching || !board) return;
     if (board.page !== page) setPage(board.page);
@@ -439,7 +437,10 @@ export function NetworkEvents() {
         <button
           type="button"
           className={cn(near ? chipOn : chipIdle)}
-          onClick={() => void nearYou()}
+          onClick={() => {
+            pinDeskScroll();
+            void nearYou();
+          }}
           disabled={locating}
           aria-pressed={near}
         >
@@ -453,7 +454,10 @@ export function NetworkEvents() {
             key={name}
             type="button"
             className={cn(on ? chipOn : chipIdle)}
-            onClick={() => setPlatform((cur) => (cur === name ? "" : name))}
+            onClick={() => {
+              pinDeskScroll();
+              setPlatform((cur) => (cur === name ? "" : name));
+            }}
             aria-pressed={on}
           >
             {name}
@@ -464,7 +468,10 @@ export function NetworkEvents() {
         <select
           className={selectClass}
           value={dateDir}
-          onChange={(e) => setDateDir(e.target.value === "desc" ? "desc" : "asc")}
+          onChange={(e) => {
+            pinDeskScroll();
+            setDateDir(e.target.value === "desc" ? "desc" : "asc");
+          }}
           aria-label={t("netDate")}
         >
           <option value="asc">{t("netSoon")}</option>
@@ -479,14 +486,22 @@ export function NetworkEvents() {
             .filter((g) => g.key === "online" || g.countries.length > 0 || continent === g.key)
             .map((g) => ({ key: g.key, title: t(g.label), countries: g.countries }))}
           onAll={() => {
+            pinDeskScroll();
             pickContinent("");
             pickCountry("");
           }}
-          onContinent={pickContinent}
-          onCountry={pickCountry}
+          onContinent={(id) => {
+            pinDeskScroll();
+            pickContinent(id);
+          }}
+          onCountry={(code) => {
+            pinDeskScroll();
+            pickCountry(code);
+          }}
         />
         {dirty ? (
           <button type="button" className={chipIdle} onClick={() => {
+            pinDeskScroll();
             setCountry("");
             setKind("");
             setContinent("");
@@ -507,7 +522,10 @@ export function NetworkEvents() {
           <button
             key={k.key}
             type="button"
-            onClick={() => setKind((cur) => (cur === k.key ? "" : k.key))}
+            onClick={() => {
+              pinDeskScroll();
+              setKind((cur) => (cur === k.key ? "" : k.key));
+            }}
             className={cn(kind === k.key ? chipOn : chipIdle, !(kindCounts[k.key] || 0) && kind !== k.key && "opacity-50")}
             aria-pressed={kind === k.key}
           >
