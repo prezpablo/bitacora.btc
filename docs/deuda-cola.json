@@ -1,5 +1,5 @@
 {
-  "resume": "2026-09-21",
+  "resume": "2026-09-23",
   "canonical": "https://bitacorabtc.org",
   "repo": "https://github.com/prezpablo/bitacora.btc",
   "human": "docs/DEUDA-TECNICA.md",
@@ -248,6 +248,34 @@
       "open": true,
       "kind": "repo",
       "done": "package.json sin firebase ni better-auth; npm ci; no bump tanstack a ciegas"
+    },
+    {
+      "id": "D-AEO-FAQ",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "FAQ es/pt/en visible: Bitácora no clona BTC Map; overlay propio, resto federado"
+    },
+    {
+      "id": "D-COPY-FED",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "leyenda del globo: cifras = red federada BTC Map, no el overlay"
+    },
+    {
+      "id": "D-EVT-HTML",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "6 próximos eventos en HTML (título, ciudad, fecha); sin scraper nuevo"
+    },
+    {
+      "id": "D-SEO-CITY",
+      "pri": "P3",
+      "open": false,
+      "kind": "manual",
+      "done": "congelado: ciudad solo con ≥3 pines del overlay; no fichas federadas; no sitemap vacío"
     }
   ],
   "guards": [

@@ -1,9 +1,9 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 21 de setiembre de 2026  
+**Fecha:** 23 de setiembre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` `bfdca8e`  
-**ZIP en `.org`:** `index-4W2ZuAE3` — **atrasado**. Repo ya tiene globo no tapado + ficha Consciencia + Sumate corto + smoke 2,9 k (`7d3f6a3`…`0b86f93`).  
+**Repo:** `prezpablo/bitacora.btc` `main` `e4ff6b4`  
+**ZIP en `.org`:** `index-BbaajBvZ` hasta que suba `e4ff6b4` (404 `noindex` + título «No encontrado»).  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -35,13 +35,36 @@ Subir `bitacora.btc-main.zip` de **`bfdca8e`** (o al menos `7d3f6a3`) con [`COMA
 | **2** | **D-GLOBE-PERF** | P3 | `pointsMerge`, `antialias:false` en 3G, DPR ≤2 ([react-globe.gl](https://github.com/vasturiano/react-globe.gl), [web-optimization](https://github.com/zakky8/web-optimization)) | FPS móvil; globo no blanco | Quitar flags |
 | **3** | **D-TILE-LATAM** | P3 | Solo si OFM/OSM-FR mudos: [PMTiles 3.8.1](https://github.com/protomaps/PMTiles) `extract` Latam `maxzoom=12` en el VPS. Leaflet raster, sin MapLibre extra. | Calles 200 first-party | Volver a OFM público |
 | **4** | **D-DEPS** | P3 | Recortar `firebase` y `better-auth` del scaffold. Menos superficie (CVE-2026-45321 TanStack: lockfile + `npm ci`, no bump a ciegas). | `package.json` sin esos; `npm ci` verde | Restaurar deps |
+| **5** | **D-AEO-FAQ** | P3 | Una pregunta visible en `#faq-seo` (es/pt/en) + el mismo JSON-LD: Bitácora **no clona** BTC Map; el overlay es propio y el resto es federado. | HTML del home trae la pregunta sin JS | Quitar la pregunta |
+| **6** | **D-COPY-FED** | P3 | Una línea junto a las cifras del globo: son la **red federada**, no el overlay de Bitácora. No cambia el conteo. | Copy es/pt/en visible | Quitar la línea |
+| **7** | **D-EVT-HTML** | P3 | Los **6** próximos eventos ya cargados, en texto (título, ciudad, fecha) dentro de Comunidad. El flyer sigue; `alt` se queda. Sin scraper nuevo. | View-source muestra 6 títulos | Volver a solo cliente |
 | **—** | **D-GLOBE** | P3 | Juicio: globo-first al entrar. No apagar. | Manual | — |
 
 ### Cerrados en repo (no reabrir)
 
 D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 (OFM+OTM, CSP sin Esri) · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 (prompt corto: sitemap **sin** labif/LICENSE; catálogo `btcmap-*`) · D-GLOBE-HERO (cifras no tapan el planeta) · D-FOUNDING (texto + redes Consciencia) · D-CTA-SHORT (Sumate móvil).
 
-**Siguiente fase de código, si se acepta:** **D-PIN-03+** (payload flaco). Antes: ZIP del globo. D-FOSS es ops GitHub, no un commit.
+**Siguiente fase de código, si se acepta:** **D-PIN-03+** (payload flaco). D-AEO-FAQ / D-COPY-FED / D-EVT-HTML van **después**, una por ZIP. D-FOSS es ops GitHub, no un commit.
+
+### Informe ATP 23 set — qué entra y qué no
+
+Semilla útil: intención local + primer uso + confianza. **No** tráfico de precio. Lo que el sitio ya responde (qué es, qué no es exchange, cómo cargar, CARGA, Uruguay, sin custodia) **no se reabre**.
+
+| Entra (cola 5–7) | Por qué no rompe lo hecho |
+|---|---|
+| **D-AEO-FAQ** | Misma FAQ y mismo `#faq-seo`. Cero rutas. Texto real (lector de pantalla y crawler). |
+| **D-COPY-FED** | D-STATS ya separó Latam / mundo. Solo rotula que el número grande es BTC Map. |
+| **D-EVT-HTML** | Reusa Luma/Meetup/Eventbrite. Tope 6 para no inflar el HTML ni el TTFB. |
+
+**Congelado (no fase):** **D-SEO-CITY**. Páginas «comercios en Montevideo» solo con ≥ 3 pines **del overlay** en esa ciudad, mismas reglas de skip/H1/idioma, y sin volcar fichas federadas como dato nuevo. Hasta entonces no entran al sitemap (H1.4 del plan híbrido).
+
+**No entra** (datos, accesibilidad o incompatibilidad):
+
+- Landings por keyword, rutas nuevas (`/aprender`, `/ciudad`, `/vs`).
+- Recomendar wallets (Phoenix, Muun, Blink) o explicar cómo pasar sats a pesos/reales.
+- Guía de Binance Pay o de cobrar por exchange.
+- Scraper nuevo de meetups. La agenda que ya hay alcanza.
+- Tratar 27 k comercios como directorio propio. El LABIF manda: overlay chico sobre BTC Map.
 
 ---
 
