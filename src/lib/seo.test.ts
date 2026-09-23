@@ -14,6 +14,13 @@ test("D-LABIF robots is noindex", () => {
   assert.equal(robotsFor("/labif"), "noindex,follow");
   assert.match(robotsFor("/"), /^index,follow/);
   assert.match(robotsFor("/mapa"), /^index,follow/);
+  assert.equal(robotsFor("/no-existe-bitacora"), "noindex,follow");
+});
+
+test("unknown path is a not-found title, not the home", () => {
+  assert.equal(pageSeo("/no-existe-bitacora", "es").title, "No encontrado | Bitácora.btc");
+  assert.equal(pageSeo("/missing", "en").title, "Not found | Bitácora.btc");
+  assert.match(pageSeo("/x", "pt").title, /Não encontrado/);
 });
 
 test("canonical is self and hreflang is per path", () => {

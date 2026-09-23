@@ -116,9 +116,26 @@ export const PAGE_SEO: Record<
   },
 };
 
+const NOT_FOUND_SEO: Record<AppLang, { title: string; description: string }> = {
+  es: {
+    title: "No encontrado | Bitácora.btc",
+    description: "Esa dirección no existe en Bitácora.btc.",
+  },
+  en: {
+    title: "Not found | Bitácora.btc",
+    description: "That address does not exist on Bitácora.btc.",
+  },
+  pt: {
+    title: "Não encontrado | Bitácora.btc",
+    description: "Esse endereço não existe na Bitácora.btc.",
+  },
+};
+
 export function pageSeo(path: string, lang: AppLang) {
   const home = SEO[lang];
-  const extra = PAGE_SEO[path]?.[lang];
+  const p = pagePath(path);
+  if (p !== "/" && !PAGE_SEO[p]) return { ...home, ...NOT_FOUND_SEO[lang] };
+  const extra = PAGE_SEO[p]?.[lang];
   return extra ? { ...home, ...extra } : home;
 }
 
@@ -140,9 +157,10 @@ export const MAPA_COPY: Record<AppLang, { lead: string; how: string; where: stri
   },
 };
 
-/** D-LABIF: dossier editorial, noindex. */
+/** /labif and unknown HTML routes stay out of the index. */
 export function robotsFor(path: string) {
-  if (pagePath(path) === "/labif") return "noindex,follow";
+  const p = pagePath(path);
+  if (p === "/labif" || (p !== "/" && !PAGE_SEO[p])) return "noindex,follow";
   return "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 }
 

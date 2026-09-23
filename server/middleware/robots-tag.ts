@@ -1,4 +1,4 @@
-/** /labif: header noindex besides meta (GSC drops faster than meta alone). */
+/** /labif and HTTP 404: header noindex (meta alone arrives late for GSC). */
 interface RobotsEvent {
   url: URL;
 }
@@ -8,8 +8,9 @@ export default async function robotsTagMiddleware(
   next: () => unknown | Promise<unknown>,
 ): Promise<unknown> {
   const result = await next();
+  if (!(result instanceof Response)) return result;
   const path = event.url.pathname.replace(/\/$/, "") || "/";
-  if (path !== "/labif" || !(result instanceof Response)) return result;
+  if (path !== "/labif" && result.status !== 404) return result;
   const headers = new Headers(result.headers);
   headers.set("X-Robots-Tag", "noindex, follow");
   return new Response(result.body, {
