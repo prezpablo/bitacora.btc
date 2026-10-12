@@ -1470,7 +1470,7 @@ const pt: Record<keyof typeof es, string> = {
   pinCheck: "Já carreguei a prova",
   pinCancel: "Cancelar",
   pinCopy: "Copiar código",
-  pinCopyPost: "Copiar texto + código para post",
+  pinCopyPost: "Copiar texto + código para o post",
   pinCopied: "Código copiado para a área de transferência.",
   pinCopiedPost: "Texto copiado. Cola-o na tua rede.",
   pinPostBody: "{name} já aceita Bitcoin.\n\nEstá no mapa da Bitácora: comércios e comunidades da América Latina, à vista, sem contas e sem custódia.\n\nEntra e encontra-o em {url}\n\n#Bitcoin #BitacoraBTC #ConscienciaBitcoin #PagarConBitcoin #Latam\n\n{code}",
