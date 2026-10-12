@@ -1,5 +1,5 @@
 {
-  "resume": "2026-09-23",
+  "resume": "2026-10-12",
   "canonical": "https://bitacorabtc.org",
   "repo": "https://github.com/prezpablo/bitacora.btc",
   "human": "docs/DEUDA-TECNICA.md",
@@ -233,7 +233,7 @@
       "pri": "P3",
       "open": true,
       "kind": "repo",
-      "done": "pointsMerge + antialias off 3G + DPR<=2 en react-globe.gl"
+      "done": "antialias off en 3G + DPR<=2; NO pointsMerge si el pin del globo abre ficha"
     },
     {
       "id": "D-TILE-LATAM",
@@ -276,6 +276,28 @@
       "open": false,
       "kind": "manual",
       "done": "congelado: ciudad solo con ≥3 pines del overlay; no fichas federadas; no sitemap vacío"
+    },
+    {
+      "id": "D-PATCH-ALL",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "editar ficha propia con el mismo CARGA: nombre, descripción, dirección, redes, logo, horarios, pagos, notas; BTC Map solo disputa con diff"
+    },
+    {
+      "id": "D-EXPERIENCIA",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "chip en Comunidad, misma prueba pública, pago en Bitcoin declarado sin custodia ni ruta nueva de sitemap"
+    },
+    {
+      "id": "D-STATUE",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "capa mapa+globo con miniatura; solo instaladas con foto; sin Lugano retirada ni Viena antes del 14 oct 2026"
+    }
     }
   ],
   "guards": [

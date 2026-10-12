@@ -1,9 +1,9 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 23 de setiembre de 2026  
+**Fecha:** 12 de octubre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` `e4ff6b4`  
-**ZIP en `.org`:** `index-BbaajBvZ` hasta que suba `e4ff6b4` (404 `noindex` + título «No encontrado»).  
+**Repo:** `prezpablo/bitacora.btc` `main` `460c004`  
+**ZIP en `.org`:** `index-CweyGd4T` · sitemap `lastmod` 2026-10-10 · `/healthz` ok. `npm audit` del zip: 0 altas.  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -18,13 +18,13 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 ---
 
-## Cola vigente — 21 set
+## Cola vigente — 12 oct
 
-No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no TradingView.
+No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no TradingView. No checkout ni custodia.
 
-### ZIP pendiente (ops, no código)
+### ZIP
 
-Subir `bitacora.btc-main.zip` de **`bfdca8e`** (o al menos `7d3f6a3`) con [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md). Trae: globo héroe, cifras **arriba** del planeta (recuadro vidrio), CTA móvil «Sumate», ficha Consciencia + redes, prompt smoke corto.
+`460c004` ya está en el `.org` (chunk `index-CweyGd4T`). No re-subir ese zip para “ver” las fases de abajo: todavía no están escritas.
 
 ### Abiertos
 
@@ -32,19 +32,31 @@ Subir `bitacora.btc-main.zip` de **`bfdca8e`** (o al menos `7d3f6a3`) con [`COMA
 |---|---|---|---|---|---|
 | **0** | **D-FOSS** | P1 | GitHub **Public**. Clone anónimo 200. LICENSE AGPL ya en disco y `/LICENSE`. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → visibilidad |
 | **1** | **D-PIN-03+** | P2 | Snapshot público sigue ~2,9 MB. Supercluster 9.1 ya está: servir bbox/`getTileRaw` o dump `id,lat,lon,icon`. Ficha rica al clic. | Red tab: GET cluster flaco; clic = getMerchant | Restaurar JSON completo al cluster |
-| **2** | **D-GLOBE-PERF** | P3 | `pointsMerge`, `antialias:false` en 3G, DPR ≤2 ([react-globe.gl](https://github.com/vasturiano/react-globe.gl), [web-optimization](https://github.com/zakky8/web-optimization)) | FPS móvil; globo no blanco | Quitar flags |
-| **3** | **D-TILE-LATAM** | P3 | Solo si OFM/OSM-FR mudos: [PMTiles 3.8.1](https://github.com/protomaps/PMTiles) `extract` Latam `maxzoom=12` en el VPS. Leaflet raster, sin MapLibre extra. | Calles 200 first-party | Volver a OFM público |
-| **4** | **D-DEPS** | P3 | Recortar `firebase` y `better-auth` del scaffold. Menos superficie (CVE-2026-45321 TanStack: lockfile + `npm ci`, no bump a ciegas). | `package.json` sin esos; `npm ci` verde | Restaurar deps |
-| **5** | **D-AEO-FAQ** | P3 | Una pregunta visible en `#faq-seo` (es/pt/en) + el mismo JSON-LD: Bitácora **no clona** BTC Map; el overlay es propio y el resto es federado. | HTML del home trae la pregunta sin JS | Quitar la pregunta |
-| **6** | **D-COPY-FED** | P3 | Una línea junto a las cifras del globo: son la **red federada**, no el overlay de Bitácora. No cambia el conteo. | Copy es/pt/en visible | Quitar la línea |
-| **7** | **D-EVT-HTML** | P3 | Los **6** próximos eventos ya cargados, en texto (título, ciudad, fecha) dentro de Comunidad. El flyer sigue; `alt` se queda. Sin scraper nuevo. | View-source muestra 6 títulos | Volver a solo cliente |
+| **2** | **D-PATCH-ALL** | P2 | Editar un comercio **propio** con el mismo CARGA que el alta: nombre, descripción, dirección (opcional), redes, logo, horarios, cómo paga, notas. El aviso de disputa ya existe: si la ficha no es nuestra, no se toca el origen y el mail lleva el diff. | Overlay `local:`/`c:` cambia un campo y la estrella espera prueba. BTC Map abre disputa, no un formulario de origen | Quitar campos nuevos del patch |
+| **3** | **D-GLOBE-PERF** | P3 | `antialias:false` en 3G y DPR ≤2. **No** `pointsMerge` si el punto se puede clicar: ese flag apaga `onPointClick`. | FPS móvil; un pin del globo sigue abriendo ficha | Quitar flags |
+| **4** | **D-EXPERIENCIA** | P3 | Dentro de Comunidad, un chip más (no una habitación nueva ni una URL de sitemap): actividades que se pagan con Bitcoin, misma prueba pública que un comercio. Sin pasarela. | Chip filtra; la ficha muestra prueba y que no custodiamos | Ocultar el chip |
+| **5** | **D-STATUE** | P3 | Capa corta en mapa y globo: estatuas **ya instaladas**, con miniatura y fuente. No las que están en colecta ni las retiradas. | Filtro muestra Budapest y las confirmadas; Lugano no vuelve sola | Quitar `tipo=statue` |
+| **6** | **D-TILE-LATAM** | P3 | Solo si OFM/OSM-FR mudos: PMTiles Latam `maxzoom=12`. Leaflet raster, sin MapLibre extra. | Calles 200 first-party | Volver a OFM público |
+| **7** | **D-DEPS** | P3 | Recortar `firebase` y `better-auth` del scaffold. `grpc-js` ya está en 1.14.6 por override. No bump de `@tanstack/*` a ciegas. | `package.json` sin esos; `npm ci` verde | Restaurar deps |
+| **8** | **D-AEO-FAQ** | P3 | Una pregunta visible en `#faq-seo` (es/pt/en): Bitácora **no clona** BTC Map. | HTML del home trae la pregunta sin JS | Quitar la pregunta |
+| **9** | **D-COPY-FED** | P3 | Una línea junto a las cifras del globo: son la **red federada**. No cambia el conteo. | Copy es/pt/en visible | Quitar la línea |
+| **10** | **D-EVT-HTML** | P3 | Los **6** próximos eventos ya cargados, en texto, dentro de Comunidad. Sin scraper nuevo. | View-source muestra 6 títulos | Volver a solo cliente |
 | **—** | **D-GLOBE** | P3 | Juicio: globo-first al entrar. No apagar. | Manual | — |
+| **—** | **D-SEO-CITY** | P3 | Congelado. Ciudad solo con ≥ 3 pines del overlay. Experiencias no abren ruta nueva hasta tener fichas propias. | — | — |
 
 ### Cerrados en repo (no reabrir)
 
 D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 (OFM+OTM, CSP sin Esri) · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 (prompt corto: sitemap **sin** labif/LICENSE; catálogo `btcmap-*`) · D-GLOBE-HERO (cifras no tapan el planeta) · D-FOUNDING (texto + redes Consciencia) · D-CTA-SHORT (Sumate móvil).
 
-**Siguiente fase de código, si se acepta:** **D-PIN-03+** (payload flaco). D-AEO-FAQ / D-COPY-FED / D-EVT-HTML van **después**, una por ZIP. D-FOSS es ops GitHub, no un commit.
+**Siguiente fase de código, si se acepta:** **D-PIN-03+**. Después **D-PATCH-ALL** (editar todo lo propio con el mismo CARGA). Experiencias y estatuas van detrás, una por ZIP. D-FOSS sigue siendo un clic en GitHub.
+
+### Parámetros 12 oct (no implementar en el mismo ZIP)
+
+**Editar un comercio (D-PATCH-ALL).** El alta ya pide pin, código `CARGA-XXXX` y un enlace público. La modificación usa esa misma puerta, no un login. En una ficha propia (`local:` o `c:`) se pueden cambiar todos los campos del alta: nombre, descripción, dirección opcional, redes, logo, horarios, medios de pago y notas. Mover el pin más de 80 m vuelve a exigir prueba. Una ficha de BTC Map no se reescribe: el botón que ya dice «Abrir disputa» manda el aviso con el antes y el después. Sin KYC.
+
+**Experiencias (D-EXPERIENCIA).** Chip dentro de Comunidad, al lado de anuncios y eventos. No es la quinta entrada de la barra. Misma prueba pública. Campos extra, todos visibles: qué es la actividad, ciudad, fecha o «recurrente», precio en sats o «a convenir», y el enlace de la prueba. Bitácora no cobra ni custodia. Hasta que haya fichas propias no entra al sitemap (igual que D-SEO-CITY).
+
+**Estatuas (D-STATUE).** Capa propia, miniatura y ficha. Solo piezas con foto pública y lugar confirmado. Entran como primera tanda: Budapest (Graphisoft Park, 2021, la de bronce con cara espejada) y El Zonte (2025, serie de Valentina Picozzi). Nueva York (NYSE, diciembre 2025) se agrega si la foto y la dirección se confirman. Lugano no se pincha: el monumento fue retirado. Viena se anuncia el 14 oct 2026: no va al mapa hasta que esté inaugurada. No scrapear satoshistatues.com.
 
 ### Informe ATP 23 set — qué entra y qué no
 
