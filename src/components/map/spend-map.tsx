@@ -364,7 +364,22 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   useEffect(() => {
     if (!pendingCarga && !cargaGenerating) return;
-    proofRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    // El pedido del código no puede mover el escritorio: scrollIntoView empujaba el foco al chip de Aprender.
+    const box = document.querySelector(".scroll-free:not([inert])");
+    const y = box instanceof HTMLElement ? box.scrollTop : 0;
+    const win = window.scrollY;
+    proofRef.current?.focus({ preventScroll: true });
+    const restore = () => {
+      if (box instanceof HTMLElement) box.scrollTop = y;
+      if (window.scrollY !== win) window.scrollTo(0, win);
+    };
+    restore();
+    const frame = requestAnimationFrame(restore);
+    const timer = window.setTimeout(restore, 60);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
   }, [pendingCarga?.id, cargaGenerating]);
 
   const csvQ = useMapCsv();
@@ -1760,7 +1775,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <div
               ref={proofRef}
               id="carga-proof"
-              className="w-full max-w-md rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5"
+              tabIndex={-1}
+              className="w-full max-w-md rounded-lg bg-card p-4 shadow-[var(--shadow-border)] outline-none sm:p-5"
             >
               <p id="carga-proof-title" className="text-sm font-medium text-foreground">
                 {t("pinFormTitle")}

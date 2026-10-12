@@ -21,7 +21,7 @@ function copyPlain(text: string) {
   area.style.height = "1px";
   area.style.opacity = "0";
   document.body.appendChild(area);
-  area.focus();
+  area.focus({ preventScroll: true });
   area.select();
   area.setSelectionRange(0, area.value.length);
   let ok = false;
