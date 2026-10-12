@@ -57,7 +57,7 @@ export function CommunityPinsBoard() {
   const [links, setLinks] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
-  const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
+  const ticketRef = useRef<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [_copied, setCopied] = useState(false);
@@ -107,7 +107,7 @@ export function CommunityPinsBoard() {
     setLinks("");
     setCaptchaOk(false);
     setPrivacyOk(false);
-    setTicket(null);
+    ticketRef.current = null;
     setErr("");
     setBusy(false);
     setGenerating(false);
@@ -138,12 +138,13 @@ export function CommunityPinsBoard() {
 
   async function submit() {
     setErr("");
-    if (!captchaOk) {
-      setErr(t("captchaNeed"));
-      return;
-    }
     if (!privacyOk) {
       setErr(t("privacyAcceptNeed"));
+      return;
+    }
+    const cap = ticketRef.current;
+    if (!cap) {
+      setErr(t("captchaNeed"));
       return;
     }
     if (!name.trim()) {
@@ -161,7 +162,7 @@ export function CommunityPinsBoard() {
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
       const res = await submitCommunityPin({
-        data: { name: name.trim(), blurb, links: extra, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce },
+        data: { name: name.trim(), blurb, links: extra, captchaId: cap.id, captcha: cap.answer, captchaNonce: cap.nonce },
       });
       await holdCargaSpinner(started);
       if (cancelled.current) return;
@@ -312,10 +313,18 @@ export function CommunityPinsBoard() {
               />
             </label>
             <div className="sm:col-span-2">
-              <CaptchaBox key={`pin-${captchaKey}`} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+              <PrivacyAccept id="privacy-pin" checked={privacyOk} onChange={setPrivacyOk} />
             </div>
             <div className="sm:col-span-2">
-              <PrivacyAccept id="privacy-pin" checked={privacyOk} onChange={setPrivacyOk} />
+              <CaptchaBox
+                key={`pin-${captchaKey}`}
+                ok={captchaOk}
+                onOk={setCaptchaOk}
+                onTicket={(next) => {
+                  ticketRef.current = next;
+                }}
+                onContinue={() => void submit()}
+              />
             </div>
             {err ? <p className="text-sm text-primary sm:col-span-2">{err}</p> : null}
             <div className="flex flex-wrap gap-2 sm:col-span-2">

@@ -149,8 +149,8 @@ export function MapComposeForm({
         <HoursEditor value={shopHours} onChange={onShopHours} />
         <PayPicker value={shopPays} onChange={onShopPays} />
         <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
-        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
         <PrivacyAccept id="privacy-map-shop" checked={privacyOk} onChange={onPrivacy} />
+        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} onContinue={onPublish} />
         {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
         <Button className="w-full" onClick={onPublish} disabled={!shopReady} title={shopReady ? undefined : t("reqHint")}>
           {t("proposeShop")}
@@ -199,8 +199,8 @@ export function MapComposeForm({
       </label>
       <LogoPicker value={form.logo} onChange={(logo) => onForm((f) => ({ ...f, logo }))} />
       <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
-      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
       <PrivacyAccept id="privacy-map-comm" checked={privacyOk} onChange={onPrivacy} />
+      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} onContinue={onPublish} />
       {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
       <Button className="w-full" onClick={onPublish} disabled={!commReady} title={commReady ? undefined : t("reqHint")}>
         {t("publishComm")}

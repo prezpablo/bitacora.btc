@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { submitListingPatch, verifyListingPatch, cancelListingPatch } from "@/infrastructure/server-fns";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,10 @@ export function ListingPatchForm({
   });
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
-  const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
+  const ticketRef = useRef<CaptchaTicket | null>(null);
+  function keepTicket(next: CaptchaTicket | null) {
+    ticketRef.current = next;
+  }
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [pending, setPending] = useState<{ id: string; token: string } | null>(null);
@@ -79,6 +82,48 @@ export function ListingPatchForm({
     else if (code === "instagram") setErr(t("pinNoIg"));
     else if (code === "proof") setErr(t("pinProofFail"));
     else setErr(t("patchFail"));
+  }
+
+  function send() {
+    if (!nextName.trim()) {
+      setErr(t("pinNeed"));
+      return;
+    }
+    if (!privacyOk) {
+      setErr(t("privacyAcceptNeed"));
+      return;
+    }
+    const cap = ticketRef.current;
+    if (!cap) {
+      setErr(t("captchaNeed"));
+      return;
+    }
+    setBusy(true);
+    setErr("");
+    void submitListingPatch({
+      data: {
+        listingId,
+        name: nextName,
+        description: nextDesc,
+        address: isCommunity ? undefined : nextAddr,
+        notes: isCommunity ? undefined : nextNotes,
+        logo: nextLogo,
+        hours: isCommunity ? undefined : openHoursCsv(nextHours),
+        pays: isCommunity ? undefined : paysToCsv(nextPays),
+        socials: isCommunity ? undefined : socialsToCsv(linksFromPicked(picked, handles)),
+        lat,
+        lon,
+        community: Boolean(isCommunity),
+        captchaId: cap.id,
+        captcha: cap.answer,
+        captchaNonce: cap.nonce,
+      },
+    })
+      .then((res) => {
+        if (res.ok && res.id && res.token) setPending({ id: res.id, token: res.token });
+        else fail(res.error);
+      })
+      .finally(() => setBusy(false));
   }
 
   if (pending) {
@@ -114,43 +159,11 @@ export function ListingPatchForm({
 
   return (
     <form
+      id={`patch-form-${listingId}`}
       className="space-y-2"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!captchaOk) {
-          setErr(t("captchaNeed"));
-          return;
-        }
-        if (!privacyOk) {
-          setErr(t("privacyAcceptNeed"));
-          return;
-        }
-        setBusy(true);
-        setErr("");
-        void submitListingPatch({
-          data: {
-            listingId,
-            name: nextName,
-            description: nextDesc,
-            address: isCommunity ? undefined : nextAddr,
-            notes: isCommunity ? undefined : nextNotes,
-            logo: nextLogo,
-            hours: isCommunity ? undefined : openHoursCsv(nextHours),
-            pays: isCommunity ? undefined : paysToCsv(nextPays),
-            socials: isCommunity ? undefined : socialsToCsv(linksFromPicked(picked, handles)),
-            lat,
-            lon,
-            community: Boolean(isCommunity),
-            captchaId: ticket?.id,
-            captcha: ticket?.answer,
-            captchaNonce: ticket?.nonce,
-          },
-        })
-          .then((res) => {
-            if (res.ok && res.id && res.token) setPending({ id: res.id, token: res.token });
-            else fail(res.error);
-          })
-          .finally(() => setBusy(false));
+        send();
       }}
     >
       <p className="text-xs text-pretty text-muted-foreground">{t("patchLead")}</p>
@@ -190,8 +203,13 @@ export function ListingPatchForm({
       ) : (
         <LogoPicker value={nextLogo} onChange={setNextLogo} />
       )}
-      <CaptchaBox ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
       <PrivacyAccept id={`privacy-patch-${listingId}`} checked={privacyOk} onChange={setPrivacyOk} />
+      <CaptchaBox
+        ok={captchaOk}
+        onOk={setCaptchaOk}
+        onTicket={keepTicket}
+        onContinue={() => send()}
+      />
       {err ? <p className="text-sm text-primary">{err}</p> : null}
       <div className="grid grid-cols-2 gap-2">
         <Button type="submit" size="sm" disabled={busy || !nextName.trim() || !captchaOk || !privacyOk} title={nextName.trim() && captchaOk && privacyOk ? undefined : t("reqHint")}>

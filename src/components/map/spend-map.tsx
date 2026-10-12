@@ -193,6 +193,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [handles, setHandles] = useState<Partial<Record<SocialKey, string>>>({});
   const [captchaOk, setCaptchaOk] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
+  const ticketRef = useRef<CaptchaTicket | null>(null);
+  function keepTicket(next: CaptchaTicket | null) {
+    ticketRef.current = next;
+    setTicket(next);
+  }
   const [pendingCarga, setPendingCarga] = useState<PendingCarga | null>(null);
   const [cargaBusy, setCargaBusy] = useState(false);
   const [cargaGenerating, setCargaGenerating] = useState(false);
@@ -1017,10 +1022,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("privacyAcceptNeed"));
       return;
     }
-    if (!drop || !shopName.trim()) return;
+    if (!drop || !shopName.trim()) {
+      setFormErr(t("pinNeed"));
+      return;
+    }
     const pin = { lat: drop.lat, lon: drop.lon };
     const links = linksFromPicked(picked, handles);
-    if (!captchaOk) {
+    const cap = ticketRef.current;
+    if (!cap) {
       setFormErr(t("captchaNeed"));
       return;
     }
@@ -1041,9 +1050,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           socials: socialsToCsv(links),
           hours: hoursToCsv(shopHours),
           pays: paysToCsv(shopPays),
-          captchaId: ticket?.id,
-          captcha: ticket?.answer,
-          captchaNonce: ticket?.nonce,
+          captchaId: cap.id,
+          captcha: cap.answer,
+          captchaNonce: cap.nonce,
         },
       });
       await holdCargaSpinner(started);
@@ -1104,7 +1113,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setAddrHit(null);
       setShopLogo("");
       setCaptchaOk(false);
-      setTicket(null);
+      keepTicket(null);
       setFormErr("");
     } catch {
       failCarga("save");
@@ -1123,7 +1132,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("privacyAcceptNeed"));
       return;
     }
-    if (!captchaOk) {
+    const cap = ticketRef.current;
+    if (!cap) {
       setFormErr(t("captchaNeed"));
       return;
     }
@@ -1142,9 +1152,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           lat: drop.lat,
           lon: drop.lon,
           socials: socialsToCsv(links),
-          captchaId: ticket?.id,
-          captcha: ticket?.answer,
-          captchaNonce: ticket?.nonce,
+          captchaId: cap.id,
+          captcha: cap.answer,
+          captchaNonce: cap.nonce,
         },
       });
       await holdCargaSpinner(started);
@@ -1202,7 +1212,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setPicked([]);
       setHandles({});
       setCaptchaOk(false);
-      setTicket(null);
+      keepTicket(null);
       setFormErr("");
     } catch {
       failCarga("save");
@@ -1727,7 +1737,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onToggleSocial={toggleSocial}
                 onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
                 onCaptcha={setCaptchaOk}
-                onTicket={setTicket}
+                onTicket={keepTicket}
                 onPrivacy={setPrivacyOk}
                 onPickAddress={pinFromAddress}
                 onPublish={dropKind === "comunidad" || mode === "comunidad" ? saveCommunity : propose}
