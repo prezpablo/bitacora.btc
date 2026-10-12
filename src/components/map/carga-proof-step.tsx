@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useT } from "@/lib/i18n";
 import { VerifyIgHow } from "./verify-ig-how";
 
@@ -7,6 +7,42 @@ export function holdCargaSpinner(started: number) {
   const wait = Math.max(0, 700 - (Date.now() - started));
   if (wait) return new Promise<void>((r) => window.setTimeout(r, wait));
   return Promise.resolve();
+}
+
+/** Copia en el mismo gesto. El portapapeles moderno falla en varios móviles y el error no se veía. */
+function copyPlain(text: string) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.top = "0";
+  area.style.left = "0";
+  area.style.width = "1px";
+  area.style.height = "1px";
+  area.style.opacity = "0";
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  area.setSelectionRange(0, area.value.length);
+  let ok = false;
+  try {
+    ok = document.execCommand("copy");
+  } catch {
+    ok = false;
+  }
+  area.remove();
+  return ok;
+}
+
+async function copyPlainAsync(text: string) {
+  if (copyPlain(text)) return true;
+  try {
+    if (!navigator.clipboard?.writeText) return false;
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Paso 2 de CARGA: el código ya salió; falta la URL pública que lo muestra. */
@@ -27,44 +63,41 @@ export function CargaProofStep({
 }) {
   const t = useT();
   const [proof, setProof] = useState("");
-  const [copied, setCopied] = useState<"code" | "post" | "">("");
+  const [copied, setCopied] = useState<"code" | "post" | "fail" | "">("");
+  const [sheet, setSheet] = useState("");
+  const flash = useRef(0);
   const mapUrl = "https://bitacorabtc.org/mapa";
+
+  function mark(kind: "code" | "post" | "fail") {
+    window.clearTimeout(flash.current);
+    setCopied(kind);
+    flash.current = window.setTimeout(() => setCopied(""), 4000);
+  }
 
   useEffect(() => {
     if (!token) return;
     let stop = false;
-    void navigator.clipboard.writeText(token).then(() => {
-      if (stop) return;
-      setCopied("code");
-      window.setTimeout(() => {
-        if (!stop) setCopied("");
-      }, 4000);
-    }).catch(() => {});
+    void copyPlainAsync(token).then((ok) => {
+      if (stop || !ok) return;
+      mark("code");
+    });
     return () => {
       stop = true;
     };
   }, [token]);
 
-  async function copyCode() {
-    try {
-      await navigator.clipboard.writeText(token);
-      setCopied("code");
-      window.setTimeout(() => setCopied(""), 4000);
-    } catch {
-      /* leave the code on screen */
+  function remember(kind: "code" | "post", text: string) {
+    setSheet(text);
+    if (copyPlain(text)) {
+      mark(kind);
+      return;
     }
-  }
-
-  async function copyPost() {
-    const place = (name || "").trim() || t("pinPostShop");
-    const text = t("pinPostBody", { name: place, url: mapUrl, code: token });
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied("post");
-      window.setTimeout(() => setCopied(""), 4000);
-    } catch {
-      /* leave the code on screen */
+    const clip = navigator.clipboard?.writeText(text);
+    if (!clip) {
+      mark("fail");
+      return;
     }
+    void clip.then(() => mark(kind)).catch(() => mark("fail"));
   }
 
   return (
@@ -72,7 +105,7 @@ export function CargaProofStep({
       <p className="text-sm text-foreground">{t("pinPostCode")}</p>
       <button
         type="button"
-        onClick={() => void copyCode()}
+        onClick={() => void remember("code", token)}
         className="block w-full rounded-md bg-primary px-3 py-3 text-center font-mono text-2xl font-bold tracking-widest text-white sm:text-3xl"
         title={t("pinCopy")}
         aria-label={`${t("pinCopy")}: ${token}`}
@@ -82,22 +115,34 @@ export function CargaProofStep({
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
-          onClick={() => void copyCode()}
-          className="h-10 rounded-md bg-elevated px-2 text-xs font-medium text-foreground"
+          onClick={() => void remember("code", token)}
+          className="min-h-10 rounded-md bg-elevated px-2 py-2 text-xs font-medium leading-tight text-foreground"
         >
-          {t("pinCopy")}
+          {copied === "code" ? t("pinCopied") : t("pinCopy")}
         </button>
         <button
           type="button"
-          onClick={() => void copyPost()}
-          className="h-10 rounded-md bg-primary px-2 text-xs font-medium text-white"
+          onClick={() => {
+            const place = (name || "").trim() || t("pinPostShop");
+            void remember("post", t("pinPostBody", { name: place, url: mapUrl, code: token }));
+          }}
+          className="min-h-10 rounded-md bg-primary px-2 py-2 text-xs font-medium leading-tight text-white"
         >
-          {t("pinCopyPost")}
+          {copied === "post" ? t("pinCopiedPost") : t("pinCopyPost")}
         </button>
       </div>
       <p className="text-sm font-medium text-primary" role="status" aria-live="polite">
-        {copied === "post" ? t("pinCopiedPost") : copied === "code" ? t("pinCopied") : t("pinPostHint")}
+        {copied === "fail" ? t("contributeCopyFail") : copied === "post" ? t("pinCopiedPost") : copied === "code" ? t("pinCopied") : t("pinPostHint")}
       </p>
+      {sheet ? (
+        <textarea
+          readOnly
+          value={sheet}
+          rows={sheet.includes("\n") ? 8 : 2}
+          className="w-full rounded-md bg-elevated px-2 py-2 font-mono text-xs text-foreground"
+          onFocus={(e) => e.currentTarget.select()}
+        />
+      ) : null}
       <VerifyIgHow />
       <label className="block text-sm">
         <span className="text-muted-foreground">{t("pinProof")}</span>
