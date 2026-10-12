@@ -324,7 +324,6 @@ export function CommunityPinsBoard() {
                 onTicket={(next) => {
                   ticketRef.current = next;
                 }}
-                onContinue={() => void submit()}
               />
             </div>
             {err ? <p className="text-sm text-primary sm:col-span-2">{err}</p> : null}

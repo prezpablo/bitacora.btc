@@ -150,9 +150,9 @@ export function MapComposeForm({
         <PayPicker value={shopPays} onChange={onShopPays} />
         <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
         <PrivacyAccept id="privacy-map-shop" checked={privacyOk} onChange={onPrivacy} />
-        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} onContinue={onPublish} />
+        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
         {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-        <Button className="w-full" onClick={onPublish} disabled={!shopReady} title={shopReady ? undefined : t("reqHint")}>
+        <Button type="button" className="w-full" onClick={onPublish} disabled={!shopReady} title={shopReady ? undefined : t("reqHint")}>
           {t("proposeShop")}
         </Button>
         <Button type="button" variant="outline" className="w-full" onClick={onCancel}>
@@ -200,9 +200,9 @@ export function MapComposeForm({
       <LogoPicker value={form.logo} onChange={(logo) => onForm((f) => ({ ...f, logo }))} />
       <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
       <PrivacyAccept id="privacy-map-comm" checked={privacyOk} onChange={onPrivacy} />
-      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} onContinue={onPublish} />
+      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
       {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
-      <Button className="w-full" onClick={onPublish} disabled={!commReady} title={commReady ? undefined : t("reqHint")}>
+      <Button type="button" className="w-full" onClick={onPublish} disabled={!commReady} title={commReady ? undefined : t("reqHint")}>
         {t("publishComm")}
       </Button>
       <Button type="button" variant="outline" className="w-full" onClick={onCancel}>

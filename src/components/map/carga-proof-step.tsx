@@ -21,6 +21,9 @@ function copyPlain(text: string) {
   area.style.height = "1px";
   area.style.opacity = "0";
   document.body.appendChild(area);
+  const box = document.querySelector(".scroll-free:not([inert])");
+  const y = box instanceof HTMLElement ? box.scrollTop : 0;
+  const win = window.scrollY;
   area.focus({ preventScroll: true });
   area.select();
   area.setSelectionRange(0, area.value.length);
@@ -31,6 +34,8 @@ function copyPlain(text: string) {
     ok = false;
   }
   area.remove();
+  if (box instanceof HTMLElement) box.scrollTop = y;
+  if (window.scrollY !== win) window.scrollTo(0, win);
   return ok;
 }
 

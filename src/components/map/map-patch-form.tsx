@@ -210,7 +210,6 @@ export function ListingPatchForm({
         ok={captchaOk}
         onOk={setCaptchaOk}
         onTicket={keepTicket}
-        onContinue={() => send()}
       />
       {err ? <p className="text-sm text-primary">{err}</p> : null}
       <div className="grid grid-cols-2 gap-2">

@@ -210,10 +210,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   function stayOnMap(lat: number, lon: number, z = 16) {
     const map = mapRef.current;
     if (!map || !Number.isFinite(lat) || !Number.isFinite(lon)) return;
+    const box = document.querySelector(".scroll-free:not([inert])");
+    const y = box instanceof HTMLElement ? box.scrollTop : 0;
+    const win = window.scrollY;
     skipWorldRef.current = true;
     map.setView([lat, lon], Math.max(map.getZoom() || 0, z), { animate: false });
     map.invalidateSize();
+    const restore = () => {
+      if (box instanceof HTMLElement) box.scrollTop = y;
+      if (window.scrollY !== win) window.scrollTo(0, win);
+    };
+    restore();
+    requestAnimationFrame(restore);
     window.setTimeout(() => {
+      restore();
       skipWorldRef.current = false;
     }, 500);
   }
@@ -364,21 +374,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   useEffect(() => {
     if (!pendingCarga && !cargaGenerating) return;
-    // El pedido del código no puede mover el escritorio: scrollIntoView empujaba el foco al chip de Aprender.
+    // Mientras sale el código la página no se mueve: el foco se queda en la carga.
     const box = document.querySelector(".scroll-free:not([inert])");
     const y = box instanceof HTMLElement ? box.scrollTop : 0;
     const win = window.scrollY;
-    proofRef.current?.focus({ preventScroll: true });
     const restore = () => {
-      if (box instanceof HTMLElement) box.scrollTop = y;
+      if (box instanceof HTMLElement && box.scrollTop !== y) box.scrollTop = y;
       if (window.scrollY !== win) window.scrollTo(0, win);
     };
     restore();
-    const frame = requestAnimationFrame(restore);
-    const timer = window.setTimeout(restore, 60);
+    box?.addEventListener("scroll", restore, { passive: true });
+    window.addEventListener("scroll", restore, { passive: true });
     return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(timer);
+      box?.removeEventListener("scroll", restore);
+      window.removeEventListener("scroll", restore);
     };
   }, [pendingCarga?.id, cargaGenerating]);
 

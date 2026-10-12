@@ -32,13 +32,10 @@ export function CaptchaBox({
   ok,
   onOk,
   onTicket,
-  onContinue,
 }: {
   ok: boolean;
   onOk: (v: boolean) => void;
   onTicket?: (t: CaptchaTicket | null) => void;
-  /** Al confirmar el código, sigue a pedir el CARGA. El voto y el contacto no lo usan. */
-  onContinue?: () => void;
 }) {
   const t = useT();
   const lang = useAppLang();
@@ -140,7 +137,6 @@ export function CaptchaBox({
     setFail("");
     onOk(true);
     onTicket?.({ id, answer: typed.trim().toUpperCase(), nonce });
-    onContinue?.();
   }
 
   function listen() {
