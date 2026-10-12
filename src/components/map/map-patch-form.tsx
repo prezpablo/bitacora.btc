@@ -5,6 +5,18 @@ import { Button } from "@/components/ui/button";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { CargaProofStep } from "./carga-proof-step";
+import { HoursEditor } from "./hours-editor";
+import { LogoPicker } from "./logo-picker";
+import { PayPicker } from "./pay-row";
+import { SocialPicker } from "./social-row";
+import { daySlots, DAYS, type WeekHours } from "@/domain/hours";
+import { hoursFromCsv, hoursToCsv, paysToCsv, socialsToCsv } from "@/domain/map-csv";
+import type { PayKey } from "@/domain/pays";
+import { linksFromPicked, type SocialKey, type SocialLink } from "@/domain/socials";
+
+function openHoursCsv(h: WeekHours) {
+  return DAYS.some((d) => daySlots(h[d.key]).length) ? hoursToCsv(h) : "";
+}
 
 export function ListingPatchForm({
   listingId,
@@ -13,6 +25,9 @@ export function ListingPatchForm({
   address,
   notes,
   logo,
+  hours,
+  pays,
+  links,
   lat,
   lon,
   isCommunity,
@@ -25,6 +40,9 @@ export function ListingPatchForm({
   address?: string;
   notes?: string;
   logo?: string;
+  hours?: WeekHours;
+  pays?: PayKey[];
+  links?: SocialLink[];
   lat: number;
   lon: number;
   isCommunity?: boolean;
@@ -36,8 +54,16 @@ export function ListingPatchForm({
   const [nextName, setNextName] = useState(name);
   const [nextDesc, setNextDesc] = useState(description || "");
   const [nextAddr, setNextAddr] = useState(address || "");
-  const [nextNotes] = useState(notes || "");
-  const [nextLogo] = useState(logo || "");
+  const [nextNotes, setNextNotes] = useState(notes || "");
+  const [nextLogo, setNextLogo] = useState(logo || "");
+  const [nextHours, setNextHours] = useState<WeekHours>(hours || hoursFromCsv(""));
+  const [nextPays, setNextPays] = useState<PayKey[]>(pays || []);
+  const [picked, setPicked] = useState<SocialKey[]>(() => (links || []).map((l) => l.key).filter((k): k is SocialKey => Boolean(k)));
+  const [handles, setHandles] = useState<Partial<Record<SocialKey, string>>>(() => {
+    const h: Partial<Record<SocialKey, string>> = {};
+    for (const l of links || []) if (l.key) h[l.key] = l.url;
+    return h;
+  });
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
@@ -107,8 +133,11 @@ export function ListingPatchForm({
             name: nextName,
             description: nextDesc,
             address: isCommunity ? undefined : nextAddr,
-            notes: nextNotes,
+            notes: isCommunity ? undefined : nextNotes,
             logo: nextLogo,
+            hours: isCommunity ? undefined : openHoursCsv(nextHours),
+            pays: isCommunity ? undefined : paysToCsv(nextPays),
+            socials: isCommunity ? undefined : socialsToCsv(linksFromPicked(picked, handles)),
             lat,
             lon,
             community: Boolean(isCommunity),
@@ -125,6 +154,7 @@ export function ListingPatchForm({
       }}
     >
       <p className="text-xs text-pretty text-muted-foreground">{t("patchLead")}</p>
+      {!isCommunity ? <p className="text-xs text-pretty text-muted-foreground">{t("shopKeeper")}</p> : null}
       <p className="text-xs text-muted-foreground">{t("reqHint")}</p>
       <label className="block text-sm">
         {t("fldName")}{" "}
@@ -138,11 +168,28 @@ export function ListingPatchForm({
         <textarea className="mt-1 min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]" value={nextDesc} onChange={(e) => setNextDesc(e.target.value)} maxLength={500} />
       </label>
       {!isCommunity ? (
-        <label className="block text-sm">
-          {t("fldAddr")}
-          <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextAddr} onChange={(e) => setNextAddr(e.target.value)} />
-        </label>
-      ) : null}
+        <>
+          <label className="block text-sm">
+            {t("fldAddr")}
+            <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextAddr} onChange={(e) => setNextAddr(e.target.value)} />
+          </label>
+          <label className="block text-sm">
+            {t("fldNotes")}
+            <textarea className="mt-1 min-h-16 w-full rounded-md bg-elevated px-3 py-2 text-sm shadow-[var(--shadow-border)]" value={nextNotes} onChange={(e) => setNextNotes(e.target.value)} maxLength={280} />
+          </label>
+          <LogoPicker value={nextLogo} onChange={setNextLogo} />
+          <HoursEditor value={nextHours} onChange={setNextHours} />
+          <PayPicker value={nextPays} onChange={setNextPays} />
+          <SocialPicker
+            picked={picked}
+            handles={handles}
+            onToggle={(k) => setPicked((cur) => (cur.includes(k) ? cur.filter((x) => x !== k) : [...cur, k]))}
+            onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
+          />
+        </>
+      ) : (
+        <LogoPicker value={nextLogo} onChange={setNextLogo} />
+      )}
       <CaptchaBox ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
       <PrivacyAccept id={`privacy-patch-${listingId}`} checked={privacyOk} onChange={setPrivacyOk} />
       {err ? <p className="text-sm text-primary">{err}</p> : null}

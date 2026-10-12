@@ -494,6 +494,9 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     address?: string;
     notes?: string;
     logo?: string;
+    hours?: string;
+    pays?: string;
+    socials?: string;
     proof?: string;
     lat?: number;
     lon?: number;
@@ -550,6 +553,9 @@ export const submitListingPatch = createServerFn({ method: "POST" })
         address: data.address,
         notes: data.notes,
         logo: data.logo,
+        hours: data.hours,
+        pays: data.pays,
+        socials: data.socials,
       },
       proof,
     );

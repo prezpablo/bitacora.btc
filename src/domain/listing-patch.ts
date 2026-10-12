@@ -10,6 +10,9 @@ export type ListingPatchFields = {
   address?: string;
   notes?: string;
   logo?: string;
+  hours?: string;
+  pays?: string;
+  socials?: string;
 };
 
 export type ListingPatch = {
@@ -53,25 +56,29 @@ function cleanHttp(raw: string) {
 
 export function sanitizePatchFields(raw: ListingPatchFields): ListingPatchFields {
   const out: ListingPatchFields = {};
-  const name = (raw.name || "").trim().slice(0, 80);
-  const description = (raw.description || "").trim().slice(0, 500);
-  const address = (raw.address || "").trim().slice(0, 160);
-  const notes = (raw.notes || "").trim().slice(0, 280);
-  const logo = cleanHttp(raw.logo || "");
-  if (name) out.name = name;
-  if (description) out.description = description;
-  if (address) out.address = address;
-  if (notes) out.notes = notes;
-  if (logo) out.logo = logo;
+  if (raw.name !== undefined) {
+    const name = raw.name.trim().slice(0, 80);
+    if (name) out.name = name;
+  }
+  if (raw.description !== undefined) out.description = raw.description.trim().slice(0, 500);
+  if (raw.address !== undefined) out.address = raw.address.trim().slice(0, 160);
+  if (raw.notes !== undefined) out.notes = raw.notes.trim().slice(0, 280);
+  if (raw.logo !== undefined) out.logo = cleanHttp(raw.logo);
+  if (raw.hours !== undefined) out.hours = raw.hours.replace(/\s+/g, "").slice(0, 200);
+  if (raw.pays !== undefined) out.pays = raw.pays.trim().slice(0, 80);
+  if (raw.socials !== undefined) out.socials = raw.socials.trim().slice(0, 800);
   return out;
 }
 
-export function patchChanged(row: Pick<MapCsvRow, "name" | "description" | "address" | "notes" | "logo">, fields: ListingPatchFields) {
+export function patchChanged(row: Pick<MapCsvRow, "name" | "description" | "address" | "notes" | "logo" | "hours" | "pays" | "socials">, fields: ListingPatchFields) {
   if (fields.name && fields.name !== row.name) return true;
-  if (fields.description && fields.description !== row.description) return true;
-  if (fields.address && fields.address !== row.address) return true;
-  if (fields.notes && fields.notes !== row.notes) return true;
-  if (fields.logo && fields.logo !== row.logo) return true;
+  if (fields.description !== undefined && fields.description !== row.description) return true;
+  if (fields.address !== undefined && fields.address !== row.address) return true;
+  if (fields.notes !== undefined && fields.notes !== row.notes) return true;
+  if (fields.logo !== undefined && fields.logo !== row.logo) return true;
+  if (fields.hours !== undefined && fields.hours !== row.hours) return true;
+  if (fields.pays !== undefined && fields.pays !== row.pays) return true;
+  if (fields.socials !== undefined && fields.socials !== row.socials) return true;
   return false;
 }
 
@@ -116,8 +123,11 @@ export function applyPatchToRow(row: MapCsvRow, patch: ListingPatch, now = Date.
     name: f.name || row.name,
     description: f.description ?? row.description,
     address: f.address ?? row.address,
-    notes: f.notes ?? row.notes,
-    logo: f.logo || row.logo,
+    notes: f.notes !== undefined ? f.notes : row.notes,
+    logo: f.logo !== undefined ? f.logo : row.logo,
+    hours: f.hours !== undefined ? f.hours : row.hours,
+    pays: f.pays !== undefined ? f.pays : row.pays,
+    socials: f.socials !== undefined ? f.socials : row.socials,
     verifiedAt: now,
   };
 }

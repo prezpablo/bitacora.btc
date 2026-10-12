@@ -77,6 +77,22 @@ test("80 m is the move ceiling", () => {
   assert.ok(metersBetween(a, { lat: -34.48, lon: -57.844 }) > PATCH_MAX_MOVE_M);
 });
 
+test("a patch can rewrite hours, pays and socials, or clear notes", () => {
+  const made = proposePatch(
+    row(),
+    { hours: "lun09001700", pays: "lightning", socials: "x:https://x.com/cafe", notes: "" },
+    "",
+  );
+  assert.equal("patch" in made, true);
+  if (!("patch" in made)) return;
+  const next = applyPatchToRow(row(), made.patch, 50);
+  assert.equal(next.hours, "lun09001700");
+  assert.equal(next.pays, "lightning");
+  assert.equal(next.socials, "x:https://x.com/cafe");
+  assert.equal(next.notes, "");
+  assert.equal(next.description, "Pagos en sats");
+});
+
 test("contact ticket is TKT- plus 6 chars", () => {
   assert.match(makeContactTicket(), /^TKT-[A-Z0-9]{6}$/);
 });

@@ -27,16 +27,17 @@ export function CargaProofStep({
 }) {
   const t = useT();
   const [proof, setProof] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"code" | "post" | "">("");
+  const mapUrl = "https://bitacorabtc.org/mapa";
 
   useEffect(() => {
     if (!token) return;
     let stop = false;
     void navigator.clipboard.writeText(token).then(() => {
       if (stop) return;
-      setCopied(true);
+      setCopied("code");
       window.setTimeout(() => {
-        if (!stop) setCopied(false);
+        if (!stop) setCopied("");
       }, 4000);
     }).catch(() => {});
     return () => {
@@ -47,8 +48,20 @@ export function CargaProofStep({
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(token);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 4000);
+      setCopied("code");
+      window.setTimeout(() => setCopied(""), 4000);
+    } catch {
+      /* leave the code on screen */
+    }
+  }
+
+  async function copyPost() {
+    const place = (name || "").trim() || t("pinPostShop");
+    const text = t("pinPostBody", { name: place, url: mapUrl, code: token });
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied("post");
+      window.setTimeout(() => setCopied(""), 4000);
     } catch {
       /* leave the code on screen */
     }
@@ -66,8 +79,24 @@ export function CargaProofStep({
       >
         {token}
       </button>
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => void copyCode()}
+          className="h-10 rounded-md bg-elevated px-2 text-xs font-medium text-foreground"
+        >
+          {t("pinCopy")}
+        </button>
+        <button
+          type="button"
+          onClick={() => void copyPost()}
+          className="h-10 rounded-md bg-primary px-2 text-xs font-medium text-white"
+        >
+          {t("pinCopyPost")}
+        </button>
+      </div>
       <p className="text-sm font-medium text-primary" role="status" aria-live="polite">
-        {copied ? t("pinCopied") : t("pinPostHint")}
+        {copied === "post" ? t("pinCopiedPost") : copied === "code" ? t("pinCopied") : t("pinPostHint")}
       </p>
       <VerifyIgHow />
       <label className="block text-sm">

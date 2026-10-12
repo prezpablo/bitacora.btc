@@ -1615,6 +1615,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   address={local?.address}
                   notes={local?.notes}
                   logo={local?.logo || sel.logo}
+                  hours={local?.hours}
+                  pays={local?.pays}
+                  links={local?.links}
                   lat={sel.lat}
                   lon={sel.lon}
                   onApplied={() => void invalidate()}
