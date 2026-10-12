@@ -1000,8 +1000,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }
 
   function failCarga(code?: string) {
-    if (code === "captcha") setFormErr(t("captchaNeed"));
-    else if (code === "rate") setFormErr(t("pinRate"));
+    if (code === "captcha") {
+      setFormErr(t("captchaSlow"));
+      setCaptchaOk(false);
+    } else if (code === "rate") setFormErr(t("pinRate"));
     else if (code === "save") setFormErr(t("pinSaveFail"));
     else if (code === "pending") setFormErr(t("listingPending"));
     else if (code === "slugTaken") setFormErr(t("slugTaken"));

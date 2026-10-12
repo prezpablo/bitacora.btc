@@ -75,8 +75,10 @@ export function ListingPatchForm({
   const [pending, setPending] = useState<{ id: string; token: string } | null>(null);
 
   function fail(code?: string) {
-    if (code === "captcha") setErr(t("captchaNeed"));
-    else if (code === "rate") setErr(t("patchRate"));
+    if (code === "captcha") {
+      setErr(t("captchaSlow"));
+      setCaptchaOk(false);
+    } else if (code === "rate") setErr(t("patchRate"));
     else if (code === "nochange") setErr(t("patchNochange"));
     else if (code === "links" || code === "need") setErr(t("verifyNeedLink"));
     else if (code === "instagram") setErr(t("pinNoIg"));

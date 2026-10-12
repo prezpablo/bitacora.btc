@@ -167,7 +167,8 @@ export function CommunityPinsBoard() {
       await holdCargaSpinner(started);
       if (cancelled.current) return;
       if (!res?.ok || !res.token || !res.id) {
-        setErr(res?.error === "rate" ? t("pinRate") : res?.error === "captcha" ? t("captchaNeed") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
+        setErr(res?.error === "rate" ? t("pinRate") : res?.error === "captcha" ? t("captchaSlow") : res?.error === "save" ? t("pinSaveFail") : t("pinNeed"));
+        if (res?.error === "captcha") setCaptchaOk(false);
         return;
       }
       keepPending({ id: res.id, token: res.token, name: name.trim(), proof: "", created: Date.now() });

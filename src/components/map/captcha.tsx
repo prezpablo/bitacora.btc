@@ -6,6 +6,8 @@ import { minePow } from "@/lib/pow";
 import { useAppLang, useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
+const MIN_AGE_MS = 1200;
+
 export type CaptchaTicket = { id: string; answer: string; nonce: string };
 
 function noise(seed: number) {
@@ -51,6 +53,7 @@ export function CaptchaBox({
   const [fail, setFail] = useState("");
   const [loading, setLoading] = useState(true);
   const [nonce, setNonce] = useState("");
+  const [ripe, setRipe] = useState(false);
   const mineAbort = useRef<AbortController | null>(null);
   const lines = useMemo(() => noise(code.split("").reduce((a, c) => a + c.charCodeAt(0), 0)), [code]);
 
@@ -63,6 +66,7 @@ export function CaptchaBox({
     setTyped("");
     setFail("");
     setNonce("");
+    setRipe(false);
     try {
       const row = await issueCaptcha();
       if (!row?.id || !row.code || !row.salt) {
@@ -100,13 +104,19 @@ export function CaptchaBox({
   }, []);
 
   useEffect(() => {
-    if (!nonce || !id || !code) return;
+    if (!code) return;
+    const wait = Math.max(0, MIN_AGE_MS - (Date.now() - born));
+    const timer = window.setTimeout(() => setRipe(true), wait);
+    return () => window.clearTimeout(timer);
+  }, [code, born]);
+
+  useEffect(() => {
+    if (!ripe || !nonce || !id || !code) return;
     if (hp.trim()) return;
     if (typed.trim().toUpperCase() !== code) return;
-    if (Date.now() - born < 400) return;
     onOk(true);
     onTicket?.({ id, answer: typed.trim().toUpperCase(), nonce });
-  }, [nonce]);
+  }, [nonce, ripe]);
 
   function pass() {
     if (!id || !code) return;
@@ -114,7 +124,7 @@ export function CaptchaBox({
       setFail(t("captchaFail"));
       return;
     }
-    if (Date.now() - born < 900) {
+    if (Date.now() - born < MIN_AGE_MS || !ripe) {
       setFail(t("captchaSlow"));
       return;
     }
@@ -207,7 +217,7 @@ export function CaptchaBox({
           onChange={(e) => {
             const v = e.target.value;
             setTyped(v);
-            const match = v.trim().toUpperCase() === code && !!code && !!nonce && !hp.trim() && Date.now() - born >= 400;
+            const match = v.trim().toUpperCase() === code && !!code && !!nonce && ripe && !hp.trim();
             if (match) {
               setFail("");
               onOk(true);
@@ -239,12 +249,12 @@ export function CaptchaBox({
             ok ? "bg-long text-white" : "bg-primary text-white",
           )}
           onClick={pass}
-          disabled={loading || !code || !nonce}
+          disabled={loading || !code || !nonce || !ripe}
         >
-          {ok ? t("captchaOk") : nonce ? t("captchaCheck") : t("captchaPow")}
+          {ok ? t("captchaOk") : nonce && ripe ? t("captchaCheck") : t("captchaPow")}
         </button>
       </div>
-      {!nonce && code && !fail ? (
+      {!ripe && code && !fail ? (
         <p className="text-xs text-muted-foreground" aria-live="polite">
           {t("captchaPow")}
         </p>
