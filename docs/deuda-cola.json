@@ -298,7 +298,6 @@
       "kind": "repo",
       "done": "capa mapa+globo con miniatura; solo instaladas con foto; sin Lugano retirada ni Viena antes del 14 oct 2026"
     }
-    }
   ],
   "guards": [
     { "id": "G-HEALTHZ", "done": "GET /healthz {ok:true}" },
