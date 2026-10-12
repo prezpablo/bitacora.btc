@@ -215,10 +215,6 @@ export async function fetchMerchants(bbox: {
   const map = new Map<string, ShopPin>();
   const zoom = Number.isFinite(bbox.zoom) ? Number(bbox.zoom) : 4;
   for (const p of clusteredCatalogShops(bbox, zoom)) map.set(p.id, p);
-  for (const p of FALLBACK) {
-    if (!inBox(p, bbox) || map.has(p.id)) continue;
-    map.set(p.id, placeAsPin(p));
-  }
   if (!map.size) {
     for (const p of catalogShopsInBox(bbox)) map.set(p.id, placeAsPin(p));
   }

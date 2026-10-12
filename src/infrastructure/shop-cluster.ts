@@ -4,16 +4,61 @@ import { catalogCount, catalogShopPins, ensureCatalog } from "./catalog.ts";
 
 export type ShopPointProps = { id: string; icon: string; name: string };
 
+function normShopId(id: string) {
+  return id
+    .trim()
+    .toLowerCase()
+    .replace(/^osm:(node|way|relation):/, "$1:")
+    .replace(/^btcmap:/, "");
+}
+
+function nearShop(a: ShopPin, b: ShopPin) {
+  const dlat = (a.lat - b.lat) * 111;
+  const dlon = (a.lon - b.lon) * 111 * Math.cos((a.lat * Math.PI) / 180);
+  return Math.hypot(dlat, dlon) < 0.08;
+}
+
+/** Una ficha por id OSM y por el mismo nombre en el mismo punto. El índice no cuenta copias. */
+export function uniqueShopPins(shops: ShopPin[]): ShopPin[] {
+  const seen = new Set<string>();
+  const cells = new Map<string, ShopPin[]>();
+  const out: ShopPin[] = [];
+  for (const s of shops) {
+    if (!s.id || !Number.isFinite(s.lat) || !Number.isFinite(s.lon)) continue;
+    const id = normShopId(s.id);
+    if (!id || seen.has(id)) continue;
+    const name = (s.name || "").trim().toLowerCase();
+    const i = Math.round(s.lat * 500);
+    const j = Math.round(s.lon * 500);
+    let copy = false;
+    for (let di = -1; di <= 1 && !copy; di++) {
+      for (let dj = -1; dj <= 1 && !copy; dj++) {
+        for (const k of cells.get(`${i + di}_${j + dj}`) || []) {
+          if (!nearShop(k, s)) continue;
+          const kn = (k.name || "").trim().toLowerCase();
+          if (!name || !kn || name === kn) copy = true;
+        }
+      }
+    }
+    if (copy) continue;
+    seen.add(id);
+    out.push(s);
+    const key = `${i}_${j}`;
+    const bucket = cells.get(key) || [];
+    bucket.push(s);
+    cells.set(key, bucket);
+  }
+  return out;
+}
+
 export function loadShopIndex(shops: ShopPin[]) {
   const index = new Supercluster<ShopPointProps>({ radius: 48, maxZoom: 16, minPoints: 3 });
   index.load(
-    shops
-      .filter((s) => s.id && Number.isFinite(s.lat) && Number.isFinite(s.lon))
-      .map((s) => ({
-        type: "Feature" as const,
-        properties: { id: s.id, icon: s.icon || "lugar", name: s.name || s.id },
-        geometry: { type: "Point" as const, coordinates: [s.lon, s.lat] as [number, number] },
-      })),
+    uniqueShopPins(shops).map((s) => ({
+      type: "Feature" as const,
+      properties: { id: s.id, icon: s.icon || "lugar", name: s.name || s.id },
+      geometry: { type: "Point" as const, coordinates: [s.lon, s.lat] as [number, number] },
+    })),
   );
   return index;
 }
@@ -27,6 +72,12 @@ export function placesFromClusters(
   const z = Math.max(0, Math.min(16, Math.floor(zoom)));
   const hits = index.getClusters(bbox, z);
   const out: ShopPin[] = [];
+  const seen = new Set<string>();
+  const push = (pin: ShopPin) => {
+    if (!pin.id || seen.has(pin.id)) return;
+    seen.add(pin.id);
+    out.push(pin);
+  };
   for (const f of hits) {
     const [lon, lat] = f.geometry.coordinates;
     const p = f.properties;
@@ -37,22 +88,24 @@ export function placesFromClusters(
         const [x, y] = leaf.geometry.coordinates;
         return x >= bbox[0] && y >= bbox[1] && x <= bbox[2] && y <= bbox[3];
       });
-      const n = inView.length || Number(p.point_count) || 0;
-      // Calle / grupo chico / la mayoría del cluster está fuera: listar fichas, no un 93 mentiroso.
-      if (z >= 12 || n <= 8 || n < (Number(p.point_count) || 0) * 0.5) {
-        for (const leaf of inView.length ? inView : leaves) {
+      // El número es solo lo que está en esta caja. Si falta alguno, o ya se lee la calle, van las fichas.
+      const n = inView.length;
+      const total = Number(p.point_count) || n;
+      if (!n) continue;
+      if (z >= 11 || n <= 12 || n < total) {
+        for (const leaf of inView) {
           const [x, y] = leaf.geometry.coordinates;
           const prop = leaf.properties as ShopPointProps;
           if (!prop?.id) continue;
-          out.push({ id: prop.id, lat: y, lon: x, icon: prop.icon || "lugar", name: prop.name || prop.id });
+          push({ id: prop.id, lat: y, lon: x, icon: prop.icon || "lugar", name: prop.name || prop.id });
         }
         continue;
       }
-      out.push({ id: `cluster:${cid}`, lat, lon, icon: "cluster", name: String(n), clusterCount: n });
+      push({ id: `cluster:${cid}`, lat, lon, icon: "cluster", name: String(n), clusterCount: n });
       continue;
     }
     const leaf = p as ShopPointProps;
-    out.push({ id: leaf.id, lat, lon, icon: leaf.icon || "lugar", name: leaf.name || leaf.id });
+    push({ id: leaf.id, lat, lon, icon: leaf.icon || "lugar", name: leaf.name || leaf.id });
   }
   return out;
 }

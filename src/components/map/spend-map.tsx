@@ -482,8 +482,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           logo: pickListingLogo(local?.logo),
         };
       });
-    return dedupeShops([...extra, ...api]);
-  }, [query.data, store, filter, bbox, sel?.id]);
+    const rows = dedupeShops([...extra, ...api]);
+    // En la calle no se dibuja el globo con el número: o es una ficha, o no está.
+    if (zoom >= 11) return rows.filter((p) => p.category !== "cluster" && !p.id.startsWith("cluster:"));
+    return rows;
+  }, [query.data, store, filter, bbox, sel?.id, zoom]);
 
   const overlayComms = comms;
   const allComms = useMemo(() => {

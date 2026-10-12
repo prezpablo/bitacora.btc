@@ -35,7 +35,20 @@ test("continent zoom clusters nearby shops; street zoom lists them", () => {
   assert.equal(leaf!.icon, "cafe");
 });
 
-test("cluster count is shops inside the box, not Buenos Aires on a Montevideo street", () => {
+test("the same shop copied many times is one ficha, not a 150", () => {
+  const copies = Array.from({ length: 150 }, (_, i) => ({
+    ...shop(i % 3 === 0 ? "node:3454449533" : `osm:node:${3454449533 + (i % 3 === 1 ? 0 : i)}`, -34.90567, -56.20469),
+    name: "Café Brasilero",
+  }));
+  const index = loadShopIndex(copies);
+  const bay: [number, number, number, number] = [-56.25, -34.95, -56.15, -34.86];
+  const pins = placesFromClusters(index, bay, 14);
+  assert.equal(pins.length, 1);
+  assert.equal(pins[0]?.icon, "cafe");
+  assert.equal(pins.some((p) => (p.clusterCount ?? 0) >= 2), false);
+});
+
+test("a cluster number never counts shops outside the bay", () => {
   const mvd = Array.from({ length: 8 }, (_, i) => shop(`mvd${i}`, -34.90 + i * 0.002, -56.17 + i * 0.002));
   const ba = Array.from({ length: 94 }, (_, i) => shop(`ba${i}`, -34.60 + (i % 10) * 0.004, -58.42 + Math.floor(i / 10) * 0.004));
   const index = loadShopIndex([...mvd, ...ba]);
