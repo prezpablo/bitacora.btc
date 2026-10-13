@@ -15,3 +15,8 @@ export function slowNet() {
   const t = c.effectiveType || "";
   return t === "slow-2g" || t === "2g" || t === "3g";
 }
+
+/** Antialias off only on a slow link and a screen that is not retina. Pins stay HTML, not pointsMerge. */
+export function globeAntialias(slow: boolean, dpr: number) {
+  return !(slow && dpr <= 2);
+}

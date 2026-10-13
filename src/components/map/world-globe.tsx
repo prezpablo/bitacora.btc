@@ -16,6 +16,7 @@ import { boxAround } from "@/domain";
 import { getCityFrame } from "@/infrastructure/server-fns";
 import { locateBest } from "@/infrastructure/geo";
 import { hasWebGL } from "@/lib/webgl";
+import { globeAntialias, slowNet } from "@/lib/net";
 
 const GEO_URL = "/data/ne-110m-countries.json";
 
@@ -411,7 +412,11 @@ function GlobeCanvas({
           globeImageUrl={WHITE}
           showAtmosphere={false}
           animateIn={false}
-          rendererConfig={{ antialias: false, alpha: false, powerPreference: "default" }}
+          rendererConfig={{
+            antialias: globeAntialias(slowNet(), typeof window === "undefined" ? 1 : window.devicePixelRatio || 1),
+            alpha: false,
+            powerPreference: "default",
+          }}
           pointOfView={{ lat: -15, lng: -58, altitude: 2.05 }}
           polygonsData={features}
           polygonGeoJsonGeometry="geometry"

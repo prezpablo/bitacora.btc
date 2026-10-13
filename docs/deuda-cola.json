@@ -231,9 +231,9 @@
     {
       "id": "D-GLOBE-PERF",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "antialias off en 3G + DPR<=2; NO pointsMerge si el pin del globo abre ficha"
+      "done": "antialias off solo en 3G con DPR<=2; pines HTML, sin pointsMerge"
     },
     {
       "id": "D-TILE-LATAM",
