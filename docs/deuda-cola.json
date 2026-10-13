@@ -282,7 +282,7 @@
       "pri": "P2",
       "open": false,
       "kind": "repo",
-      "done": "overlay local:/c: edita con CARGA; BTC Map abre disputa con antes/después; pin >80 m no se reescribe"
+      "done": "ficha BTC Map se edita y se guarda en map.csv de Bitácora; el origen no se toca; CARGA sigue"
     },
     {
       "id": "D-EXPERIENCIA",

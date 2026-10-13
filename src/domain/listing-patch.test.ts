@@ -69,9 +69,15 @@ test("applyPatchToRow keeps id and refreshes verifiedAt", () => {
   assert.equal(next.token, "CARGA-OLD");
 });
 
-test("a BTC Map pin is a dispute, not a rewrite", () => {
-  const foreign = proposePatch(row({ id: "node:13424595224" }), { name: "Otro" }, "");
-  assert.equal("error" in foreign && foreign.error, "notours");
+test("a BTC Map pin is saved as a Bitácora overlay, not rejected", () => {
+  const foreign = proposePatch(row({ id: "node:13424595224", name: "Roderich" }), { name: "Roderich Casa" }, "");
+  assert.equal("patch" in foreign, true);
+  if (!("patch" in foreign)) return;
+  assert.equal(foreign.patch.listingId, "node:13424595224");
+  assert.equal(foreign.patch.verified, false);
+  const next = applyPatchToRow(row({ id: "node:13424595224", name: "Roderich" }), foreign.patch, 7);
+  assert.equal(next.id, "node:13424595224");
+  assert.equal(next.name, "Roderich Casa");
 });
 
 test("a pin may move up to 80 m and no further", () => {

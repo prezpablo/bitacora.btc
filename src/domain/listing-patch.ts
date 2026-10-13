@@ -94,7 +94,6 @@ export function proposePatch(
   at?: { lat: number; lon: number },
   now = Date.now(),
 ): { patch: ListingPatch } | { error: PatchErr } {
-  if (!listingIsOurs(row.id)) return { error: "notours" };
   const fields = sanitizePatchFields(raw);
   const url = cleanHttp(proof);
   if (url && !/^https?:\/\//i.test(url)) return { error: "links" };

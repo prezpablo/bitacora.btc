@@ -68,7 +68,7 @@ D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GL
 
 ### Parámetros 12 oct (no implementar en el mismo ZIP)
 
-**Editar un comercio (D-PATCH-ALL).** El alta ya pide pin, código `CARGA-XXXX` y un enlace público. La modificación usa esa misma puerta, no un login. En una ficha propia (`local:` o `c:`) se pueden cambiar todos los campos del alta: nombre, descripción, dirección opcional, redes, logo, horarios, medios de pago y notas. Mover el pin más de 80 m vuelve a exigir prueba. Una ficha de BTC Map no se reescribe: el botón que ya dice «Abrir disputa» manda el aviso con el antes y el después. Sin KYC.
+**Editar un comercio (D-PATCH-ALL).** El alta ya pide pin, código `CARGA-XXXX` y un enlace público. La modificación usa esa misma puerta, no un login. Una ficha propia (`local:` o `c:`) y una ficha de BTC Map se editan con los mismos campos. El cambio de BTC Map se guarda en la base de Bitácora (`map.csv`), con el mismo id, y no se escribe en el origen. Mover el pin más de 80 m vuelve a exigir un alta. Sin KYC.
 
 **Experiencias (D-EXPERIENCIA).** Chip dentro de Comunidad, al lado de anuncios y eventos. No es la quinta entrada de la barra. Misma prueba pública. Campos extra, todos visibles: qué es la actividad, ciudad, fecha o «recurrente», precio en sats o «a convenir», y el enlace de la prueba. Bitácora no cobra ni custodia. Hasta que haya fichas propias no entra al sitemap (igual que D-SEO-CITY).
 

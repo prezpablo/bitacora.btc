@@ -134,17 +134,6 @@ export function ListingPatchForm({
       .finally(() => setBusy(false));
   }
 
-  if (!ours) {
-    return (
-      <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
-        <p className="text-pretty text-muted-foreground">{t("patchNotOurs")}</p>
-        <a href={disputeHref} className="text-sm font-medium text-primary no-underline hover:underline">
-          {t("patchDispute")}
-        </a>
-      </div>
-    );
-  }
-
   if (pending) {
     return (
       <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
@@ -186,6 +175,7 @@ export function ListingPatchForm({
       }}
     >
       <p className="text-xs text-pretty text-muted-foreground">{t("patchLead")}</p>
+      {!ours ? <p className="text-xs text-pretty text-muted-foreground">{t("patchKept")}</p> : null}
       {!isCommunity ? <p className="text-xs text-pretty text-muted-foreground">{t("shopKeeper")}</p> : null}
       <p className="text-xs text-muted-foreground">{t("reqHint")}</p>
       <label className="block text-sm">

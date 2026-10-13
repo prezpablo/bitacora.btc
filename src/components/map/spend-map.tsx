@@ -28,7 +28,7 @@ import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
 import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { SiteShell } from "@/components/site-header";
 import { MapSearch, type SearchHit } from "./map-search";
-import { listingIsOurs } from "@/domain/listing-patch";
+import { hoursToCsv, paysToCsv, socialsToCsv } from "@/domain/map-csv";
 import { CommunityCard, PlaceCard } from "./map-listing-card";
 import { CargaPendingView, holdCargaSpinner } from "./carga-proof-step";
 import { ListingPatchForm } from "./map-patch-form";
@@ -1597,11 +1597,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onGo={() => startGuide({ lat: selComm.lat, lon: selComm.lon })}
                 going={guideWait}
                 onPatch={() => {
-                  if (!listingIsOurs(selComm.id)) {
-                    const before = `${selComm.name} · ${selComm.lat.toFixed(5)},${selComm.lon.toFixed(5)}`;
-                    window.location.assign(`/?topic=dispute&listing=${encodeURIComponent(selComm.id)}&before=${encodeURIComponent(before)}#contacto`);
-                    return;
-                  }
                   setPatchOpen(true);
                   setVoteOpen(false);
                   setFormErr("");
@@ -1657,7 +1652,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 <ListingPatchForm
                   listingId={sel.id}
                   name={sel.name}
-                  description={local?.description}
+                  description={local?.description || sel.description}
                   address={local?.address}
                   notes={local?.notes}
                   logo={local?.logo || sel.logo}
@@ -1690,11 +1685,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onGo={() => startGuide({ lat: sel.lat, lon: sel.lon })}
                 going={guideWait}
                 onPatch={() => {
-                  if (!listingIsOurs(sel.id)) {
-                    const before = `${sel.name} · ${sel.lat.toFixed(5)},${sel.lon.toFixed(5)}`;
-                    window.location.assign(`/?topic=dispute&listing=${encodeURIComponent(sel.id)}&before=${encodeURIComponent(before)}#contacto`);
-                    return;
-                  }
                   setPatchOpen(true);
                   setVoteOpen(false);
                   setFormErr("");
