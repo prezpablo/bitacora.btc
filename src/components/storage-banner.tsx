@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { setStorageChoice, storageChoice, wipeExtras } from "@/lib/storage-consent";
 import { useT } from "@/lib/i18n";
+import { legalHref } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 const SEEN = "bitacora-storage-seen";
 
 export function StorageBanner() {
   const t = useT();
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const [show, setShow] = useState(false);
   const [compact, setCompact] = useState(false);
   useEffect(() => {
@@ -48,11 +51,11 @@ export function StorageBanner() {
           {compact ? null : (
             <>
               {" "}
-              <a href="/legal#cookies" className="font-medium text-foreground underline underline-offset-2">
+              <a href={legalHref("cookies", String(search || ""))} className="font-medium text-foreground underline underline-offset-2">
                 {t("legalCookies")}
               </a>
               {" · "}
-              <a href="/legal#privacidad" className="font-medium text-foreground underline underline-offset-2">
+              <a href={legalHref("privacidad", String(search || ""))} className="font-medium text-foreground underline underline-offset-2">
                 {t("legalPrivacy")}
               </a>
               .

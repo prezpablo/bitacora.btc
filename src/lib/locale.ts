@@ -49,7 +49,13 @@ export function langFromLocation(location: {
   );
 }
 
-/** Keep `?lang=` on every file route so the index `/` does not drop it. */
+/** `/legal#ancla` keeps `?lang=` when the current URL already has it. */
+export function legalHref(hash: string, search = ""): string {
+  const lang = langFromQuery(search);
+  const id = hash.replace(/^#/, "");
+  const base = lang ? `/legal?lang=${lang}` : "/legal";
+  return id && id !== "legal" ? `${base}#${id}` : base;
+}
 export function retainLangSearch(raw: Record<string, unknown>): { lang?: AppLang } {
   const lang = langFromQuery(raw);
   return lang ? { lang } : {};

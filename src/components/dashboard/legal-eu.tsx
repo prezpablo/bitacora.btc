@@ -81,7 +81,17 @@ export function LegalEu() {
         <p className="text-xs font-medium tracking-wide text-primary uppercase">{t("legalKicker")}</p>
         <h1 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{t("legalTitle")}</h1>
         <p className="max-w-3xl text-sm text-pretty text-muted-foreground sm:text-base">{copy.lead}</p>
+        <p className="text-xs text-muted-foreground">{t("legalVersion", { v: LEGAL.consentVersion })}</p>
       </header>
+      <nav aria-label={t("legalIndex")} className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+        {copy.blocks
+          .filter((b) => b.id)
+          .map((b) => (
+            <a key={b.id} href={`#${b.id}`} className="text-foreground underline-offset-2 hover:underline">
+              {b.title}
+            </a>
+          ))}
+      </nav>
       <div className="space-y-3">
         {copy.blocks.map((b) => (
           <article
@@ -91,6 +101,12 @@ export function LegalEu() {
           >
             <h2 className="font-display text-lg font-medium text-foreground">{b.title}</h2>
             <Paragraphs text={b.body} />
+            {b.clauses?.map((c) => (
+              <div key={c.title} className="mt-3">
+                <h3 className="text-sm font-medium text-foreground">{c.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-pretty text-muted-foreground">{c.body}</p>
+              </div>
+            ))}
             {b.id === "aviso" || b.id === "derechos" ? (
               <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">
                 {t("legalRightsChannel", {

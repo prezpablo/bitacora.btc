@@ -329,9 +329,9 @@
     {
       "id": "L-TERMS",
       "pri": "P1",
-      "open": true,
-      "kind": "manual",
-      "done": "índice /legal, 9 cláusulas, anexo regional, anclas viejas vivas"
+      "open": false,
+      "kind": "repo",
+      "done": "índice, versión 2.0, 9 cláusulas, anexo regional; anclas del pie vivas"
     },
     {
       "id": "L-OPS",

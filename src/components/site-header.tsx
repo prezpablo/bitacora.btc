@@ -5,7 +5,7 @@ import { BrandMark } from "@/components/dashboard/brand-mark";
 import { SeoHead } from "@/components/seo-head";
 import { SkipLink } from "@/components/skip-link";
 import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
-import { LANGS, useLocale } from "@/lib/locale";
+import { LANGS, legalHref, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
 import { LEGAL } from "@/domain/legal-config";
@@ -55,6 +55,7 @@ function LangButtons() {
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const hydrate = useLocale((s) => s.hydrate);
   const lang = useAppLang();
   const labels = COPY[lang];
@@ -291,19 +292,19 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
               <div className="flex flex-col items-center gap-0.5 text-center">
                 <span className="text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:text-[10px]">{t("footerLegal")}</span>
                 <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
-                  <a href="/legal#aviso" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                  <a href={legalHref("aviso", String(search || ""))} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalAviso")}
                   </a>
-                  <a href="/legal#privacidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                  <a href={legalHref("privacidad", String(search || ""))} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalPrivacy")}
                   </a>
-                  <a href="/legal#cookies" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                  <a href={legalHref("cookies", String(search || ""))} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalCookies")}
                   </a>
-                  <a href="/legal#accesibilidad" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                  <a href={legalHref("accesibilidad", String(search || ""))} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalA11y")}
                   </a>
-                  <a href="/legal#terminos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                  <a href={legalHref("terminos", String(search || ""))} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalTerms")}
                   </a>
                   <a href={`mailto:${LEGAL.privacyEmail}`} className="inline-flex min-h-6 min-w-6 items-center text-foreground">

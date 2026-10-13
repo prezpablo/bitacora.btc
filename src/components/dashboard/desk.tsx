@@ -26,6 +26,7 @@ import { LazyMount } from "@/components/lazy-mount";
 import { useInView } from "@/lib/in-view";
 import { DATOS, useAppLang, useT } from "@/lib/i18n";
 import { slowNet } from "@/lib/net";
+import { legalHref } from "@/lib/locale";
 import { scrollDeskTo } from "@/lib/desk-scroll";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
@@ -94,6 +95,7 @@ export function Desk() {
   const [allowFetch, setAllowFetch] = useState(false);
   const [liveOk, setLiveOk] = useState(false);
   const hash = useRouterState({ select: (s) => s.location.hash });
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const [deskHash, setDeskHash] = useState(() => String(hash || "").replace(/^#/, "") || "mapa");
   useEffect(() => {
     const read = () => setDeskHash(window.location.hash.replace(/^#/, "") || "mapa");
@@ -130,9 +132,9 @@ export function Desk() {
   useEffect(() => {
     const h = deskHash;
     if (h === "legal" || h === "aviso" || h === "privacidad" || h === "cookies" || h === "accesibilidad" || h === "terminos") {
-      window.location.replace(h === "legal" ? "/legal" : `/legal#${h}`);
+      window.location.replace(legalHref(h === "legal" ? "" : h, String(search || "")));
     }
-  }, [deskHash]);
+  }, [deskHash, search]);
 
   const fallback = useMemo(() => buildModelMarket(range, liq), [range, liq]);
 

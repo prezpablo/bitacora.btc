@@ -1,5 +1,7 @@
 import { LEGAL } from "@/domain/legal-config";
 import { useT } from "@/lib/i18n";
+import { legalHref } from "@/lib/locale";
+import { useRouterState } from "@tanstack/react-router";
 
 export function PrivacyAccept({
   checked,
@@ -17,6 +19,7 @@ export function PrivacyAccept({
   keep?: "listing" | "pin";
 }) {
   const t = useT();
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const vars = {
     email: LEGAL.privacyEmail,
     name: LEGAL.controllerName,
@@ -41,13 +44,13 @@ export function PrivacyAccept({
           <label htmlFor={id}>{variant === "contact" ? t("consentContact") : t("consentPublish")} </label>
           {variant === "publish" ? (
             <>
-              <a href="/legal#terminos" className="font-medium text-foreground underline underline-offset-2">
+              <a href={legalHref("terminos", String(search || ""))} className="font-medium text-foreground underline underline-offset-2">
                 {t("legalTerms")}
               </a>{" "}
               {t("consentAnd")}{" "}
             </>
           ) : null}
-          <a href="/legal#privacidad" className="font-medium text-foreground underline underline-offset-2">
+          <a href={legalHref("privacidad", String(search || ""))} className="font-medium text-foreground underline underline-offset-2">
             {t("legalPrivacy")}
           </a>
           .

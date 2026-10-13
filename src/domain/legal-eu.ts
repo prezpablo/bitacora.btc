@@ -4,6 +4,7 @@ export type LegalBlock = {
   id?: string;
   title: string;
   body: string;
+  clauses?: { title: string; body: string }[];
   table?: { head: string[]; rows: string[][] };
 };
 
@@ -15,10 +16,26 @@ const es: { lead: string; blocks: LegalBlock[] } = {
       id: "aviso",
       body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil consta en la inscripción ante la URCDP y se facilita a quien ejerza derechos, acreditando la suya, por el formulario de Contacto.\n\nNo hay Delegado de Protección de Datos: no es obligatorio (Ley n.º 19.670 art. 40 y Decreto n.º 64/020) porque no somos entidad pública, no tratamos datos sensibles como actividad principal ni operamos a gran escala. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es el formulario de Contacto de este sitio. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras. Bitácora.btc no es un Proveedor de Servicios de Activos Virtuales (Ley n.º 20.345).",
     },
-    {
+        {
       title: "Términos y condiciones",
       id: "terminos",
-      body: "Al usar el sitio aceptás estas reglas. Bitácora.btc no custodia, no intermedia y no administra llaves (Ley n.º 20.345: no es PSAV). El contenido del mapa y de los anuncios lo publican terceros; el responsable puede retirarlo si es ilícito, engañoso o viola estas reglas. Quien carga o modifica un comercio declara que los datos son ciertos y es responsable de mantenerlos actualizados. La verificación no cambia: el código CARGA se publica en un enlace público y el mapa se actualiza solo cuando esa prueba se comprueba. Las contribuciones al directorio se publican para replicar el CSV; los datos geográficos de OSM y BTC Map siguen ODbL (© OpenStreetMap contributors). El módulo Mercado es información educativa: no es asesoramiento financiero ni recomendación de inversión (Ley n.º 17.250). La estrella de verificado indica dos enlaces públicos, un promedio alto con votos o la allowlist de fundación: no es un sello del BCU ni una garantía comercial.\n\nLey aplicable: República Oriental del Uruguay. Jurisdicción: tribunales de Uruguay. Privacidad: esta misma página, ancla Privacidad.",
+      body: "Estas nueve reglas son las condiciones de uso.",
+      clauses: [
+        { title: "1. Aceptación", body: "Al usar el sitio aceptás estas reglas." },
+        { title: "2. Qué no es", body: "Bitácora.btc no custodia, no intermedia y no administra llaves (Ley n.º 20.345: no es PSAV)." },
+        { title: "3. Contenido de terceros", body: "El contenido del mapa y de los anuncios lo publican terceros. El responsable puede retirarlo si es ilícito, engañoso o viola estas reglas." },
+        { title: "4. Carga de un comercio", body: "Quien carga o modifica un comercio declara que los datos son ciertos y es responsable de mantenerlos actualizados." },
+        { title: "5. Verificación", body: "La verificación no cambia: el código CARGA se publica en un enlace público y el mapa se actualiza solo cuando esa prueba se comprueba." },
+        { title: "6. Aportes y mapas", body: "Las contribuciones al directorio se publican para replicar el CSV. Los datos geográficos de OSM y BTC Map siguen ODbL (© OpenStreetMap contributors)." },
+        { title: "7. Mercado", body: "El módulo Mercado es información educativa: no es asesoramiento financiero ni recomendación de inversión (Ley n.º 17.250)." },
+        { title: "8. Estrella de verificado", body: "La estrella de verificado indica dos enlaces públicos, un promedio alto con votos o la allowlist de fundación. No es un sello del BCU ni una garantía comercial." },
+        { title: "9. Ley y tribunales", body: "Ley aplicable: República Oriental del Uruguay. Jurisdicción: tribunales de Uruguay. Privacidad: esta misma página, ancla Privacidad." },
+      ],
+    },
+    {
+      title: "Anexo · Brasil, Argentina y Europa",
+      id: "anexo",
+      body: "Si estás en Brasil, también puede aplicar la Lei n.º 13.709/2018 (LGPD). Si estás en Argentina, la Ley n.º 25.326. Si estás en el Espacio Económico Europeo, el RGPD (UE 2016/679) y la Directiva ePrivacy, en lo que resulte aplicable. El régimen que ordena este texto sigue siendo el uruguayo (Ley 18.331). No hay representante en la Unión Europea ni un encargado distinto en Brasil o Argentina: el responsable sigue en Colonia del Sacramento.",
     },
     {
       title: "Qué datos se tratan y para qué",
@@ -94,6 +111,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Menores",
+      id: "menores",
       body: "El sitio no está dirigido a niños. La Ley 18.331 no fija una edad de consentimiento digital: rige el Código de la Niñez y la Adolescencia y la capacidad progresiva; en general el consentimiento lo presta el representante legal. Para visitantes del EEE, además aplica el umbral de 16 años del art. 8 RGPD. No verificamos edad. Si un adulto acredita que recabamos datos de un menor, los suprimimos.",
     },
     {
@@ -112,10 +130,26 @@ const en: { lead: string; blocks: LegalBlock[] } = {
       id: "aviso",
       body: "The site’s brand is Bitácora.btc. The controller is a natural person, domiciled in Colonia del Sacramento, Department of Colonia, Oriental Republic of Uruguay, under the Consciencia Bitcoin by LATAM Cripto Mom initiative. The controller’s civil identity is filed with the URCDP and is provided to anyone exercising their rights, after proving their own identity, via the Contact form.\n\nNo Data Protection Officer is appointed: it is not required (Act 19.670 art. 40 and Decree 64/020) because we are not a public body, we do not process sensitive data as a core activity and we do not operate at large scale. There is no EU representative (GDPR art. 27). The service is offered from Uruguay to the Latin-American bitcoiner community; if it is later aimed at the EEA market, a representative will be designated.\n\nNotices and rights requests go through this site’s Contact form. There is no user registration, no authentication, no custody of funds and no wallet linking. Bitácora.btc is not a Virtual Asset Service Provider (Act 20.345).",
     },
-    {
+        {
       title: "Terms of use",
       id: "terminos",
-      body: "By using the site you accept these rules. Bitácora.btc does not custody, intermediate or hold keys (Act 20.345: it is not a VASP). Map and announcement content is published by third parties; the controller may take it down if it is unlawful, misleading or breaches these rules. Whoever loads or edits a shop states that the data is accurate and is responsible for keeping it up to date. The check does not change: the CARGA code is published on a public link and the map updates only when that proof is confirmed. Directory contributions are published so the CSV can be replicated; OSM and BTC Map geographic data remain under ODbL (© OpenStreetMap contributors). The Market module is educational information: it is not financial advice or an investment recommendation (Act 17.250). The verified star means two public links, a high average with votes, or the founding allowlist: it is not a BCU seal or a commercial warranty.\n\nGoverning law: Oriental Republic of Uruguay. Jurisdiction: Uruguayan courts. Privacy: this page, Privacy anchor.",
+      body: "These nine rules are the terms of use.",
+      clauses: [
+        { title: "1. Acceptance", body: "By using the site you accept these rules." },
+        { title: "2. What it is not", body: "Bitácora.btc does not custody, intermediate or hold keys (Act 20.345: it is not a VASP)." },
+        { title: "3. Third-party content", body: "Map and announcement content is published by third parties. The controller may take it down if it is unlawful, misleading or breaches these rules." },
+        { title: "4. Loading a shop", body: "Whoever loads or edits a shop states that the data is accurate and is responsible for keeping it up to date." },
+        { title: "5. Verification", body: "The check does not change: the CARGA code is published on a public link and the map updates only when that proof is confirmed." },
+        { title: "6. Contributions and maps", body: "Directory contributions are published so the CSV can be replicated. OSM and BTC Map geographic data remain under ODbL (© OpenStreetMap contributors)." },
+        { title: "7. Market", body: "The Market module is educational information: it is not financial advice or an investment recommendation (Act 17.250)." },
+        { title: "8. Verified star", body: "The verified star means two public links, a high average with votes, or the founding allowlist. It is not a BCU seal or a commercial warranty." },
+        { title: "9. Law and courts", body: "Governing law: Oriental Republic of Uruguay. Jurisdiction: Uruguayan courts. Privacy: this page, Privacy anchor." },
+      ],
+    },
+    {
+      title: "Annex · Brazil, Argentina and Europe",
+      id: "anexo",
+      body: "If you are in Brazil, Lei n.º 13.709/2018 (LGPD) may also apply. If you are in Argentina, Act 25.326. If you are in the European Economic Area, the GDPR (EU 2016/679) and the ePrivacy Directive, where they apply. The regime that orders this text remains the Uruguayan one (Act 18.331). There is no representative in the European Union and no separate processor in Brazil or Argentina: the controller remains in Colonia del Sacramento.",
     },
     {
       title: "What data we process and why",
@@ -191,6 +225,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Children",
+      id: "menores",
       body: "The site is not directed at children. Act 18.331 does not set a digital-consent age: the Code on Children and Adolescents and evolving capacity apply; as a rule a legal representative consents. For EEA visitors, GDPR art. 8’s age 16 also applies. We do not verify age. If an adult shows that we collected a child’s data, we erase it.",
     },
     {
@@ -209,10 +244,26 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
       id: "aviso",
       body: "A marca do sítio é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil consta da inscrição perante a URCDP e faculta-se a quem exercer direitos, mediante prova da sua, pelo formulário de Contacto.\n\nNão há Encarregado de Proteção de Dados: não é obrigatório (Lei n.º 19.670 art. 40.º e Decreto n.º 64/020) porque não somos entidade pública, não tratamos dados sensíveis como atividade principal nem operamos em grande escala. Não há representante na União Europeia (art. 27.º RGPD). O serviço oferece-se a partir do Uruguai à comunidade bitcoiner da América Latina; se se dirigir de forma efetiva ao mercado do EEE, será designado representante.\n\nO canal para notificações e para exercer direitos é o formulário de Contacto deste sítio. Não há registo de utilizadores, não há autenticação, não há custódia de fundos nem vinculação de carteiras. A Bitácora.btc não é um Prestador de Serviços de Ativos Virtuais (Lei n.º 20.345).",
     },
-    {
+        {
       title: "Termos e condições",
       id: "terminos",
-      body: "Ao usar o sítio aceitas estas regras. A Bitácora.btc não custodia, não intermedia e não administra chaves (Lei n.º 20.345: não é PSAV). O conteúdo do mapa e dos anúncios é publicado por terceiros; o responsável pode retirá-lo se for ilícito, enganoso ou violar estas regras. Quem carrega ou modifica um comércio declara que os dados são verdadeiros e é responsável por mantê-los atualizados. A verificação não muda: o código CARGA publica-se num link público e o mapa só se atualiza quando essa prova se confirma. As contribuições ao diretório publicam-se para replicar o CSV; os dados geográficos de OSM e BTC Map seguem ODbL (© OpenStreetMap contributors). O módulo Mercado é informação educativa: não é aconselhamento financeiro nem recomendação de investimento (Lei n.º 17.250). A estrela de verificado indica dois links públicos, uma média alta com votos ou a allowlist de fundação: não é um selo do BCU nem garantia comercial.\n\nLei aplicável: República Oriental do Uruguai. Jurisdição: tribunais do Uruguai. Privacidade: esta mesma página, âncora Privacidade.",
+      body: "Estas nove regras são as condições de uso.",
+      clauses: [
+        { title: "1. Aceitação", body: "Ao usar o site você aceita estas regras." },
+        { title: "2. O que não é", body: "A Bitácora.btc não custodia, não intermedia e não administra chaves (Lei n.º 20.345: não é PSAV)." },
+        { title: "3. Conteúdo de terceiros", body: "O conteúdo do mapa e dos anúncios é publicado por terceiros. O responsável pode retirá-lo se for ilícito, enganoso ou violar estas regras." },
+        { title: "4. Carga de um comércio", body: "Quem carrega ou modifica um comércio declara que os dados são verdadeiros e é responsável por mantê-los atualizados." },
+        { title: "5. Verificação", body: "A verificação não muda: o código CARGA é publicado num link público e o mapa só se atualiza quando essa prova se confirma." },
+        { title: "6. Aportes e mapas", body: "As contribuições ao diretório são publicadas para replicar o CSV. Os dados geográficos de OSM e BTC Map seguem a ODbL (© OpenStreetMap contributors)." },
+        { title: "7. Mercado", body: "O módulo Mercado é informação educativa: não é aconselhamento financeiro nem recomendação de investimento (Lei n.º 17.250)." },
+        { title: "8. Estrela de verificado", body: "A estrela de verificado indica dois links públicos, uma média alta com votos ou a allowlist de fundação. Não é um selo do BCU nem garantia comercial." },
+        { title: "9. Lei e tribunais", body: "Lei aplicável: República Oriental do Uruguai. Jurisdição: tribunais do Uruguai. Privacidade: esta mesma página, âncora Privacidade." },
+      ],
+    },
+    {
+      title: "Anexo · Brasil, Argentina e Europa",
+      id: "anexo",
+      body: "Se você está no Brasil, também pode valer a Lei n.º 13.709/2018 (LGPD). Se você está na Argentina, a Lei n.º 25.326. Se você está no Espaço Econômico Europeu, o RGPD (UE 2016/679) e a Diretiva ePrivacy, no que for aplicável. O regime que ordena este texto continua sendo o uruguaio (Lei 18.331). Não há representante na União Europeia nem um encarregado distinto no Brasil ou na Argentina: o responsável continua em Colonia del Sacramento.",
     },
     {
       title: "Que dados se tratam e para quê",
@@ -288,6 +339,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Menores",
+      id: "menores",
       body: "O sítio não se dirige a crianças. A Lei 18.331 não fixa uma idade de consentimento digital: aplica-se o Código da Infância e da Adolescência e a capacidade progressiva; em regra consente o representante legal. Para visitantes do EEE, aplica-se também o limiar de 16 anos do art. 8.º RGPD. Não verificamos idade. Se um adulto provar que recolhemos dados de um menor, apagamo-los.",
     },
     {
