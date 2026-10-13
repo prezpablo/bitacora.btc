@@ -45,10 +45,24 @@ const HEAT_STOPS: [number, string][] = [
   [1, "var(--color-heat-5)"],
 ];
 
+function zoneShort(d: Date) {
+  try {
+    return (
+      new Intl.DateTimeFormat("es-UY", { timeZoneName: "short" })
+        .formatToParts(d)
+        .find((p) => p.type === "timeZoneName")?.value || ""
+    );
+  } catch {
+    return "";
+  }
+}
+
 function tickTime(t: number, span: number) {
   const d = new Date(t);
   if (span <= 86_400_000 * 1.2) {
-    return d.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" });
+    const clock = d.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" });
+    const zone = zoneShort(d);
+    return zone ? `${clock} ${zone}` : clock;
   }
   if (span <= 86_400_000 * 10) {
     return d.toLocaleDateString("es-UY", { weekday: "short", day: "numeric" });
@@ -72,7 +86,8 @@ function cursorDate(t: number, span: number) {
   const date = ddmmyyyy(t);
   if (span <= 86_400_000 * 40) {
     const d = new Date(t);
-    return `${date} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    const zone = zoneShort(d);
+    return `${date} ${pad2(d.getHours())}:${pad2(d.getMinutes())}${zone ? ` ${zone}` : ""}`;
   }
   return date;
 }

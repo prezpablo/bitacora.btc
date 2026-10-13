@@ -343,9 +343,9 @@
     {
       "id": "L-COPY",
       "pri": "P1",
-      "open": true,
-      "kind": "manual",
-      "done": "pt-BR, COPYRIGHT, acuse opcional, mercado etiquetado; Bircoiner no se toca"
+      "open": false,
+      "kind": "repo",
+      "done": "acuse solo si FormSubmit pide; pt-BR; /COPYRIGHT; EMA etiquetada; apodo público"
     },
     {
       "id": "L-A11Y",

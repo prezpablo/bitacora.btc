@@ -187,6 +187,7 @@ export function MapVotePanel({
           value={nick}
           onChange={(e) => onNick(e.target.value)}
         />
+        <span className="mt-1 block text-xs text-muted-foreground">{t("fldNickPublic")}</span>
       </label>
       {onDraft ? (
         <label className="block text-sm">

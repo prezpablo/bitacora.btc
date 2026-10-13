@@ -280,7 +280,6 @@ export function ContactBlock() {
           </p>
         ) : null}
         {hint ? <p className="text-xs text-muted-foreground sm:col-span-2">{hint}</p> : null}
-        <p className="text-xs text-muted-foreground sm:col-span-2">{t("contactActivate")}</p>
         <button
           type="submit"
           className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"

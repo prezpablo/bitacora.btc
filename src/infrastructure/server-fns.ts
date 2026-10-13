@@ -644,7 +644,7 @@ export const sendContact = createServerFn({ method: "POST" })
     const ticket = makeContactTicket();
     const autoRaw = (data.auto || "").trim().slice(0, 2000);
     const auto = autoRaw.replaceAll("{ticket}", ticket).replaceAll("{listing}", listingId || "—");
-    if (name.length < 2 || message.length < 2) return { ok: false, error: "need" };
+    if (name.length < 2 || message.length < 2 || !email) return { ok: false, error: "need" };
     if (!MAIL_RE.test(email)) return { ok: false, error: "email" };
     if (!(await mailboxDomainOk(email))) return { ok: false, error: "email" };
     const now = Date.now();

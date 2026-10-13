@@ -99,7 +99,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Código · licencia",
       id: "codigo",
-      body: "El programa de Bitácora.btc se publica bajo la GNU Affero General Public License v3 (AGPL-3.0). El texto íntegro está en /LICENSE. El repositorio es https://github.com/prezpablo/bitacora.btc. Los datos del mapa de OSM y BTC Map siguen ODbL.",
+      body: "El programa de Bitácora.btc se publica bajo la GNU Affero General Public License v3 (AGPL-3.0). El código fuente correspondiente es el que sirve este sitio y el repositorio https://github.com/prezpablo/bitacora.btc. El texto íntegro está en /LICENSE. El aviso corto está en /COPYRIGHT. Los datos del mapa de OSM y BTC Map siguen ODbL.",
     },
   ],
 };
@@ -196,7 +196,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Source · license",
       id: "codigo",
-      body: "Bitácora.btc’s program is published under the GNU Affero General Public License v3 (AGPL-3.0). The full text is at /LICENSE. The repository is https://github.com/prezpablo/bitacora.btc. OSM and BTC Map data remain under ODbL.",
+      body: "Bitácora.btc’s program is published under the GNU Affero General Public License v3 (AGPL-3.0). The corresponding source code is what this site serves and the repository https://github.com/prezpablo/bitacora.btc. The full text is at /LICENSE. The short notice is at /COPYRIGHT. OSM and BTC Map data remain under ODbL.",
     },
   ],
 };
@@ -293,7 +293,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Código · licença",
       id: "codigo",
-      body: "O programa da Bitácora.btc publica-se sob a GNU Affero General Public License v3 (AGPL-3.0). O texto integral está em /LICENSE. O repositório é https://github.com/prezpablo/bitacora.btc. Os dados OSM e BTC Map seguem ODbL.",
+      body: "O programa da Bitácora.btc é publicado sob a GNU Affero General Public License v3 (AGPL-3.0). O código-fonte correspondente é o que este site entrega e o repositório https://github.com/prezpablo/bitacora.btc. O texto integral está em /LICENSE. O aviso curto está em /COPYRIGHT. Os dados de OSM e BTC Map seguem a ODbL.",
     },
   ],
 };
