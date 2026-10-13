@@ -357,9 +357,9 @@
     {
       "id": "L-BRACKET",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "no imprimir corchetes de LEGAL en la casilla ni en /legal"
+      "done": "casilla y /legal no imprimen un dato de LEGAL que siga entre corchetes"
     },
     {
       "id": "L-CONTRA",

@@ -206,7 +206,7 @@ export const THIRD_PARTIES: ThirdParty[] = [
   {
     hosts: [],
     name: "Njalla",
-    country: { es: "[PAÍS_VPS]", en: "[PAÍS_VPS]", pt: "[PAÍS_VPS]" },
+    country: { es: "", en: "", pt: "" },
     side: "server",
     why: {
       es: "Servidor donde corre el sitio.",

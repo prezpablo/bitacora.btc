@@ -65,9 +65,12 @@ const es = {
   consentKeepListing: "La ficha queda publicada mientras exista.",
   consentKeepPin: "El anuncio queda 7 días.",
   consentContactInfo:
-    "Nombre, correo y mensaje son obligatorios; sin ellos no podemos responderte. Pasan por FormSubmit (Estados Unidos) hacia Gmail y se conservan hasta 12 meses. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Responsable: {name}. Domicilio: {address}. Correo:",
+    "Nombre, correo y mensaje son obligatorios; sin ellos no podemos responderte. Pasan por FormSubmit (Estados Unidos) hacia Gmail y se conservan hasta 12 meses. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
   consentPublishInfo:
-    "{keep} Se publica en GitHub (Estados Unidos) bajo {license}. Declarás que los datos son ciertos y que tenés derecho a publicar el logo. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
+    "{keep} Se publica en GitHub (Estados Unidos). Declarás que los datos son ciertos y que tenés derecho a publicar el logo. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
+  consentWhoName: "Responsable: {name}.",
+  consentWhoAddress: "Domicilio: {address}.",
+  consentLicense: "Licencia de los aportes: {license}.",
   logoRights: "Usá solo logos que tengas derecho a publicar.",
   footerRights: "Ejercer mis derechos",
   legalRightsChannel:
@@ -75,7 +78,9 @@ const es = {
   legalWho: "Responsable: {name}. Domicilio para notificaciones: {address}.",
   thirdBrowser: "Tu navegador contacta directamente",
   thirdServer: "Nuestro servidor consulta (no reciben tus datos)",
-  thirdLead: "El sitio corre en un VPS de Njalla. País del centro de datos: {vps}. Traducción automática de titulares: {translator}.",
+  thirdLead: "El sitio corre en un VPS de Njalla.",
+  thirdVps: "País del centro de datos: {vps}.",
+  thirdTranslator: "Traducción automática de titulares: {translator}.",
   skipToContent: "Saltar al contenido",
   sovTitle: "Soberanía",
   sovKicker: "Propuesta",
@@ -668,9 +673,12 @@ const en: Record<keyof typeof es, string> = {
   consentKeepListing: "The listing stays public while it exists.",
   consentKeepPin: "The announcement stays up for 7 days.",
   consentContactInfo:
-    "Name, email and message are required; without them we cannot reply. They go through FormSubmit (United States) to Gmail and are kept for up to 12 months. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Controller: {name}. Address: {address}. Email:",
+    "Name, email and message are required; without them we cannot reply. They go through FormSubmit (United States) to Gmail and are kept for up to 12 months. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
   consentPublishInfo:
-    "{keep} It is published on GitHub (United States) under {license}. You state that the data is true and that you have the right to publish the logo. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
+    "{keep} It is published on GitHub (United States). You state that the data is true and that you have the right to publish the logo. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
+  consentWhoName: "Controller: {name}.",
+  consentWhoAddress: "Address: {address}.",
+  consentLicense: "Contribution license: {license}.",
   logoRights: "Use only logos you have the right to publish.",
   footerRights: "Exercise my rights",
   legalRightsChannel:
@@ -678,7 +686,9 @@ const en: Record<keyof typeof es, string> = {
   legalWho: "Controller: {name}. Address for notices: {address}.",
   thirdBrowser: "Your browser contacts these directly",
   thirdServer: "Our server asks these (they do not get your data)",
-  thirdLead: "The site runs on an Njalla VPS. Data-center country: {vps}. Automatic headline translation: {translator}.",
+  thirdLead: "The site runs on an Njalla VPS.",
+  thirdVps: "Data-center country: {vps}.",
+  thirdTranslator: "Automatic headline translation: {translator}.",
   skipToContent: "Skip to content",
   sovTitle: "Sovereignty",
   sovKicker: "Proposal",
@@ -1271,9 +1281,12 @@ const pt: Record<keyof typeof es, string> = {
   consentKeepListing: "A ficha fica publicada enquanto existir.",
   consentKeepPin: "O anúncio fica 7 dias.",
   consentContactInfo:
-    "Nome, e-mail e mensagem são obrigatórios; sem eles não dá para responder. Passam pelo FormSubmit (Estados Unidos) até o Gmail e ficam guardados por até 12 meses. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. Responsável: {name}. Endereço: {address}. E-mail:",
+    "Nome, e-mail e mensagem são obrigatórios; sem eles não dá para responder. Passam pelo FormSubmit (Estados Unidos) até o Gmail e ficam guardados por até 12 meses. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
   consentPublishInfo:
-    "{keep} Publica-se no GitHub (Estados Unidos) sob {license}. Você declara que os dados são verdadeiros e que tem direito de publicar o logo. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
+    "{keep} Publica-se no GitHub (Estados Unidos). Você declara que os dados são verdadeiros e que tem direito de publicar o logo. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
+  consentWhoName: "Responsável: {name}.",
+  consentWhoAddress: "Endereço: {address}.",
+  consentLicense: "Licença dos aportes: {license}.",
   logoRights: "Use só logos que você tenha direito de publicar.",
   footerRights: "Exercer meus direitos",
   legalRightsChannel:
@@ -1281,7 +1294,9 @@ const pt: Record<keyof typeof es, string> = {
   legalWho: "Responsável: {name}. Endereço para notificações: {address}.",
   thirdBrowser: "Seu navegador chama estes direto",
   thirdServer: "Nosso servidor consulta estes (não recebem seus dados)",
-  thirdLead: "O site roda num VPS da Njalla. País do datacenter: {vps}. Tradução automática de manchetes: {translator}.",
+  thirdLead: "O site roda num VPS da Njalla.",
+  thirdVps: "País do datacenter: {vps}.",
+  thirdTranslator: "Tradução automática de manchetes: {translator}.",
   skipToContent: "Ir para o conteúdo",
   sovTitle: "Soberania",
   sovKicker: "Proposta",

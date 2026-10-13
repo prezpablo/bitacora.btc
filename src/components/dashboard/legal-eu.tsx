@@ -25,11 +25,11 @@ function PartyList({ title, side, lang }: { title: string; side: ThirdParty["sid
       <ul className="mt-2 space-y-2">
         {rows.map((p) => {
           const country = p.name === "Njalla" ? LEGAL.vpsCountry : p.country[lang];
+          const shown = legalFilled(country) ? country : "";
           return (
             <li key={`${side}-${p.name}`} className="text-sm leading-relaxed text-pretty text-muted-foreground">
               <span className="font-medium text-foreground">{p.name}</span>
-              {" · "}
-              {country}
+              {shown ? ` · ${shown}` : ""}
               {p.hosts.length ? ` · ${p.hosts.join(", ")}` : ""}. {p.why[lang]}
             </li>
           );
@@ -109,11 +109,7 @@ export function LegalEu() {
             ))}
             {b.id === "aviso" || b.id === "derechos" ? (
               <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">
-                {t("legalRightsChannel", {
-                  email: LEGAL.privacyEmail,
-                  name: LEGAL.controllerName,
-                  address: LEGAL.address,
-                })}{" "}
+                {t("legalRightsChannel", { email: LEGAL.privacyEmail })}{" "}
                 {legalFilled(LEGAL.controllerName) && legalFilled(LEGAL.address)
                   ? `${t("legalWho", { name: LEGAL.controllerName, address: LEGAL.address })} `
                   : null}
@@ -125,7 +121,9 @@ export function LegalEu() {
             {b.id === "terceros" ? (
               <>
                 <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">
-                  {t("thirdLead", { vps: LEGAL.vpsCountry, translator: LEGAL.translator })}
+                  {t("thirdLead")}{" "}
+                  {legalFilled(LEGAL.vpsCountry) ? t("thirdVps", { vps: LEGAL.vpsCountry }) : null}{" "}
+                  {legalFilled(LEGAL.translator) ? t("thirdTranslator", { translator: LEGAL.translator }) : null}
                 </p>
                 <PartyList title={t("thirdBrowser")} side="browser" lang={lang} />
                 <PartyList title={t("thirdServer")} side="server" lang={lang} />
