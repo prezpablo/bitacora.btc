@@ -65,9 +65,18 @@ export function useMapMerchants(bbox: MapBbox | null, zoom = 4) {
     queryKey: qBox ? mapKeys.merchants(qBox, z) : [...mapKeys.merchantsRoot, "idle"],
     queryFn: async () => {
       if (!qBox) return [];
-      const shops = await getMerchants({ data: { ...qBox, zoom: z } });
-      shopMem = rememberShopBox(shopMem, qBox, shops, Date.now(), undefined, z);
-      return shops;
+      const qs = new URLSearchParams({
+        west: String(qBox.west),
+        south: String(qBox.south),
+        east: String(qBox.east),
+        north: String(qBox.north),
+        zoom: String(z),
+      });
+      const res = await fetch(`/map-shops?${qs}`);
+      const shops = res.ok ? ((await res.json()) as Awaited<ReturnType<typeof getMerchants>>) : await getMerchants({ data: { ...qBox, zoom: z } });
+      const rows = Array.isArray(shops) ? shops : [];
+      shopMem = rememberShopBox(shopMem, qBox, rows, Date.now(), undefined, z);
+      return rows;
     },
     staleTime: STALE.merchants,
     enabled: Boolean(qBox) && cached == null,

@@ -51,6 +51,22 @@ export function uniqueShopPins(shops: ShopPin[]): ShopPin[] {
   return out;
 }
 
+/** Lo que viaja al mapa: id, lat, lon, icon. Sin descripción. Tope para no mandar el dump. */
+export function thinClusterPins(pins: ShopPin[], max = 800): ShopPin[] {
+  return pins.slice(0, max).map((p) => {
+    const row: ShopPin = {
+      id: p.id,
+      lat: p.lat,
+      lon: p.lon,
+      icon: p.icon || "lugar",
+    };
+    if (p.name) row.name = p.name;
+    if ((p.clusterCount ?? 0) > 1) row.clusterCount = p.clusterCount;
+    else if (p.logo && p.icon !== "cluster") row.logo = p.logo;
+    return row;
+  });
+}
+
 export function loadShopIndex(shops: ShopPin[]) {
   const index = new Supercluster<ShopPointProps>({ radius: 48, maxZoom: 16, minPoints: 3 });
   index.load(

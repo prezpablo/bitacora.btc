@@ -13,15 +13,24 @@ function seedFiles(name: string) {
 }
 
 function readSeed<T>(name: string): T[] {
+  let best: T[] = [];
+  let bestScore = -1;
   for (const path of seedFiles(name)) {
     try {
       const rows = JSON.parse(readFileSync(path, "utf8")) as T[];
-      if (Array.isArray(rows) && rows.length) return rows;
+      if (!Array.isArray(rows) || !rows.length) continue;
+      const first = rows[0] as { name?: string };
+      const named = first && typeof first === "object" && first.name ? 1_000_000 : 0;
+      const score = rows.length + named;
+      if (score > bestScore) {
+        best = rows;
+        bestScore = score;
+      }
     } catch {
       /* next path */
     }
   }
-  return [];
+  return best;
 }
 
 function asPin(row: Record<string, unknown>): ShopPin {

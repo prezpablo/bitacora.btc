@@ -224,9 +224,9 @@
     {
       "id": "D-PIN-03+",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "snapshot/cluster flaco id,lat,lon,icon; getTileRaw o bbox; no JSON 2.9MB al cliente"
+      "done": "GET /map-shops por bbox, tope 800, sin descripción; clic sigue en getMerchant"
     },
     {
       "id": "D-GLOBE-PERF",

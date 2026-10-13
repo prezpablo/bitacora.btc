@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { loadShopIndex, placesFromClusters } from "./shop-cluster.ts";
+import { loadShopIndex, placesFromClusters, thinClusterPins } from "./shop-cluster.ts";
 import { isShopCluster, pinAsPlace } from "../domain/entities.ts";
 import type { ShopPin } from "@/domain";
 
@@ -10,6 +10,21 @@ const shop = (id: string, lat: number, lon: number): ShopPin => ({
   lon,
   icon: "cafe",
   name: id,
+});
+
+test("thin cluster pins drop the rich card and stay under the cap", () => {
+  const fat = Array.from({ length: 900 }, (_, i) => ({
+    ...shop(`s${i}`, -34.9, -56.16),
+    logo: "https://example.com/a.png",
+    description: "no viaja",
+  }));
+  const thin = thinClusterPins(fat as ShopPin[]);
+  assert.equal(thin.length, 800);
+  assert.equal("description" in thin[0]!, false);
+  assert.equal(thin[0]?.logo, "https://example.com/a.png");
+  const cluster = thinClusterPins([{ id: "cluster:1", lat: 1, lon: 2, icon: "cluster", name: "12", clusterCount: 12, logo: "x" }]);
+  assert.equal(cluster[0]?.logo, undefined);
+  assert.equal(cluster[0]?.clusterCount, 12);
 });
 
 test("isShopCluster detects cluster placeholders", () => {
