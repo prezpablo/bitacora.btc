@@ -52,6 +52,7 @@ export function LogoPicker({
         </label>
       </div>
       <p className="text-xs text-muted-foreground">{t("logoHint")}</p>
+      <p className="text-xs text-muted-foreground">{t("logoRights")}</p>
       {err ? (
         <div className="relative pt-1">
           <span className="absolute top-0 left-6 size-2 rotate-45 bg-primary" aria-hidden />

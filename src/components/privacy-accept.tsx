@@ -1,15 +1,30 @@
+import { LEGAL } from "@/domain/legal-config";
 import { useT } from "@/lib/i18n";
 
 export function PrivacyAccept({
   checked,
   onChange,
   id,
+  variant = "publish",
+  keep = "listing",
 }: {
   checked: boolean;
   onChange: (value: boolean) => void;
   id: string;
+  /** Contacto habla de FormSubmit. El resto publica en GitHub. */
+  variant?: "contact" | "publish";
+  /** Ficha = mientras exista. Anuncio = 7 días. */
+  keep?: "listing" | "pin";
 }) {
   const t = useT();
+  const vars = {
+    email: LEGAL.privacyEmail,
+    name: LEGAL.controllerName,
+    address: LEGAL.address,
+    license: LEGAL.contributionLicense,
+    keep: keep === "pin" ? t("consentKeepPin") : t("consentKeepListing"),
+  };
+  const info = variant === "contact" ? t("consentContactInfo", vars) : t("consentPublishInfo", vars);
   return (
     <div className="flex items-start gap-2 text-sm text-foreground">
       <input
@@ -23,18 +38,27 @@ export function PrivacyAccept({
       />
       <div className="min-w-0">
         <p className="text-pretty leading-snug">
-          <label htmlFor={id}>{t("privacyAccept")} </label>
-          <a
-            href="/legal#privacidad"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-foreground underline underline-offset-2"
-          >
+          <label htmlFor={id}>{variant === "contact" ? t("consentContact") : t("consentPublish")} </label>
+          {variant === "publish" ? (
+            <>
+              <a href="/legal#terminos" className="font-medium text-foreground underline underline-offset-2">
+                {t("legalTerms")}
+              </a>{" "}
+              {t("consentAnd")}{" "}
+            </>
+          ) : null}
+          <a href="/legal#privacidad" className="font-medium text-foreground underline underline-offset-2">
             {t("legalPrivacy")}
           </a>
           .
         </p>
-        <p className="mt-1 text-xs leading-snug text-pretty text-muted-foreground">{t("privacyArt13")}</p>
+        <p className="mt-1 text-xs leading-snug text-pretty text-muted-foreground">
+          {info}{" "}
+          <a className="underline underline-offset-2" href={`mailto:${LEGAL.privacyEmail}`}>
+            {LEGAL.privacyEmail}
+          </a>
+          .
+        </p>
       </div>
     </div>
   );

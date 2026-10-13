@@ -1,5 +1,6 @@
 import { BitcoinMark } from "@/components/dashboard/brand-mark";
 import { SkipLink } from "@/components/skip-link";
+import { LEGAL } from "@/domain/legal-config";
 
 export function LabifDossier() {
   return (
@@ -422,6 +423,9 @@ export function LabifDossier() {
             </a>
             <a href="/legal#terminos" className="text-[#1d1d1b] underline-offset-2 hover:underline">
               Términos
+            </a>
+            <a href={`mailto:${LEGAL.privacyEmail}`} className="text-[#1d1d1b] underline-offset-2 hover:underline">
+              Ejercer mis derechos
             </a>
           </nav>
         </div>

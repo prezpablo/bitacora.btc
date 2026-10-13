@@ -1,4 +1,5 @@
 import { LEGAL_EU, type LegalBlock } from "@/domain/legal-eu";
+import { LEGAL } from "@/domain/legal-config";
 import { useAppLang, useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +67,18 @@ export function LegalEu() {
           >
             <h2 className="font-display text-lg font-medium text-foreground">{b.title}</h2>
             <Paragraphs text={b.body} />
+            {b.id === "aviso" || b.id === "derechos" ? (
+              <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">
+                {t("legalRightsChannel", {
+                  email: LEGAL.privacyEmail,
+                  name: LEGAL.controllerName,
+                  address: LEGAL.address,
+                })}{" "}
+                <a className="font-medium text-foreground underline underline-offset-2" href={`mailto:${LEGAL.privacyEmail}`}>
+                  {t("footerRights")}
+                </a>
+              </p>
+            ) : null}
             {b.table ? <LegalTable table={b.table} /> : null}
           </article>
         ))}

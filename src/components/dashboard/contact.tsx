@@ -11,6 +11,7 @@ const TOPICS = [
   { id: "dispute", label: "contactTopicDispute", auto: "contactAutoDispute" },
   { id: "events", label: "contactTopicEvents", auto: "contactAutoEvents" },
   { id: "collab", label: "contactTopicCollab", auto: "contactAutoCollab" },
+  { id: "rights", label: "contactTopicRights", auto: "contactAutoRights" },
 ] as const;
 
 function postHiddenForm(action: string, fields: Record<string, string>) {
@@ -80,7 +81,7 @@ export function ContactBlock() {
     try {
       const s = new URLSearchParams(window.location.search);
       const tp = s.get("topic");
-      if (tp === "dispute" || tp === "map" || tp === "events" || tp === "collab" || tp === "general") setTopic(tp);
+      if (tp === "dispute" || tp === "map" || tp === "events" || tp === "collab" || tp === "general" || tp === "rights") setTopic(tp);
       const listing = s.get("listing") || "";
       if (listing) setListingId(listing.slice(0, 80));
     } catch {
@@ -265,7 +266,7 @@ export function ContactBlock() {
           <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
         </div>
         <div className="sm:col-span-2">
-          <PrivacyAccept id="privacy-contact" checked={privacyOk} onChange={setPrivacyOk} />
+          <PrivacyAccept id="privacy-contact" variant="contact" checked={privacyOk} onChange={setPrivacyOk} />
         </div>
         {err ? (
           <p role="alert" className="text-sm text-short sm:col-span-2">

@@ -314,7 +314,7 @@ export function CommunityPinsBoard() {
               />
             </label>
             <div className="sm:col-span-2">
-              <PrivacyAccept id="privacy-pin" checked={privacyOk} onChange={setPrivacyOk} />
+              <PrivacyAccept id="privacy-pin" variant="publish" keep="pin" checked={privacyOk} onChange={setPrivacyOk} />
             </div>
             <div className="sm:col-span-2">
               <CaptchaBox

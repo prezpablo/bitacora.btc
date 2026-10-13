@@ -301,16 +301,16 @@
     {
       "id": "L-CFG",
       "pri": "P0",
-      "open": true,
-      "kind": "manual",
-      "done": "constante LEGAL con placeholders; no inventar nombre, domicilio, expediente ni país del VPS"
+      "open": false,
+      "kind": "repo",
+      "done": "src/domain/legal-config.ts: corchetes vacíos; correo privacidad@ real"
     },
     {
       "id": "L-CONSENT",
       "pri": "P0",
-      "open": true,
-      "kind": "manual",
-      "done": "casilla contact solo en Contacto; publish en altas sin FormSubmit ni 12 meses; mailto de derechos en pie y aviso"
+      "open": false,
+      "kind": "repo",
+      "done": "casilla contact solo en Contacto; publish en altas sin FormSubmit; mailto en pie, aviso y derechos"
     },
     {
       "id": "L-THIRD",

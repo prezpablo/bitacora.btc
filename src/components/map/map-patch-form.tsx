@@ -205,7 +205,7 @@ export function ListingPatchForm({
       ) : (
         <LogoPicker value={nextLogo} onChange={setNextLogo} />
       )}
-      <PrivacyAccept id={`privacy-patch-${listingId}`} checked={privacyOk} onChange={setPrivacyOk} />
+      <PrivacyAccept id={`privacy-patch-${listingId}`} variant="publish" keep="listing" checked={privacyOk} onChange={setPrivacyOk} />
       <CaptchaBox
         ok={captchaOk}
         onOk={setCaptchaOk}

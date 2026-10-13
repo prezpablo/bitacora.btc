@@ -8,6 +8,7 @@ import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
+import { LEGAL } from "@/domain/legal-config";
 import { scrollDeskTo } from "@/lib/desk-scroll";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
@@ -304,6 +305,9 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                   </a>
                   <a href="/legal#terminos" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("legalTerms")}
+                  </a>
+                  <a href={`mailto:${LEGAL.privacyEmail}`} className="inline-flex min-h-6 min-w-6 items-center text-foreground">
+                    {t("footerRights")}
                   </a>
                 </div>
               </div>
