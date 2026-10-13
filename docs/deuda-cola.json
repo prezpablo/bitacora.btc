@@ -364,9 +364,9 @@
     {
       "id": "L-CONTRA",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "derechos solo por mailto; sacar Ley 17.250 del aviso"
+      "done": "derechos por privacidad@ sin captcha; Ley 17.250 fuera del aviso"
     },
     {
       "id": "L-ACK",

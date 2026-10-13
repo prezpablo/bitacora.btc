@@ -42,7 +42,7 @@ No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no 
 
 **Vos, no el repo:** completar en `LEGAL` el nombre, el domicilio, la licencia de los aportes, el país del VPS y el traductor. Ampliar la inscripción URCDP (mapa, reseñas, anuncios, traducción). El número se publica cuando exista. Hacer público el repo, o dejar de prometer el clone.
 
-**Siguiente fase de código, si se acepta:** **L-CONTRA**. L-BRACKET ya no imprime un dato que siga entre corchetes.
+**Siguiente fase de código, si se acepta:** **L-ACK**. L-CONTRA ya manda los derechos al correo y saca la Ley 17.250.
 
 ### Después de ese ZIP
 
@@ -73,7 +73,7 @@ No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no 
 
 D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 · D-GLOBE-HERO · D-FOUNDING · D-CTA-SHORT. Legal ya desplegado y que esta verificación no reabre: casilla distinta por formulario, correo `privacidad@`, lista de terceros con país, plazos y aviso de 72 h. L-CFG, L-CONSENT, L-THIRD, L-PRIV, L-TERMS, L-OPS, L-COPY y L-A11Y quedan cerrados como fase; lo que falta de ellos es L-BRACKET, L-CONTRA y L-ACK.
 
-**Siguiente fase de código, si se acepta:** **L-CONTRA**. L-BRACKET ya no imprime un dato que siga entre corchetes. D-FOSS sigue siendo un clic en GitHub.
+**Siguiente fase de código, si se acepta:** **L-ACK**. L-CONTRA ya manda los derechos al correo y saca la Ley 17.250. D-FOSS sigue siendo un clic en GitHub.
 
 ### Parámetros 12 oct (no implementar en el mismo ZIP)
 

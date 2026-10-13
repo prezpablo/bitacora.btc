@@ -35,3 +35,11 @@ test("an unfilled legal field is not printed", () => {
   assert.equal(legalFilled("[LICENCIA_CONTRIBUCIONES]"), false);
   assert.equal(legalFilled("privacidad@bitacorabtc.org"), true);
 });
+
+test("rights go to the privacy mailbox, not the contact form, and market cites no Act 17.250", () => {
+  const src = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(src, /17\.250/);
+  assert.doesNotMatch(src, /ejercer derechos es el formulario|go through this site’s Contact form|formulário de Contacto deste/);
+  assert.doesNotMatch(src, /nombre civil se da|civil name is given|nome civil é dado/);
+  assert.match(src, /privacidad@bitacorabtc\.org/);
+});
