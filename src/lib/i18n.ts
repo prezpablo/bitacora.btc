@@ -68,7 +68,8 @@ const es = {
   logoRights: "Usá solo logos que tengas derecho a publicar.",
   footerRights: "Ejercer mis derechos",
   legalRightsChannel:
-    "También podés ejercer derechos sin captcha, gratis, en 5 días hábiles, escribiendo a {email}. Responsable: {name}. Domicilio para notificaciones: {address}.",
+    "También podés ejercer derechos sin captcha, gratis, en 5 días hábiles, escribiendo a {email}.",
+  legalWho: "Responsable: {name}. Domicilio para notificaciones: {address}.",
   thirdBrowser: "Tu navegador contacta directamente",
   thirdServer: "Nuestro servidor consulta (no reciben tus datos)",
   thirdLead: "El sitio corre en un VPS de Njalla. País del centro de datos: {vps}. Traducción automática de titulares: {translator}.",
@@ -645,7 +646,8 @@ const en: Record<keyof typeof es, string> = {
   logoRights: "Use only logos you have the right to publish.",
   footerRights: "Exercise my rights",
   legalRightsChannel:
-    "You can also exercise your rights with no captcha, free of charge, within 5 business days, by writing to {email}. Controller: {name}. Address for notices: {address}.",
+    "You can also exercise your rights with no captcha, free of charge, within 5 business days, by writing to {email}.",
+  legalWho: "Controller: {name}. Address for notices: {address}.",
   thirdBrowser: "Your browser contacts these directly",
   thirdServer: "Our server asks these (they do not get your data)",
   thirdLead: "The site runs on an Njalla VPS. Data-center country: {vps}. Automatic headline translation: {translator}.",
@@ -1222,7 +1224,8 @@ const pt: Record<keyof typeof es, string> = {
   logoRights: "Use só logos que você tenha direito de publicar.",
   footerRights: "Exercer meus direitos",
   legalRightsChannel:
-    "Você também pode exercer direitos sem captcha, de graça, em 5 dias úteis, escrevendo para {email}. Responsável: {name}. Endereço para notificações: {address}.",
+    "Você também pode exercer direitos sem captcha, de graça, em 5 dias úteis, escrevendo para {email}.",
+  legalWho: "Responsável: {name}. Endereço para notificações: {address}.",
   thirdBrowser: "Seu navegador chama estes direto",
   thirdServer: "Nosso servidor consulta estes (não recebem seus dados)",
   thirdLead: "O site roda num VPS da Njalla. País do datacenter: {vps}. Tradução automática de manchetes: {translator}.",

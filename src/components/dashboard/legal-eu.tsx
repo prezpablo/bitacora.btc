@@ -1,5 +1,5 @@
 import { LEGAL_EU, type LegalBlock } from "@/domain/legal-eu";
-import { LEGAL } from "@/domain/legal-config";
+import { LEGAL, legalFilled } from "@/domain/legal-config";
 import { THIRD_PARTIES, type ThirdParty } from "@/domain/third-parties";
 import { useAppLang, useT } from "@/lib/i18n";
 import type { AppLang } from "@/lib/locale";
@@ -98,6 +98,9 @@ export function LegalEu() {
                   name: LEGAL.controllerName,
                   address: LEGAL.address,
                 })}{" "}
+                {legalFilled(LEGAL.controllerName) && legalFilled(LEGAL.address)
+                  ? `${t("legalWho", { name: LEGAL.controllerName, address: LEGAL.address })} `
+                  : null}
                 <a className="font-medium text-foreground underline underline-offset-2" href={`mailto:${LEGAL.privacyEmail}`}>
                   {t("footerRights")}
                 </a>

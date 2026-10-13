@@ -23,7 +23,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Qué datos se tratan y para qué",
       id: "privacidad",
-      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación por Contacto.",
+      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación por Contacto.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil se da a quien ejerce derechos. Las finalidades son responder el contacto, publicar el directorio y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha, mientras exista.",
       table: {
         head: ["Interacción", "Datos", "Base (Ley 18.331)", "Conservación"],
         rows: [
@@ -43,7 +43,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
             "Anuncios comunitarios",
             "Nombre, texto, URL de prueba y redes, código CARGA",
             "Consentimiento al publicar, con caducidad semanal",
-            "7 días en el tablero. El código queda en el servidor, no en el CSV público",
+            "7 días en el tablero. El código CARGA se conserva 30 días y no sale en el CSV público",
           ],
           [
             "Ubicación GPS",
@@ -55,13 +55,13 @@ const es: { lead: string; blocks: LegalBlock[] } = {
             "Ciudad por IP",
             "Ciudad aproximada (GeoJS / ipwho.is)",
             "Consentimiento: extras del dispositivo o el botón de ubicación",
-            "No se persiste. La IP de abuso se reduce a un hash",
+            "No se persiste. Si hay abuso, se guarda un HMAC-SHA256 truncado de la IP: dato seudonimizado, no la IP en claro",
           ],
           [
             "Seguridad",
-            "Hash de IP, ticket de captcha, tope de envíos",
+            "HMAC-SHA256 truncado de la IP (dato seudonimizado), ticket de captcha, tope de envíos",
             "Necesario para prestar el servicio y mitigar spam o ataques (no es telemetría ni analítica)",
-            "Ventana corta del tope (horas). El captcha caduca",
+            "Ventana del tope: 2 horas. El captcha caduca",
           ],
           [
             "Este dispositivo",
@@ -75,7 +75,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transferencias, terceros e inmutabilidad",
       id: "terceros",
-      body: "El tratamiento se hace en un servidor contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo:\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS o ipwho.is estiman ciudad si lo autorizás. APIs de mercado y de eventos alimentan el desk (precio, on-chain, agenda). No hay Cláusulas Contractuales Tipo ni evaluación de impacto de transferencias documentada: si hay titulares en la UE, esa es una brecha a cerrar. La casilla de privacidad documenta tu consentimiento a estas transferencias (art. 23 A de la Ley 18.331).\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
+      body: "El tratamiento se hace en un servidor contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo. La lista, con nombre y país, está debajo.\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS o ipwho.is estiman ciudad si lo autorizás. APIs de mercado y de eventos alimentan el desk (precio, on-chain, agenda). La casilla de privacidad documenta tu consentimiento a estas transferencias (art. 23 A de la Ley 18.331).\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
     },
     {
       title: "Derechos",
@@ -99,7 +99,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Código · licencia",
       id: "codigo",
-      body: "El programa de Bitácora.btc se publica bajo la GNU Affero General Public License v3 (AGPL-3.0). El texto íntegro está en /LICENSE. El repositorio es https://github.com/prezpablo/bitacora.btc — hasta que el clone anónimo responda 200, el código oponible es el que sirve este sitio. Los datos del mapa de OSM y BTC Map siguen ODbL.",
+      body: "El programa de Bitácora.btc se publica bajo la GNU Affero General Public License v3 (AGPL-3.0). El texto íntegro está en /LICENSE. El repositorio es https://github.com/prezpablo/bitacora.btc. Los datos del mapa de OSM y BTC Map siguen ODbL.",
     },
   ],
 };
@@ -120,7 +120,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "What data we process and why",
       id: "privacidad",
-      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification via Contact.",
+      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification via Contact.\n\nArt. 13 information. The controller is a natural person in Colonia del Sacramento, Uruguay; the civil name is given to anyone exercising their rights. The purposes are to reply to contact, publish the directory and limit abuse. Recipients are in the third-party section. On Contact, name, email and message are required: without them there is no reply. On the map, the name is required to publish. You may request access, rectification, update, inclusion and erasure, free of charge, within 5 business days, at privacidad@bitacorabtc.org. Retention: contact, 12 months; announcement, 7 days; CARGA code, 30 days; listing, while it exists.",
       table: {
         head: ["Interaction", "Data", "Legal basis (Act 18.331)", "Retention"],
         rows: [
@@ -140,7 +140,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
             "Community announcements",
             "Name, text, proof URL and socials, CARGA code",
             "Consent to publish, weekly TTL",
-            "7 days on the board. The code stays on the server, not in the public CSV",
+            "7 days on the board. The CARGA code is kept 30 days and is not in the public CSV",
           ],
           [
             "GPS location",
@@ -152,13 +152,13 @@ const en: { lead: string; blocks: LegalBlock[] } = {
             "City by IP",
             "Approximate city (GeoJS / ipwho.is)",
             "Consent: device extras or the locate button",
-            "Not persisted. Abuse IPs are reduced to a hash",
+            "Not persisted. On abuse, a truncated HMAC-SHA256 of the IP is stored: pseudonymised data, not the IP in the clear",
           ],
           [
             "Security",
-            "IP hash, captcha ticket, send limits",
+            "Truncated HMAC-SHA256 of the IP (pseudonymised), captcha ticket, send limits",
             "Necessary to run the service and mitigate spam or attacks (not telemetry or analytics)",
-            "Short rate-limit window (hours). Captcha expires",
+            "Rate-limit window: 2 hours. Captcha expires",
           ],
           [
             "This device",
@@ -172,7 +172,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transfers, processors and immutability",
       id: "terceros",
-      body: "Processing runs on a contracted server (Njalla VPS) and in your browser. Processors and recipients sit outside Uruguay and, in some cases, outside the EEA:\n\nGitHub (US) hosts the public map and announcement CSV, without CARGA codes or emails. FormSubmit forwards the Contact form to Gmail. Nominatim/OpenStreetMap resolves addresses. GeoJS or ipwho.is estimate city if you allow it. Market and event APIs feed the desk. No Standard Contractual Clauses or transfer impact assessment are on file: if there are EU data subjects, that is a gap. The privacy checkbox records your consent to these transfers (Act 18.331 art. 23 A).\n\nWhat you publish on the map, on GitHub or on a public network (Nostr, Lightning, chain) cannot be fully erased. Erasure applies to our copies; open history and public networks are beyond absolute oblivion. That is stated before you publish.",
+      body: "Processing runs on a contracted server (Njalla VPS) and in your browser. Processors and recipients sit outside Uruguay and, in some cases, outside the EEA. The list, with name and country, is below.\n\nGitHub (US) hosts the public map and announcement CSV, without CARGA codes or emails. FormSubmit forwards the Contact form to Gmail. Nominatim/OpenStreetMap resolves addresses. GeoJS or ipwho.is estimate city if you allow it. Market and event APIs feed the desk. The privacy checkbox records your consent to these transfers (Act 18.331 art. 23 A).\n\nWhat you publish on the map, on GitHub or on a public network (Nostr, Lightning, chain) cannot be fully erased. Erasure applies to our copies; open history and public networks are beyond absolute oblivion. That is stated before you publish.",
     },
     {
       title: "Rights",
@@ -196,7 +196,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Source · license",
       id: "codigo",
-      body: "Bitácora.btc’s program is published under the GNU Affero General Public License v3 (AGPL-3.0). The full text is at /LICENSE. The repository is https://github.com/prezpablo/bitacora.btc — until an anonymous clone returns 200, the enforceable source is what this site serves. OSM and BTC Map data remain under ODbL.",
+      body: "Bitácora.btc’s program is published under the GNU Affero General Public License v3 (AGPL-3.0). The full text is at /LICENSE. The repository is https://github.com/prezpablo/bitacora.btc. OSM and BTC Map data remain under ODbL.",
     },
   ],
 };
@@ -217,7 +217,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Que dados se tratam e para quê",
       id: "privacidad",
-      body: "Aplica-se o princípio de minimização (arts. 7.º e 8.º da Lei 18.331): só o necessário para cada finalidade, veraz e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão recolhemos palavras-passe, documentos de identidade, biometria, historial financeiro nem chaves de criptoativos. O diretório público não inclui correio nem telefone de particulares: só redes sociais ou identificadores que tu publicas.\n\nO art. 2.º da Lei 18.331 também alcança, quando corresponda, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação pelo Contacto.",
+      body: "Aplica-se o princípio de minimização (arts. 7.º e 8.º da Lei 18.331): só o necessário para cada finalidade, veraz e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão recolhemos palavras-passe, documentos de identidade, biometria, historial financeiro nem chaves de criptoativos. O diretório público não inclui correio nem telefone de particulares: só redes sociais ou identificadores que tu publicas.\n\nO art. 2.º da Lei 18.331 também alcança, quando corresponda, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação pelo Contacto.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil é dado a quem exercer direitos. As finalidades são responder o contato, publicar o diretório e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha, enquanto existir.",
       table: {
         head: ["Interação", "Dados", "Base (Lei 18.331)", "Conservação"],
         rows: [
@@ -237,7 +237,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
             "Anúncios comunitários",
             "Nome, texto, URL de prova e redes, código CARGA",
             "Consentimento ao publicar, com caducidade semanal",
-            "7 dias no quadro. O código fica no servidor, não no CSV público",
+            "7 dias no quadro. O código CARGA fica 30 dias e não sai no CSV público",
           ],
           [
             "Localização GPS",
@@ -249,13 +249,13 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
             "Cidade por IP",
             "Cidade aproximada (GeoJS / ipwho.is)",
             "Consentimento: extras do dispositivo ou o botão de localização",
-            "Não se persiste. O IP de abuso reduz-se a um hash",
+            "Não se persiste. Em caso de abuso, guarda-se um HMAC-SHA256 truncado do IP: dado pseudonimizado, não o IP em claro",
           ],
           [
             "Segurança",
-            "Hash de IP, ticket de captcha, limite de envios",
+            "HMAC-SHA256 truncado do IP (dado pseudonimizado), ticket de captcha, limite de envios",
             "Necessário para prestar o serviço e mitigar spam ou ataques (não é telemetria nem analítica)",
-            "Janela curta do limite (horas). O captcha caduca",
+            "Janela do limite: 2 horas. O captcha caduca",
           ],
           [
             "Este dispositivo",
@@ -269,7 +269,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transferências, terceiros e imutabilidade",
       id: "terceros",
-      body: "O tratamento faz-se num servidor contratado (VPS Njalla) e no teu browser. Há encarregados e destinatários fora do Uruguai e, em alguns casos, fora do EEE:\n\nO GitHub (EUA) aloja o CSV público do mapa e dos anúncios, sem códigos CARGA nem correios. O FormSubmit reenvia o formulário de Contacto para o Gmail. O Nominatim/OpenStreetMap resolve moradas. O GeoJS ou o ipwho.is estimam a cidade se o autorizares. APIs de mercado e de eventos alimentam o desk. Não há Cláusulas Contratuais-Tipo nem avaliação de impacto de transferências documentada: se houver titulares na UE, essa é uma falha a fechar. A caixa de privacidade documenta o teu consentimento a estas transferências (art. 23.º A da Lei 18.331).\n\nO que publicas no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se pode apagar por completo. O direito de apagamento exerce-se sobre as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso informa-se antes de publicar.",
+      body: "O tratamento faz-se num servidor contratado (VPS Njalla) e no teu browser. Há encarregados e destinatários fora do Uruguai e, em alguns casos, fora do EEE. A lista, com nome e país, está abaixo.\n\nO GitHub (EUA) aloja o CSV público do mapa e dos anúncios, sem códigos CARGA nem correios. O FormSubmit reenvia o formulário de Contacto para o Gmail. O Nominatim/OpenStreetMap resolve moradas. O GeoJS ou o ipwho.is estimam a cidade se o autorizares. APIs de mercado e de eventos alimentam o desk. A caixa de privacidade documenta o teu consentimento a estas transferências (art. 23.º A da Lei 18.331).\n\nO que publicas no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se pode apagar por completo. O direito de apagamento exerce-se sobre as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso informa-se antes de publicar.",
     },
     {
       title: "Direitos",
@@ -293,7 +293,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Código · licença",
       id: "codigo",
-      body: "O programa da Bitácora.btc publica-se sob a GNU Affero General Public License v3 (AGPL-3.0). O texto integral está em /LICENSE. O repositório é https://github.com/prezpablo/bitacora.btc — até o clone anónimo responder 200, o código oponível é o que este sítio serve. Os dados OSM e BTC Map seguem ODbL.",
+      body: "O programa da Bitácora.btc publica-se sob a GNU Affero General Public License v3 (AGPL-3.0). O texto integral está em /LICENSE. O repositório é https://github.com/prezpablo/bitacora.btc. Os dados OSM e BTC Map seguem ODbL.",
     },
   ],
 };

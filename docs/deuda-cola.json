@@ -322,9 +322,9 @@
     {
       "id": "L-PRIV",
       "pri": "P0",
-      "open": true,
-      "kind": "manual",
-      "done": "política art. 13 con plazos; frases de brecha fuera de /legal"
+      "open": false,
+      "kind": "repo",
+      "done": "art. 13 y plazos en /legal; brecha y clone en docs/TODO-legal.md"
     },
     {
       "id": "L-TERMS",
