@@ -69,6 +69,9 @@ const es = {
   footerRights: "Ejercer mis derechos",
   legalRightsChannel:
     "También podés ejercer derechos sin captcha, gratis, en 5 días hábiles, escribiendo a {email}. Responsable: {name}. Domicilio para notificaciones: {address}.",
+  thirdBrowser: "Tu navegador contacta directamente",
+  thirdServer: "Nuestro servidor consulta (no reciben tus datos)",
+  thirdLead: "El sitio corre en un VPS de Njalla. País del centro de datos: {vps}. Traducción automática de titulares: {translator}.",
   skipToContent: "Saltar al contenido",
   sovTitle: "Soberanía",
   sovKicker: "Propuesta",
@@ -643,6 +646,9 @@ const en: Record<keyof typeof es, string> = {
   footerRights: "Exercise my rights",
   legalRightsChannel:
     "You can also exercise your rights with no captcha, free of charge, within 5 business days, by writing to {email}. Controller: {name}. Address for notices: {address}.",
+  thirdBrowser: "Your browser contacts these directly",
+  thirdServer: "Our server asks these (they do not get your data)",
+  thirdLead: "The site runs on an Njalla VPS. Data-center country: {vps}. Automatic headline translation: {translator}.",
   skipToContent: "Skip to content",
   sovTitle: "Sovereignty",
   sovKicker: "Proposal",
@@ -1217,6 +1223,9 @@ const pt: Record<keyof typeof es, string> = {
   footerRights: "Exercer meus direitos",
   legalRightsChannel:
     "Você também pode exercer direitos sem captcha, de graça, em 5 dias úteis, escrevendo para {email}. Responsável: {name}. Endereço para notificações: {address}.",
+  thirdBrowser: "Seu navegador chama estes direto",
+  thirdServer: "Nosso servidor consulta estes (não recebem seus dados)",
+  thirdLead: "O site roda num VPS da Njalla. País do datacenter: {vps}. Tradução automática de manchetes: {translator}.",
   skipToContent: "Ir para o conteúdo",
   sovTitle: "Soberania",
   sovKicker: "Proposta",

@@ -315,9 +315,9 @@
     {
       "id": "L-THIRD",
       "pri": "P0",
-      "open": true,
-      "kind": "manual",
-      "done": "THIRD_PARTIES.json cubre la CSP; test falla si hay un host nuevo sin ficha"
+      "open": false,
+      "kind": "repo",
+      "done": "THIRD_PARTIES cubre font/img/connect/form-action; test contra Caddyfile"
     },
     {
       "id": "L-PRIV",

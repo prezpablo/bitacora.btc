@@ -74,6 +74,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Transferencias, terceros e inmutabilidad",
+      id: "terceros",
       body: "El tratamiento se hace en un servidor contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo:\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS o ipwho.is estiman ciudad si lo autorizás. APIs de mercado y de eventos alimentan el desk (precio, on-chain, agenda). No hay Cláusulas Contractuales Tipo ni evaluación de impacto de transferencias documentada: si hay titulares en la UE, esa es una brecha a cerrar. La casilla de privacidad documenta tu consentimiento a estas transferencias (art. 23 A de la Ley 18.331).\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
     },
     {
@@ -170,6 +171,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Transfers, processors and immutability",
+      id: "terceros",
       body: "Processing runs on a contracted server (Njalla VPS) and in your browser. Processors and recipients sit outside Uruguay and, in some cases, outside the EEA:\n\nGitHub (US) hosts the public map and announcement CSV, without CARGA codes or emails. FormSubmit forwards the Contact form to Gmail. Nominatim/OpenStreetMap resolves addresses. GeoJS or ipwho.is estimate city if you allow it. Market and event APIs feed the desk. No Standard Contractual Clauses or transfer impact assessment are on file: if there are EU data subjects, that is a gap. The privacy checkbox records your consent to these transfers (Act 18.331 art. 23 A).\n\nWhat you publish on the map, on GitHub or on a public network (Nostr, Lightning, chain) cannot be fully erased. Erasure applies to our copies; open history and public networks are beyond absolute oblivion. That is stated before you publish.",
     },
     {
@@ -266,6 +268,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     },
     {
       title: "Transferências, terceiros e imutabilidade",
+      id: "terceros",
       body: "O tratamento faz-se num servidor contratado (VPS Njalla) e no teu browser. Há encarregados e destinatários fora do Uruguai e, em alguns casos, fora do EEE:\n\nO GitHub (EUA) aloja o CSV público do mapa e dos anúncios, sem códigos CARGA nem correios. O FormSubmit reenvia o formulário de Contacto para o Gmail. O Nominatim/OpenStreetMap resolve moradas. O GeoJS ou o ipwho.is estimam a cidade se o autorizares. APIs de mercado e de eventos alimentam o desk. Não há Cláusulas Contratuais-Tipo nem avaliação de impacto de transferências documentada: se houver titulares na UE, essa é uma falha a fechar. A caixa de privacidade documenta o teu consentimento a estas transferências (art. 23.º A da Lei 18.331).\n\nO que publicas no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se pode apagar por completo. O direito de apagamento exerce-se sobre as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso informa-se antes de publicar.",
     },
     {

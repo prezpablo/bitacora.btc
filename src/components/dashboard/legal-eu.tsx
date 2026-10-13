@@ -1,6 +1,8 @@
 import { LEGAL_EU, type LegalBlock } from "@/domain/legal-eu";
 import { LEGAL } from "@/domain/legal-config";
+import { THIRD_PARTIES, type ThirdParty } from "@/domain/third-parties";
 import { useAppLang, useT } from "@/lib/i18n";
+import type { AppLang } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 function Paragraphs({ text }: { text: string }) {
@@ -12,6 +14,28 @@ function Paragraphs({ text }: { text: string }) {
         </p>
       ))}
     </>
+  );
+}
+
+function PartyList({ title, side, lang }: { title: string; side: ThirdParty["side"]; lang: AppLang }) {
+  const rows = THIRD_PARTIES.filter((p) => p.side === side);
+  return (
+    <div className="mt-4">
+      <h3 className="text-sm font-medium text-foreground">{title}</h3>
+      <ul className="mt-2 space-y-2">
+        {rows.map((p) => {
+          const country = p.name === "Njalla" ? LEGAL.vpsCountry : p.country[lang];
+          return (
+            <li key={`${side}-${p.name}`} className="text-sm leading-relaxed text-pretty text-muted-foreground">
+              <span className="font-medium text-foreground">{p.name}</span>
+              {" · "}
+              {country}
+              {p.hosts.length ? ` · ${p.hosts.join(", ")}` : ""}. {p.why[lang]}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
@@ -78,6 +102,15 @@ export function LegalEu() {
                   {t("footerRights")}
                 </a>
               </p>
+            ) : null}
+            {b.id === "terceros" ? (
+              <>
+                <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">
+                  {t("thirdLead", { vps: LEGAL.vpsCountry, translator: LEGAL.translator })}
+                </p>
+                <PartyList title={t("thirdBrowser")} side="browser" lang={lang} />
+                <PartyList title={t("thirdServer")} side="server" lang={lang} />
+              </>
             ) : null}
             {b.table ? <LegalTable table={b.table} /> : null}
           </article>
