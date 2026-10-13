@@ -326,7 +326,7 @@ export function CommunityPinsBoard() {
                 }}
               />
             </div>
-            {err ? <p className="text-sm text-primary sm:col-span-2">{err}</p> : null}
+            {err ? <p role="alert" className="text-sm text-primary sm:col-span-2">{err}</p> : null}
             <div className="flex flex-wrap gap-2 sm:col-span-2">
               <button
                 type="submit"

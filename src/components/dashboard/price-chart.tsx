@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import {
   TF_SPEC,
@@ -349,6 +349,7 @@ export function PriceChart({
   heatOn?: boolean;
 }) {
   const t = useT();
+  const sumId = useId();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [lite, setLite] = useState(false);
   const [frame, setFrame] = useState({ w: 800, h: 430 });
@@ -839,9 +840,11 @@ export function PriceChart({
       tabIndex={0}
       title={t("zoomNeedFocus")}
       aria-label={t("chartKeys")}
+      aria-describedby={sumId}
       onKeyDown={onKeyDown}
       onPointerDown={() => wrapRef.current?.focus({ preventScroll: true })}
     >
+      <p id={sumId} className="sr-only">{t("chartDisclaimer")}</p>
       <div className="absolute top-2 left-2 z-10 flex gap-1">
         <Button
           type="button"

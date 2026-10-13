@@ -40,7 +40,7 @@ Los textos van en es, pt y en. Los datos entre corchetes no se inventan.
 
 **No son fase:** A3.3 (esperar sí), A3.2 (después de L-THIRD), A4.9 (esperar sí/no), A6.2 Bircoiner, A6.3, A6.5 (ya está), B1–B5 y B7. B6 entra el día que haya número de inscripción.
 
-**Siguiente fase de código, si se acepta:** **L-A11Y**. L-OPS está en el repo. El producto espera.
+**Siguiente fase de código, si se acepta:** el legal de esta cola está cerrado. Lo que sigue es **D-PIN-03+**.
 
 ### Producto (sigue en cola, después del legal)
 
@@ -64,7 +64,7 @@ Los textos van en es, pt y en. Los datos entre corchetes no se inventan.
 
 D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 (OFM+OTM, CSP sin Esri) · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 (prompt corto: sitemap **sin** labif/LICENSE; catálogo `btcmap-*`) · D-GLOBE-HERO (cifras no tapan el planeta) · D-FOUNDING (texto + redes Consciencia) · D-CTA-SHORT (Sumate móvil).
 
-**Siguiente fase de código, si se acepta:** **L-A11Y**. L-OPS ya registra el consentimiento sin la IP. D-FOSS sigue siendo un clic en GitHub.
+**Siguiente fase de código, si se acepta:** el legal de esta cola está cerrado. Lo que sigue es **D-PIN-03+**. D-FOSS sigue siendo un clic en GitHub.
 
 ### Parámetros 12 oct (no implementar en el mismo ZIP)
 

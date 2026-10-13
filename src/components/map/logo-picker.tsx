@@ -56,7 +56,7 @@ export function LogoPicker({
       {err ? (
         <div className="relative pt-1">
           <span className="absolute top-0 left-6 size-2 rotate-45 bg-primary" aria-hidden />
-          <p className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-white">{err}</p>
+          <p role="alert" className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-white">{err}</p>
         </div>
       ) : null}
     </div>

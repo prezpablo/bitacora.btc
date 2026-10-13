@@ -350,9 +350,9 @@
     {
       "id": "L-A11Y",
       "pri": "P2",
-      "open": true,
-      "kind": "manual",
-      "done": "mailto junto al captcha, targets 24px, alternativa a globo y velas"
+      "open": false,
+      "kind": "repo",
+      "done": "enlace del captcha, role=alert, lista del globo y resumen del gráfico"
     }
   ],
   "guards": [

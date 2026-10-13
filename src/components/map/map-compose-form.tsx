@@ -151,7 +151,7 @@ export function MapComposeForm({
         <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
         <PrivacyAccept id="privacy-map-shop" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} />
         <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
-        {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
+        {formErr ? <p role="alert" className="text-sm text-short">{formErr}</p> : null}
         <Button type="button" className="w-full" onClick={onPublish} disabled={!shopReady} title={shopReady ? undefined : t("reqHint")}>
           {t("proposeShop")}
         </Button>
@@ -201,7 +201,7 @@ export function MapComposeForm({
       <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
       <PrivacyAccept id="privacy-map-comm" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} />
       <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
-      {formErr ? <p className="text-sm text-short">{formErr}</p> : null}
+      {formErr ? <p role="alert" className="text-sm text-short">{formErr}</p> : null}
       <Button type="button" className="w-full" onClick={onPublish} disabled={!commReady} title={commReady ? undefined : t("reqHint")}>
         {t("publishComm")}
       </Button>

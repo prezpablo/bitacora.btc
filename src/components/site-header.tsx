@@ -55,7 +55,6 @@ function LangButtons() {
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
-  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const hydrate = useLocale((s) => s.hydrate);
   const lang = useAppLang();
   const labels = COPY[lang];
@@ -207,6 +206,7 @@ export function SiteHeader() {
 
 export function SiteShell({ children, fill = false }: { children: ReactNode; fill?: boolean }) {
   const t = useT();
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   return (
     <div
       className={cn("flex min-h-dvh flex-col bg-background", fill && "h-dvh overflow-hidden")}

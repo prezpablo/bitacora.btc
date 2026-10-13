@@ -4,7 +4,9 @@ import { issueCaptcha } from "@/infrastructure/server-fns";
 import { speakChallenge, spokenCode } from "@/lib/captcha-speech";
 import { minePow } from "@/lib/pow";
 import { useAppLang, useT } from "@/lib/i18n";
+import { legalHref } from "@/lib/locale";
 import { cn } from "@/lib/utils";
+import { useRouterState } from "@tanstack/react-router";
 
 const MIN_AGE_MS = 1200;
 
@@ -39,6 +41,7 @@ export function CaptchaBox({
 }) {
   const t = useT();
   const lang = useAppLang();
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const uid = useId();
   const spokenId = `${uid}-spoken`;
   const altId = `${uid}-alt`;
@@ -148,7 +151,10 @@ export function CaptchaBox({
     <div className="space-y-2 rounded-md bg-elevated p-3 shadow-[var(--shadow-border)]">
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("captchaTitle")}</p>
       <p id={altId} className="text-xs text-pretty text-muted-foreground">
-        {t("captchaAlt")}
+        {t("captchaAlt")}{" "}
+        <a href={legalHref("accesibilidad", String(search || ""))} className="inline-flex min-h-6 items-center font-medium text-foreground underline underline-offset-2">
+          {t("captchaA11y")}
+        </a>
       </p>
       <div className="flex items-center gap-2">
         <svg viewBox="0 0 180 56" className="h-14 w-full rounded-md bg-[#1a1a1a]" aria-hidden="true">

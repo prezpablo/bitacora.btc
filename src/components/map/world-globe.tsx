@@ -300,7 +300,7 @@ function GlobeCanvas({
         <p className="hidden text-[11px] text-neutral-600 sm:mt-0.5 sm:block sm:text-sm">{t("globeTitle")}</p>
         {world ? (
           <>
-          <ul className="mt-1.5 grid grid-cols-2 justify-items-center gap-x-2 gap-y-1 sm:mt-2 sm:grid-cols-4 sm:gap-x-6">
+          <ul className="mt-1.5 grid grid-cols-2 justify-items-center gap-x-2 gap-y-1 sm:mt-2 sm:grid-cols-4 sm:gap-x-6" aria-label={t("globeTitle")}>
             <li className="text-[11px] text-neutral-600 sm:text-sm">
               <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.cities.toLocaleString()}</span>
               <span className="ml-1 font-medium">{t("globeCitiesShort")}</span>

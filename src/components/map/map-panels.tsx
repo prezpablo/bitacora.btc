@@ -218,7 +218,7 @@ export function MapVotePanel({
       </div>
       <CaptchaBox key={captchaKey} ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
       <PrivacyAccept id={privacyId} variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} />
-      {err ? <p className="text-sm text-short">{err}</p> : null}
+      {err ? <p role="alert" className="text-sm text-short">{err}</p> : null}
       <Button type="button" className="w-full" onClick={onPublish} disabled={!captchaOk || !privacyOk}>
         {t("publishVote")}
       </Button>

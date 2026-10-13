@@ -212,7 +212,7 @@ export function ListingPatchForm({
         onOk={setCaptchaOk}
         onTicket={keepTicket}
       />
-      {err ? <p className="text-sm text-primary">{err}</p> : null}
+      {err ? <p role="alert" className="text-sm text-primary">{err}</p> : null}
       <div className="grid grid-cols-2 gap-2">
         <Button type="submit" size="sm" disabled={busy || !nextName.trim() || !captchaOk || !privacyOk} title={nextName.trim() && captchaOk && privacyOk ? undefined : t("reqHint")}>
           {t("patchSubmit")}
