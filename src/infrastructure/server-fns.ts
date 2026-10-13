@@ -15,6 +15,7 @@ import { pickGuideMode, type GuideMode, type GuideStep } from "@/domain/guide";
 import { buildEventBoard } from "@/domain/event-board";
 import { loadMapCsvText, saveMapCsvText, savePublicMapCsv, countPendingMapRows, deleteUnverifiedMapRow } from "./map-csv-io";
 import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
+import { loadExperiences, saveExperiences, replaceExperiences, countPendingExperiences } from "./experience-io";
 import { loadPatches, savePatch, replacePatches, countPendingPatches, saveContactTicket } from "./patches-io";
 import { scrapeShowsToken } from "./pin-verify";
 import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
@@ -25,6 +26,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
+import { cleanExperience, experienceOnBoard, experiencePublic, type Experience } from "@/domain/experience";
 import { localShopId, slugifyName } from "@/domain/map-compose";
 import { applyListingPatch, proposeListingPatch } from "@/application/map-listings";
 import { makeContactTicket, PATCH_TTL_MS, patchAlive } from "@/domain/listing-patch";
@@ -462,6 +464,104 @@ export const cancelCommunityPin = createServerFn({ method: "POST" })
     if (pin.verified) return { ok: false, error: "live" };
     if (pin.token !== token) return { ok: false, error: "token" };
     await replacePins(rows.filter((p) => p.id !== data.id));
+    return { ok: true };
+  });
+
+const XP_TTL_MS = 7 * 24 * 60 * 60_000;
+
+export const getExperiences = createServerFn({ method: "POST" }).handler(async (): Promise<Experience[]> => {
+  try {
+    const rows = await loadExperiences();
+    return rows.filter(experienceOnBoard).slice(0, 48).map(experiencePublic);
+  } catch {
+    return [];
+  }
+});
+
+export const submitExperience = createServerFn({ method: "POST" })
+  .validator((input: {
+    activity: string;
+    city: string;
+    when?: string;
+    recurrent?: boolean;
+    price?: string;
+    deal?: boolean;
+    captchaId?: string;
+    captcha?: string;
+    captchaNonce?: string;
+    hp?: string;
+    consent?: boolean;
+  }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
+    if ((data.hp || "").trim()) return { ok: true };
+    if (data.consent !== true) return { ok: false, error: "consent" };
+    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
+      return { ok: false, error: "captcha" };
+    }
+    const fields = cleanExperience(data);
+    if ("error" in fields) return { ok: false, error: fields.error };
+    if (tooMany(clientKey("xp"), 6, 60 * 60_000)) return { ok: false, error: "rate" };
+    if (tooMany("xp:global", 24, 60 * 60_000)) return { ok: false, error: "rate" };
+    if ((await countPendingExperiences()) >= 80) return { ok: false, error: "rate" };
+    const row: Experience = {
+      id: `xp:${Date.now().toString(36)}`,
+      ...fields,
+      proof: "",
+      token: makePinToken(),
+      verified: false,
+      verifiedAt: 0,
+      created: Date.now(),
+    };
+    const rows = await loadExperiences();
+    const fresh = rows.filter((r) => r.verified || Date.now() - r.created < 40 * XP_TTL_MS);
+    try {
+      await saveExperiences([...fresh, row]);
+    } catch {
+      return { ok: false, error: "save" };
+    }
+    try {
+      recordConsent("publish", row.id);
+    } catch {
+      /* el alta no depende del log */
+    }
+    return { ok: true, token: row.token, id: row.id };
+  });
+
+export const verifyExperience = createServerFn({ method: "POST" })
+  .validator((input: { id: string; proof?: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    if (tooMany(clientKey("xp-verify-burst"), 5, 5_000)) return { ok: false, error: "rate" };
+    if (tooMany(clientKey("xp-verify"), 12, 60 * 60_000)) return { ok: false, error: "rate" };
+    const rows = await loadExperiences();
+    const row = rows.find((r) => r.id === data.id);
+    if (!row) return { ok: false, error: "missing" };
+    if ((data.proof || "").trim()) {
+      const n = normalizeProofUrl(data.proof || "");
+      if ("error" in n) return { ok: false, error: n.error };
+      const proof = safeHttp(n.url);
+      if (!proof) return { ok: false, error: "proof" };
+      row.proof = proof;
+    }
+    if (!row.proof) return { ok: false, error: "need" };
+    const hit = await scrapeShowsToken(row.proof, row.token);
+    if (!hit) return { ok: false, error: /instagram\.com/i.test(row.proof) ? "instagram" : "proof" };
+    row.verified = true;
+    row.verifiedAt = Date.now();
+    await saveExperiences(rows);
+    return { ok: true };
+  });
+
+export const cancelExperience = createServerFn({ method: "POST" })
+  .validator((input: { id: string; token: string }) => input)
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+    const token = (data.token || "").trim();
+    if (!token) return { ok: false, error: "token" };
+    const rows = await loadExperiences();
+    const row = rows.find((r) => r.id === data.id);
+    if (!row) return { ok: true };
+    if (row.verified) return { ok: false, error: "live" };
+    if (row.token !== token) return { ok: false, error: "token" };
+    await replaceExperiences(rows.filter((r) => r.id !== data.id));
     return { ok: true };
   });
 

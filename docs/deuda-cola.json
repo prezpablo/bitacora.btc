@@ -287,9 +287,9 @@
     {
       "id": "D-EXPERIENCIA",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "chip en Comunidad, misma prueba pública, pago en Bitcoin declarado sin custodia ni ruta nueva de sitemap"
+      "done": "chip en Comunidad; CARGA; ciudad, fecha o recurrente, sats o a convenir; sin pasarela ni sitemap"
     },
     {
       "id": "D-STATUE",

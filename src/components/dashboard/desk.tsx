@@ -31,6 +31,7 @@ import { scrollDeskTo } from "@/lib/desk-scroll";
 import { MaToggles, Segmented, HeatToggle } from "./segmented";
 
 const CommunityPinsBoard = lazy(() => import("./community-pins").then((m) => ({ default: m.CommunityPinsBoard })));
+const ExperiencesBoard = lazy(() => import("./experiences").then((m) => ({ default: m.ExperiencesBoard })));
 const CommunityFeedPanel = lazy(() => import("./community-feed").then((m) => ({ default: m.CommunityFeedPanel })));
 const NetworkEvents = lazy(() => import("./network-events").then((m) => ({ default: m.NetworkEvents })));
 const HistoryTimeline = lazy(() => import("./history-timeline").then((m) => ({ default: m.HistoryTimeline })));
@@ -294,7 +295,7 @@ export function Desk() {
         <HubIndex
           kicker="navComunidad"
           items={COMMUNITY_HUB}
-          labels={{ anuncios: "hubAds", eventos: "hubEvents", feed: "hubFeed" }}
+          labels={{ anuncios: "hubAds", eventos: "hubEvents", experiencias: "hubExperiences", feed: "hubFeed" }}
           fallbackHash="anuncios"
           parentHash="comunidad"
         />
@@ -310,6 +311,13 @@ export function Desk() {
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="28rem">
             <NetworkEvents />
+          </LazyMount>
+        </Suspense>
+        </section>
+        <section id="experiencias" className="scroll-mt-[4.5rem]">
+        <Suspense fallback={<Soft />}>
+          <LazyMount fallback={<Soft />} minHeight="12rem">
+            <ExperiencesBoard />
           </LazyMount>
         </Suspense>
         </section>

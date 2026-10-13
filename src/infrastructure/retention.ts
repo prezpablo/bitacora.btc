@@ -13,6 +13,7 @@ export function purgeRetention(now = Date.now()) {
   };
   return {
     pins: changes("UPDATE pins SET token = '' WHERE token != '' AND created > 0 AND created < ?"),
+    experiences: changes("UPDATE experiences SET token = '' WHERE token != '' AND created > 0 AND created < ?"),
     map: changes("UPDATE map_rows SET token = '' WHERE token != '' AND created > 0 AND created < ?"),
     patches: changes("UPDATE listing_patches SET token = '' WHERE token != '' AND created > 0 AND created < ?"),
     hashes: changes("DELETE FROM rate_hits WHERE t < ?"),

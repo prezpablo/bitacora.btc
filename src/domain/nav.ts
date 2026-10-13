@@ -55,13 +55,14 @@ export const MARKET_HUB: readonly NavItem[] = [
 export const COMMUNITY_HUB: readonly NavItem[] = [
   { id: "anuncios", hash: "anuncios" },
   { id: "eventos", hash: "eventos" },
+  { id: "experiencias", hash: "experiencias" },
   { id: "feed", hash: "feed" },
 ];
 
 export type DeskSector = "llegar" | "comunidad" | "mercado" | "pie";
 
 const LLEGAR = new Set(["", "mapa", "aprender", "conciencia", "historia", "pulso"]);
-const COMUNIDAD = new Set(["comunidad", "anuncios", "eventos", "feed"]);
+const COMUNIDAD = new Set(["comunidad", "anuncios", "eventos", "experiencias", "feed"]);
 const MERCADO = new Set(["mercado", "red"]);
 
 export function sectorOf(hash: string): DeskSector {

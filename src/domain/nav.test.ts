@@ -41,11 +41,12 @@ test("D-NAV-03 Red is inside Mercado, not a primary destination", () => {
   assert.ok(!PRIMARY_NAV.some((n) => n.id === "red"));
 });
 
-test("community hub is anuncios, eventos, feed", () => {
+test("community hub is anuncios, eventos, experiencias, feed", () => {
   assert.deepEqual(
     COMMUNITY_HUB.map((n) => n.hash),
-    ["anuncios", "eventos", "feed"],
+    ["anuncios", "eventos", "experiencias", "feed"],
   );
+  assert.ok(!PRIMARY_NAV.some((n) => n.id === "experiencias"));
 });
 
 test("D-NAV-04 Sumate is not a nav destination", () => {
@@ -67,6 +68,7 @@ test("desk sectors: Mapa+Aprender share llegar; comunidad and mercado are own ro
   assert.equal(sectorOf("comunidad"), "comunidad");
   assert.equal(sectorOf("anuncios"), "comunidad");
   assert.equal(sectorOf("eventos"), "comunidad");
+  assert.equal(sectorOf("experiencias"), "comunidad");
   assert.equal(sectorOf("feed"), "comunidad");
   assert.equal(sectorOf("mercado"), "mercado");
   assert.equal(sectorOf("red"), "mercado");

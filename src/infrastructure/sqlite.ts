@@ -105,6 +105,18 @@ CREATE TABLE IF NOT EXISTS consent_log (
   ref TEXT NOT NULL DEFAULT '',
   created INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS experiences (
+  id TEXT PRIMARY KEY,
+  activity TEXT NOT NULL,
+  city TEXT NOT NULL,
+  when_at TEXT NOT NULL,
+  price TEXT NOT NULL,
+  proof TEXT NOT NULL DEFAULT '',
+  token TEXT NOT NULL DEFAULT '',
+  verified INTEGER NOT NULL DEFAULT 0,
+  verified_at INTEGER NOT NULL DEFAULT 0,
+  created INTEGER NOT NULL
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
 CREATE INDEX IF NOT EXISTS catalog_tipo ON catalog (tipo);
