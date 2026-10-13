@@ -353,6 +353,27 @@
       "open": false,
       "kind": "repo",
       "done": "enlace del captcha, role=alert, lista del globo y resumen del gráfico"
+    },
+    {
+      "id": "L-BRACKET",
+      "pri": "P0",
+      "open": true,
+      "kind": "repo",
+      "done": "no imprimir corchetes de LEGAL en la casilla ni en /legal"
+    },
+    {
+      "id": "L-CONTRA",
+      "pri": "P0",
+      "open": true,
+      "kind": "repo",
+      "done": "derechos solo por mailto; sacar Ley 17.250 del aviso"
+    },
+    {
+      "id": "L-ACK",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "el acuse de FormSubmit sale solo si la persona lo pide"
     }
   ],
   "guards": [
