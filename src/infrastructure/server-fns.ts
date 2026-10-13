@@ -20,6 +20,7 @@ import { scrapeShowsToken } from "./pin-verify";
 import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, peerFromHeaders, tooMany } from "./rate-limit";
+import { recordConsent } from "./consent-log";
 import { getRequest } from "@tanstack/react-start/server";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
@@ -286,9 +287,11 @@ export const submitMapListing = createServerFn({ method: "POST" })
     captcha?: string;
     captchaNonce?: string;
     hp?: string;
+    consent?: boolean;
   }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; token?: string; error?: string }> => {
     if ((data.hp || "").trim()) return { ok: true }; // honeypot: ok sin id/token, el formulario no avanza
+    if (data.consent !== true) return { ok: false, error: "consent" };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
       return { ok: false, error: "captcha" };
     }
@@ -332,6 +335,11 @@ export const submitMapListing = createServerFn({ method: "POST" })
     };
     const ok = await saveMapCsvText(stringifyMapCsv([...rows, row]));
     if (!ok) return { ok: false, error: "save" };
+    try {
+      recordConsent("publish", row.id);
+    } catch {
+      /* el alta no depende del log */
+    }
     return { ok: true, id: row.id, token: row.token };
   });
 
@@ -371,8 +379,9 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
 });
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { name: string; blurb: string; proof?: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string }) => input)
+  .validator((input: { name: string; blurb: string; proof?: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string; consent?: boolean }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
+    if (data.consent !== true) return { ok: false, error: "consent" };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = data.name.trim().slice(0, 80);
     const blurb = data.blurb.trim().slice(0, 220);
@@ -405,6 +414,11 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
       await savePins([...fresh, pin]);
     } catch {
       return { ok: false, error: "save" };
+    }
+    try {
+      recordConsent("publish", pin.id);
+    } catch {
+      /* el alta no depende del log */
     }
     return { ok: true, token: pin.token, id: pin.id };
   });
@@ -505,9 +519,11 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     captcha?: string;
     captchaNonce?: string;
     hp?: string;
+    consent?: boolean;
   }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
     if ((data.hp || "").trim()) return { ok: true };
+    if (data.consent !== true) return { ok: false, error: "consent" };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
       return { ok: false, error: "captcha" };
     }
@@ -561,6 +577,11 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     );
     if (!made.ok) return { ok: false, error: made.error };
     await savePatch(made.patch);
+    try {
+      recordConsent("publish", made.patch.id);
+    } catch {
+      /* el alta no depende del log */
+    }
     return { ok: true, token: made.patch.token, id: made.patch.id };
   });
 
@@ -624,6 +645,7 @@ export const sendContact = createServerFn({ method: "POST" })
     captchaId?: string;
     captcha?: string;
     captchaNonce?: string;
+    consent?: boolean;
   }) => input)
   .handler(async ({ data }): Promise<{
     ok: boolean;
@@ -635,6 +657,7 @@ export const sendContact = createServerFn({ method: "POST" })
     ticket?: string;
   }> => {
     if ((data.hp || "").trim()) return { ok: true };
+    if (data.consent !== true) return { ok: false, error: "consent" };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = (data.name || "").trim().slice(0, 80);
     const email = (data.email || "").trim().toLowerCase().slice(0, 120);
@@ -653,6 +676,11 @@ export const sendContact = createServerFn({ method: "POST" })
     if (tooMany(clientKey(`mail:${email}`), 5, 60 * 60_000)) return { ok: false, error: "rate" };
     await persistContact({ name, email, message, topic, auto, ticket, listingId });
     saveContactTicket({ id: ticket, topic, listingId, name, email, message, created: now });
+    try {
+      recordConsent("contact", ticket);
+    } catch {
+      /* el envío no depende del log */
+    }
     contactHits.set(email, now);
     const payload = { name, email, message, topic, auto, ticket, listingId };
     const [sent, ack] = await Promise.all([forwardFormSubmit(payload), forwardAck(payload)]);

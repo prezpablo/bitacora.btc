@@ -12,7 +12,7 @@ No hay Cláusulas Contractuales Tipo ni evaluación de impacto documentada. Si h
 
 ## Código CARGA
 
-La política dice 30 días. No hay un job que borre el token a los 30 días: sigue en SQLite. No declarar en público que ya se borra solo.
+La política dice 30 días. El job `scripts/retain.mjs` (timer `bitacora-retain`) borra el token viejo y deja la ficha. Hay que tener el timer activo en el VPS.
 
 ## Datos que Pablo completa
 

@@ -119,6 +119,7 @@ export function ListingPatchForm({
         captchaId: cap.id,
         captcha: cap.answer,
         captchaNonce: cap.nonce,
+        consent: true,
       },
     })
       .then((res) => {

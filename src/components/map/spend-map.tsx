@@ -1082,6 +1082,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           captchaId: cap.id,
           captcha: cap.answer,
           captchaNonce: cap.nonce,
+          consent: true,
         },
       });
       await holdCargaSpinner(started);
@@ -1184,6 +1185,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           captchaId: cap.id,
           captcha: cap.answer,
           captchaNonce: cap.nonce,
+          consent: true,
         },
       });
       await holdCargaSpinner(started);

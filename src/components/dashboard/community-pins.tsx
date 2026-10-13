@@ -162,7 +162,7 @@ export function CommunityPinsBoard() {
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
       const res = await submitCommunityPin({
-        data: { name: name.trim(), blurb, links: extra, captchaId: cap.id, captcha: cap.answer, captchaNonce: cap.nonce },
+        data: { name: name.trim(), blurb, links: extra, captchaId: cap.id, captcha: cap.answer, captchaNonce: cap.nonce, consent: true },
       });
       await holdCargaSpinner(started);
       if (cancelled.current) return;

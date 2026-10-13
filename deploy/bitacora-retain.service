@@ -1,0 +1,12 @@
+[Unit]
+Description=Bitacora retention: CARGA codes and IP hashes older than 30 days
+After=network.target
+
+[Service]
+Type=oneshot
+User=bitacora
+WorkingDirectory=/var/www/bitacora
+EnvironmentFile=-/etc/bitacora.env
+ExecStart=/usr/bin/node --experimental-strip-types /var/www/bitacora/scripts/retain.mjs
+Nice=10
+TimeoutStartSec=60

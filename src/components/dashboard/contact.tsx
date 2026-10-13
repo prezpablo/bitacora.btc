@@ -118,6 +118,7 @@ export function ContactBlock() {
           captchaId: ticket?.id,
           captcha: ticket?.answer,
           captchaNonce: ticket?.nonce,
+          consent: true,
         },
       });
       if (!res.ok) {

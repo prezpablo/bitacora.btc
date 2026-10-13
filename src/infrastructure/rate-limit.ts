@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { getRequest } from "@tanstack/react-start/server";
-import { openSqlite } from "./sqlite";
+import { openSqlite } from "./sqlite.ts";
 
 const hits = new Map<string, number[]>();
 const MAX_KEYS = 4000;

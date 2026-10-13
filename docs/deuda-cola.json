@@ -336,9 +336,9 @@
     {
       "id": "L-OPS",
       "pri": "P1",
-      "open": true,
-      "kind": "manual",
-      "done": "log de consentimiento sin IP en claro; docs/incidentes.md; cron 30 días"
+      "open": false,
+      "kind": "repo",
+      "done": "consent_log sin IP; incidentes.md y aviso de 72 h; retain 30 días"
     },
     {
       "id": "L-COPY",

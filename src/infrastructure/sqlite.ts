@@ -97,6 +97,14 @@ CREATE TABLE IF NOT EXISTS contact_tickets (
   created INTEGER NOT NULL,
   status TEXT NOT NULL DEFAULT 'open'
 );
+CREATE TABLE IF NOT EXISTS consent_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kind TEXT NOT NULL,
+  version TEXT NOT NULL,
+  ip_hash TEXT NOT NULL DEFAULT '',
+  ref TEXT NOT NULL DEFAULT '',
+  created INTEGER NOT NULL
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
 CREATE INDEX IF NOT EXISTS catalog_tipo ON catalog (tipo);
