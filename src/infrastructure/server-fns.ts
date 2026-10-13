@@ -748,6 +748,7 @@ export const sendContact = createServerFn({ method: "POST" })
     captcha?: string;
     captchaNonce?: string;
     consent?: boolean;
+    ack?: boolean;
   }) => input)
   .handler(async ({ data }): Promise<{
     ok: boolean;
@@ -785,15 +786,17 @@ export const sendContact = createServerFn({ method: "POST" })
     }
     contactHits.set(email, now);
     const payload = { name, email, message, topic, auto, ticket, listingId };
-    const [sent, ack] = await Promise.all([forwardFormSubmit(payload), forwardAck(payload)]);
+    const wantAck = data.ack === true;
+    const sent = await forwardFormSubmit(payload);
+    const ack = wantAck ? await forwardAck(payload) : "skip";
     const relay = contactRelay();
     const ackUrl = ackRelay(email).url;
-    const activate = sent === "activate" || ack === "activate";
+    const activate = wantAck && (sent === "activate" || ack === "activate");
     if (sent === "ok" && ack === "ok") return { ok: true, subject: `${relay.subject} · ${topic} · ${ticket}`, activate, ticket };
     return {
       ok: true,
       relay: sent === "ok" ? undefined : relay.url,
-      ack: ack === "ok" ? undefined : ackUrl,
+      ack: wantAck && ack !== "ok" ? ackUrl : undefined,
       subject: `${relay.subject} · ${topic} · ${ticket}`,
       activate,
       ticket,

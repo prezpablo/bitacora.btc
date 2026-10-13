@@ -371,9 +371,9 @@
     {
       "id": "L-ACK",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "el acuse de FormSubmit sale solo si la persona lo pide"
+      "done": "el acuse de FormSubmit sale solo si la persona marca la casilla"
     }
   ],
   "guards": [

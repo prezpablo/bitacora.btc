@@ -69,6 +69,7 @@ export function ContactBlock() {
   const [hp, setHp] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
+  const [wantAck, setWantAck] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState(false);
@@ -121,6 +122,7 @@ export function ContactBlock() {
           captcha: ticket?.answer,
           captchaNonce: ticket?.nonce,
           consent: true,
+          ack: wantAck,
         },
       });
       if (!res.ok) {
@@ -147,7 +149,7 @@ export function ContactBlock() {
           }),
         );
       }
-      if (res.ack) {
+      if (res.ack && wantAck) {
         jobs.push(
           postHiddenForm(res.ack, {
             name: "Bitácora.btc",
@@ -161,8 +163,9 @@ export function ContactBlock() {
         );
       }
       if (jobs.length) await Promise.all(jobs);
-      if (res.activate) setHint(t("contactActivate"));
-      else setHint(t("contactAckHint"));
+      if (wantAck && res.activate) setHint(t("contactActivate"));
+      else if (wantAck) setHint(t("contactAckHint"));
+      else setHint("");
       setOk(true);
       setThanksName(name.trim());
       setCaseId(res.ticket || "");
@@ -172,6 +175,7 @@ export function ContactBlock() {
       if (topic !== "dispute") setListingId("");
       setCaptchaOk(false);
       setPrivacyOk(false);
+      setWantAck(false);
     } catch {
       setErr(t("contactFail"));
     } finally {
@@ -271,6 +275,15 @@ export function ContactBlock() {
         <div className="sm:col-span-2">
           <PrivacyAccept id="privacy-contact" variant="contact" checked={privacyOk} onChange={setPrivacyOk} />
         </div>
+        <label className="flex items-start gap-2 text-sm text-foreground sm:col-span-2">
+          <input
+            type="checkbox"
+            className="mt-1 size-4 shrink-0 accent-primary"
+            checked={wantAck}
+            onChange={(e) => setWantAck(e.target.checked)}
+          />
+          <span>{t("contactWantAck")}</span>
+        </label>
         {err ? (
           <p role="alert" className="text-sm text-short sm:col-span-2">
             {err}

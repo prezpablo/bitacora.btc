@@ -43,3 +43,13 @@ test("rights go to the privacy mailbox, not the contact form, and market cites n
   assert.doesNotMatch(src, /nombre civil se da|civil name is given|nome civil é dado/);
   assert.match(src, /privacidad@bitacorabtc\.org/);
 });
+
+test("contact acknowledgement is sent only when asked", () => {
+  const server = readFileSync(new URL("../infrastructure/server-fns.ts", import.meta.url), "utf8");
+  const form = readFileSync(new URL("../components/dashboard/contact.tsx", import.meta.url), "utf8");
+  assert.match(server, /data\.ack === true/);
+  assert.doesNotMatch(server, /forwardFormSubmit\(payload\), forwardAck\(payload\)/);
+  assert.match(form, /contactWantAck/);
+  assert.match(form, /ack: wantAck/);
+  assert.match(form, /useState\(false\)/);
+});
