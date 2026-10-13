@@ -93,8 +93,9 @@ export function proposeListingPatch(
   row: MapCsvRow,
   fields: ListingPatchFields,
   proof: string,
+  at?: { lat: number; lon: number },
 ): { ok: true; patch: ListingPatch } | { ok: false; error: PatchErr } {
-  const made = proposePatch(row, fields, proof);
+  const made = proposePatch(row, fields, proof, at);
   if ("error" in made) return { ok: false, error: made.error };
   return { ok: true, patch: made.patch };
 }

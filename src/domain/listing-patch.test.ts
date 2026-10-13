@@ -2,11 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { MapCsvRow } from "./map-csv.ts";
 import {
-  PATCH_MAX_MOVE_M,
   applyPatchToRow,
   listingIsOurs,
   makeContactTicket,
-  metersBetween,
   proposePatch,
 } from "./listing-patch.ts";
 
@@ -71,10 +69,22 @@ test("applyPatchToRow keeps id and refreshes verifiedAt", () => {
   assert.equal(next.token, "CARGA-OLD");
 });
 
-test("80 m is the move ceiling", () => {
-  const a = { lat: -34.471, lon: -57.844 };
-  assert.ok(metersBetween(a, { lat: -34.4712, lon: -57.844 }) < PATCH_MAX_MOVE_M);
-  assert.ok(metersBetween(a, { lat: -34.48, lon: -57.844 }) > PATCH_MAX_MOVE_M);
+test("a BTC Map pin is a dispute, not a rewrite", () => {
+  const foreign = proposePatch(row({ id: "node:13424595224" }), { name: "Otro" }, "");
+  assert.equal("error" in foreign && foreign.error, "notours");
+});
+
+test("a pin may move up to 80 m and no further", () => {
+  const near = proposePatch(row(), { description: "Pagos en sats" }, "", { lat: -34.4712, lon: -57.844 });
+  assert.equal("patch" in near, true);
+  if ("patch" in near) {
+    assert.equal(near.patch.verified, false);
+    const next = applyPatchToRow(row(), near.patch, 40);
+    assert.equal(next.lat, -34.4712);
+    assert.equal(next.verifiedAt, 40);
+  }
+  const far = proposePatch(row(), { name: "Café Satoshi" }, "", { lat: -34.48, lon: -57.844 });
+  assert.equal("error" in far && far.error, "move");
 });
 
 test("a patch can rewrite hours, pays and socials, or clear notes", () => {

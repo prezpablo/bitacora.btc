@@ -280,9 +280,9 @@
     {
       "id": "D-PATCH-ALL",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "editar ficha propia con el mismo CARGA: nombre, descripción, dirección, redes, logo, horarios, pagos, notas; BTC Map solo disputa con diff"
+      "done": "overlay local:/c: edita con CARGA; BTC Map abre disputa con antes/después; pin >80 m no se reescribe"
     },
     {
       "id": "D-EXPERIENCIA",

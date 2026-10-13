@@ -84,6 +84,8 @@ export function ContactBlock() {
       if (tp === "dispute" || tp === "map" || tp === "events" || tp === "collab" || tp === "general" || tp === "rights") setTopic(tp);
       const listing = s.get("listing") || "";
       if (listing) setListingId(listing.slice(0, 80));
+      const before = s.get("before") || "";
+      if (before && tp === "dispute") setMessage(`Antes: ${before.slice(0, 180)}\nDespués: `);
     } catch {
       /* ignore */
     }

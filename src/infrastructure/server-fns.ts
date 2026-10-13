@@ -561,6 +561,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
       verifiedAt: 0,
     };
     if (!row.id || !Number.isFinite(row.lat) || !Number.isFinite(row.lon)) return { ok: false, error: "need" };
+    const at = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : undefined;
     const made = proposeListingPatch(
       row,
       {
@@ -574,6 +575,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
         socials: data.socials,
       },
       proof,
+      at,
     );
     if (!made.ok) return { ok: false, error: made.error };
     await savePatch(made.patch);

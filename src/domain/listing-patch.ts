@@ -91,13 +91,22 @@ export function proposePatch(
   row: MapCsvRow,
   raw: ListingPatchFields,
   proof: string,
+  at?: { lat: number; lon: number },
   now = Date.now(),
 ): { patch: ListingPatch } | { error: PatchErr } {
+  if (!listingIsOurs(row.id)) return { error: "notours" };
   const fields = sanitizePatchFields(raw);
   const url = cleanHttp(proof);
   if (url && !/^https?:\/\//i.test(url)) return { error: "links" };
-  if (listingIsOurs(row.id) && !patchChanged(row, fields)) return { error: "nochange" };
-  if (!listingIsOurs(row.id) && !patchChanged(row, fields) && !fields.name && !row.name) return { error: "need" };
+  let lat = row.lat;
+  let lon = row.lon;
+  if (at && Number.isFinite(at.lat) && Number.isFinite(at.lon)) {
+    if (metersBetween(row, at) > PATCH_MAX_MOVE_M) return { error: "move" };
+    lat = at.lat;
+    lon = at.lon;
+  }
+  const moved = lat !== row.lat || lon !== row.lon;
+  if (!patchChanged(row, fields) && !moved) return { error: "nochange" };
   if (fields.name !== undefined && fields.name.length < 2) return { error: "name" };
   return {
     patch: {
@@ -107,8 +116,8 @@ export function proposePatch(
       token: makePinToken(),
       proof: url,
       fields,
-      lat: row.lat,
-      lon: row.lon,
+      lat,
+      lon,
       created: now,
       verified: false,
       verifiedAt: 0,
@@ -121,6 +130,8 @@ export function applyPatchToRow(row: MapCsvRow, patch: ListingPatch, now = Date.
   return {
     ...row,
     name: f.name || row.name,
+    lat: Number.isFinite(patch.lat) ? patch.lat : row.lat,
+    lon: Number.isFinite(patch.lon) ? patch.lon : row.lon,
     description: f.description ?? row.description,
     address: f.address ?? row.address,
     notes: f.notes !== undefined ? f.notes : row.notes,

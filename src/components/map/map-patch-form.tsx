@@ -11,6 +11,7 @@ import { PayPicker } from "./pay-row";
 import { SocialPicker } from "./social-row";
 import { daySlots, DAYS, type WeekHours } from "@/domain/hours";
 import { hoursFromCsv, hoursToCsv, paysToCsv, socialsToCsv } from "@/domain/map-csv";
+import { listingIsOurs } from "@/domain/listing-patch";
 import type { PayKey } from "@/domain/pays";
 import { linksFromPicked, type SocialKey, type SocialLink } from "@/domain/socials";
 
@@ -50,7 +51,9 @@ export function ListingPatchForm({
   onClose?: () => void;
 }) {
   const t = useT();
-  const disputeHref = `/?topic=dispute&listing=${encodeURIComponent(listingId)}#contacto`;
+  const ours = listingIsOurs(listingId);
+  const before = `${name} · ${lat.toFixed(5)},${lon.toFixed(5)}`;
+  const disputeHref = `/?topic=dispute&listing=${encodeURIComponent(listingId)}&before=${encodeURIComponent(before)}#contacto`;
   const [nextName, setNextName] = useState(name);
   const [nextDesc, setNextDesc] = useState(description || "");
   const [nextAddr, setNextAddr] = useState(address || "");
@@ -80,6 +83,8 @@ export function ListingPatchForm({
       setCaptchaOk(false);
     } else if (code === "rate") setErr(t("patchRate"));
     else if (code === "nochange") setErr(t("patchNochange"));
+    else if (code === "move") setErr(t("patchMove"));
+    else if (code === "notours") setErr(t("patchNotOurs"));
     else if (code === "links" || code === "need") setErr(t("verifyNeedLink"));
     else if (code === "instagram") setErr(t("pinNoIg"));
     else if (code === "proof") setErr(t("pinProofFail"));
@@ -127,6 +132,17 @@ export function ListingPatchForm({
         else fail(res.error);
       })
       .finally(() => setBusy(false));
+  }
+
+  if (!ours) {
+    return (
+      <div className="space-y-2 rounded-md bg-elevated px-3 py-2 text-sm">
+        <p className="text-pretty text-muted-foreground">{t("patchNotOurs")}</p>
+        <a href={disputeHref} className="text-sm font-medium text-primary no-underline hover:underline">
+          {t("patchDispute")}
+        </a>
+      </div>
+    );
   }
 
   if (pending) {
