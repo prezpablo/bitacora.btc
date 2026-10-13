@@ -1,5 +1,5 @@
 {
-  "resume": "2026-10-12",
+  "resume": "2026-10-13",
   "canonical": "https://bitacorabtc.org",
   "repo": "https://github.com/prezpablo/bitacora.btc",
   "human": "docs/DEUDA-TECNICA.md",
@@ -297,6 +297,62 @@
       "open": true,
       "kind": "repo",
       "done": "capa mapa+globo con miniatura; solo instaladas con foto; sin Lugano retirada ni Viena antes del 14 oct 2026"
+    },
+    {
+      "id": "L-CFG",
+      "pri": "P0",
+      "open": true,
+      "kind": "manual",
+      "done": "constante LEGAL con placeholders; no inventar nombre, domicilio, expediente ni país del VPS"
+    },
+    {
+      "id": "L-CONSENT",
+      "pri": "P0",
+      "open": true,
+      "kind": "manual",
+      "done": "casilla contact solo en Contacto; publish en altas sin FormSubmit ni 12 meses; mailto de derechos en pie y aviso"
+    },
+    {
+      "id": "L-THIRD",
+      "pri": "P0",
+      "open": true,
+      "kind": "manual",
+      "done": "THIRD_PARTIES.json cubre la CSP; test falla si hay un host nuevo sin ficha"
+    },
+    {
+      "id": "L-PRIV",
+      "pri": "P0",
+      "open": true,
+      "kind": "manual",
+      "done": "política art. 13 con plazos; frases de brecha fuera de /legal"
+    },
+    {
+      "id": "L-TERMS",
+      "pri": "P1",
+      "open": true,
+      "kind": "manual",
+      "done": "índice /legal, 9 cláusulas, anexo regional, anclas viejas vivas"
+    },
+    {
+      "id": "L-OPS",
+      "pri": "P1",
+      "open": true,
+      "kind": "manual",
+      "done": "log de consentimiento sin IP en claro; docs/incidentes.md; cron 30 días"
+    },
+    {
+      "id": "L-COPY",
+      "pri": "P1",
+      "open": true,
+      "kind": "manual",
+      "done": "pt-BR, COPYRIGHT, acuse opcional, mercado etiquetado; Bircoiner no se toca"
+    },
+    {
+      "id": "L-A11Y",
+      "pri": "P2",
+      "open": true,
+      "kind": "manual",
+      "done": "mailto junto al captcha, targets 24px, alternativa a globo y velas"
     }
   ],
   "guards": [

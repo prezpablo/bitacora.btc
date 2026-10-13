@@ -120,3 +120,50 @@ Si se almacenan datos personales de forma estructurada, la base se inscribe en l
 - Banner de cookies de marketing.  
 - Cláusula de “billetera vinculada” hasta que haya wallet.  
 - Declarar “conformidad RGPD/WCAG certificada”.
+
+---
+
+## Informe 13 oct 2026 — qué entra, qué no
+
+Origen: «Lista de mejoras» (Parte A código, Parte B trámites URCDP). No es dictamen. Los `[CORCHETES]` no se inventan: viven en una constante `LEGAL` hasta que Pablo los complete.
+
+### Ya estaba (no reabrir)
+
+| Ítem del informe | Estado |
+|---|---|
+| Pie con aviso, privacidad, cookies, accesibilidad, términos | Hecho (L0). |
+| `/legal` con anclas | Hecho (L0.2). Falta índice y versión 2.0 (A4.2). |
+| Casilla desmarcada y botón detenido sin ella | Hecho. El texto es el de Contacto en todos los formularios: eso es A1.1, abierto. |
+| Fuentes sin Google Fonts | Hecho. |
+| Repo 404 anónimo | Sigue siendo **D-FOSS**. A5.1 no es un hallazgo nuevo. |
+| Firebase en el bundle | Sigue siendo **D-DEPS**. A3.4 no abre otra cola. |
+| `og:locale` es_UY / pt_BR y alternate en_US | Ya está en el HTML de `/`. A6.5 no entra. |
+
+### No entra
+
+| Ítem | Por qué |
+|---|---|
+| A6.2 «Bircoiner» | No es un typo del build. El eslogan quedó así a pedido. No se revierte solo. |
+| A3.3 sacar FormSubmit | El informe pide confirmación antes de codear. Hasta un sí, no hay fase. |
+| A3.2 proxy de teselas e imágenes | P3 y choca con el uso de las teselas. Después de A3.1, no antes. |
+| A4.9 «Patrocinado» en LABITCONF | Falta el sí o el no. Sin eso no se etiqueta. |
+| A6.3 voseo de todo el sitio | Pasa de copy, no de esta cola legal. No se mezcla con un ZIP de textos legales. |
+| Parte B (B1–B5, B7, B8) | Trámites de Pablo ante la URCDP. No son commits. B6 sí es código, cuando existan los números. |
+
+### Tensión con la cola de septiembre
+
+L1.2 dejó el nombre civil fuera del sitio. A4.1 pide nombre, domicilio y correo en `/legal#aviso` (art. 13). No se publica un nombre inventado. Cuando `LEGAL.controllerName` y `LEGAL.address` tengan valor, el aviso los muestra. Hasta entonces el aviso sigue como está y la fase no se da por cerrada.
+
+A4.5 pide sacar del público las frases de brecha («no hay CCT», «el clone no responde 200»). Esas frases pasan a `docs/TODO-legal.md` en la fase L-PRIV. La brecha no desaparece: deja de estar en `/legal`.
+
+### Parte B — Pablo, no el repo
+
+| Id | Qué | Cuándo |
+|---|---|---|
+| B1 | Confirmar estado y anotar el número de expediente | Esta semana |
+| B2 | Ampliar la inscripción: directorio del mapa y anuncios. Actualizar Contacto (FormSubmit + Gmail) y Seguridad (Njalla, hash de IP, 30 días) | 2 semanas |
+| B3 | Dejar escrito en el expediente si la transferencia a EE.UU. es consentimiento (art. 23) o autorización con garantías | Junto con B2 |
+| B4 | Carpeta con los términos de Njalla, FormSubmit, Google y GitHub. Borrado manual de Gmail a los 12 meses | 1 mes |
+| B5 | Anotar la fecha real de inicio del sitio. Si es anterior al 4 jun 2026, el plazo de 90 días ya estaba vencido al presentar | Esta semana |
+| B6 | Pasar los números de inscripción para publicarlos | Cuando la URCDP los dé |
+| B7 | Aviso a la URCDP si cambia un proveedor. Revisión ene/abr/jul/oct | Recurrente |

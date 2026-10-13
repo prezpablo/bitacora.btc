@@ -1,9 +1,8 @@
 # Deuda técnica vigente — Bitácora.btc
 
-**Fecha:** 12 de octubre de 2026  
+**Fecha:** 13 de octubre de 2026  
 **Canónica:** `https://bitacorabtc.org` · VPS Njalla `45.158.116.49` (Caddy → Node :8080)  
-**Repo:** `prezpablo/bitacora.btc` `main` `460c004`  
-**ZIP en `.org`:** `index-CweyGd4T` · sitemap `lastmod` 2026-10-10 · `/healthz` ok. `npm audit` del zip: 0 altas.  
+**Repo:** `prezpablo/bitacora.btc` `main`  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
 ## Acuerdo 11 set (tarde) — congelado
@@ -18,19 +17,36 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 ---
 
-## Cola vigente — 12 oct
+## Cola vigente — 13 oct
 
 No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no TradingView. No checkout ni custodia.
 
-### ZIP
+El informe legal del 13 oct **pasa adelante** de D-PIN-03+, experiencias y estatuas. Esas fases de producto siguen en la tabla de abajo y no se borran. No se codea un ZIP de producto hasta cerrar L-CONSENT, L-THIRD y L-PRIV.
 
-`460c004` ya está en el `.org` (chunk `index-CweyGd4T`). No re-subir ese zip para “ver” las fases de abajo: todavía no están escritas.
+### Legal (informe 13 oct) — una fase por ZIP
 
-### Abiertos
+Los textos van en es, pt y en. Los datos entre corchetes no se inventan.
 
 | Orden | Id | Pri | Qué | Verificación | Cómo volver |
 |---|---|---|---|---|---|
-| **0** | **D-FOSS** | P1 | GitHub **Public**. Clone anónimo 200. LICENSE AGPL ya en disco y `/LICENSE`. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → visibilidad |
+| **L0** | **L-CFG** | P0 | Módulo `LEGAL`: nombre, domicilio, `privacidad@`, `accesibilidad@`, licencia de aportes, país del VPS, traductor, expediente, fecha de vigencia. Vacío = placeholder visible, no un dato falso. | El aviso y las casillas leen esa constante | Borrar el módulo |
+| **L1** | **L-CONSENT** | P0 | A1.1 + A1.6 + A2.1. Casilla `contact` solo en Contacto. Casilla `publish` en comercio, comunidad, voto, parche y pin: GitHub (EE.UU.), licencia de aportes, términos y privacidad. Ficha = mientras exista. Pin = 7 días. Aviso de logo. `mailto:` de derechos en aviso, casilla y pie, sin captcha. Motivo nuevo en Contacto. | Ningún alta dice FormSubmit ni «12 meses». El correo de derechos se alcanza en dos clics | Volver a `privacyAccept` único |
+| **L2** | **L-THIRD** | P0 | A3.1. `THIRD_PARTIES.json` con cada dominio de la CSP (nombre y país). Dos listas en `/legal`: lo que llama el navegador y lo que llama el servidor. Test que falla si Caddy suma un host sin ficha. | El test compara Caddy y el JSON | Quitar el test y la sección |
+| **L3** | **L-PRIV** | P0 | A4.4 + A4.5 + A4.1 cuando L-CFG tenga nombre y domicilio. Política con los siete puntos del art. 13 y plazos concretos (CARGA a 30 días, contacto 12 meses). Sacar de `/legal` las frases de brecha; pasan a `docs/TODO-legal.md`. | `/legal` no dice «brecha a cerrar» ni «clone anónimo» | Restaurar el párrafo |
+| **L4** | **L-TERMS** | P1 | A4.2 + A4.3 + A4.6. Índice en `/legal`, H2 por sección, versión 2.0, anclas viejas vivas. Nueve cláusulas. Anexo LGPD / 25.326 / RGPD. El kicker deja de liderar con RGPD. | Pie y sitemap siguen. `?lang=` conserva la ancla | Volver al muro único |
+| **L5** | **L-OPS** | P1 | A1.4 + A8.1 + A8.2. Log de consentimiento (`CONSENT_VERSION`, hash de IP, no IP en claro). `docs/incidentes.md` y aviso de 72 h. Cron: CARGA de pines/anuncios y hashes a los 30 días. | Un envío deja fila. Un código viejo desaparece en el test | Apagar el cron |
+| **L6** | **L-COPY** | P1 | A1.2 acuse opcional. A1.3 correo obligatorio dicho igual en HTML y servidor. A1.5 apodo público. A5.2 `COPYRIGHT` sin tocar `/LICENSE`. A5.3 «código fuente correspondiente» + ODbL. A4.7 mercado: sin Ley 17.250 en el módulo, hora con zona, serie modelo etiquetada. A6.1 pt-BR. A4.8 texto del QR. | grep de pt-PT en el bloque `pt` = 0. `/COPYRIGHT` 200 | Revertir el diccionario `pt` |
+| **L7** | **L-A11Y** | P2 | A2.2 enlace junto al captcha. A7.1 targets 24 px. A7.2 lista del globo y resumen del gráfico. A7.3 errores con `role=alert`. A7.4 declaración. Solapa con L2.1–L2.5, no la duplica. | axe sin target-size en cabecera, mapa y captcha | Quitar los textos alternativos |
+
+**No son fase:** A3.3 (esperar sí), A3.2 (después de L-THIRD), A4.9 (esperar sí/no), A6.2 Bircoiner, A6.3, A6.5 (ya está), B1–B5 y B7. B6 entra el día que haya número de inscripción.
+
+**Siguiente fase de código, si se acepta:** **L-CFG** y en el ZIP siguiente **L-CONSENT**. D-PIN-03+ queda detrás de L-PRIV.
+
+### Producto (sigue en cola, después del legal)
+
+| Orden | Id | Pri | Qué | Verificación | Cómo volver |
+|---|---|---|---|---|---|
+| **0** | **D-FOSS** | P1 | GitHub **Public**. Clone anónimo 200. LICENSE AGPL ya en disco y `/LICENSE`. Cubre A5.1. | `curl -sI https://github.com/prezpablo/bitacora.btc` → 200 | Settings → visibilidad |
 | **1** | **D-PIN-03+** | P2 | Snapshot público sigue ~2,9 MB. Supercluster 9.1 ya está: servir bbox/`getTileRaw` o dump `id,lat,lon,icon`. Ficha rica al clic. | Red tab: GET cluster flaco; clic = getMerchant | Restaurar JSON completo al cluster |
 | **2** | **D-PATCH-ALL** | P2 | Editar un comercio **propio** con el mismo CARGA que el alta: nombre, descripción, dirección (opcional), redes, logo, horarios, cómo paga, notas. El aviso de disputa ya existe: si la ficha no es nuestra, no se toca el origen y el mail lleva el diff. | Overlay `local:`/`c:` cambia un campo y la estrella espera prueba. BTC Map abre disputa, no un formulario de origen | Quitar campos nuevos del patch |
 | **3** | **D-GLOBE-PERF** | P3 | `antialias:false` en 3G y DPR ≤2. **No** `pointsMerge` si el punto se puede clicar: ese flag apaga `onPointClick`. | FPS móvil; un pin del globo sigue abriendo ficha | Quitar flags |
@@ -48,7 +64,7 @@ No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no 
 
 D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 (OFM+OTM, CSP sin Esri) · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 (prompt corto: sitemap **sin** labif/LICENSE; catálogo `btcmap-*`) · D-GLOBE-HERO (cifras no tapan el planeta) · D-FOUNDING (texto + redes Consciencia) · D-CTA-SHORT (Sumate móvil).
 
-**Siguiente fase de código, si se acepta:** **D-PIN-03+**. Después **D-PATCH-ALL** (editar todo lo propio con el mismo CARGA). Experiencias y estatuas van detrás, una por ZIP. D-FOSS sigue siendo un clic en GitHub.
+**Siguiente fase de código, si se acepta:** **L-CFG**, después **L-CONSENT**. El producto (D-PIN-03+, D-PATCH-ALL) espera a que cierre L-PRIV. D-FOSS sigue siendo un clic en GitHub y cubre A5.1.
 
 ### Parámetros 12 oct (no implementar en el mismo ZIP)
 
