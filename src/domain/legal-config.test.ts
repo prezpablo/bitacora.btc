@@ -7,10 +7,14 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.equal(LEGAL.controllerName, "Pablo Daniel Perez Correa");
   assert.equal(LEGAL.address, "Domingo Baque 176, Colonia del Sacramento, Colonia, Uruguay");
   assert.equal(legalFilled(LEGAL.vpsCountry), true);
-  assert.equal(legalFilled(LEGAL.contributionLicense), false);
+  assert.equal(LEGAL.contributionLicense, "CC BY 4.0");
   assert.equal(legalFilled(LEGAL.translator), false);
   assert.equal(legalFilled(LEGAL.privacyEmail), true);
-  assert.equal(LEGAL.consentVersion, "2.1");
+  assert.equal(LEGAL.consentVersion, "2.2");
+  const terms = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.equal(terms.match(/CC BY 4\.0/g)?.length, 3);
+  assert.match(terms, /ODbL/);
+  assert.match(terms, /AGPL-3\.0/);
 });
 
 test("publish consent is not the contact form", () => {

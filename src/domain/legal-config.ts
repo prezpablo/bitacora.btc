@@ -9,13 +9,13 @@ export const LEGAL = {
   address: "Domingo Baque 176, Colonia del Sacramento, Colonia, Uruguay",
   privacyEmail: "privacidad@bitacorabtc.org",
   a11yEmail: "accesibilidad@bitacorabtc.org",
-  contributionLicense: "[LICENCIA_CONTRIBUCIONES]",
+  contributionLicense: "CC BY 4.0",
   vpsCountry: VPS_COUNTRY.es,
   translator: "[PROVEEDOR_TRADUCCION]",
   expediente: "[N.º EXPEDIENTE URCDP]",
   inscription: "[N.º INSCRIPCIÓN]",
   vigencia: "[FECHA_VIGENCIA]",
-  consentVersion: "2.1",
+  consentVersion: "2.2",
 } as const;
 
 export function legalFilled(value: string) {
