@@ -4,6 +4,7 @@ import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { SocialRow } from "@/components/map/social-row";
 import { getCommunityPins, submitCommunityPin, verifyCommunityPin } from "@/infrastructure/server-fns";
+import { LEGAL } from "@/domain/legal-config";
 import { pinOnBoard, pinPending, pinTimeLeft, formatPinLeft, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
@@ -162,7 +163,7 @@ export function CommunityPinsBoard() {
         .filter(Boolean)
         .map((u) => (u.match(/^https?:\/\//i) ? u : `https://${u}`));
       const res = await submitCommunityPin({
-        data: { name: name.trim(), blurb, links: extra, captchaId: cap.id, captcha: cap.answer, captchaNonce: cap.nonce, consent: true },
+        data: { name: name.trim(), blurb, links: extra, captchaId: cap.id, captcha: cap.answer, captchaNonce: cap.nonce, consent: true, textVersion: LEGAL.consentVersion, form: "pin" },
       });
       await holdCargaSpinner(started);
       if (cancelled.current) return;

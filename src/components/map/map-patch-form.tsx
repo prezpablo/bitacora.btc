@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { submitListingPatch, verifyListingPatch, cancelListingPatch } from "@/infrastructure/server-fns";
+import { LEGAL } from "@/domain/legal-config";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
@@ -125,6 +126,8 @@ export function ListingPatchForm({
         captcha: cap.answer,
         captchaNonce: cap.nonce,
         consent: true,
+        textVersion: LEGAL.consentVersion,
+        form: "patch",
       },
     })
       .then((res) => {

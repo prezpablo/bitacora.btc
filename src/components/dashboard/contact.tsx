@@ -3,6 +3,7 @@ import { ContributeQr } from "@/components/contribute-qr";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { sendContact } from "@/infrastructure/server-fns";
+import { LEGAL } from "@/domain/legal-config";
 import { useT, type CopyKey } from "@/lib/i18n";
 import { legalHref } from "@/lib/locale";
 import { useRouterState } from "@tanstack/react-router";
@@ -132,6 +133,8 @@ export function ContactBlock() {
           consent: true,
           transfer: true,
           ack: wantAck,
+          textVersion: LEGAL.consentVersion,
+          form: "contact",
         },
       });
       if (!res.ok) {

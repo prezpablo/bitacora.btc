@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08 | **L-IP** (ZIP) · **A-09** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09 | **L-IP** (ZIP) · **A-10** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-09**. Cada envío manda la versión del texto y el formulario. La IP no se guarda en claro. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-10**. El título pasa a «Textos legales». Si la vigencia es un corchete, no se muestra. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -67,7 +67,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | **A-04** | P0 | Hecho en el repo (textos 2.8). La cita es «Ley 18.331, art. 23, inciso 2º, literal A». Gmail sigue en 12 meses. Falta el ZIP. | No se inventan plazos de logs ni de FormSubmit. |
 | **A-07** | P1 | Hecho en el repo. La hora del mercado es de Uruguay y nombra la zona. Si la cifra es de la serie modelo, dice que no es cotización. Falta el ZIP. | No se inventa una lista de fuentes. |
 | **A-08** | P1 | Hecho en el repo (textos 2.9). 14 reglas en es, pt y en. La regla 12 muestra 5 días hábiles y no un plazo de disputa. La licencia de la ficha armada no se afirma. Falta el ZIP. | No se pega «sigue la ODbL» sobre la ficha. |
-| **A-09** | P1 | Cada envío manda la versión del texto y el formulario. | La IP no se guarda en claro. El hash, si entra, ensancha la base de seguridad y va con B-01. No en el mismo corte que el texto. |
+| **A-09** | P1 | Hecho en el repo. Contacto, comercio, comunidad, anuncio, experiencia y parche mandan la versión y el formulario. Una IP en claro no se guarda. Falta el ZIP. | El hash de IP no se ensancha en este corte. |
 | **A-10** | P1 | Título «Textos legales» / «Textos legais» / «Legal». Historial de 2.0, 2.2 y 2.4. | La fecha de vigencia no se imprime mientras sea un corchete. |
 | **A-11** | P1 | Sacar «Brechas en curso» y «Plan:» de la página. El plan pasa a `TODO-legal.md`. | No nombrar el resumen de precios hasta que exista A-23. |
 | **A-13** | P1 | El aviso público de vulneración no dice «cuando corresponda». | El procedimiento de 24 h y 72 h ya se mira contra `docs/incidentes.md` (L-OPS). No se duplica el documento si ya está. |

@@ -196,7 +196,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | L-IP | P1 | Falta el ZIP `9bd3b6d`. |
 | A-07 | P1 | Hecho en el repo. Falta el ZIP. Hora de Uruguay con zona. La serie modelo dice que no es cotización. |
 | A-08 | P1 | Hecho en el repo (textos 2.9). Falta el ZIP. 14 reglas. Sin plazo de disputa. La ficha armada no afirma ODbL. |
-| A-09 | P1 | Versión del consentimiento en el envío. IP nunca en claro. |
+| A-09 | P1 | Hecho en el repo. Falta el ZIP. El envío manda versión y formulario. IP en claro no. |
 | A-10 | P1 | Título «Textos legales». Vigencia oculta si es un corchete. |
 | A-11 | P1 | Sacar «Brechas en curso» y «Plan:» de la página. |
 | A-13 | P1 | El aviso de vulneración no dice «cuando corresponda». |

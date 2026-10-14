@@ -213,6 +213,18 @@ function repoCheck(id) {
       !/Estas diez reglas/.test(legal);
     return { pass: ok, detail: ok ? "14 reglas; sin plazo de disputa inventado" : "siguen 10 reglas o un plazo inventado" };
   }
+  if (id === "A-09") {
+    const log = read("src/infrastructure/consent-log.ts");
+    const server = read("src/infrastructure/server-fns.ts");
+    const contact = read("src/components/dashboard/contact.tsx");
+    const ok =
+      /function safeIpHash/.test(log) &&
+      /function readSentConsent/.test(log) &&
+      /textVersion: LEGAL\.consentVersion/.test(contact) &&
+      /form: "contact"/.test(contact) &&
+      !/recordConsent\("publish"/.test(server);
+    return { pass: ok, detail: ok ? "versión y formulario en el envío; IP en claro no" : "el envío no manda versión o formulario" };
+  }
   return { pass: false, detail: "manual" };
 }
 

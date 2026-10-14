@@ -4,6 +4,7 @@ import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { CargaPendingView, holdCargaSpinner } from "@/components/map/carga-proof-step";
 import { cancelExperience, getExperiences, submitExperience, verifyExperience } from "@/infrastructure/server-fns";
+import { LEGAL } from "@/domain/legal-config";
 import { useT } from "@/lib/i18n";
 
 const PENDING_KEY = "bitacora-xp-pending";
@@ -107,6 +108,8 @@ export function ExperiencesBoard() {
           captcha: ticket.answer,
           captchaNonce: ticket.nonce,
           consent: true,
+          textVersion: LEGAL.consentVersion,
+          form: "experience",
         },
       });
       await holdCargaSpinner(started);

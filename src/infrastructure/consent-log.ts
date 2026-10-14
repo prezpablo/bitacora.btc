@@ -4,9 +4,21 @@ import { openSqlite } from "./sqlite.ts";
 import { getRequest } from "@tanstack/react-start/server";
 
 /** Misma cifra que LEGAL.consentVersion. No importar el módulo: el test corre sin el alias de Vite. */
-const CONSENT_VERSION = "2.9";
+export const CONSENT_VERSION = "2.9";
 
-export type ConsentKind = "contact" | "publish";
+export type ConsentKind = "contact" | "shop" | "community" | "pin" | "experience" | "patch" | "publish" | "";
+
+const FORMS = new Set(["contact", "shop", "community", "pin", "experience", "patch"]);
+
+/** Solo una versión corta y un formulario de la lista. Lo demás queda vacío: no se inventa. */
+export function readSentConsent(raw: { textVersion?: string; form?: string }) {
+  const version = (raw.textVersion || "").trim();
+  const form = (raw.form || "").trim();
+  return {
+    version: /^\d+\.\d+$/.test(version) ? version.slice(0, 16) : "",
+    form: FORMS.has(form) ? form : "",
+  };
+}
 
 export type ConsentRow = {
   kind: ConsentKind;
@@ -30,7 +42,8 @@ export function writeConsent(row: ConsentRow) {
     .run(row.kind, row.version.slice(0, 16), ipHash, row.ref.slice(0, 80), row.created);
 }
 
-export function recordConsent(kind: ConsentKind, ref: string) {
+export function recordConsent(form: string, ref: string, version: string) {
+  const sent = readSentConsent({ textVersion: version, form });
   let ipHash = "";
   try {
     const req = getRequest();
@@ -38,7 +51,7 @@ export function recordConsent(kind: ConsentKind, ref: string) {
   } catch {
     ipHash = "";
   }
-  writeConsent({ kind, version: CONSENT_VERSION, ipHash, ref, created: Date.now() });
+  writeConsent({ kind: sent.form as ConsentKind, version: sent.version, ipHash, ref, created: Date.now() });
   try {
     purgeRetentionIfDue();
   } catch {

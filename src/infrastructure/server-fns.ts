@@ -290,6 +290,8 @@ export const submitMapListing = createServerFn({ method: "POST" })
     captchaNonce?: string;
     hp?: string;
     consent?: boolean;
+    textVersion?: string;
+    form?: string;
   }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; token?: string; error?: string }> => {
     if ((data.hp || "").trim()) return { ok: true }; // honeypot: ok sin id/token, el formulario no avanza
@@ -338,7 +340,7 @@ export const submitMapListing = createServerFn({ method: "POST" })
     const ok = await saveMapCsvText(stringifyMapCsv([...rows, row]));
     if (!ok) return { ok: false, error: "save" };
     try {
-      recordConsent("publish", row.id);
+      recordConsent(data.form || "", row.id, data.textVersion || "");
     } catch {
       /* el alta no depende del log */
     }
@@ -381,7 +383,7 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
 });
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
-  .validator((input: { name: string; blurb: string; proof?: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string; consent?: boolean }) => input)
+  .validator((input: { name: string; blurb: string; proof?: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string; consent?: boolean; textVersion?: string; form?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
     if (data.consent !== true) return { ok: false, error: "consent" };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
@@ -418,7 +420,7 @@ export const submitCommunityPin = createServerFn({ method: "POST" })
       return { ok: false, error: "save" };
     }
     try {
-      recordConsent("publish", pin.id);
+      recordConsent(data.form || "", pin.id, data.textVersion || "");
     } catch {
       /* el alta no depende del log */
     }
@@ -491,6 +493,8 @@ export const submitExperience = createServerFn({ method: "POST" })
     captchaNonce?: string;
     hp?: string;
     consent?: boolean;
+    textVersion?: string;
+    form?: string;
   }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
     if ((data.hp || "").trim()) return { ok: true };
@@ -520,7 +524,7 @@ export const submitExperience = createServerFn({ method: "POST" })
       return { ok: false, error: "save" };
     }
     try {
-      recordConsent("publish", row.id);
+      recordConsent(data.form || "", row.id, data.textVersion || "");
     } catch {
       /* el alta no depende del log */
     }
@@ -620,6 +624,8 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     captchaNonce?: string;
     hp?: string;
     consent?: boolean;
+    textVersion?: string;
+    form?: string;
   }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
     if ((data.hp || "").trim()) return { ok: true };
@@ -680,7 +686,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
     if (!made.ok) return { ok: false, error: made.error };
     await savePatch(made.patch);
     try {
-      recordConsent("publish", made.patch.id);
+      recordConsent(data.form || "", made.patch.id, data.textVersion || "");
     } catch {
       /* el alta no depende del log */
     }
@@ -750,6 +756,8 @@ export const sendContact = createServerFn({ method: "POST" })
     consent?: boolean;
     transfer?: boolean;
     ack?: boolean;
+    textVersion?: string;
+    form?: string;
   }) => input)
   .handler(async ({ data }): Promise<{
     ok: boolean;
@@ -781,7 +789,7 @@ export const sendContact = createServerFn({ method: "POST" })
     await persistContact({ name, email, message, topic, auto, ticket, listingId });
     saveContactTicket({ id: ticket, topic, listingId, name, email, message, created: now });
     try {
-      recordConsent("contact", ticket);
+      recordConsent(data.form || "", ticket, data.textVersion || "");
     } catch {
       /* el envío no depende del log */
     }

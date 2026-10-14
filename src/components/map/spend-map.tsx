@@ -11,6 +11,7 @@ import { VERIFIED_STAR_HTML, VerifiedStar } from "./verified-star";
 import { linksFromPicked, type SocialKey } from "@/domain/socials";
 import { publishCommunity, publishShop, rateCommunityListing, rateShopListing } from "@/application/map-listings";
 import { getCityFrame, getMerchant, saveMapCsv, submitMapListing, cancelMapListing, verifyMapListing, reverseAddress } from "@/infrastructure/server-fns";
+import { LEGAL } from "@/domain/legal-config";
 import { formatGuideMeters, formatGuideStep } from "@/domain/guide";
 import { localeTag } from "@/lib/display";
 import { countryFromGlobe, prefetchEventPage, useGlobeStats, useMapCommunities, useMapCsv, useMapMerchants, useMapStore, type MapBbox } from "@/lib/map-query";
@@ -1083,6 +1084,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           captcha: cap.answer,
           captchaNonce: cap.nonce,
           consent: true,
+          textVersion: LEGAL.consentVersion,
+          form: "shop",
         },
       });
       await holdCargaSpinner(started);
@@ -1186,6 +1189,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           captcha: cap.answer,
           captchaNonce: cap.nonce,
           consent: true,
+          textVersion: LEGAL.consentVersion,
+          form: "community",
         },
       });
       await holdCargaSpinner(started);

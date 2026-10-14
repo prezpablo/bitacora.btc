@@ -476,7 +476,7 @@
     {
       "id": "A-09",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "los envíos llevan la versión del texto; no se guarda la IP en claro"
     },
