@@ -217,7 +217,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | L-LABIT (A-27) | P3 | No etiquetar LABITCONF hasta el sí o el no. |
 | D-FOSS (A-05) | P1 | Repo 200 anónimo, o paquete de fuentes. Recién ahí el hash y el enlace. |
 
-No entra: A-12 (Bircoiner, a pedido), A-06 (titular lo define Pablo), A-16 (FormSubmit, hasta un sí), A-20 (voseo, otro pase), A-28 (ya está), A-30 (después de los arreglos de accesibilidad), A-32 (proxy de teselas, no en esta VPS).
+No entra: A-12 (Bircoiner, a pedido), A-06 (titular lo define Pablo), A-16 (FormSubmit, hasta un sí), A-20 (voseo, otro pase), A-28 (ya está), A-32 (proxy de teselas, no en esta VPS). A-30 está hecho en el repo: 14 de octubre de 2026.
 
 Pablo: B-01 bases, B-02 domicilio, B-03 fechas, B-04 número, B-05 plazos, B-06 copyright y ODbL, B-07 revisión trimestral, B-08 sí/no de producto, B-09 delegado (hoy no aplica).
 

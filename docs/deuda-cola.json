@@ -577,6 +577,13 @@
       "open": false,
       "kind": "repo",
       "done": "si se nombra la LGPD art. 14, la frase es sobre niños menores de 12; no se agrega adolescentes hasta verificar"
+    },
+    {
+      "id": "A-30",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "la autoevaluación de accesibilidad está fechada el 14 de octubre de 2026 y sigue sin ser certificado"
     }
   ],
   "guards": [

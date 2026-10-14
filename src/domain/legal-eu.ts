@@ -135,7 +135,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Accesibilidad",
       id: "accesibilidad",
-      body: "La soberanía tecnológica incluye poder usar el sitio con teclado y lector de pantalla. Declaración de autoevaluación, 7 de setiembre de 2026: recorrido de código y teclado. No es auditoría externa ni certificado de las pautas de accesibilidad web (WCAG) 2.2 AA ni Directiva (UE) 2019/882.\n\nHoy: enlace de salto al contenido (primer control al tabular, también en LABIF), selector de idioma con etiquetas para el lector (aria), regiones de la página (landmarks), anillo de foco al tabular, barra de almacenamiento como región (no modal), código QR con texto alternativo, navegación etiquetada, lista textual de lugares bajo el mapa, menos movimiento (prefers-reduced-motion) en el globo (sin auto-rotación) y en los vuelos del mapa, y captcha con audio y anuncio para lector (el dibujo es apoyo visual).",
+      body: "La soberanía tecnológica incluye poder usar el sitio con teclado y lector de pantalla. Declaración de autoevaluación, 14 de octubre de 2026: recorrido de código y teclado. No es auditoría externa ni certificado de las pautas de accesibilidad web (WCAG) 2.2 AA ni Directiva (UE) 2019/882.\n\nHoy: enlace de salto al contenido (primer control al tabular, también en LABIF), selector de idioma con etiquetas para el lector (aria), regiones de la página (landmarks), anillo de foco al tabular, barra de almacenamiento como región (no modal), código QR con texto alternativo, navegación etiquetada, lista textual de lugares bajo el mapa, menos movimiento (prefers-reduced-motion) en el globo (sin auto-rotación) y en los vuelos del mapa, y captcha con audio y anuncio para lector (el dibujo es apoyo visual).",
     },
     {
       title: "Menores",
@@ -276,7 +276,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Accessibility",
       id: "accesibilidad",
-      body: "Technological sovereignty includes using the site with a keyboard and a screen reader. Self-assessment dated 7 September 2026: code and keyboard review. This is not an external audit or a WCAG 2.2 AA or Directive (EU) 2019/882 certificate.\n\nToday: skip link to main (first tab stop, including LABIF), language control with aria, landmarks, a focus ring when tabbing, the storage bar as a region (not a modal), QR alt text, labelled nav, a text list of places under the map, prefers-reduced-motion on the globe (no auto-rotate) and map flights, and a captcha with audio plus a screen-reader announcement (the drawing is visual support).",
+      body: "Technological sovereignty includes using the site with a keyboard and a screen reader. Self-assessment dated 14 October 2026: code and keyboard review. This is not an external audit or a WCAG 2.2 AA or Directive (EU) 2019/882 certificate.\n\nToday: skip link to main (first tab stop, including LABIF), language control with aria, landmarks, a focus ring when tabbing, the storage bar as a region (not a modal), QR alt text, labelled nav, a text list of places under the map, prefers-reduced-motion on the globe (no auto-rotate) and map flights, and a captcha with audio plus a screen-reader announcement (the drawing is visual support).",
     },
     {
       title: "Children",
@@ -417,7 +417,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Acessibilidade",
       id: "accesibilidad",
-      body: "A soberania tecnológica inclui poder usar o site com teclado e leitor de tela. Declaração de autoavaliação, 7 de setembro de 2026: revisão de código e teclado. Não é auditoria externa nem certificado WCAG 2.2 AA nem Diretiva (UE) 2019/882.\n\nHoje: link de salto para o conteúdo (primeiro controle ao usar Tab, também no LABIF), seletor de idioma com aria, landmarks, anel de foco ao usar Tab, barra de armazenamento como região (não modal), QR com texto alternativo, navegação rotulada, lista textual de lugares sob o mapa, prefers-reduced-motion no globo (sem rotação automática) e nos deslocamentos do mapa, e captcha com áudio e aviso para leitor de tela (o desenho é apoio visual).",
+      body: "A soberania tecnológica inclui poder usar o site com teclado e leitor de tela. Declaração de autoavaliação, 14 de outubro de 2026: revisão de código e teclado. Não é auditoria externa nem certificado WCAG 2.2 AA nem Diretiva (UE) 2019/882.\n\nHoje: link de salto para o conteúdo (primeiro controle ao usar Tab, também no LABIF), seletor de idioma com aria, landmarks, anel de foco ao usar Tab, barra de armazenamento como região (não modal), QR com texto alternativo, navegação rotulada, lista textual de lugares sob o mapa, prefers-reduced-motion no globo (sem rotação automática) e nos deslocamentos do mapa, e captcha com áudio e aviso para leitor de tela (o desenho é apoio visual).",
     },
     {
       title: "Menores",

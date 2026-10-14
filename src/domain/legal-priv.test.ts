@@ -26,3 +26,14 @@ test("LGPD art. 14 is not named, and niños y adolescentes is not published", ()
   assert.doesNotMatch(legal, /niños y adolescentes/i);
   assert.doesNotMatch(legal, /art\.\s*14/);
 });
+
+test("the accessibility self-assessment date is 14 October 2026", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.match(legal, /14 de octubre de 2026/);
+  assert.match(legal, /14 October 2026/);
+  assert.match(legal, /14 de outubro de 2026/);
+  assert.doesNotMatch(legal, /7 de setiembre de 2026|7 September 2026|7 de setembro de 2026/);
+  assert.match(legal, /No es auditoría externa/);
+  assert.match(legal, /not an external audit/);
+  assert.match(legal, /Não é auditoria externa/);
+});

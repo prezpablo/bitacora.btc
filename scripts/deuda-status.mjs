@@ -320,6 +320,11 @@ function repoCheck(id) {
     const ok = !/niños y adolescentes/i.test(legal) && !/art\.\s*14/.test(legal);
     return { pass: ok, detail: ok ? "no se nombra el art. 14 ni «niños y adolescentes»" : "entró el art. 14 o la frase sin verificar" };
   }
+  if (id === "A-30") {
+    const legal = read("src/domain/legal-eu.ts");
+    const ok = /14 de octubre de 2026/.test(legal) && /14 October 2026/.test(legal) && /14 de outubro de 2026/.test(legal) && /No es auditoría externa/.test(legal);
+    return { pass: ok, detail: ok ? "autoevaluación al 14 de octubre de 2026, sin certificado" : "la fecha vieja sigue o se afirmó un certificado" };
+  }
   return { pass: false, detail: "manual" };
 }
 
