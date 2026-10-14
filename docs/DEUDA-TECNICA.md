@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14 | **L-IP** (ZIP) · **A-15** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15 | **L-IP** (ZIP) · **A-17** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-15**. Tabla de claves reales, dicho si son `localStorage` o `sessionStorage`. `bitacora-hit*` se confirma antes. Si es una animación, no entra. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-17**. Enlace `mailto:` junto al captcha, en los tres idiomas. El audio del captcha no se saca. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -72,7 +72,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | **A-11** | P1 | Hecho en el repo (textos 2.10). «Brechas en curso» y «Plan:» salieron de la página. Están en `TODO-legal.md`. Falta el ZIP. | No se nombra el resumen de precios. |
 | **A-13** | P1 | Hecho en el repo (textos 2.11). El aviso dice 24 h de mitigación y 72 h a la URCDP. No dice «cuando corresponda». Falta el ZIP. | El procedimiento largo sigue en `INCIDENTES-URCDP.md`. No se copió a la página. |
 | **A-14** | P2 | Hecho en el repo. El cron saca el anuncio a los 7 días y vacía el código de comercio y de experiencia a los 30. La ficha queda. Falta el ZIP y el timer activo en el VPS. | Gmail no se borra desde el VPS. El plazo de logs no se cambió. |
-| **A-15** | P2 | Tabla de claves reales, dicho si son `localStorage` o `sessionStorage`. | `bitacora-hit*` se confirma antes. Si es una animación, no entra en la tabla. |
+| **A-15** | P2 | Hecho en el repo (textos 2.12). La tabla dice la clave y si es `localStorage` o `sessionStorage`. Falta el ZIP. | `bitacora-hit` es la animación del punto: no entra. `grok-auth.bearer-token` es solo del preview: no entra. El idioma no se guarda. |
 | **A-17** | P2 | Enlace `mailto:` junto al captcha, en los tres idiomas. | El audio del captcha ya está. Esto no lo saca. |
 | **A-18** | P2 | La apertura queda en la ley uruguaya y remite al anexo. Anexo: Brasil y Argentina, con el texto del informe. | El informe pide el EEE y no trae el párrafo. No se redacta uno. |
 | **A-21** | P2 | La primera vez, cada término de `/legal` se dice en castellano. | «allowlist» no es «lista de fundadores». Si se explica: lista de direcciones permitidas. LABIF no se define hasta saber el texto. |

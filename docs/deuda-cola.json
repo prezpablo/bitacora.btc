@@ -511,7 +511,7 @@
     {
       "id": "A-15",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "la tabla de cookies sale de las claves reales; un nombre de animación no se documenta como almacenamiento"
     },

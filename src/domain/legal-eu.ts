@@ -114,7 +114,23 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Almacenamiento en el terminal (cookies)",
       id: "cookies",
-      body: "No usamos cookies de analítica, de publicidad ni de redes sociales de terceros. No hay gtag, píxel ni CMP de marketing.\n\nSí hay localStorage: el idioma (necesario para prestar el servicio) y, solo si aceptás en el aviso de este dispositivo, el apodo y la caché del mapa. Eso es almacenamiento en el terminal (art. 5.3 ePrivacy). El banner permite «Solo necesario» o aceptar la caché. Las tipografías se sirven desde este sitio (no Google Fonts). La ciudad por IP no se pide hasta que aceptás extras o usás el botón de ubicación.\n\nPara retirar el consentimiento: «Solo necesario» en el aviso, o borrar los datos de este sitio en el navegador.",
+      body: "No usamos cookies de analítica, de publicidad ni de redes sociales de terceros. No hay gtag, píxel ni CMP de marketing.\n\nEl idioma no se guarda en el navegador: va en la dirección de la página. El aviso de este dispositivo guarda la elección y, solo si aceptás la caché, el apodo y la caché del mapa. La tabla lista cada clave. Eso es almacenamiento en el terminal (art. 5.3 ePrivacy). El banner permite «Solo necesario» o aceptar la caché. Las tipografías se sirven desde este sitio (no Google Fonts). La ciudad por IP no se pide hasta que aceptás extras o usás el botón de ubicación.\n\nPara retirar el consentimiento: «Solo necesario» en el aviso, o borrar los datos de este sitio en el navegador.",
+      table: {
+        head: ["Clave", "Dónde", "Para qué"],
+        rows: [
+          ["bitacora-storage", "localStorage", "La elección del aviso: solo necesario o caché."],
+          ["bitacora-nick", "localStorage", "Apodo, solo si se acepta la caché."],
+          ["bitacora-map-csv-v1", "localStorage", "Caché del mapa, solo si se acepta."],
+          ["bitacora-places-v1", "localStorage", "Caché de comercios, solo si se acepta."],
+          ["bitacora-communities-v1", "localStorage", "Caché de comunidades, solo si se acepta."],
+          ["bitacora-map-pending", "localStorage y sessionStorage", "Ficha a medio cargar, en esta visita."],
+          ["bitacora-pin-pending", "localStorage y sessionStorage", "Anuncio a medio cargar, en esta visita."],
+          ["bitacora-xp-pending", "sessionStorage", "Experiencia a medio cargar, en esta pestaña."],
+          ["bitacora-storage-seen", "sessionStorage", "El aviso ya se mostró en esta pestaña."],
+          ["bitacora-join", "sessionStorage", "El botón de sumarse ya se usó en esta pestaña."],
+          ["bitacora-chunk-reload", "sessionStorage", "Un reintento si una parte de la página no cargó."],
+        ],
+      },
     },
     {
       title: "Accesibilidad",
@@ -239,7 +255,23 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Storage on the device (cookies)",
       id: "cookies",
-      body: "We do not use analytics, advertising or third-party social cookies. There is no gtag, pixel or marketing CMP.\n\nWe do use localStorage: language (necessary to provide the service) and, only if you accept in the device notice, nick and map cache. That is terminal storage (ePrivacy art. 5.3). The banner lets you choose “Necessary only” or accept the cache. Fonts are served from this site (not Google Fonts). City-by-IP is not requested until you accept extras or use the locate button.\n\nTo withdraw consent: “Necessary only” on the notice, or clear this site’s data in the browser.",
+      body: "We do not use analytics, advertising or third-party social cookies. There is no gtag, pixel or marketing CMP.\n\nLanguage is not stored in the browser: it stays in the page address. This device’s notice stores the choice and, only if you accept the cache, the nick and the map cache. The table lists each key. That is terminal storage (ePrivacy art. 5.3). The banner lets you choose “Necessary only” or accept the cache. Fonts are served from this site (not Google Fonts). City-by-IP is not requested until you accept extras or use the locate button.\n\nTo withdraw consent: “Necessary only” on the notice, or clear this site’s data in the browser.",
+      table: {
+        head: ["Key", "Where", "What for"],
+        rows: [
+          ["bitacora-storage", "localStorage", "The notice choice: necessary only, or cache."],
+          ["bitacora-nick", "localStorage", "Nick, only if the cache is accepted."],
+          ["bitacora-map-csv-v1", "localStorage", "Map cache, only if accepted."],
+          ["bitacora-places-v1", "localStorage", "Shop cache, only if accepted."],
+          ["bitacora-communities-v1", "localStorage", "Community cache, only if accepted."],
+          ["bitacora-map-pending", "localStorage and sessionStorage", "A listing left half-finished, this visit."],
+          ["bitacora-pin-pending", "localStorage and sessionStorage", "An announcement left half-finished, this visit."],
+          ["bitacora-xp-pending", "sessionStorage", "An experience left half-finished, this tab."],
+          ["bitacora-storage-seen", "sessionStorage", "The notice was already shown in this tab."],
+          ["bitacora-join", "sessionStorage", "The join button was already used in this tab."],
+          ["bitacora-chunk-reload", "sessionStorage", "One retry if part of the page failed to load."],
+        ],
+      },
     },
     {
       title: "Accessibility",
@@ -364,7 +396,23 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Armazenamento no aparelho (cookies)",
       id: "cookies",
-      body: "Não usamos cookies de analítica, de publicidade nem de redes sociais de terceiros. Não há gtag, pixel nem CMP de marketing.\n\nHá localStorage: o idioma (necessário para prestar o serviço) e, só se você aceitar no aviso deste aparelho, o apelido e o cache do mapa. Isso é armazenamento no aparelho (art. 5, n. 3, da ePrivacy). O aviso permite «Só o necessário» ou aceitar o cache. As fontes vêm deste site (não do Google Fonts). A cidade por IP não é pedida até você aceitar extras ou usar o botão de localização.\n\nPara retirar o consentimento: «Só o necessário» no aviso, ou apagar os dados deste site no navegador.",
+      body: "Não usamos cookies de analítica, de publicidade nem de redes sociais de terceiros. Não há gtag, pixel nem CMP de marketing.\n\nO idioma não fica no navegador: vai no endereço da página. O aviso deste aparelho guarda a escolha e, só se você aceitar o cache, o apelido e o cache do mapa. A tabela lista cada chave. Isso é armazenamento no aparelho (art. 5, n. 3, da ePrivacy). O aviso permite «Só o necessário» ou aceitar o cache. As fontes vêm deste site (não do Google Fonts). A cidade por IP não é pedida até você aceitar extras ou usar o botão de localização.\n\nPara retirar o consentimento: «Só o necessário» no aviso, ou apagar os dados deste site no navegador.",
+      table: {
+        head: ["Chave", "Onde", "Para quê"],
+        rows: [
+          ["bitacora-storage", "localStorage", "A escolha do aviso: só o necessário ou cache."],
+          ["bitacora-nick", "localStorage", "Apelido, só se o cache for aceito."],
+          ["bitacora-map-csv-v1", "localStorage", "Cache do mapa, só se for aceito."],
+          ["bitacora-places-v1", "localStorage", "Cache de comércios, só se for aceito."],
+          ["bitacora-communities-v1", "localStorage", "Cache de comunidades, só se for aceito."],
+          ["bitacora-map-pending", "localStorage e sessionStorage", "Ficha pela metade, nesta visita."],
+          ["bitacora-pin-pending", "localStorage e sessionStorage", "Anúncio pela metade, nesta visita."],
+          ["bitacora-xp-pending", "sessionStorage", "Experiência pela metade, nesta aba."],
+          ["bitacora-storage-seen", "sessionStorage", "O aviso já apareceu nesta aba."],
+          ["bitacora-join", "sessionStorage", "O botão de participar já foi usado nesta aba."],
+          ["bitacora-chunk-reload", "sessionStorage", "Uma nova tentativa se uma parte da página não carregou."],
+        ],
+      },
     },
     {
       title: "Acessibilidade",

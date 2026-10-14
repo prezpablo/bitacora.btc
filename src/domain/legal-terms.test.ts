@@ -62,3 +62,13 @@ test("the breach notice does not say when it applies", () => {
   assert.match(legal, /em 24 horas ela é contida e em 72 horas é comunicada à URCDP/);
   assert.match(legal, /where the GDPR applies/);
 });
+
+test("storage keys are the real ones and the map pulse is not a key", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.match(legal, /bitacora-storage", "localStorage"/);
+  assert.match(legal, /bitacora-xp-pending", "sessionStorage"/);
+  assert.match(legal, /bitacora-map-pending", "localStorage y sessionStorage"/);
+  assert.match(legal, /El idioma no se guarda/);
+  assert.doesNotMatch(legal, /bitacora-hit/);
+  assert.doesNotMatch(legal, /grok-auth/);
+});
