@@ -150,6 +150,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     goToUser,
     startGuide,
   } = useMapGuide(lang, t);
+  const [geoNotice, setGeoNotice] = useState(false);
   const { qc, invalidate } = useMapStore();
   const onWorldRef = useRef(onWorld);
   onWorldRef.current = onWorld;
@@ -190,6 +191,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [form, setForm] = useState<CommForm>(EMPTY_COMM_FORM);
   const [formErr, setFormErr] = useState("");
   const [privacyOk, setPrivacyOk] = useState(false);
+  const [linkOk, setLinkOk] = useState(false);
   const [picked, setPicked] = useState<SocialKey[]>([]);
   const [handles, setHandles] = useState<Partial<Record<SocialKey, string>>>({});
   const [captchaOk, setCaptchaOk] = useState(false);
@@ -1075,6 +1077,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("privacyAcceptNeed"));
       return;
     }
+    if (!linkOk) {
+      setFormErr(t("linkNeed"));
+      return;
+    }
     if (!drop || !shopName.trim()) {
       setFormErr(t("pinNeed"));
       return;
@@ -1357,6 +1363,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setFormErr("");
     setCaptchaOk(false);
     setPrivacyOk(false);
+    setLinkOk(false);
     setShopName("");
     setShopDesc("");
     setShopNotes("");
@@ -1380,6 +1387,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     setFormErr("");
     setCaptchaOk(false);
     setPrivacyOk(false);
+    setLinkOk(false);
     setDraft("");
     setDrop(null);
     setDropKind("pick");
@@ -1525,6 +1533,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             </p>
           ) : null}
           </div>
+          {geoNotice ? <p className="px-3 pt-2 text-center text-xs text-pretty text-muted-foreground">{t("geoPurpose")}</p> : null}
           <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
             <button
               type="button"
@@ -1533,6 +1542,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               title={geo === "timeout" || geo === "unavailable" || geo === "denied" ? t("geoRetry") : t("geoAsk")}
               onClick={(ev) => {
                 ev.stopPropagation();
+                if (!geoNotice) {
+                  setGeoNotice(true);
+                  return;
+                }
+                setGeoNotice(false);
                 void goToUser(true);
               }}
             >
@@ -1785,6 +1799,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 handles={handles}
                 captchaOk={captchaOk}
                 privacyOk={privacyOk}
+                linkOk={linkOk}
                 formErr={formErr}
                 onShopName={setShopName}
                 onShopDesc={setShopDesc}
@@ -1803,6 +1818,23 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 onPickAddress={pinFromAddress}
                 onPublish={dropKind === "comunidad" || mode === "comunidad" ? saveCommunity : propose}
                 onCancel={cancelDrop}
+                shopGate={
+                  dropKind === "comunidad" || mode === "comunidad" ? null : (
+                    <label htmlFor="shop-link" className="flex items-start gap-2 text-sm text-pretty text-foreground">
+                      <input
+                        id="shop-link"
+                        type="checkbox"
+                        className="mt-1 size-4 shrink-0 accent-primary"
+                        checked={linkOk}
+                        aria-required="true"
+                        aria-invalid={formErr === t("linkNeed") ? true : undefined}
+                        required
+                        onChange={(e) => setLinkOk(e.target.checked)}
+                      />
+                      <span>{t("consentLink")}</span>
+                    </label>
+                  )
+                }
               />
             </div>
           ) : (

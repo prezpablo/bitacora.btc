@@ -15,6 +15,38 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 |---|---|
 | `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22, A-23, A-25, A-26, A-29, A-31, A-30, L-VALOR, L-MKT-COPY, L-PSAV, L-LABIT | **L-IP** (ZIP) · **D-BAK-ON** · **D-BAK-OFF** · **D-DEPS** (diferido) · **D-FOSS** · **D-STATUE** · **D-SQL-ONE** |
 
+## Cotejo 14 oct 13:27 — informe del 13, leído sobre el .org
+
+El PDF fechó el sitio en la versión 2.0 y el commit `79d2b76`. A las 13:27 `/legal` sirve la **2.16** (14 reglas). Eso no se reabre. Tampoco se reabre lo que el PDF pide y el corte anterior ya cerró: calle o RUT (B-02), número de trámite (B-04), adivinar el país (L-PAIS), imprimir `[FECHA_VIGENCIA]` (A-10), cambiar «Bircoiner» (A-12), sacar FormSubmit (B-08), decir conformidad WCAG, ni volver a «barre shorts» (L-MKT-COPY). El naranja de texto ya es `#9a5600`; `#f7931a` queda para pin, fondo y la moneda que gira.
+
+**Sigue abierto, y ya estaba:** **L-TAKEDOWN** (no hay plazo propio de denuncia; no se redacta una exención hasta que Pablo dé el plazo). **D-FOSS** (el 200 anónimo de GitHub se vio; el pie todavía no muestra el hash). **D-BAK-ON**, **D-BAK-OFF**, **D-DEPS**, **D-SQL-ONE**. Parte B.
+
+**Entra ahora**, en este orden. Una por ZIP.
+
+| Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|
+| **A-COLOR** | P2 | Hecho en el repo. En ETF, 5 días, 30 días y el total dicen ingreso o egreso, no solo el color. Bajo el gráfico, con el calor prendido, la leyenda dice violeta/amarillo y corto/largo. | No se redibuja el gráfico. La vela ya dice Alcista o Bajista. |
+| **L-VINCULO** | P2 | Hecho en el repo. Al cargar un comercio hay una casilla: vínculo o autorización de quien publica. En es, pt y en. | No se pide documento. No hay KYC. |
+| **A-CAPTCHA-ALT** | P2 | Hecho en el repo. Publicar no pide transcribir letras. Siguen el tope de envíos, la espera, el audio y el mailto a accesibilidad@. | No se apagó el captcha. |
+| **A-EMOJI** | P3 | Hecho en el repo. Los dibujos de las viñetas de Conciencia no los lee el lector. El título queda. | No se borraron los dibujos. |
+| **A-PULSE-HOVER** | P3 | Hecho en el repo. El pulso se detiene al pasar el mouse o al enfocar el bloque. El botón «Pausar ciclo» sigue. | No se sacó el botón ni el freno de `prefers-reduced-motion`. El intervalo sigue en 8 s. |
+| **L-GEO-AVISO** | P3 | Hecho en el repo. Antes del permiso del navegador, el mapa y el globo dicen para qué es la ubicación y que no se guarda. | No se pide la ubicación del navegador al cargar la página. |
+| **L-HMAC** | P3 | Hecho el 14 oct 2026. Pimienta rotada en el VPS (`pepper_chars 64`, healthz ok). `/legal` 2.18 nombra esa fecha en es, pt y en. La próxima es el 12 ene 2027. | No se publicó la clave. No se guardó la anterior. No se migró la base. |
+| **L-DPIA** | P3 | Hecho en el repo. Evaluación breve en `docs/DPIA-INTERNO.md`. | No se publica en `/legal`. |
+| **L-BROWSE** | P3 | Hecho en el repo. La regla 1, en es, pt y en, dice que leer el sitio no es aceptar. La aceptación queda en la casilla. Versión de consentimiento 2.17. | No se inventó otra base. |
+
+**D-GLOBE** cerrada el 14 oct. No hay pantalla nueva. Se entra por el globo. Una CARGA a medias abre el mapa y «Volver al globo» no la suelta. Una red 3G no apaga el globo.
+
+**D-FOSS** está en el repo y no en el sitio. GitHub ya responde 200 sin login. El pie enlaza el commit corto solo si el build tiene `SOURCE_REV` (el ZIP ya lo pide). En bitacorabtc.org el pie todavía no muestra el hash. No se cierra hasta ver ese enlace en el HTML.
+
+**S-SVG** cerrada en el repo el 14 oct. `/logo` convierte un SVG a JPEG o responde 404. Esa ruta lleva `default-src 'none'`. No está en bitacorabtc.org hasta el próximo ZIP.
+
+**S-VOTE** cerrada en el repo el 14 oct. En un envío, cada ficha vota una vez. Un 5 suelto no pisa el promedio: solo vale si es la suma de una estrella. No está en el sitio hasta el próximo ZIP.
+
+**S-PATCH** cerrada en el repo el 14 oct. Si la ficha ya tiene la estrella, el parche público no le escribe logo ni redes. Con el token CARGA, sí. Una ficha sin estrella se puede completar, y el texto vacío también. No está en el sitio hasta el próximo ZIP.
+
+**Siguiente:** **D-FOSS**, con el próximo ZIP (el pie con el hash, y estos tres arreglos). **D-DEPS** no entra. **D-SQL-ONE** no es un cambio: sigue un solo proceso escribiendo la base. La pimienta se rotó el 14 oct 2026; la próxima es el 12 ene 2027. La copia semanal avisa los miércoles.
+
 ---
 
 ## Checklist legal — 13 oct 22:22 -03, cotejo del .org
@@ -55,8 +87,8 @@ Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE. **D-DEPS*
 
 | Id | Pri | Hecho cuando | No se hace |
 |---|---|---|---|
-| **D-BAK-ON** | P2 | En el VPS están activos `bitacora-backup.timer` (03:17) y `bitacora-retain.timer` (04:10), y hay un `.sqlite.gz` del día en `/var/backups/bitacora`. | No se escribe otro script. Los unit ya están en `deploy/`. |
-| **D-BAK-OFF** | P2 | Una copia de ese gzip está fuera de ese disco. El camino es `deploy/pull-backup.ps1`, una vez por semana. | No se suma un servicio de backups. |
+| **D-BAK-ON** | P2 | Hecho el 14 oct 20:59 UTC. Timers activos y `bitacora-20261014-2059.sqlite.gz` en `/var/backups/bitacora`. Ya había una copia diaria desde el 7 oct. | No se escribe otro script. |
+| **D-BAK-OFF** | P2 | Hecho el 14 oct 18:03 -03. Los gzip están en `Documents\bitacora-backups` de la PC, incluido el de las 20:59 UTC. | No se suma un servicio. Se repite a mano, una vez por semana. |
 | **D-SQL-ONE** | P3 | Sigue un solo proceso escribiendo `bitacora.sqlite`. No se sube Node ni el tope de 400 filas o 350.000 caracteres mientras `node:sqlite` sea experimental. | No se parte la base. |
 
 **Siguiente fase de código:** ninguna que no espere. **D-FOSS** sigue siendo un clic en GitHub. **D-DEPS** no entra. En el VPS quedan **D-BAK-ON** y **D-BAK-OFF**.

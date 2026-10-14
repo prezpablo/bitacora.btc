@@ -44,7 +44,8 @@ export function LiqHeatmap({ market }: { market: MarketPayload }) {
   const py = yOf(market.price);
 
   return (
-    <div ref={ref} className="h-full min-h-[200px] w-full">
+    <div ref={ref} className="flex h-full min-h-[200px] w-full flex-col">
+    <p className="px-1 pb-1 text-[11px] leading-snug text-muted-foreground">{t("heatLegend")}</p>
     <svg
       viewBox={`0 0 ${w} ${h}`}
       width="100%"

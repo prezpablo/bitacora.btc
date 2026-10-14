@@ -1,4 +1,4 @@
-/** 3G / Save-Data: skip the 1.8 MB globe and slow down live polls. */
+/** 3G / Save-Data: encuestas más lentas. No elige el globo ni el mapa. */
 
 type Conn = { saveData?: boolean; effectiveType?: string; addEventListener?: (t: string, fn: () => void) => void; removeEventListener?: (t: string, fn: () => void) => void };
 

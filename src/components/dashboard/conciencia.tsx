@@ -31,7 +31,8 @@ export function ConcienciaBlock() {
           {c.mapItems.map((item) => (
             <li key={item.title} className="text-sm leading-relaxed sm:text-base">
               <span className="font-medium text-foreground">
-                {item.mark} {item.title}:
+                <span aria-hidden="true">{item.mark} </span>
+                {item.title}:
               </span>{" "}
               <span className="text-pretty text-muted-foreground">{item.body}</span>
             </li>

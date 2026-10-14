@@ -22,7 +22,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
       id: "terminos",
       body: "Estas reglas son las condiciones de uso.",
       clauses: [
-        { title: "1. Aceptación", body: "Al usar el sitio aceptás las reglas publicadas en esta página. Si no las aceptás, no uses el sitio." },
+        { title: "1. Aceptación", body: "Leer o recorrer el sitio no es aceptar estas reglas. Las aceptás en la casilla, cuando publicás una ficha, un anuncio o una experiencia, o cuando enviás el formulario de Contacto." },
         { title: "2. Qué no es", body: "Bitácora.btc no custodia, no intermedia y no administra llaves. No presta, en forma habitual y profesional, intercambio, transferencia ni custodia de activos virtuales, ni participa en la oferta de un emisor (Circular del Banco Central n.º 2507, art. 127.22). La Ley n.º 20.345 y el art. 693 de la Ley n.º 20.446 incluyen a esos proveedores entre las entidades que supervisa el Banco Central (Ley n.º 16.696, art. 37, literal H)." },
         { title: "3. Contenido de terceros", body: "El contenido del mapa y de los anuncios lo publican terceros. El responsable puede retirarlo si es ilícito, engañoso o viola estas reglas." },
         { title: "4. Carga de un comercio", body: "Quien carga o modifica un comercio declara que los datos son ciertos y es responsable de mantenerlos actualizados." },
@@ -90,7 +90,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
             "Seguridad",
             "HMAC-SHA256 truncado de la IP (dato seudonimizado), ticket de captcha, tope de envíos",
             "Necesario para prestar el servicio y mitigar correo basura (spam) o ataques (no es telemetría ni analítica)",
-            "Ventana del tope: 2 horas. El captcha caduca",
+            "Ventana del tope: 2 horas. El captcha caduca. La clave de ese resumen se rotó el 14 de octubre de 2026; la anterior no se conserva",
           ],
           [
             "Este dispositivo",
@@ -163,7 +163,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
       id: "terminos",
       body: "These rules are the terms of use.",
       clauses: [
-        { title: "1. Acceptance", body: "By using the site you accept the rules published on this page. If you do not accept them, do not use the site." },
+        { title: "1. Acceptance", body: "Reading or browsing the site is not acceptance of these rules. You accept them in the checkbox, when you publish a listing, an announcement or an experience, or when you send the Contact form." },
         { title: "2. What it is not", body: "Bitácora.btc does not custody, intermediate or hold keys. It does not, on a habitual and professional basis, exchange, transfer or custody virtual assets, and it does not take part in an issuer’s offering (Central Bank Circular No. 2507, art. 127.22). Act 20.345 and art. 693 of Act 20.446 include those providers among the entities the Central Bank supervises (Act 16.696, art. 37, letter H)." },
         { title: "3. Third-party content", body: "Map and announcement content is published by third parties. The controller may take it down if it is unlawful, misleading or breaches these rules." },
         { title: "4. Loading a shop", body: "Whoever loads or edits a shop states that the data is accurate and is responsible for keeping it up to date." },
@@ -231,7 +231,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
             "Security",
             "Truncated HMAC-SHA256 of the IP (pseudonymised), captcha ticket, send limits",
             "Necessary to run the service and mitigate spam or attacks (not telemetry or analytics)",
-            "Rate-limit window: 2 hours. Captcha expires",
+            "Rate-limit window: 2 hours. Captcha expires. That digest's key was rotated on 14 October 2026; the previous key is not kept",
           ],
           [
             "This device",
@@ -304,7 +304,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
       id: "terminos",
       body: "Estas regras são as condições de uso.",
       clauses: [
-        { title: "1. Aceitação", body: "Ao usar o site você aceita as regras publicadas nesta página. Se não as aceitar, não use o site." },
+        { title: "1. Aceitação", body: "Ler ou percorrer o site não é aceitar estas regras. Você as aceita na caixa, ao publicar uma ficha, um anúncio ou uma experiência, ou ao enviar o formulário de Contato." },
         { title: "2. O que não é", body: "A Bitácora.btc não custodia, não intermedia e não administra chaves. Não presta, de forma habitual e profissional, troca, transferência nem custódia de ativos virtuais, nem participa da oferta de um emissor (Circular do Banco Central n.º 2507, art. 127.22). A Lei n.º 20.345 e o art. 693 da Lei n.º 20.446 incluem esses provedores entre as entidades que o Banco Central supervisiona (Lei n.º 16.696, art. 37, literal H)." },
         { title: "3. Conteúdo de terceiros", body: "O conteúdo do mapa e dos anúncios é publicado por terceiros. O responsável pode retirá-lo se for ilícito, enganoso ou violar estas regras." },
         { title: "4. Carga de um comércio", body: "Quem carrega ou modifica um comércio declara que os dados são verdadeiros e é responsável por mantê-los atualizados." },
@@ -372,7 +372,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
             "Segurança",
             "HMAC-SHA256 truncado do IP (dado pseudonimizado), ticket de captcha, limite de envios",
             "Necessário para prestar o serviço e reduzir spam ou ataques (não é telemetria nem analítica)",
-            "Janela do limite: 2 horas. O captcha expira",
+            "Janela do limite: 2 horas. O captcha expira. A chave desse resumo foi trocada em 14 de outubro de 2026; a anterior não se conserva",
           ],
           [
             "Este dispositivo",

@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin } from "vite";
@@ -30,6 +31,27 @@ function hasGlobbedMigrations(root: string): boolean {
  * migrations — no schema to apply — skips it entirely rather than paying for a
  * PGLite instance it never queries.
  */
+function sourceRev() {
+  const env = process.env.SOURCE_REV || "";
+  if (/^[0-9a-f]{7,40}$/i.test(env)) return env.slice(0, 7).toLowerCase();
+  try {
+    const sha = execSync("git rev-parse --short=7 HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    return /^[0-9a-f]{7}$/.test(sha) ? sha : "";
+  } catch {
+    return "";
+  }
+}
+
+function revPlugin(rev: string): Plugin {
+  return {
+    name: "bitacora-rev",
+    transform(_code, id) {
+      if (!id.replace(/\\/g, "/").endsWith("/src/build-rev.ts")) return;
+      return `export const BUILD_REV = ${JSON.stringify(rev)};\n`;
+    },
+  };
+}
+
 function pgliteBootstrapPlugin(): Plugin {
   return {
     name: "app-builder:pglite-bootstrap",
@@ -213,6 +235,7 @@ export default defineConfig(({ command, isPreview }) => ({
     external: ["react-globe.gl", "three", "three-globe", "maplibre-gl", "@maplibre/maplibre-gl-leaflet", "node:sqlite"],
   },
   plugins: [
+    revPlugin(sourceRev()),
     globeStubOnServer(),
     authOffStubOnBuild(),
     pgliteBootstrapPlugin(),

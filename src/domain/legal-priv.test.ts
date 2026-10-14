@@ -38,6 +38,14 @@ test("the accessibility self-assessment date is 14 October 2026", () => {
   assert.match(legal, /Não é auditoria externa/);
 });
 
+test("the HMAC key rotation date is named, without the key", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.match(legal, /La clave de ese resumen se rotó el 14 de octubre de 2026/);
+  assert.match(legal, /rotated on 14 October 2026/);
+  assert.match(legal, /trocada em 14 de outubro de 2026/);
+  assert.doesNotMatch(legal, /BITACORA_IP_PEPPER|pepper_chars/);
+});
+
 test("rights name the challenge to a personal valuation, and the five-day term stays on arts. 14 and 15", () => {
   const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
   assert.match(legal, /impugnar esa valoración \(art\. 16\)/);

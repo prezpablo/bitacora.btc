@@ -4,7 +4,7 @@ import { openSqlite } from "./sqlite.ts";
 import { getRequest } from "@tanstack/react-start/server";
 
 /** Misma cifra que LEGAL.consentVersion. No importar el módulo: el test corre sin el alias de Vite. */
-export const CONSENT_VERSION = "2.16";
+export const CONSENT_VERSION = "2.18";
 
 export type ConsentKind = "contact" | "shop" | "community" | "pin" | "experience" | "patch" | "publish" | "";
 

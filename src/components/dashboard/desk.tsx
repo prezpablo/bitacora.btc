@@ -452,6 +452,7 @@ export function Desk({ eventHtml = [] }: { eventHtml?: EventHtmlRow[] }) {
         </div>
         <p className="border-t border-border px-3 py-2 text-xs text-pretty text-muted-foreground">
           <span className="text-foreground">{priceSum}</span> {t("chartDisclaimer")}
+          {heatOn ? ` ${t("heatLegend")}` : ""}
         </p>
       </section>
       <Suspense fallback={null}>

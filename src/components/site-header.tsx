@@ -9,6 +9,7 @@ import { LANGS, legalHref, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
 import { LEGAL } from "@/domain/legal-config";
+import { BUILD_REV } from "@/build-rev";
 import { scrollDeskTo } from "@/lib/desk-scroll";
 
 const ContributeQr = lazy(() => import("@/components/contribute-qr").then((m) => ({ default: m.ContributeQr })));
@@ -269,6 +270,17 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                   <a href="/#soberania" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("sovTitle")}
                   </a>
+                  {/^[0-9a-f]{7}$/.test(BUILD_REV) ? (
+                    <a
+                      href={`https://github.com/prezpablo/bitacora.btc/commit/${BUILD_REV}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("footerCode")}
+                      className="inline-flex min-h-6 min-w-6 items-center font-mono text-foreground"
+                    >
+                      {BUILD_REV}
+                    </a>
+                  ) : null}
                 </div>
               </div>
               <div className="flex flex-col items-center gap-0.5 text-center">

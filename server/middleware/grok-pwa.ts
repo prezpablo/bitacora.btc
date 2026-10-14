@@ -30,11 +30,6 @@ interface GrokPwaEvent {
   req: { method: string; headers: Headers };
 }
 
-function skipOgInject(host: string) {
-  const h = host.split(":")[0]?.toLowerCase() ?? "";
-  return h === "bitacorabtc.org" || h === "www.bitacorabtc.org";
-}
-
 function requestHost(event: GrokPwaEvent): string {
   return (
     event.req.headers.get("x-forwarded-host") ?? event.req.headers.get("host") ?? event.url.host
@@ -108,8 +103,7 @@ export default async function grokPwaMiddleware(
     result instanceof Response &&
     result.body &&
     String(result.headers.get("content-type") ?? "").includes("text/html") &&
-    !result.headers.get("content-encoding") &&
-    !skipOgInject(requestHost(event))
+    !result.headers.get("content-encoding")
   ) {
     return injectHeadStreaming(result, requestHost(event));
   }

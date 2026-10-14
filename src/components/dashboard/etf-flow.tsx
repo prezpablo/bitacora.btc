@@ -108,7 +108,8 @@ function FlowChart({ series }: { series: SeriesPoint[] }) {
       </svg>
       {hit ? (
         <p className="absolute top-1 right-3 font-mono text-xs tabular-nums text-foreground">
-          {fmtDate(hit.t)} · <span className={hit.v >= 0 ? "text-long" : "text-short"}>{moneyM(hit.v)}</span>
+          {fmtDate(hit.t)} · <span className={hit.v >= 0 ? "text-long" : "text-short"}>{moneyM(hit.v)}</span>{" "}
+          <span className="font-sans text-muted-foreground">{hit.v >= 0 ? t("etfIn") : t("etfOut")}</span>
         </p>
       ) : null}
     </div>
@@ -195,9 +196,18 @@ export function EtfFlowPanel({ data }: { data: EtfFlowPayload | null }) {
                     {data.lastBtc != null ? ` · ${Math.round(data.lastBtc).toLocaleString()} BTC` : ""}
                   </span>
                 </td>
-                <td className={cn("px-3 py-2", data.weekUsdM >= 0 ? "text-long" : "text-short")}>{moneyM(data.weekUsdM)}</td>
-                <td className={cn("px-3 py-2", data.monthUsdM >= 0 ? "text-long" : "text-short")}>{moneyM(data.monthUsdM)}</td>
-                <td className={cn("px-3 py-2", total >= 0 ? "text-long" : "text-short")}>{moneyM(total)}</td>
+                <td className={cn("px-3 py-2", data.weekUsdM >= 0 ? "text-long" : "text-short")}>
+                  {moneyM(data.weekUsdM)}{" "}
+                  <span className="font-sans text-[11px] text-muted-foreground">{data.weekUsdM >= 0 ? t("etfIn") : t("etfOut")}</span>
+                </td>
+                <td className={cn("px-3 py-2", data.monthUsdM >= 0 ? "text-long" : "text-short")}>
+                  {moneyM(data.monthUsdM)}{" "}
+                  <span className="font-sans text-[11px] text-muted-foreground">{data.monthUsdM >= 0 ? t("etfIn") : t("etfOut")}</span>
+                </td>
+                <td className={cn("px-3 py-2", total >= 0 ? "text-long" : "text-short")}>
+                  {moneyM(total)}{" "}
+                  <span className="font-sans text-[11px] text-muted-foreground">{total >= 0 ? t("etfIn") : t("etfOut")}</span>
+                </td>
                 <td className={cn("px-3 py-2", keys.streakUp ? "text-long" : "text-short")}>
                   {keys.streak}d {keys.streakUp ? t("etfIn") : t("etfOut")}
                 </td>

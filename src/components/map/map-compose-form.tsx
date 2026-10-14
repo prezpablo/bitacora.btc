@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { Button } from "@/components/ui/button";
 import type { WeekHours } from "@/domain/hours";
@@ -40,6 +40,7 @@ export function MapComposeForm({
   handles,
   captchaOk,
   privacyOk,
+  linkOk = true,
   formErr,
   near,
   onShopName,
@@ -59,6 +60,7 @@ export function MapComposeForm({
   onPickAddress,
   onPublish,
   onCancel,
+  shopGate = null,
 }: {
   kind: "comercio" | "comunidad";
   lang: AppLang;
@@ -75,6 +77,7 @@ export function MapComposeForm({
   handles: Partial<Record<SocialKey, string>>;
   captchaOk: boolean;
   privacyOk: boolean;
+  linkOk?: boolean;
   formErr: string;
   near?: { lat: number; lon: number } | null;
   onShopName: (v: string) => void;
@@ -94,6 +97,7 @@ export function MapComposeForm({
   onPickAddress: (hit: StreetHit) => void;
   onPublish: () => void;
   onCancel: () => void;
+  shopGate?: ReactNode;
 }) {
   const t = useT();
   const errId = useId();
@@ -101,8 +105,8 @@ export function MapComposeForm({
   const slugBad = formErr === t("needSlug") || formErr === t("slugTaken");
   const captchaBad = formErr === t("captchaNeed") || formErr === t("captchaSlow");
   const privacyBad = formErr === t("privacyAcceptNeed");
-  // Comercio y comunidad: pin + nombre + captcha + privacidad. La dirección es opcional.
-  const shopReady = Boolean(shopName.trim()) && captchaOk && privacyOk;
+  // Comercio: pin + nombre + captcha + privacidad + vínculo. Comunidad no pide vínculo. La dirección es opcional.
+  const shopReady = Boolean(shopName.trim()) && captchaOk && privacyOk && linkOk;
   const commReady = Boolean(form.name.trim()) && captchaOk && privacyOk;
   if (kind === "comercio") {
     return (
@@ -157,6 +161,7 @@ export function MapComposeForm({
         <HoursEditor value={shopHours} onChange={onShopHours} />
         <PayPicker value={shopPays} onChange={onShopPays} />
         <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
+        {shopGate}
         <PrivacyAccept id="privacy-map-shop" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
         <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} invalid={captchaBad} describedBy={captchaBad ? errId : undefined} />
         {formErr ? <p id={errId} role="alert" className="text-sm text-short">{formErr}</p> : null}

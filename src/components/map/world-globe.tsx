@@ -75,6 +75,7 @@ function GlobeCanvas({
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
   const [loadErr, setLoadErr] = useState("");
   const [joining, setJoining] = useState(false);
+  const [geoNotice, setGeoNotice] = useState(false);
   const [size, setSize] = useState({ w: 360, h: 360 });
   const [hover, setHover] = useState<Feat | null>(null);
   const [alt, setAlt] = useState(2.05);
@@ -189,6 +190,15 @@ function GlobeCanvas({
     if (entered.current) return;
     entered.current = true;
     onEnter({ lat, lon, zoom, iso, id: pin?.id, kind: pin?.kind, join });
+  }
+
+  function askJoin() {
+    if (joining || entered.current) return;
+    if (!geoNotice) {
+      setGeoNotice(true);
+      return;
+    }
+    void joinHere();
   }
 
   async function joinHere() {
@@ -506,12 +516,13 @@ function GlobeCanvas({
         </div>
       ) : null}
       </div>
+      {geoNotice ? <p className="px-3 pt-2 text-center text-xs text-pretty text-muted-foreground">{t("geoPurpose")}</p> : null}
       <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
         <span className="hidden sm:block" />
         <button
           type="button"
           className="h-9 shrink-0 whitespace-nowrap rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-60"
-          onClick={() => void joinHere()}
+          onClick={() => askJoin()}
           disabled={joining}
         >
           {joining ? t("geoWait") : t("globeJoin")}

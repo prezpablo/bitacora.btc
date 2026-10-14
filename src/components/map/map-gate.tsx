@@ -102,12 +102,7 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
       const cityOf = (lat: number, lon: number, zoom: number) =>
         getCityFrame({ data: { lat, lon, zoom } }).catch(() => boxAround(lat, lon));
       try {
-        let city;
-        try {
-          city = (await locateBest(true, cityOf)).city;
-        } catch {
-          city = (await locateBest(false, cityOf)).city;
-        }
+        const city = (await locateBest(false, cityOf)).city;
         goMap({ lat: city.lat, lon: city.lon, zoom: 16, iso: city.countryCode, join: true });
       } catch {
         goMap({ lat: FOUNDING_UY.lat, lon: FOUNDING_UY.lon, zoom: 16, join: true });

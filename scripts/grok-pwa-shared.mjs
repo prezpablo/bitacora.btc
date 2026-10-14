@@ -28,42 +28,6 @@ const SHARE_META_KEYS = new Set([
   "x:game:image:height",
 ]);
 
-const BITACORA_HOST = new Set(["bitacorabtc.org", "www.bitacorabtc.org"]);
-const HOME_TITLE = {
-  es: "Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica",
-  en: "Bitácora.btc | Bitcoin community and merchant map for Latin America",
-  pt: "Bitácora.btc | Mapa de comunidades e comércios Bitcoin na América Latina",
-};
-const HOME_LOCALE = { es: "es_UY", en: "en_US", pt: "pt_BR" };
-const NOT_FOUND_TITLE = {
-  es: "No encontrado | Bitácora.btc",
-  en: "Not found | Bitácora.btc",
-  pt: "Não encontrado | Bitácora.btc",
-};
-
-export function langFromSearch(search = "") {
-  const m = String(search).match(/[?&]lang=(es|en|pt)\b/i);
-  return m ? m[1].toLowerCase() : "";
-}
-
-export function wantGrokExtensions(host = "") {
-  const h = String(host).split(":")[0].toLowerCase().replace(/^www\./, "");
-  if (h === "bitacorabtc.org") return false;
-  return true;
-}
-
-export function stripGrokExtensions(html) {
-  return String(html)
-    .replace(/<script\b[^>]*grok-app-builder\/extensions\.js[^>]*>\s*<\/script>/gi, "")
-    .replace(/<script\b[^>]*grok-app-builder\/extensions\.js[^>]*\/?\s*>/gi, "");
-}
-
-function pathFromSearch(search = "") {
-  const raw = String(search || "/");
-  const path = raw.split("?")[0] || "/";
-  return path.startsWith("/") ? path : `/${path}`;
-}
-
 export function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -243,6 +207,11 @@ export function readGrokProjectId() {
   return String(fromProcess ?? "").trim();
 }
 
+export function readGrokExtensionsEnabled() {
+  const fromProcess = typeof process !== "undefined" ? process.env?.VITE_GROK_EXTENSIONS : "";
+  return String(fromProcess ?? "").trim() !== "0";
+}
+
 export function readXCreator() {
   const fromProcess = typeof process !== "undefined" ? process.env?.X_CREATOR : "";
   return String(fromProcess ?? "").trim();
@@ -270,6 +239,7 @@ export function grokExtensionsHeadTags(projectId = readGrokProjectId()) {
   if (projectId) {
     tags.push(`<meta name="grok-project-id" content="${id}">`);
   }
+  if (!readGrokExtensionsEnabled()) return tags;
   tags.push(
     `<script src="${GROK_EXTENSIONS_SCRIPT_SRC}"${
       projectId ? ` data-project-id="${id}"` : ""
@@ -375,8 +345,6 @@ export function grokOgHeadTags({
   site = {},
   documentTitle = "",
   cwd = process.cwd(),
-  search = "",
-  description = "",
 } = {}) {
   const title = resolveOgTitle(site, appName, host, documentTitle);
   const publicHost = resolvePublicHost(host);
@@ -384,9 +352,9 @@ export function grokOgHeadTags({
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta property="og:title" content="${escapeHtml(title)}">`,
   ];
-  const desc = String(description || site.description || "").trim();
-  if (desc) {
-    tags.push(`<meta property="og:description" content="${escapeHtml(desc)}">`);
+  const description = String(site.description ?? "").trim();
+  if (description) {
+    tags.push(`<meta property="og:description" content="${escapeHtml(description)}">`);
   }
   if (String(site.type ?? "").toLowerCase() === "x:game") {
     tags.push(`<meta property="og:type" content="x:game">`);
@@ -400,11 +368,8 @@ export function grokOgHeadTags({
     const color = !custom ? placeholderCardColor(site) : "";
     if (color) image += `&color=${encodeURIComponent(color)}`;
     tags.push(`<meta property="og:image" content="${escapeHtml(image)}">`);
-    tags.push(`<meta name="twitter:image" content="${escapeHtml(image)}">`);
     tags.push(`<meta property="og:image:width" content="1200">`);
     tags.push(`<meta property="og:image:height" content="630">`);
-    const path = search ? (String(search).startsWith("/") ? search : `/${search}`) : "/";
-    tags.push(`<meta property="og:url" content="${escapeHtml(`https://${publicHost}${path === "/" && !search ? "/" : path}`)}">`);
     const banner = String(site.banner ?? "").trim();
     if (banner) {
       const bannerUrl = `https://${publicHost}${banner.startsWith("/") ? banner : `/${banner}`}`;
@@ -414,6 +379,13 @@ export function grokOgHeadTags({
     }
   }
   return tags;
+}
+
+function stripGrokExtensionsScript(html) {
+  return String(html).replace(
+    /<script\b[^>]*\bsrc\s*=\s*["'][^"']*\/grok-app-builder\/extensions\.js[^"']*["'][^>]*>\s*<\/script>/gi,
+    "",
+  );
 }
 
 export function stripShareMetaTags(html) {
@@ -463,103 +435,43 @@ export function normalizeHeadContext(ctx = {}) {
   };
 }
 
-function descriptionFromDocument(html) {
-  const tag = String(html).match(/<meta\b[^>]*\bname=["']description["'][^>]*>/i);
-  if (!tag) return "";
-  const content = tag[0].match(/\bcontent=["']([^"']*)["']/i);
-  return content ? content[1] : "";
-}
-
-function setHtmlLang(html, lang) {
-  if (!lang || !/<html\b/i.test(html)) return html;
-  return html.replace(/<html\b([^>]*)>/i, (full, attrs) => {
-    if (/\blang=/i.test(attrs)) return `<html${attrs.replace(/\blang=["'][^"']*["']/i, `lang="${lang}"`)}>`;
-    return `<html lang="${lang}"${attrs}>`;
-  });
-}
-
-function setTitle(html, title) {
-  if (/<title\b/i.test(html)) return html.replace(/<title\b[^>]*>[^<]*<\/title>/i, `<title>${title}</title>`);
-  return insertAfterHeadOpen(html, `<title>${title}</title>`);
-}
-
 export function injectGrokPwaHead(html, ctx = {}) {
   if (typeof html !== "string") return html;
   const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
-  const search = ctx.search || "";
-  const status = Number(ctx.status || 0);
-  const lang = String(ctx.lang || langFromSearch(search) || "").toLowerCase();
-  const pathname = pathFromSearch(search);
-  let next = html;
-  if (!wantGrokExtensions(host)) next = stripGrokExtensions(next);
-  if (lang) next = setHtmlLang(next, lang);
-
-  const bitacora = wantGrokExtensions(host) === false;
-  if (status === 404) {
-    next = setTitle(next, NOT_FOUND_TITLE[lang] || NOT_FOUND_TITLE.es);
-    if (/name=["']robots["']/i.test(next)) {
-      next = next.replace(/<meta\b[^>]*name=["']robots["'][^>]*>/gi, `<meta name="robots" content="noindex,follow">`);
-    } else {
-      next = insertAfterHeadOpen(next, `<meta name="robots" content="noindex,follow">`);
-    }
-    next = next.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/gi, "");
-  } else if (bitacora && lang && (pathname === "/" || pathname === "")) {
-    const title = HOME_TITLE[lang];
-    if (title) next = setTitle(next, title);
-    const loc = HOME_LOCALE[lang];
-    if (loc) {
-      if (/property=["']og:locale["']/i.test(next)) {
-        next = next.replace(/<meta\b[^>]*property=["']og:locale["'][^>]*>/i, `<meta property="og:locale" content="${loc}">`);
-      } else {
-        next = insertAfterHeadOpen(next, `<meta property="og:locale" content="${loc}">`);
-      }
-    }
-  }
-
-  const documentTitle = titleFromDocument(next);
+  const documentTitle = titleFromDocument(html);
   const appName = resolveOgTitle(
     site,
     ctx.appName ?? DEFAULT_APP_NAME,
     host,
     documentTitle,
   );
-  const pageDesc = descriptionFromDocument(next);
-  next = stripShareMetaTags(next);
+  let next = stripShareMetaTags(html);
+  if (!readGrokExtensionsEnabled()) next = stripGrokExtensionsScript(next);
 
   const missing = grokPwaHeadTags(appName)
     .filter(([key]) => {
-      if (key === "manifest") return !/rel=["']manifest["']/i.test(next);
-      if (key === "apple-touch-icon") return !/rel=["']apple-touch-icon["']/i.test(next);
+      if (key === "manifest") return !next.includes('href="/__grok/manifest.webmanifest"');
+      if (key === "apple-touch-icon") return !next.includes('href="/__grok/icon-180.png"');
       return !next.includes(`name="${key}"`);
     })
     .map(([, tag]) => tag);
 
   next = insertAfterHeadOpen(
     next,
-    grokOgHeadTags({
-      host,
-      appName,
-      site,
-      documentTitle,
-      cwd,
-      search,
-      description: pageDesc,
-    }).join(""),
+    grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
   );
 
-  if (wantGrokExtensions(host)) {
-    if (!next.includes("/grok-app-builder/extensions.js")) {
-      missing.push(...grokExtensionsHeadTags(projectId));
-    } else if (projectId && !next.includes('name="grok-project-id"')) {
-      missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
-    }
-    if (
-      projectId &&
-      !next.includes('property="grok:app_id"') &&
-      !next.includes("property='grok:app_id'")
-    ) {
-      missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
-    }
+  if (readGrokExtensionsEnabled() && !next.includes("/grok-app-builder/extensions.js")) {
+    missing.push(...grokExtensionsHeadTags(projectId));
+  } else if (projectId && !next.includes('name="grok-project-id"')) {
+    missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
+  }
+  if (
+    projectId &&
+    !next.includes('property="grok:app_id"') &&
+    !next.includes("property='grok:app_id'")
+  ) {
+    missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
   }
   const creatorTags = grokXCreatorHeadTags(creator, creatorId);
   if (creatorTags.length > 0) {
@@ -600,9 +512,6 @@ export function createHeadInjector(ctx = {}) {
       host: normalized.host,
       cwd: normalized.cwd,
       site: normalized.site,
-      search: ctx.search || "",
-      status: ctx.status || 0,
-      lang: ctx.lang || "",
     });
 
   return {

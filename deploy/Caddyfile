@@ -13,6 +13,12 @@ bitacorabtc.org {
 		Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=(), usb=()"
 		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://tiles.openfreemap.org; img-src 'self' data: blob: https://static.btcmap.org https://*.btcmap.org https://tiles.openfreemap.org https://*.tile.opentopomap.org https://*.tile.openstreetmap.fr https://images.lumacdn.com https://*.lumacdn.com https://*.meetupstatic.com https://img.evbuc.com https://cdn.evbuc.com https://images.unsplash.com; connect-src 'self' https://get.geojs.io https://ipwho.is https://nominatim.openstreetmap.org https://tiles.openfreemap.org https://*.tile.opentopomap.org https://static.btcmap.org https://api.btcmap.org; worker-src 'self' blob: 'wasm-unsafe-eval'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co"
 	}
+	@logo path /logo*
+	header @logo {
+		defer
+		Content-Security-Policy "default-src 'none'; sandbox"
+		X-Content-Type-Options nosniff
+	}
 	@noindex path /LICENSE /humans.txt /labif /COPYRIGHT
 	header @noindex X-Robots-Tag "noindex, follow"
 	header /assets/* Cache-Control "public, max-age=31536000, immutable"

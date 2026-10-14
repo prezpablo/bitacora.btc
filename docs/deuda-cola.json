@@ -154,9 +154,9 @@
     {
       "id": "D-GLOBE",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "manual",
-      "done": "juicio de producto: globo-first salvo CARGA pendiente. No apagar."
+      "done": "14 oct: el juicio queda. Se abre en el globo. Si hay una CARGA a medias, se abre en el mapa y Volver no la abandona. Una red lenta no apaga el globo."
     },
     {
       "id": "D-GLOBE-KEYS",
@@ -252,16 +252,16 @@
     {
       "id": "D-BAK-ON",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "manual",
-      "done": "en el VPS, bitacora-backup.timer (03:17) y bitacora-retain.timer (04:10) enabled; hay un sqlite.gz del día en /var/backups/bitacora. Los unit ya están en deploy/. No se escribe otro script."
+      "done": "14 oct 20:59 UTC. Timers activos y bitacora-20261014-2059.sqlite.gz en /var/backups/bitacora."
     },
     {
       "id": "D-BAK-OFF",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "manual",
-      "done": "una copia del gzip fuera de ese disco, con deploy/pull-backup.ps1, una vez por semana. Sin servicio nuevo."
+      "done": "14 oct 18:03 -03. Los gzip están en Documents\\bitacora-backups de la PC, incluido el de las 20:59 UTC."
     },
     {
       "id": "D-SQL-ONE",
@@ -605,12 +605,45 @@
       "open": false,
       "kind": "repo",
       "done": "la autoevaluación de accesibilidad está fechada el 14 de octubre de 2026 y sigue sin ser certificado"
+    },
+    {
+      "id": "S-SVG",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "14 oct: /logo no devuelve SVG. Lo pasa a JPEG o responde 404. CSP de esa ruta: default-src none. Entra con el próximo ZIP."
+    },
+    {
+      "id": "S-VOTE",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "14 oct: un id vota una vez por envío. El 5 suelto no pisa el promedio: solo vale sumar una estrella."
+    },
+    {
+      "id": "S-PATCH",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "14 oct: con la estrella, el parche público no escribe logo ni redes. El token CARGA sí. El texto vacío sigue pudiendo completarse."
     }
   ],
   "guards": [
-    { "id": "G-HEALTHZ", "done": "GET /healthz {ok:true}" },
-    { "id": "G-LANG-PT", "done": "/?lang=pt html lang=pt y H1 Boas-vindas" },
-    { "id": "G-CSV", "done": "map.csv público sin CARGA- ni BIT-" },
-    { "id": "G-FONTS", "done": "CSP sin fonts.googleapis.com" }
+    {
+      "id": "G-HEALTHZ",
+      "done": "GET /healthz {ok:true}"
+    },
+    {
+      "id": "G-LANG-PT",
+      "done": "/?lang=pt html lang=pt y H1 Boas-vindas"
+    },
+    {
+      "id": "G-CSV",
+      "done": "map.csv público sin CARGA- ni BIT-"
+    },
+    {
+      "id": "G-FONTS",
+      "done": "CSP sin fonts.googleapis.com"
+    }
   ]
 }

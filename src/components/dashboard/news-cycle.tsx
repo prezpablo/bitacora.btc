@@ -7,6 +7,8 @@ import { StaleStamp } from "./stale-stamp";
 import { LANGS, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
+const PULSE_MS = 8_000;
+
 function headline(item: { title: string; sourceLang?: string }) {
   const lang = item.sourceLang?.toUpperCase();
   return lang ? `${item.title} (${lang})` : item.title;
@@ -19,11 +21,13 @@ export function NewsCycle({ data, fetching = false }: { data: PulsePayload | nul
   const news: NewsItem[] = data?.news ?? [];
   const trends = data?.trends ?? [];
   const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [held, setHeld] = useState(false);
+  const [hot, setHot] = useState(false);
   const reduceMotion = usePrefersReducedMotion();
   const n = news.length;
   const asOf = data?.asOf;
   const trStatus = fetching ? "loading" : (data?.translate?.status ?? (n ? "ok" : "off"));
+  const paused = held || hot;
 
   useEffect(() => {
     setI(0);
@@ -31,7 +35,7 @@ export function NewsCycle({ data, fetching = false }: { data: PulsePayload | nul
 
   useEffect(() => {
     if (n < 2 || paused || reduceMotion) return;
-    const id = window.setInterval(() => setI((v) => (v + 1) % n), 8_000);
+    const id = window.setInterval(() => setI((v) => (v + 1) % n), PULSE_MS);
     return () => window.clearInterval(id);
   }, [n, asOf, paused, reduceMotion]);
 
@@ -39,7 +43,16 @@ export function NewsCycle({ data, fetching = false }: { data: PulsePayload | nul
   const rest = n ? news.filter((_, idx) => idx !== i % n).slice(0, 5) : [];
 
   return (
-    <section className="rounded-2xl bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
+    <section
+      className="rounded-2xl bg-card p-4 shadow-[var(--shadow-border)] sm:p-5"
+      onMouseEnter={() => setHot(true)}
+      onMouseLeave={() => setHot(false)}
+      onFocus={() => setHot(true)}
+      onBlur={(e) => {
+        const next = e.relatedTarget;
+        if (!(next instanceof Node) || !e.currentTarget.contains(next)) setHot(false);
+      }}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="flex items-center gap-2 text-base font-medium text-foreground">
@@ -72,10 +85,10 @@ export function NewsCycle({ data, fetching = false }: { data: PulsePayload | nul
             <button
               type="button"
               className="rounded-md bg-elevated px-2 py-1 text-xs font-medium text-foreground"
-              onClick={() => setPaused((v) => !v)}
-              aria-pressed={paused}
+              onClick={() => setHeld((v) => !v)}
+              aria-pressed={held}
             >
-              {paused ? t("pulsePlay") : t("pulsePause")}
+              {held ? t("pulsePlay") : t("pulsePause")}
             </button>
             <p className="font-mono text-xs tabular-nums text-muted-foreground">
               {((i % n) + 1).toString().padStart(2, "0")}/{n.toString().padStart(2, "0")}

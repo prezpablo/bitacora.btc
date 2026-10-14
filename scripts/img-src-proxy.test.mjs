@@ -36,6 +36,12 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/);
   assert.match(logo, /fit: "cover"/);
   assert.match(logo, /position: "centre"/);
+  assert.match(logo, /isSvgPayload/);
+  assert.match(logo, /limitInputPixels: PIXELS/);
+  assert.match(logo, /default-src 'none'; sandbox/);
+  assert.match(logo, /readAtMost/);
+  assert.match(caddy, /@logo path \/logo\*/);
+  assert.match(caddy, /default-src 'none'; sandbox/);
 });
 
 test("smoke diario cubre /logo, img-src y Luma compacto", () => {

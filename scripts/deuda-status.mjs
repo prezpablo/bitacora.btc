@@ -127,7 +127,18 @@ function repoCheck(id) {
   }
   if (id === "D-FOSS") {
     const lic = existsSync(join(ROOT, "LICENSE"));
-    return { pass: false, detail: lic ? "LICENSE en disco; falta 200 anónimo" : "sin LICENSE y repo 404 anónimo" };
+    const header = read("src/components/site-header.tsx");
+    const linked = /github\.com\/prezpablo\/bitacora\.btc\/commit\//.test(header);
+    const ok = lic && linked;
+    return { pass: ok, detail: ok ? "LICENSE y el pie enlaza el commit" : "falta LICENSE o el hash del pie" };
+  }
+  if (id === "D-GLOBE") {
+    const gate = read("src/components/map/map-gate.tsx");
+    const globeFirst = /mapHasPendingCarga\(\) \? "map" : "globe"/.test(gate);
+    const back = /if \(!mapHasPendingCarga\(\)\) setMode\("globe"\)/.test(gate);
+    const notSlow = !/slowNet/.test(gate);
+    const ok = globeFirst && back && notSlow;
+    return { pass: ok, detail: ok ? "globo primero; CARGA pendiente abre el mapa" : "el globo ya no es la entrada" };
   }
   if (id === "L-N1") {
     const parties = read("src/domain/third-parties.ts");
@@ -369,6 +380,42 @@ function repoCheck(id) {
     const ok = /id: "budapest"/.test(src) && /id: "el-zonte"/.test(src) && !/id: "(lugano|viena|vienna|nyse)"/.test(src);
     return { pass: ok, detail: ok ? "Budapest y El Zonte; sin Lugano, Viena ni NYSE" : "entró una pieza que no correspondía" };
   }
+  if (id === "A-COLOR") {
+    const etf = read("src/components/dashboard/etf-flow.tsx");
+    const heat = read("src/components/dashboard/liq-heatmap.tsx");
+    const week = /weekUsdM[\s\S]{0,180}etfIn/.test(etf);
+    const legend = /heatLegend/.test(heat);
+    const ok = week && legend;
+    return { pass: ok, detail: ok ? "ETF y calor con palabra, no solo color" : !week ? "ETF 5d/30d/total sigue en color" : "el calor no tiene leyenda" };
+  }
+  if (id === "L-VINCULO") {
+    const i18n = read("src/lib/i18n.ts");
+    const form = read("src/components/map/spend-map.tsx");
+    const ok = /consentLink:/.test(i18n) && /consentLink/.test(form) && !/cédula|cedula|CI\b|RUT/.test(form);
+    return { pass: ok, detail: ok ? "casilla de vínculo, sin documento" : "cargar un comercio no pide vínculo" };
+  }
+  if (id === "A-CAPTCHA-ALT") {
+    const cap = read("src/components/map/captcha.tsx");
+    const letters = /maxLength=\{8\}/.test(cap);
+    return { pass: !letters, detail: letters ? "sigue la transcripción de letras" : "publicar no transcribe letras" };
+  }
+  if (id === "A-EMOJI") {
+    const ui = read("src/components/dashboard/conciencia.tsx");
+    const ok = /aria-hidden="true"[\s\S]{0,80}item\.mark/.test(ui);
+    return { pass: ok, detail: ok ? "el dibujo de la viñeta no se lee" : "el lector lee el emoji" };
+  }
+  if (id === "A-PULSE-HOVER") {
+    const ui = read("src/components/dashboard/news-cycle.tsx");
+    const ok = /onMouseEnter/.test(ui) && /onFocus/.test(ui) && /pulsePause/.test(ui);
+    return { pass: ok, detail: ok ? "el pulso frena con mouse, foco y botón" : "el pulso solo frena con el botón" };
+  }
+  if (id === "L-GEO-AVISO") {
+    const i18n = read("src/lib/i18n.ts");
+    const globe = read("src/components/map/world-globe.tsx");
+    const map = read("src/components/map/spend-map.tsx");
+    const ok = /geoPurpose:/.test(i18n) && /geoPurpose/.test(globe) && /geoPurpose/.test(map);
+    return { pass: ok, detail: ok ? "el permiso dice para qué y que no se guarda" : "el permiso del navegador sale sin ese aviso" };
+  }
   return { pass: false, detail: "manual" };
 }
 
@@ -385,10 +432,15 @@ async function liveCheck(id) {
     return { pass: ok, detail: ok ? "CSP teselas OFM+OTM" : `csp osm=${csp.includes("tile.openstreetmap")} ofm=${csp.includes("openfreemap")} esri=${csp.includes("arcgisonline")}` };
   }
   if (id === "D-FOSS") {
-    const r = await pull("https://github.com/prezpablo/bitacora.btc");
+    const gh = await pull("https://github.com/prezpablo/bitacora.btc");
+    const home = await pull(ORIGIN + "/");
     const lic = existsSync(join(ROOT, "LICENSE"));
-    const ok = r.status === 200 && lic;
-    return { pass: ok, detail: `github ${r.status} license=${lic}` };
+    const hash = /github\.com\/prezpablo\/bitacora\.btc\/commit\/[0-9a-f]{7}/.test(home.text);
+    const ok = gh.status === 200 && lic && hash;
+    return {
+      pass: ok,
+      detail: ok ? "github 200 y el pie muestra el commit" : `github ${gh.status} pie=${hash} license=${lic}`,
+    };
   }
   if (id === "D-SITEMAP") {
     const r = await pull(ORIGIN + "/sitemap.xml");

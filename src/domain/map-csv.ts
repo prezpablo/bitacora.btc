@@ -2,6 +2,8 @@ import type { Community, MerchantLocal, MerchantPlace } from "./entities";
 import { DAYS, EMPTY_HOURS, daySlots, type DayKey, type TimeSlot, type WeekHours } from "./hours";
 import { PAY_KEYS, type PayKey } from "./pays";
 import { SOCIAL_KEYS, type SocialKey, type SocialLink, urlFor } from "./socials";
+import { takePublicVote } from "./public-vote";
+import { publicBrandAllowed, publicRowStarred } from "./patch-star";
 
 export const MAP_CSV_HEADERS = [
   "id",
@@ -502,10 +504,11 @@ function sanitizeNewRow(r: MapCsvRow): MapCsvRow | null {
   };
 }
 
-/** POST público: altas nuevas (máx. 2) + un voto por fila; no mueve coords ni borra. */
+/** POST público: altas nuevas (máx. 2) y un voto por id. El puntaje no se reemplaza: se promedia. */
 export function applyPublicMapPatch(current: MapCsvRow[], incoming: MapCsvRow[]): MapCsvRow[] | null {
   const out = current.map((r) => ({ ...r }));
   const byId = new Map(out.map((r) => [r.id, r]));
+  const voted = new Set<string>();
   let added = 0;
   let voteBumps = 0;
   for (const r of incoming) {
@@ -520,16 +523,13 @@ export function applyPublicMapPatch(current: MapCsvRow[], incoming: MapCsvRow[])
       continue;
     }
     const nextVotes = Math.max(0, Math.floor(Number(r.votes) || 0));
-    if (nextVotes > (prev.votes || 0) + 1) continue;
-    if (nextVotes === (prev.votes || 0) + 1) {
-      if (voteBumps >= 3) continue;
-      voteBumps += 1;
-      prev.votes = nextVotes;
-      prev.score = Math.min(5, Math.max(1, Number(r.score) || prev.score || 1));
-    }
+    const step = takePublicVote(prev, { id: r.id, score: Number(r.score), votes: nextVotes }, voted, voteBumps);
+    voteBumps = step.bumps;
+    if (step.skipRest) continue;
+    const brand = publicBrandAllowed(publicRowStarred(prev, socialsFromCsv(prev.socials || "")), prev.token, r.token);
     if (!prev.description && r.description) prev.description = String(r.description).slice(0, 400);
-    if (!prev.logo && r.logo) prev.logo = String(r.logo).slice(0, 500);
-    if (!prev.socials && r.socials) prev.socials = String(r.socials).slice(0, 800);
+    if (brand && !prev.logo && r.logo) prev.logo = String(r.logo).slice(0, 500);
+    if (brand && !prev.socials && r.socials) prev.socials = String(r.socials).slice(0, 800);
     if (!prev.hours && r.hours) prev.hours = String(r.hours).replace(/\s+/g, "").slice(0, 200);
     if (!prev.pays && r.pays) prev.pays = String(r.pays).slice(0, 80);
     if (!prev.address && r.address) prev.address = String(r.address).slice(0, 200);
