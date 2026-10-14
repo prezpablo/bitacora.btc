@@ -315,6 +315,11 @@ function repoCheck(id) {
     const ok = /id=\{errId\} role="alert"/.test(contact) && /fieldErr\(errId, emailBad\)/.test(contact) && /id=\{failId\} role="alert"/.test(captcha);
     return { pass: ok, detail: ok ? "el error se anuncia y queda ligado al campo" : "falta el aviso o el lazo al campo" };
   }
+  if (id === "A-31") {
+    const legal = read("src/domain/legal-eu.ts");
+    const ok = !/niños y adolescentes/i.test(legal) && !/art\.\s*14/.test(legal);
+    return { pass: ok, detail: ok ? "no se nombra el art. 14 ni «niños y adolescentes»" : "entró el art. 14 o la frase sin verificar" };
+  }
   return { pass: false, detail: "manual" };
 }
 

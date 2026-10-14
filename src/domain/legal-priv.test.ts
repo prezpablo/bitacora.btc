@@ -20,3 +20,9 @@ test("privacyArt13 is unused copy; the art. 13 notice stays", () => {
   assert.match(legal, /art\. 13 of Act 18\.331/);
   assert.match(legal, /Informação do art\. 13/);
 });
+
+test("LGPD art. 14 is not named, and niños y adolescentes is not published", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(legal, /niños y adolescentes/i);
+  assert.doesNotMatch(legal, /art\.\s*14/);
+});

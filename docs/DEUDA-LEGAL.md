@@ -210,7 +210,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | A-25 | P3 | Hecho en el repo. Falta el ZIP. La clave no se usaba. El aviso del art. 13 queda. |
 | A-26 | P3 | Hecho en el repo. Falta el ZIP. Donar abre la ficha. El aviso está junto al QR. |
 | A-29 | P3 | Hecho en el repo. Falta el ZIP. El error se anuncia y queda ligado al campo. |
-| A-31 | P3 | LGPD art. 14 solo para menores de 12, si se publica. |
+| A-31 | P3 | Hecho en el repo. No se nombra el art. 14. No está «niños y adolescentes». |
 | L-VALOR | P2 | Impugnación de valoraciones. El v2 no lo repite. Sigue. |
 | L-PSAV | P2 | 20.446 y Circular 2507 solo después de leerlas. |
 | L-MKT-COPY | P2 | Sacar «barre shorts». |
