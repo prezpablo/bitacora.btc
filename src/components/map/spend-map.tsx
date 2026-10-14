@@ -1817,10 +1817,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         ) : null}
       </div>
 
-      <details className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
-        <summary className="cursor-pointer text-sm font-medium text-foreground">
-          {t("mapListTitle")} ({visibleComms.length + places.length})
-        </summary>
+      <section className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]" aria-labelledby="map-list-title">
+        <h2 id="map-list-title" className="text-sm font-medium text-foreground">
+          {t("mapListTitle")} ({visibleComms.length + Math.min(places.length, 80)})
+        </h2>
         <ul className="mt-3 columns-1 gap-x-6 text-sm sm:columns-2">
           {visibleComms.map((c) => (
             <li key={`c-${c.id}`} className="break-inside-avoid py-0.5">
@@ -1865,7 +1865,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             </li>
           ))}
         </ul>
-      </details>
+      </section>
 
       <section className="mt-4 rounded-lg bg-card p-4 shadow-[var(--shadow-border)]">
         <h2 className="text-sm font-medium tracking-wide text-foreground uppercase">{t("verifyHow")}</h2>

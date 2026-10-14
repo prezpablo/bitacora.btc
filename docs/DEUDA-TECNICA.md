@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22 | **L-IP** (ZIP) · **A-23** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22, A-23 | **L-IP** (ZIP) · **A-25** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-23**. Lista de lugares visible. Resumen escrito del precio, con zona (A-07). No se esconde el globo del teclado si la lista todavía no equivale. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-25**. Sacar `privacyArt13` si ninguna pantalla la usa. No se borra una clave que el aviso todavía muestra. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -77,7 +77,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | **A-18** | P2 | Hecho en el repo (textos 2.13). La apertura queda en la Ley 18.331 y remite al anexo. Brasil y Argentina siguen con el texto que ya estaba. Falta el ZIP. | No se redactó un párrafo nuevo del EEE. |
 | **A-21** | P2 | Hecho en el repo (textos 2.14). La primera vez, el término se dice en castellano. Falta el ZIP. | «allowlist» quedó como lista de direcciones permitidas, no de fundadores. LABIF no se definió. |
 | **A-22** | P2 | Hecho en el repo. Idioma, rangos 1D/1S/1M/6M, zoom del mapa y captcha no bajan de 24 px. Falta el ZIP. | El corte de axe no se subió a 44 px. |
-| **A-23** | P2 | Lista de lugares visible. Resumen escrito del precio, con zona (A-07). | No se esconde el globo del teclado si la lista todavía no equivale. |
+| **A-23** | P2 | Hecho en el repo. La lista de lugares se ve bajo el mapa. El precio se lee, con hora de Uruguay. Falta el ZIP. | El globo sigue en el teclado: la lista no lo reemplaza. |
 | **A-25** | P3 | Sacar `privacyArt13` si ninguna pantalla la usa. | No se borra una clave que el aviso todavía muestra. |
 | **A-26** | P3 | Junto al QR: aporte voluntario, sin contraprestación, no se revierte, la cadena es pública, no hay custodia. | — |
 | **A-29** | P3 | `role="alert"` y el error ligado al campo. | — |

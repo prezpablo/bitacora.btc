@@ -343,10 +343,12 @@ export function PriceChart({
   market,
   enabled,
   heatOn = true,
+  summary = "",
 }: {
   market: MarketPayload;
   enabled: Record<MaKey, boolean>;
   heatOn?: boolean;
+  summary?: string;
 }) {
   const t = useT();
   const sumId = useId();
@@ -844,7 +846,7 @@ export function PriceChart({
       onKeyDown={onKeyDown}
       onPointerDown={() => wrapRef.current?.focus({ preventScroll: true })}
     >
-      <p id={sumId} className="sr-only">{t("chartDisclaimer")}</p>
+      <p id={sumId} className="sr-only">{summary ? `${summary} ${t("chartDisclaimer")}` : t("chartDisclaimer")}</p>
       <div className="absolute top-2 left-2 z-10 flex gap-1">
         <Button
           type="button"

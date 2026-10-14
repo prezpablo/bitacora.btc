@@ -546,7 +546,7 @@
     {
       "id": "A-23",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "hay lista de lugares y resumen de precio en texto, sin depender del globo ni del canvas"
     },

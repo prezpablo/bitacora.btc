@@ -215,6 +215,10 @@ export function Desk() {
   }, [query.data, fallback, tick.data]);
   const fetching = query.isFetching || extras.isFetching;
   const updatedAt = tick.dataUpdatedAt || query.dataUpdatedAt || market.asOf;
+  const priceText = formatUsd(market.price, 0);
+  const priceSum = market.source === "modelo"
+    ? t(updatedAt ? "priceSumModel" : "priceSumModelZone", { price: priceText, when: updatedAt ? formatMarketClock(updatedAt) : "" })
+    : t(updatedAt ? "priceSum" : "priceSumZone", { price: priceText, when: updatedAt ? formatMarketClock(updatedAt) : "" });
   const up = (market?.change24h ?? 0) >= 0;
 
   const dist6m = useMemo(() => {
@@ -438,12 +442,14 @@ export function Desk() {
           <LazyMount fallback={<div className="bit-stage bg-plot" />} minHeight="14rem">
             <ClientOnly fallback={<div className="bit-stage bg-plot" />}>
               <Suspense fallback={<div className="bit-stage bg-plot" />}>
-                <PriceChart market={market} enabled={ma} heatOn={heatOn} />
+                <PriceChart market={market} enabled={ma} heatOn={heatOn} summary={priceSum} />
               </Suspense>
             </ClientOnly>
           </LazyMount>
         </div>
-        <p className="border-t border-border px-3 py-2 text-xs text-pretty text-muted-foreground">{t("chartDisclaimer")}</p>
+        <p className="border-t border-border px-3 py-2 text-xs text-pretty text-muted-foreground">
+          <span className="text-foreground">{priceSum}</span> {t("chartDisclaimer")}
+        </p>
       </section>
       <Suspense fallback={null}>
         <EtfFlowPanel data={etfFlows.data ?? null} />

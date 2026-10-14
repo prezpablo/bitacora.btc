@@ -290,6 +290,13 @@ function repoCheck(id) {
     const ok = /min-h-6 min-w-6/.test(seg) && !/min-h-11/.test(seg) && /min-height: 1\.5rem/.test(css) && !/wcag22aaa/.test(read("scripts/probe-a11y.mjs"));
     return { pass: ok, detail: ok ? "piso 24 px; el corte no sube a 44" : "falta el piso o se subió a 44" };
   }
+  if (id === "A-23") {
+    const map = read("src/components/map/spend-map.tsx");
+    const desk = read("src/components/dashboard/desk.tsx");
+    const globe = read("src/components/map/world-globe.tsx");
+    const ok = /id="map-list-title"/.test(map) && !/<details[\s\S]{0,180}mapListTitle/.test(map) && /summary=\{priceSum\}/.test(desk) && /Hora de Uruguay/.test(read("src/lib/i18n.ts")) && /tabIndex=\{0\}/.test(globe);
+    return { pass: ok, detail: ok ? "lista visible y precio escrito; globo en el teclado" : "falta la lista, el precio o se escondió el globo" };
+  }
   return { pass: false, detail: "manual" };
 }
 
