@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18 | **L-IP** (ZIP) · **A-21** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21 | **L-IP** (ZIP) · **A-22** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-21**. La primera vez, cada término de `/legal` se dice en castellano. «allowlist» no es «lista de fundadores». LABIF no se define hasta saber el texto. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-22**. 24 px en idioma, rangos 1D/1S/1M/6M, mapa y captcha. No se sube el umbral a 44 px en el mismo corte. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -75,7 +75,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | **A-15** | P2 | Hecho en el repo (textos 2.12). La tabla dice la clave y si es `localStorage` o `sessionStorage`. Falta el ZIP. | `bitacora-hit` es la animación del punto: no entra. `grok-auth.bearer-token` es solo del preview: no entra. El idioma no se guarda. |
 | **A-17** | P2 | Hecho en el repo. Junto al captcha hay un `mailto:` a accesibilidad@, en los tres idiomas. Falta el ZIP. | El botón de audio sigue. |
 | **A-18** | P2 | Hecho en el repo (textos 2.13). La apertura queda en la Ley 18.331 y remite al anexo. Brasil y Argentina siguen con el texto que ya estaba. Falta el ZIP. | No se redactó un párrafo nuevo del EEE. |
-| **A-21** | P2 | La primera vez, cada término de `/legal` se dice en castellano. | «allowlist» no es «lista de fundadores». Si se explica: lista de direcciones permitidas. LABIF no se define hasta saber el texto. |
+| **A-21** | P2 | Hecho en el repo (textos 2.14). La primera vez, el término se dice en castellano. Falta el ZIP. | «allowlist» quedó como lista de direcciones permitidas, no de fundadores. LABIF no se definió. |
 | **A-22** | P2 | 24 px en idioma, rangos 1D/1S/1M/6M, mapa y captcha. | No se sube el umbral a 44 px en el mismo corte. |
 | **A-23** | P2 | Lista de lugares visible. Resumen escrito del precio, con zona (A-07). | No se esconde el globo del teclado si la lista todavía no equivale. |
 | **A-25** | P3 | Sacar `privacyArt13` si ninguna pantalla la usa. | No se borra una clave que el aviso todavía muestra. |

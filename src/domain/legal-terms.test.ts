@@ -67,7 +67,7 @@ test("storage keys are the real ones and the map pulse is not a key", () => {
   const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
   assert.match(legal, /bitacora-storage", "localStorage"/);
   assert.match(legal, /bitacora-xp-pending", "sessionStorage"/);
-  assert.match(legal, /bitacora-map-pending", "localStorage y sessionStorage"/);
+  assert.match(legal, /bitacora-map-pending", "localStorage y sessionStorage/);
   assert.match(legal, /El idioma no se guarda/);
   assert.doesNotMatch(legal, /bitacora-hit/);
   assert.doesNotMatch(legal, /grok-auth/);
@@ -84,4 +84,15 @@ test("the opening stays on Uruguayan law and points at the annex", () => {
   }
   assert.match(legal, /13\.709\/2018/);
   assert.match(legal, /25\.326/);
+});
+
+test("Spanish legal terms are said in Spanish the first time", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  const es = legal.slice(0, legal.indexOf("const en"));
+  assert.match(es, /lista de direcciones permitidas/);
+  assert.doesNotMatch(es, /allowlist|lista de fundadores/);
+  assert.match(es, /también en LABIF/);
+  assert.doesNotMatch(es, /Impact Fund|Latin America Bitcoin/);
+  assert.match(es, /casa de cambio \(exchange\)/);
+  assert.match(es, /prueba de robot \(captcha\)/);
 });

@@ -532,7 +532,7 @@
     {
       "id": "A-21",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "la primera mención técnica en /legal se explica; allowlist no se traduce como lista de fundadores"
     },

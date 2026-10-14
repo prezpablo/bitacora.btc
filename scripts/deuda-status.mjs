@@ -261,7 +261,7 @@ function repoCheck(id) {
     const legal = read("src/domain/legal-eu.ts");
     const ok =
       /bitacora-storage", "localStorage"/.test(legal) &&
-      /bitacora-xp-pending", "sessionStorage"/.test(legal) &&
+      /bitacora-map-pending", "localStorage y sessionStorage/.test(legal) &&
       /El idioma no se guarda/.test(legal) &&
       !/bitacora-hit/.test(legal);
     return { pass: ok, detail: ok ? "tabla de claves reales; el pulso no entra" : "falta la tabla o entra una clave que no es" };
@@ -277,6 +277,12 @@ function repoCheck(id) {
     const leads = [...legal.matchAll(/\n  lead: "([^"]+)"/g)].map((m) => m[1] || "");
     const ok = leads.length === 3 && leads.every((lead) => /18\.331/.test(lead) && /anexo|annex/.test(lead) && !/RGPD|GDPR|ePrivacy/.test(lead)) && /13\.709\/2018/.test(legal) && /25\.326/.test(legal);
     return { pass: ok, detail: ok ? "apertura uruguaya; anexo ya escrito" : "la apertura sigue con el RGPD" };
+  }
+  if (id === "A-21") {
+    const legal = read("src/domain/legal-eu.ts");
+    const es = legal.slice(0, legal.indexOf("const en"));
+    const ok = /lista de direcciones permitidas/.test(es) && !/allowlist|lista de fundadores|Impact Fund/.test(es) && /también en LABIF/.test(es);
+    return { pass: ok, detail: ok ? "términos en castellano; LABIF sin definir" : "sigue un término en inglés o se definió LABIF" };
   }
   return { pass: false, detail: "manual" };
 }

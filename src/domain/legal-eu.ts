@@ -10,12 +10,12 @@ export type LegalBlock = {
 };
 
 const es: { lead: string; blocks: LegalBlock[] } = {
-  lead: "Bitácora.btc es una bitácora comunitaria impulsada desde Colonia del Sacramento, Uruguay. No es un exchange, no custodia fondos y no abre cuentas. El régimen que ordena este texto es la Ley n.º 18.331 de Protección de Datos Personales y Acción de Habeas Data, reglamentada por el Decreto n.º 414/009, con control de la URCDP. Brasil y Argentina están en el anexo. Este texto cumple el deber de información del art. 13 de la Ley 18.331. Describe lo que el sitio hace hoy: no es un certificado de conformidad ni un dictamen jurídico.",
+  lead: "Bitácora.btc es una bitácora comunitaria impulsada desde Colonia del Sacramento, Uruguay. No es una casa de cambio (exchange), no custodia fondos y no abre cuentas. El régimen que ordena este texto es la Ley n.º 18.331 de Protección de Datos Personales y Acción de Habeas Data, reglamentada por el Decreto n.º 414/009, con control de la URCDP. Brasil y Argentina están en el anexo. Este texto cumple el deber de información del art. 13 de la Ley 18.331. Describe lo que el sitio hace hoy: no es un certificado de conformidad ni un dictamen jurídico.",
   blocks: [
     {
       title: "Aviso legal · responsable",
       id: "aviso",
-      body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido. La inscripción ante la URCDP sigue en trámite. Quien ejerza derechos escribe a privacidad@bitacorabtc.org, sin captcha, acreditando la suya.\n\nNo hay Delegado de Protección de Datos: no es obligatorio (Ley n.º 19.670 art. 40 y Decreto n.º 64/020) porque no somos entidad pública, no tratamos datos sensibles como actividad principal ni operamos a gran escala. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es privacidad@bitacorabtc.org, sin captcha. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras. Bitácora.btc no es un Proveedor de Servicios de Activos Virtuales (Ley n.º 20.345).",
+      body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido. La inscripción ante la URCDP sigue en trámite. Quien ejerza derechos escribe a privacidad@bitacorabtc.org, sin la prueba de robot (captcha), acreditando la suya.\n\nNo hay Delegado de Protección de Datos: no es obligatorio (Ley n.º 19.670 art. 40 y Decreto n.º 64/020) porque no somos entidad pública, no tratamos datos sensibles como actividad principal ni operamos a gran escala. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es privacidad@bitacorabtc.org, sin captcha. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras. Bitácora.btc no es un Proveedor de Servicios de Activos Virtuales (Ley n.º 20.345).",
     },
         {
       title: "Términos y condiciones",
@@ -27,13 +27,13 @@ const es: { lead: string; blocks: LegalBlock[] } = {
         { title: "3. Contenido de terceros", body: "El contenido del mapa y de los anuncios lo publican terceros. El responsable puede retirarlo si es ilícito, engañoso o viola estas reglas." },
         { title: "4. Carga de un comercio", body: "Quien carga o modifica un comercio declara que los datos son ciertos y es responsable de mantenerlos actualizados." },
         { title: "5. Verificación", body: "La verificación no cambia: el código CARGA se publica en un enlace público y el mapa se actualiza solo cuando esa prueba se comprueba." },
-        { title: "6. Aportes y mapas", body: "Los aportes propios al directorio se publican bajo CC BY 4.0: se pueden copiar citando a Bitácora.btc. Los datos geográficos de OSM y BTC Map siguen ODbL (© OpenStreetMap contributors). El programa sigue en AGPL-3.0. La licencia de una ficha armada a partir de esos datos no se afirma aquí." },
+        { title: "6. Aportes y mapas", body: "Los aportes propios al directorio se publican bajo la licencia Creative Commons de atribución (CC BY 4.0): se pueden copiar citando a Bitácora.btc. Los datos geográficos de OpenStreetMap (OSM) y BTC Map siguen la licencia de base de datos abierta (ODbL) (© OpenStreetMap contributors). El programa sigue en la licencia pública Affero (AGPL-3.0). La licencia de una ficha armada a partir de esos datos no se afirma aquí." },
         { title: "7. Mercado", body: "El módulo Mercado es información educativa: no es asesoramiento financiero ni recomendación de inversión." },
-        { title: "8. Estrella de verificado", body: "La estrella de verificado indica dos enlaces públicos, un promedio alto con votos o la allowlist de fundación. No es un sello del BCU ni una garantía comercial." },
+        { title: "8. Estrella de verificado", body: "La estrella de verificado indica dos enlaces públicos, un promedio alto con votos o la lista de direcciones permitidas de la fundación. No es un sello del BCU ni una garantía comercial." },
         { title: "9. Ley y tribunales", body: "Ley aplicable: República Oriental del Uruguay. Jurisdicción: tribunales de Uruguay. Privacidad: esta misma página, ancla Privacidad." },
-        { title: "10. Experiencias", body: "Quien publica una experiencia declara que la actividad, la ciudad, la fecha o el carácter recurrente, el precio en sats o el convenio y el enlace de prueba son ciertos. Eso se hace público bajo CC BY 4.0, citando a Bitácora.btc. El código de edición no se publica y se borra a los 30 días." },
+        { title: "10. Experiencias", body: "Quien publica una experiencia declara que la actividad, la ciudad, la fecha o el carácter recurrente, el precio en satoshis (sats) o el convenio y el enlace de prueba son ciertos. Eso se hace público bajo CC BY 4.0, citando a Bitácora.btc. El código de edición no se publica y se borra a los 30 días." },
         { title: "11. Anuncios", body: "Quien publica un anuncio declara que el texto y el enlace son ciertos. El anuncio dura 7 días en el tablero. El código CARGA no se publica y se borra a los 30 días." },
-        { title: "12. Disputas", body: "Una disputa de ficha se manda por el formulario de Contacto, con un ticket. No hay un plazo propio de disputa en esta página. Si el pedido es de acceso, rectificación o supresión, el plazo es de 5 días hábiles (arts. 14 y 15 de la Ley 18.331)." },
+        { title: "12. Disputas", body: "Una disputa de ficha se manda por el formulario de Contacto, con un número de seguimiento (ticket). No hay un plazo propio de disputa en esta página. Si el pedido es de acceso, rectificación o supresión, el plazo es de 5 días hábiles (arts. 14 y 15 de la Ley 18.331)." },
         { title: "13. Retiro", body: "Quien publicó una ficha, un anuncio o una experiencia puede pedir el retiro por el mismo formulario. El retiro alcanza nuestras copias. Lo ya publicado en GitHub o en una red pública no se borra del todo." },
         { title: "14. Cambios", body: "Estas reglas pueden cambiar. Rige el texto publicado en esta página." },
       ],
@@ -46,7 +46,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Qué datos se tratan y para qué",
       id: "privacidad",
-      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación a privacidad@bitacorabtc.org.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido. Las finalidades son responder el contacto, publicar el directorio y las experiencias, y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha y experiencia, mientras existan; código de edición de la experiencia, 30 días.",
+      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay puntaje automatizado de personas (scoring), no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación a privacidad@bitacorabtc.org.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido. Las finalidades son responder el contacto, publicar el directorio y las experiencias, y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha y experiencia, mientras existan; código de edición de la experiencia, 30 días.",
       table: {
         head: ["Interacción", "Datos", "Base (Ley 18.331)", "Conservación"],
         rows: [
@@ -58,7 +58,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
           ],
           [
             "Mapa / fichas",
-            "Nombre del lugar, descripción, dirección, horarios, redes, URL de logo, coordenadas, votos",
+            "Nombre del lugar, descripción, dirección, horarios, redes, dirección web (URL) de logo, coordenadas, votos",
             "Consentimiento al publicar un directorio abierto (art. 9). Lo que cargás se hace público",
             "Mientras la ficha exista. El historial de GitHub puede persistir",
           ],
@@ -66,7 +66,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
             "Anuncios comunitarios",
             "Nombre, texto, URL de prueba y redes, código CARGA",
             "Consentimiento al publicar, con caducidad semanal",
-            "7 días en el tablero. El código CARGA se conserva 30 días y no sale en el CSV público",
+            "7 días en el tablero. El código CARGA se conserva 30 días y no sale en el archivo separado por comas (CSV) público",
           ],
           [
             "Experiencias",
@@ -84,18 +84,18 @@ const es: { lead: string; blocks: LegalBlock[] } = {
             "Ciudad por IP",
             "Ciudad aproximada (GeoJS / ipwho.is)",
             "Consentimiento: extras del dispositivo o el botón de ubicación",
-            "No se persiste. Si hay abuso, se guarda un HMAC-SHA256 truncado de la IP: dato seudonimizado, no la IP en claro",
+            "No se persiste. Si hay abuso, se guarda un resumen criptográfico truncado (HMAC-SHA256) de la IP: dato seudonimizado, no la IP en claro",
           ],
           [
             "Seguridad",
             "HMAC-SHA256 truncado de la IP (dato seudonimizado), ticket de captcha, tope de envíos",
-            "Necesario para prestar el servicio y mitigar spam o ataques (no es telemetría ni analítica)",
+            "Necesario para prestar el servicio y mitigar correo basura (spam) o ataques (no es telemetría ni analítica)",
             "Ventana del tope: 2 horas. El captcha caduca",
           ],
           [
             "Este dispositivo",
             "Idioma; si aceptás, apodo y caché del mapa",
-            "Idioma: necesario para mostrar el sitio. El resto, consentimiento del banner (ePrivacy)",
+            "Idioma: necesario para mostrar el sitio. El resto, consentimiento del aviso (banner; Directiva ePrivacy)",
             "Hasta que borres los datos del navegador o elijas «Solo necesario»",
           ],
         ],
@@ -104,7 +104,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transferencias, terceros e inmutabilidad",
       id: "terceros",
-      body: "El tratamiento se hace en un servidor contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo. La lista, con nombre y país, está debajo.\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS o ipwho.is estiman ciudad si lo autorizás. APIs de mercado y de eventos alimentan el desk (precio, on-chain, agenda). La casilla de Contacto que nombra a FormSubmit documenta el consentimiento a esa transferencia a Estados Unidos (Ley 18.331, art. 23, inciso 2º, literal A). La casilla al publicar documenta la de GitHub. Las demás consultas no usan esa casilla.\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
+      body: "El tratamiento se hace en un servidor virtual contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo. La lista, con nombre y país, está debajo.\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS o ipwho.is estiman ciudad si lo autorizás. Las interfaces de mercado y de eventos alimentan la mesa de mercado (precio, datos de la cadena y agenda). La casilla de Contacto que nombra a FormSubmit documenta el consentimiento a esa transferencia a Estados Unidos (Ley 18.331, art. 23, inciso 2º, literal A). La casilla al publicar documenta la de GitHub. Las demás consultas no usan esa casilla.\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
     },
     {
       title: "Derechos",
@@ -114,16 +114,16 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Almacenamiento en el terminal (cookies)",
       id: "cookies",
-      body: "No usamos cookies de analítica, de publicidad ni de redes sociales de terceros. No hay gtag, píxel ni CMP de marketing.\n\nEl idioma no se guarda en el navegador: va en la dirección de la página. El aviso de este dispositivo guarda la elección y, solo si aceptás la caché, el apodo y la caché del mapa. La tabla lista cada clave. Eso es almacenamiento en el terminal (art. 5.3 ePrivacy). El banner permite «Solo necesario» o aceptar la caché. Las tipografías se sirven desde este sitio (no Google Fonts). La ciudad por IP no se pide hasta que aceptás extras o usás el botón de ubicación.\n\nPara retirar el consentimiento: «Solo necesario» en el aviso, o borrar los datos de este sitio en el navegador.",
+      body: "No usamos cookies de analítica, de publicidad ni de redes sociales de terceros. No hay código de analítica (gtag), píxel ni gestor de consentimiento de marketing (CMP).\n\nEl idioma no se guarda en el navegador: va en la dirección de la página. El aviso de este dispositivo guarda la elección y, solo si aceptás la caché, el apodo y la caché del mapa. La tabla lista cada clave. Eso es almacenamiento en el terminal (art. 5.3 ePrivacy). El aviso permite «Solo necesario» o aceptar la caché. Las tipografías se sirven desde este sitio (no Google Fonts). La ciudad por IP no se pide hasta que aceptás extras o usás el botón de ubicación.\n\nPara retirar el consentimiento: «Solo necesario» en el aviso, o borrar los datos de este sitio en el navegador.",
       table: {
         head: ["Clave", "Dónde", "Para qué"],
         rows: [
-          ["bitacora-storage", "localStorage", "La elección del aviso: solo necesario o caché."],
+          ["bitacora-storage", "localStorage (memoria del navegador)", "La elección del aviso: solo necesario o caché."],
           ["bitacora-nick", "localStorage", "Apodo, solo si se acepta la caché."],
           ["bitacora-map-csv-v1", "localStorage", "Caché del mapa, solo si se acepta."],
           ["bitacora-places-v1", "localStorage", "Caché de comercios, solo si se acepta."],
           ["bitacora-communities-v1", "localStorage", "Caché de comunidades, solo si se acepta."],
-          ["bitacora-map-pending", "localStorage y sessionStorage", "Ficha a medio cargar, en esta visita."],
+          ["bitacora-map-pending", "localStorage y sessionStorage (memoria de la pestaña)", "Ficha a medio cargar, en esta visita."],
           ["bitacora-pin-pending", "localStorage y sessionStorage", "Anuncio a medio cargar, en esta visita."],
           ["bitacora-xp-pending", "sessionStorage", "Experiencia a medio cargar, en esta pestaña."],
           ["bitacora-storage-seen", "sessionStorage", "El aviso ya se mostró en esta pestaña."],
@@ -135,7 +135,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Accesibilidad",
       id: "accesibilidad",
-      body: "La soberanía tecnológica incluye poder usar el sitio con teclado y lector de pantalla. Declaración de autoevaluación, 7 de setiembre de 2026: recorrido de código y teclado. No es auditoría externa ni certificado WCAG 2.2 AA ni Directiva (UE) 2019/882.\n\nHoy: enlace de salto al contenido (primer control al tabular, también en LABIF), selector de idioma con aria, landmarks, anillo de foco al tabular, barra de almacenamiento como región (no modal), QR con texto alternativo, navegación etiquetada, lista textual de lugares bajo el mapa, prefers-reduced-motion en el globo (sin auto-rotación) y en los vuelos del mapa, y captcha con audio y anuncio para lector (el dibujo es apoyo visual).",
+      body: "La soberanía tecnológica incluye poder usar el sitio con teclado y lector de pantalla. Declaración de autoevaluación, 7 de setiembre de 2026: recorrido de código y teclado. No es auditoría externa ni certificado de las pautas de accesibilidad web (WCAG) 2.2 AA ni Directiva (UE) 2019/882.\n\nHoy: enlace de salto al contenido (primer control al tabular, también en LABIF), selector de idioma con etiquetas para el lector (aria), regiones de la página (landmarks), anillo de foco al tabular, barra de almacenamiento como región (no modal), código QR con texto alternativo, navegación etiquetada, lista textual de lugares bajo el mapa, menos movimiento (prefers-reduced-motion) en el globo (sin auto-rotación) y en los vuelos del mapa, y captcha con audio y anuncio para lector (el dibujo es apoyo visual).",
     },
     {
       title: "Menores",
@@ -311,7 +311,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
         { title: "5. Verificação", body: "A verificação não muda: o código CARGA é publicado num link público e o mapa só se atualiza quando essa prova se confirma." },
         { title: "6. Aportes e mapas", body: "Os aportes próprios ao diretório são publicados sob CC BY 4.0: podem ser copiados citando a Bitácora.btc. Os dados geográficos de OSM e BTC Map seguem a ODbL (© OpenStreetMap contributors). O programa continua na AGPL-3.0. A licença de uma ficha montada a partir desses dados não é afirmada aqui." },
         { title: "7. Mercado", body: "O módulo Mercado é informação educativa: não é aconselhamento financeiro nem recomendação de investimento." },
-        { title: "8. Estrela de verificado", body: "A estrela de verificado indica dois links públicos, uma média alta com votos ou a allowlist de fundação. Não é um selo do BCU nem garantia comercial." },
+        { title: "8. Estrela de verificado", body: "A estrela de verificado indica dois links públicos, uma média alta com votos ou a lista de endereços permitidos da fundação. Não é um selo do BCU nem garantia comercial." },
         { title: "9. Lei e tribunais", body: "Lei aplicável: República Oriental do Uruguai. Jurisdição: tribunais do Uruguai. Privacidade: esta mesma página, âncora Privacidade." },
         { title: "10. Experiências", body: "Quem publica uma experiência declara que a atividade, a cidade, a data ou o caráter recorrente, o preço em sats ou o convênio e o link de prova são verdadeiros. Isso fica público sob CC BY 4.0, citando a Bitácora.btc. O código de edição não é publicado e é apagado em 30 dias." },
         { title: "11. Anúncios", body: "Quem publica um anúncio declara que o texto e o link são verdadeiros. O anúncio fica 7 dias no quadro. O código CARGA não é publicado e é apagado em 30 dias." },
