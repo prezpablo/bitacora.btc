@@ -144,6 +144,11 @@ function repoCheck(id) {
     const ok = form.includes("privacy-transfer") && form.includes("consentTransfer") && !legal.includes("casilla de privacidad documenta tu consentimiento a estas transferencias");
     return { pass: ok, detail: ok ? "casilla FormSubmit aparte" : "sigue una sola casilla" };
   }
+  if (id === "L-IP") {
+    const row = read("src/domain/third-parties.ts");
+    const ok = /name: "FormSubmit"[\s\S]{0,280}navegador también le envía tu IP/.test(row);
+    return { pass: ok, detail: ok ? "FormSubmit declara la IP" : "el renglón no nombra la IP" };
+  }
   return { pass: false, detail: "manual" };
 }
 

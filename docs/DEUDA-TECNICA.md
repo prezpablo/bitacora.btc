@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER | **L-IP** · **L-PAIS** · **L-URCDP** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, L-IP | **L-PAIS** · **L-URCDP** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -40,7 +40,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 |---|---|---|---|---|---|
 | 1 | **L-N1** | P0 | N1 | **Hecho en repo.** Lista propia: «Reciben lo que publicás o lo que nos escribís». Falta el ZIP para verse en el .org. | Código |
 | 2 | **L-XFER** | P0 | D4, N2 | **Hecho en repo.** Casilla aparte que nombra FormSubmit. Falta el ZIP. | Código |
-| 3 | **L-IP** | P1 | N3 | FormSubmit está en «el navegador contacta». El renglón no dice que también recibe la IP. | Código |
+| 3 | **L-IP** | P1 | N3 | **Hecho en repo.** El renglón dice que el navegador también le envía la IP. Falta el ZIP. | Código |
 | 4 | **L-PAIS** | P1 | D3 | «no declarado»: OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva. No inventar el país. Si no se sabe, se dice o se saca. | Código, con fuente |
 | 5 | **L-URCDP** | P1 | D2 | Sigue «Número de trámite: en trámite». No hay expediente ni inscripción. | Pablo |
 | 6 | **L-VALOR** | P2 | D7 | Los derechos no nombran impugnar valoraciones. | Código |
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen en la cola vieja, no se duplican: captcha de letras (L2.1), globo y velas sin teclado (L2.4), contraste y 24 px (L2.5), repo 404 anónimo (D-FOSS). Polymarket tiene «Ver en Polymarket» (T6): no se saca en este corte.
 
-**Siguiente fase de código, si se acepta:** **L-IP**. Un ZIP. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **L-PAIS**. No inventar el país. No mezclar con D-STATUE.
 
 ### Cola vigente — lo que quedó de antes
 

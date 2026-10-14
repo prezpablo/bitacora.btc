@@ -189,7 +189,7 @@ La pasada de las 21:19 miró la versión 2.0. El sitio publicado a las 22:22 es 
 |---|---|---|
 | L-N1 | P0 | Hecho en el repo: lista propia. En el .org sigue el título viejo hasta el ZIP. |
 | L-XFER | P0 | Hecho en el repo: casilla aparte para FormSubmit. En el .org sigue una sola hasta el ZIP. |
-| L-IP | P1 | Decir que FormSubmit, llamado por el navegador, recibe la IP. |
+| L-IP | P1 | Hecho en el repo: el renglón de FormSubmit nombra la IP. En el .org falta el ZIP. |
 | L-PAIS | P1 | OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva siguen «no declarado». No inventar el país. |
 | L-URCDP | P1 | El número de trámite no es «en trámite». Lo pone Pablo. |
 | L-VALOR | P2 | Impugnación de valoraciones. |

@@ -392,7 +392,7 @@
     {
       "id": "L-IP",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "el renglón de FormSubmit dice que el navegador también le envía la IP"
     },
