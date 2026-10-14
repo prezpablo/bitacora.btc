@@ -161,6 +161,16 @@ function repoCheck(id) {
       /legalWhoPending:/.test(i18n);
     return { pass: ok, detail: ok ? "sin domicilio de notificación publicado" : "el aviso todavía dice que el domicilio figura" };
   }
+  if (id === "L-URCDP") {
+    const cfg = read("src/domain/legal-config.ts");
+    const legal = read("src/domain/legal-eu.ts");
+    const ok =
+      /expediente: "\[N\.º TRÁMITE\]"/.test(cfg) &&
+      /filingDate: "\[FECHA_PRESENTACION\]"/.test(cfg) &&
+      !/Número de trámite: en trámite/.test(legal) &&
+      /todavía no asignó número de trámite/.test(legal);
+    return { pass: ok, detail: ok ? "sin número de trámite inventado" : "sigue «en trámite» como número" };
+  }
   return { pass: false, detail: "manual" };
 }
 

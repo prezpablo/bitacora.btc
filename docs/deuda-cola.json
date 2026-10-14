@@ -406,7 +406,7 @@
     {
       "id": "L-URCDP",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "A-02: no aparece Número de trámite: en trámite; tres estados; sin número se dice que la URCDP no lo asignó; la fecha se omite hasta que Pablo la confirme; bases = contacto y seguridad"
     },

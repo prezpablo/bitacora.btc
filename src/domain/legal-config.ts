@@ -15,10 +15,13 @@ export const LEGAL = {
   contributionLicense: "CC BY 4.0",
   vpsCountry: VPS_COUNTRY.es,
   translator: "[PROVEEDOR_TRADUCCION]",
-  expediente: "en trámite",
+  /** Número de trámite URCDP. Un corchete no es un número. */
+  expediente: "[N.º TRÁMITE]",
   inscription: "[N.º INSCRIPCIÓN]",
+  /** Fecha de presentación. No se publica hasta que Pablo la confirme. */
+  filingDate: "[FECHA_PRESENTACION]",
   vigencia: "[FECHA_VIGENCIA]",
-  consentVersion: "2.5",
+  consentVersion: "2.6",
 } as const;
 
 export const LEGAL_CITY = {

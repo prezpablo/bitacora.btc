@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01 | **L-URCDP** · **L-PAIS** · **A-04** · **L-IP** (ZIP) · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP | **L-PAIS** · **A-04** · **L-IP** (ZIP) · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -42,7 +42,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 | 2 | **L-XFER** | P0 | D4, N2 | **En el .org** (22:41). Casilla aparte que nombra FormSubmit. | — |
 | 3 | **L-IP** | P1 | N3 viejo | **En GitHub `9bd3b6d`, no en el .org.** El renglón sigue sin la IP. | ZIP |
 | 4 | **L-PAIS** | P0 | A-03 | Sigue «no declarado». Pasa a P0: país con fuente, o «país no informado por el proveedor». No inventar. | Código, con fuente |
-| 5 | **L-URCDP** | P0 | A-02 | Sigue «Número de trámite: en trámite». El texto honesto (sin número) es código. El número lo pone Pablo. | Código, después Pablo |
+| 5 | **L-URCDP** | P0 | A-02 | **En GitHub, no en el .org.** Textos 2.6: sin número, la URCDP no lo asignó. La fecha no se publica. | ZIP |
 | 6 | **L-VALOR** | P2 | D7 | Los derechos no nombran impugnar valoraciones. El informe v2 no lo repite. Sigue. | Código |
 | 7 | **L-TAKEDOWN** | P2 | A-08 r.12 | El plazo de denuncia queda en la regla 12, oculto hasta que Pablo dé el número. | Código |
 | 8 | **L-PSAV** | P2 | T4 | Solo Ley 20.345. La 20.446 y la Circular BCU 2507 no se citan hasta leerlas. | Confirmar, después código |
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **L-URCDP** (A-02). No imprimir «en trámite» como si fuera el número. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **L-PAIS** (A-03). País con fuente, o «el proveedor no informa el país». No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -62,7 +62,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | Id | Pri | Qué se hace | No se hace |
 |---|---|---|---|
 | **A-01** | P0 | Hecho en el repo (textos 2.5). Sin domicilio de notificación, el aviso no dice que figura. Queda la ciudad. Falta el ZIP para el .org. | No se publica una calle. |
-| **L-URCDP** (A-02) | P0 | Tres estados. Hoy: la solicitud está en curso y la URCDP no asignó número. Bases: contacto y seguridad. | No se imprime «en trámite» como si fuera el número. La fecha del 2 de setiembre se omite hasta que Pablo la confirme (B-03). No se agregan anuncios ni experiencias a las bases. |
+| **L-URCDP** (A-02) | P0 | Hecho en el repo (textos 2.6). Sin número, dice que la URCDP no lo asignó. La fecha no se publica. Bases: contacto y seguridad. Falta el ZIP. | No se imprime «en trámite» como número. No se agregan anuncios ni experiencias. |
 | **L-PAIS** (A-03) | P0 | País con enlace a la fuente del proveedor, o «país no informado por el proveedor». | No se adivina el país ni la instancia de Lingva. |
 | **A-04** | P0 | La cita pasa a «Ley 18.331, art. 23, inciso 2º, literal A» (y el equivalente en pt y en). Gmail: 12 meses, que ya está dicho. | No se inventan `[PLAZO_LOGS]` ni `[PLAZO_FORMSUBMIT]`. Si no están, no se muestran. |
 | **A-07** | P1 | La hora del mercado lleva zona. En serie modelo, la cifra dice que no es cotización. | Las fuentes del aviso son las que el desk ya usa. No se inventa una lista. |

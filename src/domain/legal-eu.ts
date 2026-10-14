@@ -105,7 +105,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Derechos",
       id: "derechos",
-      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace escribiendo a privacidad@bitacorabtc.org, sin captcha, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\nLa inscripción de la base de contacto y de seguridad ante la URCDP se presentó el 2 de setiembre de 2026. Número de trámite: en trámite. El número de inscripción se publicará aquí cuando esté aprobado. El directorio del mapa, por ser un listado público que vos mismo publicás, se informa como tal en esa presentación.\n\nSi una violación de seguridad afecta datos personales, se avisa a la URCDP y, cuando corresponda, a las personas afectadas, dentro de 72 horas de conocida.",
+      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace escribiendo a privacidad@bitacorabtc.org, sin captcha, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\n{{URCDP}}\n\nSi una violación de seguridad afecta datos personales, se avisa a la URCDP y, cuando corresponda, a las personas afectadas, dentro de 72 horas de conocida.",
     },
     {
       title: "Almacenamiento en el terminal (cookies)",
@@ -226,7 +226,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Rights",
       id: "derechos",
-      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests are made by writing to privacidad@bitacorabtc.org, with no captcha, and with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\nRegistration of the contact and security database with the URCDP was filed on 2 September 2026. Procedure number: in progress. The registration number will be published here when approved. The map directory, as a public listing you yourself publish, is disclosed as such in that filing.\n\nIf a security breach affects personal data, the URCDP and, where it applies, the people affected are told within 72 hours of it becoming known.",
+      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests are made by writing to privacidad@bitacorabtc.org, with no captcha, and with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\n{{URCDP}}\n\nIf a security breach affects personal data, the URCDP and, where it applies, the people affected are told within 72 hours of it becoming known.",
     },
     {
       title: "Storage on the device (cookies)",
@@ -347,7 +347,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Direitos",
       id: "derechos",
-      body: "Você pode exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14 a 16 da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e o direito de não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido é feito escrevendo para privacidad@bitacorabtc.org, sem captcha, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14 e 15). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controle do art. 77 do RGPD.\n\nA inscrição da base de contato e de segurança perante a URCDP foi apresentada em 2 de setembro de 2026. Número do processo: em tramitação. O número de inscrição será publicado aqui quando for aprovado. O diretório do mapa, por ser uma lista pública que você mesmo publica, é informado como tal nessa apresentação.\n\nSe uma violação de segurança afetar dados pessoais, a URCDP e, quando for o caso, as pessoas afetadas são avisadas em até 72 horas depois que se souber.",
+      body: "Você pode exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14 a 16 da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e o direito de não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido é feito escrevendo para privacidad@bitacorabtc.org, sem captcha, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14 e 15). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controle do art. 77 do RGPD.\n\n{{URCDP}}\n\nSe uma violação de segurança afetar dados pessoais, a URCDP e, quando for o caso, as pessoas afetadas são avisadas em até 72 horas depois que se souber.",
     },
     {
       title: "Armazenamento no aparelho (cookies)",
@@ -411,4 +411,49 @@ const NOTICE_READY: Record<AppLang, Array<[string, string]>> = {
 export function withNoticeAddress(text: string, lang: AppLang) {
   if (!legalFilled(LEGAL.address)) return text;
   return (NOTICE_READY[lang] || []).reduce((out, [from, to]) => out.split(from).join(to), text);
+}
+
+/** Tres estados. Sin número no se imprime «en trámite» como si lo fuera. Sin fecha confirmada, no se imprime. */
+export function urcdpParagraph(
+  lang: AppLang,
+  fields: { date: string; file: string; reg: string } = {
+    date: LEGAL.filingDate,
+    file: LEGAL.expediente,
+    reg: LEGAL.inscription,
+  },
+) {
+  const date = legalFilled(fields.date) ? fields.date : "";
+  const file = legalFilled(fields.file) ? fields.file : "";
+  const reg = legalFilled(fields.reg) ? fields.reg : "";
+  if (file) {
+    const row = {
+      es: `Inscripción URCDP. Número de trámite: ${file}.`,
+      en: `URCDP registration. Procedure number: ${file}.`,
+      pt: `Inscrição na URCDP. Número do processo: ${file}.`,
+    }[lang];
+    const extra = reg
+      ? { es: ` Número de inscripción: ${reg}.`, en: ` Registration number: ${reg}.`, pt: ` Número de inscrição: ${reg}.` }[lang]
+      : "";
+    return row + extra;
+  }
+  if (date) {
+    return {
+      es: `La inscripción de las bases de contacto y de seguridad ante la URCDP se presentó el ${date}. La URCDP todavía no asignó número de trámite.`,
+      en: `Registration of the contact and security databases with the URCDP was filed on ${date}. The URCDP has not yet assigned a procedure number.`,
+      pt: `A inscrição das bases de contato e de segurança perante a URCDP foi apresentada em ${date}. A URCDP ainda não atribuiu número de processo.`,
+    }[lang];
+  }
+  return {
+    es: "La inscripción de las bases de contacto y de seguridad ante la URCDP está solicitada. La URCDP todavía no asignó número de trámite. El número se publicará en esta página cuando exista.",
+    en: "Registration of the contact and security databases with the URCDP has been requested. The URCDP has not yet assigned a procedure number. The number will be published on this page when it exists.",
+    pt: "A inscrição das bases de contato e de segurança perante a URCDP está solicitada. A URCDP ainda não atribuiu número de processo. O número será publicado nesta página quando existir.",
+  }[lang];
+}
+
+export function withUrcdp(text: string, lang: AppLang) {
+  return text.split("{{URCDP}}").join(urcdpParagraph(lang));
+}
+
+export function legalBody(text: string, lang: AppLang) {
+  return withNoticeAddress(withUrcdp(text, lang), lang);
 }

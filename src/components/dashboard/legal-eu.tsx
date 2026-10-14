@@ -1,4 +1,4 @@
-import { LEGAL_EU, withNoticeAddress, type LegalBlock } from "@/domain/legal-eu";
+import { LEGAL_EU, legalBody, type LegalBlock } from "@/domain/legal-eu";
 import { LEGAL, LEGAL_CITY, VPS_COUNTRY, legalFilled } from "@/domain/legal-config";
 import { THIRD_PARTIES, type ThirdParty } from "@/domain/third-parties";
 import { useAppLang, useT } from "@/lib/i18n";
@@ -100,7 +100,7 @@ export function LegalEu() {
             className={cn("rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5", b.id && "scroll-mt-[var(--header-offset)]")}
           >
             <h2 className="font-display text-lg font-medium text-foreground">{b.title}</h2>
-            <Paragraphs text={withNoticeAddress(b.body, lang)} />
+            <Paragraphs text={legalBody(b.body, lang)} />
             {b.clauses?.map((c) => (
               <div key={c.title} className="mt-3">
                 <h3 className="text-sm font-medium text-foreground">{c.title}</h3>
