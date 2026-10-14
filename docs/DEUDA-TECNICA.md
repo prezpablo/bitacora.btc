@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, L-IP | **L-PAIS** · **L-URCDP** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER | **A-01** · **L-URCDP** · **L-PAIS** · **A-04** · **L-IP** (ZIP) · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -38,20 +38,81 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 | Orden | Id | Pri | Informe | Qué falta en el .org | Quién |
 |---|---|---|---|---|---|
-| 1 | **L-N1** | P0 | N1 | **Hecho en repo.** Lista propia: «Reciben lo que publicás o lo que nos escribís». Falta el ZIP para verse en el .org. | Código |
-| 2 | **L-XFER** | P0 | D4, N2 | **Hecho en repo.** Casilla aparte que nombra FormSubmit. Falta el ZIP. | Código |
-| 3 | **L-IP** | P1 | N3 | **Hecho en repo.** El renglón dice que el navegador también le envía la IP. Falta el ZIP. | Código |
-| 4 | **L-PAIS** | P1 | D3 | «no declarado»: OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva. No inventar el país. Si no se sabe, se dice o se saca. | Código, con fuente |
-| 5 | **L-URCDP** | P1 | D2 | Sigue «Número de trámite: en trámite». No hay expediente ni inscripción. | Pablo |
-| 6 | **L-VALOR** | P2 | D7 | Los derechos no nombran impugnar valoraciones. | Código |
-| 7 | **L-TAKEDOWN** | P2 | T2 | Se puede retirar lo ilícito. No hay plazo de denuncia. | Código |
+| 1 | **L-N1** | P0 | N1 | **En el .org** (22:41). Lista «Reciben lo que publicás o lo que nos escribís». | — |
+| 2 | **L-XFER** | P0 | D4, N2 | **En el .org** (22:41). Casilla aparte que nombra FormSubmit. | — |
+| 3 | **L-IP** | P1 | N3 viejo | **En GitHub `9bd3b6d`, no en el .org.** El renglón sigue sin la IP. | ZIP |
+| 4 | **L-PAIS** | P0 | A-03 | Sigue «no declarado». Pasa a P0: país con fuente, o «país no informado por el proveedor». No inventar. | Código, con fuente |
+| 5 | **L-URCDP** | P0 | A-02 | Sigue «Número de trámite: en trámite». El texto honesto (sin número) es código. El número lo pone Pablo. | Código, después Pablo |
+| 6 | **L-VALOR** | P2 | D7 | Los derechos no nombran impugnar valoraciones. El informe v2 no lo repite. Sigue. | Código |
+| 7 | **L-TAKEDOWN** | P2 | A-08 r.12 | El plazo de denuncia queda en la regla 12, oculto hasta que Pablo dé el número. | Código |
 | 8 | **L-PSAV** | P2 | T4 | Solo Ley 20.345. La 20.446 y la Circular BCU 2507 no se citan hasta leerlas. | Confirmar, después código |
-| 9 | **L-MKT-COPY** | P2 | T5 | En vivo: «si BTC sube hasta ahí, barre shorts». | Código |
-| 10 | **L-LABIT** | P2 | T7 | Banner «Destacado · LABITCONF 26 · Comprar ticket», sin Publicidad ni Alianza. No etiquetar hasta un sí o un no. | Pablo |
+| 9 | **L-MKT-COPY** | P2 | T5 | En vivo: «si BTC sube hasta ahí, barre shorts». Distinto de A-07. | Código |
+| 10 | **L-LABIT** | P3 | A-27 | No etiquetar hasta un sí o un no. El v2 lo baja a P3. | Pablo |
 
-Siguen en la cola vieja, no se duplican: captcha de letras (L2.1), globo y velas sin teclado (L2.4), contraste y 24 px (L2.5), repo 404 anónimo (D-FOSS). Polymarket tiene «Ver en Polymarket» (T6): no se saca en este corte.
+Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **L-PAIS**. No inventar el país. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-01**. No publicar una calle. No mezclar con D-STATUE.
+
+### Informe v2 — 13 oct 22:23 -03
+
+Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen. Los corchetes no se inventan. La versión de los textos sigue **2.4** hasta que se publique un bloque.
+
+#### Entra, en este orden
+
+| Id | Pri | Qué se hace | No se hace |
+|---|---|---|---|
+| **A-01** | P0 | Si no hay domicilio de notificación, el aviso deja de decir que «figura en esta página». Queda la ciudad. Cuando Pablo pase el domicilio, se muestra. | No se republica ninguna calle. |
+| **L-URCDP** (A-02) | P0 | Tres estados. Hoy: la solicitud está en curso y la URCDP no asignó número. Bases: contacto y seguridad. | No se imprime «en trámite» como si fuera el número. La fecha del 2 de setiembre se omite hasta que Pablo la confirme (B-03). No se agregan anuncios ni experiencias a las bases. |
+| **L-PAIS** (A-03) | P0 | País con enlace a la fuente del proveedor, o «país no informado por el proveedor». | No se adivina el país ni la instancia de Lingva. |
+| **A-04** | P0 | La cita pasa a «Ley 18.331, art. 23, inciso 2º, literal A» (y el equivalente en pt y en). Gmail: 12 meses, que ya está dicho. | No se inventan `[PLAZO_LOGS]` ni `[PLAZO_FORMSUBMIT]`. Si no están, no se muestran. |
+| **A-07** | P1 | La hora del mercado lleva zona. En serie modelo, la cifra dice que no es cotización. | Las fuentes del aviso son las que el desk ya usa. No se inventa una lista. |
+| **A-08** | P1 | Reglas 1, 6, 10 y 11 a 14, en los tres idiomas. El plazo de disputas queda oculto y se muestra el de 5 días hábiles. | La frase de que la ficha derivada de OSM «sigue la ODbL» queda en `[verificar]` (B-06). No se pega hasta leerla. |
+| **A-09** | P1 | Cada envío manda la versión del texto y el formulario. | La IP no se guarda en claro. El hash, si entra, ensancha la base de seguridad y va con B-01. No en el mismo corte que el texto. |
+| **A-10** | P1 | Título «Textos legales» / «Textos legais» / «Legal». Historial de 2.0, 2.2 y 2.4. | La fecha de vigencia no se imprime mientras sea un corchete. |
+| **A-11** | P1 | Sacar «Brechas en curso» y «Plan:» de la página. El plan pasa a `TODO-legal.md`. | No nombrar el resumen de precios hasta que exista A-23. |
+| **A-13** | P1 | El aviso público de vulneración no dice «cuando corresponda». | El procedimiento de 24 h y 72 h ya se mira contra `docs/incidentes.md` (L-OPS). No se duplica el documento si ya está. |
+| **A-14** | P2 | Cron: códigos CARGA y de experiencias a los 30 días; pines a los 7. | Gmail no se borra desde el VPS. Es un aviso a Pablo. El plazo de logs no se inventa. |
+| **A-15** | P2 | Tabla de claves reales, dicho si son `localStorage` o `sessionStorage`. | `bitacora-hit*` se confirma antes. Si es una animación, no entra en la tabla. |
+| **A-17** | P2 | Enlace `mailto:` junto al captcha, en los tres idiomas. | El audio del captcha ya está. Esto no lo saca. |
+| **A-18** | P2 | La apertura queda en la ley uruguaya y remite al anexo. Anexo: Brasil y Argentina, con el texto del informe. | El informe pide el EEE y no trae el párrafo. No se redacta uno. |
+| **A-21** | P2 | La primera vez, cada término de `/legal` se dice en castellano. | «allowlist» no es «lista de fundadores». Si se explica: lista de direcciones permitidas. LABIF no se define hasta saber el texto. |
+| **A-22** | P2 | 24 px en idioma, rangos 1D/1S/1M/6M, mapa y captcha. | No se sube el umbral a 44 px en el mismo corte. |
+| **A-23** | P2 | Lista de lugares visible. Resumen escrito del precio, con zona (A-07). | No se esconde el globo del teclado si la lista todavía no equivale. |
+| **A-25** | P3 | Sacar `privacyArt13` si ninguna pantalla la usa. | No se borra una clave que el aviso todavía muestra. |
+| **A-26** | P3 | Junto al QR: aporte voluntario, sin contraprestación, no se revierte, la cadena es pública, no hay custodia. | — |
+| **A-29** | P3 | `role="alert"` y el error ligado al campo. | — |
+| **A-31** | P3 | Si se nombra el art. 14 de la LGPD: niños menores de 12 años. | No se publica «niños y adolescentes» hasta verificar. El propio informe lo marca. |
+
+**D-FOSS** absorbe A-05 y A-19: el pie y el hash del commit se muestran cuando la URL responda 200 sin login, o cuando haya un paquete de fuentes. Hoy el repo anónimo sigue en 404. No se dice que el JavaScript servido es el código fuente. Antes de publicar: que no viajen `.env`, token de FormSubmit ni claves.
+
+**D-DEPS** absorbe A-24: sacar Firebase del bundle si no se usa. Si se llega a usar, se informa como tercero. No las dos cosas.
+
+#### No entra
+
+| Id | Por qué |
+|---|---|
+| **A-12** «Bircoiner» | Marca pedida. No es una errata. No se cambia a «bitcoiner». |
+| **A-06** titular del copyright | Lo define Pablo (B-06). No se asume que es él. `/COPYRIGHT` sigue como está. |
+| **A-16** sacar FormSubmit | Hasta un sí (B-08) no hay fase. |
+| **A-20** voseo de todo el sitio | Pase de copy aparte. No se mezcla con un ZIP legal. |
+| **A-28** `og:locale` | Ya está `es_UY`, `pt_BR` y `en_US`. |
+| **A-30** fecha de autoevaluación | Después de A-11, A-22, A-23 y A-29. No antes. |
+| **A-32** proxy de teselas e imágenes | Choca con el uso de esas teselas en esta VPS. Después de los países, no antes. |
+| Parte B (B-01 a B-09) | Trámites de Pablo. No son commits. |
+
+#### Pablo, no el repo
+
+| Id | Pri | Qué tiene que pasar para que el código avance |
+|---|---|---|
+| B-01 | P0 | Qué bases cubre la solicitud. Recién ahí se cambia «contacto y seguridad». |
+| B-02 | P0 | Domicilio de notificación, acordado con un abogado. No el particular. Ahí se llena A-01. |
+| B-03 | P0 | Confirmar si la presentación fue el 2 de setiembre de 2026, y la fecha de inicio del sitio. |
+| B-04 | P1 | Número de trámite, y después el de inscripción. |
+| B-05 | P1 | Carpeta de encargados y los dos plazos (logs y FormSubmit). |
+| B-06 | P1 | Titular del copyright y si la CC BY 4.0 convive con la ODbL. |
+| B-07 | P2 | Avisar a la URCDP si cambia un proveedor. Revisión trimestral. |
+| B-08 | P2 | Sí o no a FormSubmit, a LABITCONF, al plazo de reclamos y a las fuentes de precio que se pueden nombrar. |
+| B-09 | P3 | Delegado de datos: hoy no aplica. Una vulneración sigue el procedimiento de 72 h. |
 
 ### Cola vigente — lo que quedó de antes
 

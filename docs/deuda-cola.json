@@ -398,17 +398,17 @@
     },
     {
       "id": "L-PAIS",
-      "pri": "P1",
+      "pri": "P0",
       "open": true,
       "kind": "repo",
-      "done": "OpenFreeMap, BTC Map, GeoJS, ipwho.is y Lingva no dicen no declarado si el país se conoce; no se inventa"
+      "done": "A-03: OpenFreeMap, BTC Map, GeoJS, ipwho.is y Lingva no dicen no declarado pelado; país con fuente o país no informado por el proveedor; no se inventa"
     },
     {
       "id": "L-URCDP",
-      "pri": "P1",
+      "pri": "P0",
       "open": true,
-      "kind": "manual",
-      "done": "número de trámite real en LEGAL.expediente; no se imprime en trámite como si fuera el número"
+      "kind": "repo",
+      "done": "A-02: no aparece Número de trámite: en trámite; tres estados; sin número se dice que la URCDP no lo asignó; la fecha se omite hasta que Pablo la confirme; bases = contacto y seguridad"
     },
     {
       "id": "L-VALOR",
@@ -440,10 +440,143 @@
     },
     {
       "id": "L-LABIT",
-      "pri": "P2",
+      "pri": "P3",
       "open": true,
       "kind": "manual",
-      "done": "el banner de LABITCONF se etiqueta solo cuando se sepa si hay contraprestación"
+      "done": "A-27: el banner de LABITCONF se etiqueta solo cuando Pablo diga si hay contraprestación"
+    },
+    {
+      "id": "A-01",
+      "pri": "P0",
+      "open": true,
+      "kind": "repo",
+      "done": "sin domicilio de notificación el aviso no dice que figura en la página; queda la ciudad; ninguna calle se publica"
+    },
+    {
+      "id": "A-04",
+      "pri": "P0",
+      "open": true,
+      "kind": "repo",
+      "done": "la cita es Ley 18.331, art. 23, inciso 2º, literal A; no se inventa el plazo de logs ni el de FormSubmit"
+    },
+    {
+      "id": "A-07",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "la hora del mercado lleva zona; la serie modelo no muestra una cifra sin decir que no es cotización"
+    },
+    {
+      "id": "A-08",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "14 reglas en es/pt/en; el plazo de disputas queda oculto hasta que Pablo lo dé; la ODbL sobre fichas derivadas no se afirma hasta verificar"
+    },
+    {
+      "id": "A-09",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "los envíos llevan la versión del texto; no se guarda la IP en claro"
+    },
+    {
+      "id": "A-10",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "título Textos legales; la fecha de vigencia no se imprime si sigue en corchetes"
+    },
+    {
+      "id": "A-11",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "/legal no publica Brechas en curso ni Plan:"
+    },
+    {
+      "id": "A-13",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "el aviso de vulneración no dice cuando corresponda"
+    },
+    {
+      "id": "A-14",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "cron borra CARGA y el código de experiencias a los 30 días y los pines a los 7; Gmail no se borra desde el VPS"
+    },
+    {
+      "id": "A-15",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "la tabla de cookies sale de las claves reales; un nombre de animación no se documenta como almacenamiento"
+    },
+    {
+      "id": "A-17",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "mailto visible junto al captcha en los formularios que lo usan"
+    },
+    {
+      "id": "A-18",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "la apertura no lidera con el RGPD; anexo Brasil y Argentina; el párrafo del EEE no se inventa"
+    },
+    {
+      "id": "A-21",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "la primera mención técnica en /legal se explica; allowlist no se traduce como lista de fundadores"
+    },
+    {
+      "id": "A-22",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "selector de idioma, rangos del gráfico, controles del mapa y captcha miden al menos 24 px o tienen el espacio equivalente"
+    },
+    {
+      "id": "A-23",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "hay lista de lugares y resumen de precio en texto, sin depender del globo ni del canvas"
+    },
+    {
+      "id": "A-25",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "privacyArt13 no viaja en el bundle si ninguna pantalla la usa"
+    },
+    {
+      "id": "A-26",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "junto al QR de sats se dice que el aporte es voluntario, público y no se revierte"
+    },
+    {
+      "id": "A-29",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "el error de un formulario se anuncia y queda ligado al campo"
+    },
+    {
+      "id": "A-31",
+      "pri": "P3",
+      "open": true,
+      "kind": "repo",
+      "done": "si se nombra la LGPD art. 14, la frase es sobre niños menores de 12; no se agrega adolescentes hasta verificar"
     }
   ],
   "guards": [

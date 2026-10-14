@@ -185,18 +185,39 @@ La pasada de las 21:19 miró la versión 2.0. El sitio publicado a las 22:22 es 
 
 ### Abierto
 
+Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9bd3b6d` y no en el sitio. El informe v2 (22:23) entra abajo. Parte B no es código.
+
 | Id | Pri | Falta |
 |---|---|---|
-| L-N1 | P0 | Hecho en el repo: lista propia. En el .org sigue el título viejo hasta el ZIP. |
-| L-XFER | P0 | Hecho en el repo: casilla aparte para FormSubmit. En el .org sigue una sola hasta el ZIP. |
-| L-IP | P1 | Hecho en el repo: el renglón de FormSubmit nombra la IP. En el .org falta el ZIP. |
-| L-PAIS | P1 | OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva siguen «no declarado». No inventar el país. |
-| L-URCDP | P1 | El número de trámite no es «en trámite». Lo pone Pablo. |
-| L-VALOR | P2 | Impugnación de valoraciones. |
-| L-TAKEDOWN | P2 | Plazo para denunciar y retirar. |
-| L-PSAV | P2 | 20.446 y Circular 2507 solo después de leerlas. Hoy solo 20.345. |
+| A-01 | P0 | El aviso no dice que el domicilio de notificación figura en la página. Sin calle. |
+| L-URCDP (A-02) | P0 | No imprimir «Número de trámite: en trámite». Sin número, decir que no fue asignado. |
+| L-PAIS (A-03) | P0 | «No declarado» pelado se reemplaza por fuente o por «el proveedor no informa el país». |
+| A-04 | P0 | Cita del art. 23, inciso 2º, literal A. Sin inventar plazos. |
+| L-IP | P1 | Falta el ZIP `9bd3b6d`. |
+| A-07 | P1 | Hora con zona. La serie modelo dice que no es cotización. |
+| A-08 | P1 | 14 reglas. Plazo de disputas oculto. ODbL de fichas derivadas, sin verificar, no se publica. |
+| A-09 | P1 | Versión del consentimiento en el envío. IP nunca en claro. |
+| A-10 | P1 | Título «Textos legales». Vigencia oculta si es un corchete. |
+| A-11 | P1 | Sacar «Brechas en curso» y «Plan:» de la página. |
+| A-13 | P1 | El aviso de vulneración no dice «cuando corresponda». |
+| A-14 | P2 | Borrado de códigos y pines. Gmail no se borra desde el VPS. |
+| A-15 | P2 | Tabla de almacenamiento real. |
+| A-17 | P2 | `mailto:` junto al captcha. El audio queda. |
+| A-18 | P2 | Anexo Brasil y Argentina. El párrafo del EEE no vino: no se inventa. |
+| A-21 | P2 | Lenguaje claro. Allowlist no es «lista de fundadores». |
+| A-22 | P2 | 24 px. |
+| A-23 | P2 | Lista y resumen de precio en texto. |
+| A-25 | P3 | Claves i18n muertas, si no se usan. |
+| A-26 | P3 | Aviso junto al QR de sats. |
+| A-29 | P3 | Errores anunciados. |
+| A-31 | P3 | LGPD art. 14 solo para menores de 12, si se publica. |
+| L-VALOR | P2 | Impugnación de valoraciones. El v2 no lo repite. Sigue. |
+| L-PSAV | P2 | 20.446 y Circular 2507 solo después de leerlas. |
 | L-MKT-COPY | P2 | Sacar «barre shorts». |
-| L-LABIT | P2 | No etiquetar el banner de LABITCONF hasta saber si hay contraprestación. |
+| L-LABIT (A-27) | P3 | No etiquetar LABITCONF hasta el sí o el no. |
+| D-FOSS (A-05) | P1 | Repo 200 anónimo, o paquete de fuentes. Recién ahí el hash y el enlace. |
 
-No se duplican L2.1 (captcha), L2.4 (globo y velas) ni D-FOSS.
+No entra: A-12 (Bircoiner, a pedido), A-06 (titular lo define Pablo), A-16 (FormSubmit, hasta un sí), A-20 (voseo, otro pase), A-28 (ya está), A-30 (después de los arreglos de accesibilidad), A-32 (proxy de teselas, no en esta VPS).
+
+Pablo: B-01 bases, B-02 domicilio, B-03 fechas, B-04 número, B-05 plazos, B-06 copyright y ODbL, B-07 revisión trimestral, B-08 sí/no de producto, B-09 delegado (hoy no aplica).
 
