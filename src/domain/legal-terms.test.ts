@@ -6,13 +6,20 @@ import { legalHref } from "../lib/locale.ts";
 
 const ANCHORS = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"];
 
-test("old legal anchors stay and terms has ten clauses", () => {
+test("terms has fourteen rules and does not invent a dispute deadline", () => {
+  const dispute = /5 días hábiles|5 business days|5 dias úteis/;
   for (const lang of ["es", "en", "pt"] as const) {
     const ids = LEGAL_EU[lang].blocks.map((b) => b.id).filter(Boolean);
     for (const id of ANCHORS) assert.ok(ids.includes(id), `${lang} ${id}`);
     assert.ok(ids.includes("anexo"));
     const terms = LEGAL_EU[lang].blocks.find((b) => b.id === "terminos");
-    assert.equal(terms?.clauses?.length, 10);
+    assert.equal(terms?.clauses?.length, 14);
+    const titles = (terms?.clauses || []).map((c) => c.title);
+    for (let n = 1; n <= 14; n++) assert.match(titles[n - 1] || "", new RegExp(`^${n}\\.`));
+    const joined = (terms?.clauses || []).map((c) => c.body).join("\n");
+    assert.match(joined, dispute);
+    assert.doesNotMatch(joined, /\[PLAZO|sigue la ODbL|remains under the ODbL as a derived|ficha derivada/);
+    assert.match(joined, /no se afirma aquí|is not stated here|não é afirmada aqui/);
   }
 });
 

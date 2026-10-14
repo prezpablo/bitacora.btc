@@ -13,7 +13,7 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.equal(LEGAL.contributionLicense, "CC BY 4.0");
   assert.equal(legalFilled(LEGAL.translator), false);
   assert.equal(legalFilled(LEGAL.privacyEmail), true);
-  assert.equal(LEGAL.consentVersion, "2.8");
+  assert.equal(LEGAL.consentVersion, "2.9");
   const terms = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
   assert.equal(terms.match(/CC BY 4\.0/g)?.length, 6);
   assert.match(terms, /ODbL/);

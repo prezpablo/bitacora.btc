@@ -201,6 +201,18 @@ function repoCheck(id) {
       /source === "modelo" \? t\("notQuote"\)/.test(desk);
     return { pass: ok, detail: ok ? "hora con zona; la serie modelo no es cotización" : "falta zona o el aviso de la serie" };
   }
+  if (id === "A-08") {
+    const legal = read("src/domain/legal-eu.ts");
+    const ok =
+      /"11\. Anuncios"/.test(legal) &&
+      /"12\. Disputes"/.test(legal) &&
+      /"14\. Mudanças"/.test(legal) &&
+      /5 días hábiles/.test(legal) &&
+      /no se afirma aquí/.test(legal) &&
+      !/sigue la ODbL/.test(legal) &&
+      !/Estas diez reglas/.test(legal);
+    return { pass: ok, detail: ok ? "14 reglas; sin plazo de disputa inventado" : "siguen 10 reglas o un plazo inventado" };
+  }
   return { pass: false, detail: "manual" };
 }
 

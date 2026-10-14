@@ -469,7 +469,7 @@
     {
       "id": "A-08",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "14 reglas en es/pt/en; el plazo de disputas queda oculto hasta que Pablo lo dé; la ODbL sobre fichas derivadas no se afirma hasta verificar"
     },
