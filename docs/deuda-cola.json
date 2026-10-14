@@ -413,7 +413,7 @@
     {
       "id": "L-VALOR",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "derechos en es/pt/en nombran impugnar valoraciones"
     },

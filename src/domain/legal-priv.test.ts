@@ -37,3 +37,14 @@ test("the accessibility self-assessment date is 14 October 2026", () => {
   assert.match(legal, /not an external audit/);
   assert.match(legal, /Não é auditoria externa/);
 });
+
+test("rights name the challenge to a personal valuation, and the five-day term stays on arts. 14 and 15", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.match(legal, /impugnar esa valoración \(art\. 16\)/);
+  assert.match(legal, /challenge that valuation \(art\. 16\)/);
+  assert.match(legal, /impugnar essa valoração \(art\. 16\)/);
+  assert.doesNotMatch(legal, /arts\. 14 a 16|arts\. 14 to 16|arts\. 14 a 16/);
+  assert.match(legal, /5 días hábiles \(arts\. 14 y 15\)/);
+  assert.match(legal, /5 business days \(arts\. 14 and 15\)/);
+  assert.match(legal, /5 dias úteis \(arts\. 14 e 15\)/);
+});

@@ -325,6 +325,11 @@ function repoCheck(id) {
     const ok = /14 de octubre de 2026/.test(legal) && /14 October 2026/.test(legal) && /14 de outubro de 2026/.test(legal) && /No es auditoría externa/.test(legal);
     return { pass: ok, detail: ok ? "autoevaluación al 14 de octubre de 2026, sin certificado" : "la fecha vieja sigue o se afirmó un certificado" };
   }
+  if (id === "L-VALOR") {
+    const legal = read("src/domain/legal-eu.ts");
+    const ok = /impugnar esa valoración \(art\. 16\)/.test(legal) && /challenge that valuation \(art\. 16\)/.test(legal) && /impugnar essa valoração \(art\. 16\)/.test(legal) && !/arts\. 14 a 16/.test(legal);
+    return { pass: ok, detail: ok ? "el art. 16 nombra impugnar la valoración; el plazo de 5 días queda en 14 y 15" : "los derechos siguen sin el art. 16" };
+  }
   return { pass: false, detail: "manual" };
 }
 
