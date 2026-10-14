@@ -3,11 +3,14 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { LEGAL, legalFilled } from "./legal-config.ts";
 
-test("legal config does not invent the controller", () => {
-  assert.equal(legalFilled(LEGAL.controllerName), false);
-  assert.equal(legalFilled(LEGAL.address), false);
+test("legal config uses the stated controller and does not invent the rest", () => {
+  assert.equal(LEGAL.controllerName, "Pablo Daniel Perez Correa");
+  assert.equal(LEGAL.address, "Domingo Baque 176, Colonia del Sacramento, Colonia, Uruguay");
+  assert.equal(legalFilled(LEGAL.vpsCountry), true);
+  assert.equal(legalFilled(LEGAL.contributionLicense), false);
+  assert.equal(legalFilled(LEGAL.translator), false);
   assert.equal(legalFilled(LEGAL.privacyEmail), true);
-  assert.equal(LEGAL.consentVersion, "2.0");
+  assert.equal(LEGAL.consentVersion, "2.1");
 });
 
 test("publish consent is not the contact form", () => {

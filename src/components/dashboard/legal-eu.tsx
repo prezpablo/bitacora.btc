@@ -1,5 +1,5 @@
 import { LEGAL_EU, type LegalBlock } from "@/domain/legal-eu";
-import { LEGAL, legalFilled } from "@/domain/legal-config";
+import { LEGAL, VPS_COUNTRY, legalFilled } from "@/domain/legal-config";
 import { THIRD_PARTIES, type ThirdParty } from "@/domain/third-parties";
 import { useAppLang, useT } from "@/lib/i18n";
 import type { AppLang } from "@/lib/locale";
@@ -24,7 +24,7 @@ function PartyList({ title, side, lang }: { title: string; side: ThirdParty["sid
       <h3 className="text-sm font-medium text-foreground">{title}</h3>
       <ul className="mt-2 space-y-2">
         {rows.map((p) => {
-          const country = p.name === "Njalla" ? LEGAL.vpsCountry : p.country[lang];
+          const country = p.name === "Njalla" && legalFilled(LEGAL.vpsCountry) ? VPS_COUNTRY[lang] : p.country[lang];
           const shown = legalFilled(country) ? country : "";
           return (
             <li key={`${side}-${p.name}`} className="text-sm leading-relaxed text-pretty text-muted-foreground">
@@ -122,7 +122,7 @@ export function LegalEu() {
               <>
                 <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">
                   {t("thirdLead")}{" "}
-                  {legalFilled(LEGAL.vpsCountry) ? t("thirdVps", { vps: LEGAL.vpsCountry }) : null}{" "}
+                  {legalFilled(LEGAL.vpsCountry) ? t("thirdVps", { vps: VPS_COUNTRY[lang] }) : null}{" "}
                   {legalFilled(LEGAL.translator) ? t("thirdTranslator", { translator: LEGAL.translator }) : null}
                 </p>
                 <PartyList title={t("thirdBrowser")} side="browser" lang={lang} />
