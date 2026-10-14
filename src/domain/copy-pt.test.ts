@@ -29,6 +29,9 @@ test("COPYRIGHT notice does not replace the AGPL", () => {
   assert.match(notice, /ODbL/);
   assert.doesNotMatch(notice, /GNU AFFERO GENERAL PUBLIC LICENSE/);
   assert.match(license, /GNU AFFERO GENERAL PUBLIC LICENSE/);
+  assert.match(notice, /Copyright © 2026 Pablo Daniel Perez Correa/);
+  assert.doesNotMatch(notice, /Copyright © 2026 Consciencia Bitcoin/);
+  assert.match(notice, /Iniciativa Consciencia Bitcoin by LATAM Cripto Mom/);
 });
 
 test("market module does not cite Act 17.250", () => {
