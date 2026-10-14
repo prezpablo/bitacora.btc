@@ -6,7 +6,7 @@ export type ThirdParty = {
   hosts: string[];
   name: string;
   country: Phrase;
-  side: "browser" | "server";
+  side: "browser" | "server" | "recipient";
   why: Phrase;
 };
 
@@ -152,7 +152,7 @@ export const THIRD_PARTIES: ThirdParty[] = [
     hosts: ["github.com"],
     name: "GitHub",
     country: US,
-    side: "server",
+    side: "recipient",
     why: {
       es: "CSV público del mapa y de los anuncios. No lleva códigos CARGA ni correos.",
       en: "Public CSV of the map and announcements. No CARGA codes or emails.",
@@ -163,7 +163,7 @@ export const THIRD_PARTIES: ThirdParty[] = [
     hosts: ["mail.google.com"],
     name: "Google (Gmail)",
     country: US,
-    side: "server",
+    side: "recipient",
     why: {
       es: "Buzón donde termina el Contacto. No lo llama el navegador.",
       en: "Inbox where Contact ends up. The browser does not call it.",

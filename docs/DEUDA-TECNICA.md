@@ -38,7 +38,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 | Orden | Id | Pri | Informe | Qué falta en el .org | Quién |
 |---|---|---|---|---|---|
-| 1 | **L-N1** | P0 | N1 | GitHub y Gmail están bajo «Nuestro servidor consulta (no reciben tus datos)». GitHub recibe las fichas. Gmail recibe el Contacto. | Código |
+| 1 | **L-N1** | P0 | N1 | **Hecho en repo.** Lista propia: «Reciben lo que publicás o lo que nos escribís». Falta el ZIP para verse en el .org. | Código |
 | 2 | **L-XFER** | P0 | D4, N2 | Una casilla. El rótulo es «para responderme». FormSubmit está en la línea de abajo. `/legal` dice que esa casilla documenta el art. 23. | Código |
 | 3 | **L-IP** | P1 | N3 | FormSubmit está en «el navegador contacta». El renglón no dice que también recibe la IP. | Código |
 | 4 | **L-PAIS** | P1 | D3 | «no declarado»: OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva. No inventar el país. Si no se sabe, se dice o se saca. | Código, con fuente |
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen en la cola vieja, no se duplican: captcha de letras (L2.1), globo y velas sin teclado (L2.4), contraste y 24 px (L2.5), repo 404 anónimo (D-FOSS). Polymarket tiene «Ver en Polymarket» (T6): no se saca en este corte.
 
-**Siguiente fase de código, si se acepta:** **L-N1** junto con **L-XFER**. Un ZIP. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **L-XFER**. Un ZIP. No mezclar con D-STATUE.
 
 ### Cola vigente — lo que quedó de antes
 

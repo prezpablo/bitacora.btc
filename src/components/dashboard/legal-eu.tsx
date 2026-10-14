@@ -126,6 +126,7 @@ export function LegalEu() {
                   {legalFilled(LEGAL.translator) ? t("thirdTranslator", { translator: LEGAL.translator }) : null}
                 </p>
                 <PartyList title={t("thirdBrowser")} side="browser" lang={lang} />
+                <PartyList title={t("thirdRecipients")} side="recipient" lang={lang} />
                 <PartyList title={t("thirdServer")} side="server" lang={lang} />
               </>
             ) : null}

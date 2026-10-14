@@ -378,9 +378,9 @@
     {
       "id": "L-N1",
       "pri": "P0",
-      "open": true,
-      "kind": "live",
-      "done": "/legal no lista GitHub ni Gmail bajo el título que dice que no reciben datos"
+      "open": false,
+      "kind": "repo",
+      "done": "GitHub y Gmail están en thirdRecipients, no bajo el título que dice que no reciben datos"
     },
     {
       "id": "L-XFER",

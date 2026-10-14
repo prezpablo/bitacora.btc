@@ -187,7 +187,7 @@ La pasada de las 21:19 miró la versión 2.0. El sitio publicado a las 22:22 es 
 
 | Id | Pri | Falta |
 |---|---|---|
-| L-N1 | P0 | Sacar GitHub y Gmail de «no reciben tus datos». |
+| L-N1 | P0 | Hecho en el repo: lista propia. En el .org sigue el título viejo hasta el ZIP. |
 | L-XFER | P0 | La casilla de Contacto no acredita sola el art. 23. |
 | L-IP | P1 | Decir que FormSubmit, llamado por el navegador, recibe la IP. |
 | L-PAIS | P1 | OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva siguen «no declarado». No inventar el país. |

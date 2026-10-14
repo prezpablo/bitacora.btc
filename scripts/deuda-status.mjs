@@ -129,6 +129,15 @@ function repoCheck(id) {
     const lic = existsSync(join(ROOT, "LICENSE"));
     return { pass: false, detail: lic ? "LICENSE en disco; falta 200 anónimo" : "sin LICENSE y repo 404 anónimo" };
   }
+  if (id === "L-N1") {
+    const parties = read("src/domain/third-parties.ts");
+    const ui = read("src/components/dashboard/legal-eu.tsx");
+    const gh = /name: "GitHub"[\s\S]{0,80}side: "recipient"/.test(parties);
+    const gm = /name: "Google \(Gmail\)"[\s\S]{0,80}side: "recipient"/.test(parties);
+    const shown = ui.includes('side="recipient"');
+    const ok = gh && gm && shown;
+    return { pass: ok, detail: ok ? "GitHub y Gmail fuera de no-reciben" : "siguen en side server" };
+  }
   return { pass: false, detail: "manual" };
 }
 
