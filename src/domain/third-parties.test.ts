@@ -19,3 +19,12 @@ test("GitHub and Gmail are not under the list that receives no personal data", (
   const server = THIRD_PARTIES.filter((p) => p.side === "server").map((p) => p.name);
   assert.ok(!server.some((n) => /GitHub|Gmail/.test(n)));
 });
+
+test("the FormSubmit row says the browser also sends the IP", () => {
+  const row = THIRD_PARTIES.find((p) => p.name === "FormSubmit");
+  assert.ok(row);
+  assert.equal(row.side, "browser");
+  assert.match(row.why.es, /IP/);
+  assert.match(row.why.en, /IP/);
+  assert.match(row.why.pt, /IP/);
+});
