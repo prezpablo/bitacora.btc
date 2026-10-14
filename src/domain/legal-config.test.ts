@@ -15,6 +15,11 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.equal(terms.match(/CC BY 4\.0/g)?.length, 3);
   assert.match(terms, /ODbL/);
   assert.match(terms, /AGPL-3\.0/);
+  assert.equal(LEGAL.expediente, "en trámite");
+  assert.equal(legalFilled(LEGAL.inscription), false);
+  assert.match(terms, /Número de trámite: en trámite/);
+  assert.match(terms, /Procedure number: in progress/);
+  assert.match(terms, /Número de trâmite: em tramitação/);
 });
 
 test("publish consent is not the contact form", () => {

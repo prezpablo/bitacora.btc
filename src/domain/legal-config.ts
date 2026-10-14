@@ -12,7 +12,7 @@ export const LEGAL = {
   contributionLicense: "CC BY 4.0",
   vpsCountry: VPS_COUNTRY.es,
   translator: "[PROVEEDOR_TRADUCCION]",
-  expediente: "[N.º EXPEDIENTE URCDP]",
+  expediente: "en trámite",
   inscription: "[N.º INSCRIPCIÓN]",
   vigencia: "[FECHA_VIGENCIA]",
   consentVersion: "2.2",
