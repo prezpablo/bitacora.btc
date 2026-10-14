@@ -167,3 +167,36 @@ A4.5 pide sacar del público las frases de brecha («no hay CCT», «el clone no
 | B5 | Anotar la fecha real de inicio del sitio. Si es anterior al 4 jun 2026, el plazo de 90 días ya estaba vencido al presentar | Esta semana |
 | B6 | Pasar los números de inscripción para publicarlos | Cuando la URCDP los dé |
 | B7 | Aviso a la URCDP si cambia un proveedor. Revisión ene/abr/jul/oct | Recurrente |
+
+---
+
+## Checklist 13 oct 22:22 — informe vs .org (versión 2.4)
+
+La pasada de las 21:19 miró la versión 2.0. El sitio publicado a las 22:22 es la 2.4. Cola máquina: `deuda-cola.json`.
+
+### Cumple
+
+- Nombre y ciudad en `/legal`. Sin cédula, sin RUT, sin calle.
+- Casilla al publicar ficha y otra al publicar experiencia.
+- Regla 10 y fila Experiencias. CC BY 4.0.
+- Njalla: Finlandia. Pulso: botón Pausar ciclo.
+- `/COPYRIGHT` a nombre de la iniciativa. Sin Ley 17.250 ni corchetes.
+- Bircoiner no se toca.
+
+### Abierto
+
+| Id | Pri | Falta |
+|---|---|---|
+| L-N1 | P0 | Sacar GitHub y Gmail de «no reciben tus datos». |
+| L-XFER | P0 | La casilla de Contacto no acredita sola el art. 23. |
+| L-IP | P1 | Decir que FormSubmit, llamado por el navegador, recibe la IP. |
+| L-PAIS | P1 | OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva siguen «no declarado». No inventar el país. |
+| L-URCDP | P1 | El número de trámite no es «en trámite». Lo pone Pablo. |
+| L-VALOR | P2 | Impugnación de valoraciones. |
+| L-TAKEDOWN | P2 | Plazo para denunciar y retirar. |
+| L-PSAV | P2 | 20.446 y Circular 2507 solo después de leerlas. Hoy solo 20.345. |
+| L-MKT-COPY | P2 | Sacar «barre shorts». |
+| L-LABIT | P2 | No etiquetar el banner de LABITCONF hasta saber si hay contraprestación. |
+
+No se duplican L2.1 (captcha), L2.4 (globo y velas) ni D-FOSS.
+

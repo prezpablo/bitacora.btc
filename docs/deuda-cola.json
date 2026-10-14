@@ -374,6 +374,76 @@
       "open": false,
       "kind": "repo",
       "done": "el acuse de FormSubmit sale solo si la persona marca la casilla"
+    },
+    {
+      "id": "L-N1",
+      "pri": "P0",
+      "open": true,
+      "kind": "live",
+      "done": "/legal no lista GitHub ni Gmail bajo el título que dice que no reciben datos"
+    },
+    {
+      "id": "L-XFER",
+      "pri": "P0",
+      "open": true,
+      "kind": "live",
+      "done": "la casilla de Contacto nombra la transferencia a FormSubmit, o /legal deja de decir que esa casilla documenta el art. 23"
+    },
+    {
+      "id": "L-IP",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "el renglón de FormSubmit dice que el navegador también le envía la IP"
+    },
+    {
+      "id": "L-PAIS",
+      "pri": "P1",
+      "open": true,
+      "kind": "repo",
+      "done": "OpenFreeMap, BTC Map, GeoJS, ipwho.is y Lingva no dicen no declarado si el país se conoce; no se inventa"
+    },
+    {
+      "id": "L-URCDP",
+      "pri": "P1",
+      "open": true,
+      "kind": "manual",
+      "done": "número de trámite real en LEGAL.expediente; no se imprime en trámite como si fuera el número"
+    },
+    {
+      "id": "L-VALOR",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "derechos en es/pt/en nombran impugnar valoraciones"
+    },
+    {
+      "id": "L-TAKEDOWN",
+      "pri": "P2",
+      "open": true,
+      "kind": "repo",
+      "done": "términos con plazo para denunciar contenido y retirarlo"
+    },
+    {
+      "id": "L-PSAV",
+      "pri": "P2",
+      "open": true,
+      "kind": "manual",
+      "done": "cita de Ley 20.446 y Circular BCU 2507 solo después de leer el texto; hoy solo 20.345"
+    },
+    {
+      "id": "L-MKT-COPY",
+      "pri": "P2",
+      "open": true,
+      "kind": "live",
+      "done": "el home no dice barre shorts"
+    },
+    {
+      "id": "L-LABIT",
+      "pri": "P2",
+      "open": true,
+      "kind": "manual",
+      "done": "el banner de LABITCONF se etiqueta solo cuando se sepa si hay contraprestación"
     }
   ],
   "guards": [

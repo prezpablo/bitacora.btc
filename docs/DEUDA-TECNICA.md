@@ -13,67 +13,51 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo | **L-BRACKET** · **L-CONTRA** · **L-ACK** · **D-FOSS** · ZIP de `main` sin subir · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK | **L-N1** · **L-XFER** · **L-PAIS** · **L-URCDP** · **D-FOSS** · **D-STATUE** |
 
 ---
 
-## Cola vigente — 13 oct, noche
+## Checklist legal — 13 oct 22:22 -03, cotejo del .org
 
-Sondeo de `bitacorabtc.org` a las 20:41 -03. `/healthz` `{"ok":true}`. TTFB 0,31–0,39 s. `/`, `/mapa`, `/legal`, `/LICENSE` (AGPL), `/labif`, sitemap, `pins.csv`, `map.csv` y `btcmap-shops.json` responden 200. El bundle en línea es `index-MvoQ601k.js`. No trae Experiencias, ni la edición de fichas de BTC Map, ni el antialias condicional del globo: eso está en `main` y **no está desplegado**.
+Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa pasada miró la versión 2.0. El sitio publicado ahora es **versión 2.4** (`/healthz` `{"ok":true}`, bundle `index-DthQSnb0.js`). Esto no es dictamen.
 
-| En el .org ahora | Qué implica |
+### Cumple (no reabrir)
+
+| Id del informe | En el .org de esta pasada |
 |---|---|
-| Casilla de `/legal`: «Responsable: [NOMBRE Y APELLIDO]. Domicilio: [DOMICILIO]» | El consentimiento que se acepta no está informado. Sale primero. |
-| Terceros: `[PAÍS_VPS]` y `[PROVEEDOR_TRADUCCION]` | Mismo defecto, en la política. |
-| «sin captcha» y, a la vez, «formulario de Contacto» (5 veces) | Los derechos no pueden ir por las dos puertas. |
-| Ley 17.250 en el aviso, no en el módulo Mercado | La cita que se pidió sacar sigue en `/legal`. |
-| `Bircoiner` en el home | A pedido. No es deuda de código. |
-| GitHub `prezpablo/bitacora.btc` → 404 anónimo | **D-FOSS**. `/LICENSE` del sitio sí es 200. |
-| `/data/experiences.csv` → 404 | El chip no está en este ZIP. |
+| D1 nombre y domicilio | «Pablo Daniel Perez Correa» y «Colonia del Sacramento, Colonia, Uruguay». Sin calle, sin cédula, sin RUT. |
+| D5 casilla al publicar | El bundle trae «Acepto publicar estos datos» y «Acepto publicar esta experiencia». |
+| Experiencias | Fila en la tabla y regla 10. Licencia CC BY 4.0. |
+| N5 país de Njalla | Finlandia. |
+| A1 pausa del pulso | «Pausar ciclo» en el bundle. `prefers-reduced-motion` lo frena. |
+| `/COPYRIGHT` | Solo Consciencia Bitcoin by LATAM Cripto Mom. El nombre civil no está. `/LICENSE` sigue AGPL. |
+| L-BRACKET, L-CONTRA | No hay corchetes ni Ley 17.250. «formulario de Contacto» nombra el relé, no la vía de derechos. |
+| A10 «Bircoiner» | Marca pedida. No es errata. |
 
-No fusionar. Una fase por ZIP. No Mapbox GL, no API keys, no OSMF, no Carto, no TradingView. No checkout ni custodia. No inventar nombre, domicilio, expediente ni país del VPS.
+### No cumple — entra a la cola
 
-### Ahora — el corte legal que el .org pide
-
-| Orden | Id | Pri | Qué | Verificación | Cómo volver |
+| Orden | Id | Pri | Informe | Qué falta en el .org | Quién |
 |---|---|---|---|---|---|
-| **1** | **L-BRACKET** | P0 | Si un dato de `LEGAL` sigue entre corchetes, la casilla y `/legal` no lo imprimen. Quedan el correo `privacidad@`, el plazo y que los derechos no piden captcha. | View-source de `/legal` no contiene `[NOMBRE`, `[DOMICILIO`, `[PAÍS_VPS`, `[PROVEEDOR` ni `[LICENCIA` | Volver a interpolar siempre |
-| **2** | **L-CONTRA** | P0 | Mismo ZIP. Aviso y derechos, en es/pt/en, mandan al `mailto:` y no al formulario. Sale la Ley 17.250 de la cláusula 7. | `/legal` no dice «formulario de Contacto» como vía de derechos ni «17.250» | Restaurar las frases |
+| 1 | **L-N1** | P0 | N1 | GitHub y Gmail están bajo «Nuestro servidor consulta (no reciben tus datos)». GitHub recibe las fichas. Gmail recibe el Contacto. | Código |
+| 2 | **L-XFER** | P0 | D4, N2 | Una casilla. El rótulo es «para responderme». FormSubmit está en la línea de abajo. `/legal` dice que esa casilla documenta el art. 23. | Código |
+| 3 | **L-IP** | P1 | N3 | FormSubmit está en «el navegador contacta». El renglón no dice que también recibe la IP. | Código |
+| 4 | **L-PAIS** | P1 | D3 | «no declarado»: OpenFreeMap, BTC Map, GeoJS, ipwho.is, Lingva. No inventar el país. Si no se sabe, se dice o se saca. | Código, con fuente |
+| 5 | **L-URCDP** | P1 | D2 | Sigue «Número de trámite: en trámite». No hay expediente ni inscripción. | Pablo |
+| 6 | **L-VALOR** | P2 | D7 | Los derechos no nombran impugnar valoraciones. | Código |
+| 7 | **L-TAKEDOWN** | P2 | T2 | Se puede retirar lo ilícito. No hay plazo de denuncia. | Código |
+| 8 | **L-PSAV** | P2 | T4 | Solo Ley 20.345. La 20.446 y la Circular BCU 2507 no se citan hasta leerlas. | Confirmar, después código |
+| 9 | **L-MKT-COPY** | P2 | T5 | En vivo: «si BTC sube hasta ahí, barre shorts». | Código |
+| 10 | **L-LABIT** | P2 | T7 | Banner «Destacado · LABITCONF 26 · Comprar ticket», sin Publicidad ni Alianza. No etiquetar hasta un sí o un no. | Pablo |
 
-**Vos, no el repo:** completar en `LEGAL` el nombre, el domicilio, la licencia de los aportes, el país del VPS y el traductor. Ampliar la inscripción URCDP (mapa, reseñas, anuncios, traducción). El número se publica cuando exista. Hacer público el repo, o dejar de prometer el clone.
+Siguen en la cola vieja, no se duplican: captcha de letras (L2.1), globo y velas sin teclado (L2.4), contraste y 24 px (L2.5), repo 404 anónimo (D-FOSS). Polymarket tiene «Ver en Polymarket» (T6): no se saca en este corte.
 
-**Siguiente fase de código, si se acepta:** **D-STATUE**. L-ACK ya no manda el acuse si nadie lo pidió. D-FOSS sigue siendo un clic en GitHub. El ZIP de `main` todavía no está en el .org.
+**Siguiente fase de código, si se acepta:** **L-N1** junto con **L-XFER**. Un ZIP. No mezclar con D-STATUE.
 
-### Después de ese ZIP
+### Cola vigente — lo que quedó de antes
 
-| Orden | Id | Pri | Dónde está | Qué |
-|---|---|---|---|---|
-| **3** | **L-ACK** | P1 | Repo y .org | El acuse de FormSubmit sale siempre. Tiene que salir solo si la persona lo pide. |
-| **4** | **D-FOSS** | P1 | GitHub | Repo público. Hoy 404 anónimo. |
-| **5** | **ZIP** | P1 | `main` ≠ .org | Subir el ZIP: pines por caja, edición guardada en Bitácora, globo en 3G, chip Experiencias. |
-| **6** | **D-STATUE** | P3 | Cola | Estatuas ya instaladas, con foto. No Lugano. No Viena antes de inaugurada. |
-| **7** | **D-TILE-LATAM** | P3 | Cola | Solo si OFM/OSM-FR mudos. |
-| **8** | **D-DEPS** | P3 | Cola | Sacar `firebase` y `better-auth` del scaffold. |
-| **9** | **D-AEO-FAQ** | P3 | Cola | Una pregunta visible: Bitácora no clona BTC Map. |
-| **10** | **D-COPY-FED** | P3 | Cola | Una línea: las cifras del globo son la red federada. |
-| **11** | **D-EVT-HTML** | P3 | Cola | Seis próximos eventos en el HTML de Comunidad. |
+Sondeo de las 20:41 superado por el de las 22:22. Experiencias, la versión 2.4 y el nombre ya están en el `.org`.
 
-**No son fase:** A3.3 (esperar sí), A3.2, A4.9, A6.2 Bircoiner, A6.3, A6.5, B1–B5 y B7. B6 entra el día que haya número de inscripción.
-
-### Producto ya en `main`, todavía no en el .org
-
-| Id | Estado en repo | En el .org de esta noche |
-|---|---|---|
-| D-PIN-03+ | Cerrado en `f781b16` | No verificado en el bundle; entra con el ZIP |
-| D-PATCH-ALL | Cerrado en `9362c76`: la ficha de BTC Map se guarda en Bitácora | No: el bundle no tiene `patchKept` |
-| D-GLOBE-PERF | Cerrado en `577fbc0` | No: el bundle no tiene `globeAntialias` |
-| D-EXPERIENCIA | Cerrado en `1aaecbe` | No: 0 «Experiencias» y `experiences.csv` 404 |
-
-### Cerrados en el .org (no reabrir)
-
-D-TILE-ZIP · D-PIN-01/02 · D-VIZ-01/02/03 · D-STATS · D-CTA · D-418 · D-GLOBE-INIT · D-TILE-03 · D-SKIP-404 · D-LIC · D-PWA · D-CSP-IMG · D-MKT · D-QA · D-GLOBE-KEYS · D-BANNER · D-LABIF · D-A11Y-24 · D-SITEMAP · D-SMOKE-12 · D-SMOKE-09 · D-GLOBE-HERO · D-FOUNDING · D-CTA-SHORT. Legal ya desplegado y que esta verificación no reabre: casilla distinta por formulario, correo `privacidad@`, lista de terceros con país, plazos y aviso de 72 h. L-CFG, L-CONSENT, L-THIRD, L-PRIV, L-TERMS, L-OPS, L-COPY y L-A11Y quedan cerrados como fase; lo que falta de ellos es L-BRACKET, L-CONTRA y L-ACK.
-
-**Siguiente fase de código, si se acepta:** **D-STATUE**. L-ACK ya no manda el acuse si nadie lo pidió. D-FOSS sigue siendo un clic en GitHub.
+**Siguiente de producto, después del corte legal:** **D-STATUE**. D-FOSS sigue siendo un clic en GitHub.
 
 ### Parámetros 12 oct (no implementar en el mismo ZIP)
 
