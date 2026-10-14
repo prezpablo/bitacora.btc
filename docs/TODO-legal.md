@@ -2,6 +2,14 @@
 
 No se publica. Lo que salió de `/legal` en L-PRIV sigue abierto acá.
 
+## Accesibilidad
+
+Salió de `/legal` en A-11. No volver a publicar «Brechas en curso» ni «Plan:».
+
+El globo 3D y el gráfico de velas no son usables con teclado ni lector. Algunos controles pueden fallar el tamaño mínimo de 24 px (2.5.8). Eso se mira en A-22, no como estado de la página.
+
+Avisos aria-live en todos los campos: trabajo interno, no un plan publicado.
+
 ## Transferencias
 
 No hay Cláusulas Contractuales Tipo ni evaluación de impacto documentada. Si hay titulares en el EEE, hay que cerrarlo antes de decir que la transferencia está cubierta. La casilla documenta el consentimiento (art. 23 A). No volver a escribir «brecha» en `/legal`.

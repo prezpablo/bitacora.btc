@@ -237,6 +237,12 @@ function repoCheck(id) {
       !/FECHA_VIGENCIA/.test(page);
     return { pass: ok, detail: ok ? "título Textos legales; vigencia oculta" : "sigue el título viejo o la fecha" };
   }
+  if (id === "A-11") {
+    const legal = read("src/domain/legal-eu.ts");
+    const todo = read("docs/TODO-legal.md");
+    const ok = !/Brechas en curso|Open gaps|Falhas em curso|\nPlan:|\nPlano:/.test(legal) && /A-11/.test(todo);
+    return { pass: ok, detail: ok ? "brechas y plan fuera de /legal" : "siguen publicadas" };
+  }
   return { pass: false, detail: "manual" };
 }
 

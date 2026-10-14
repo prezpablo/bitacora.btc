@@ -48,3 +48,8 @@ test("the legal title names the texts and a bracket date stays hidden", () => {
   assert.doesNotMatch(page, /FECHA_VIGENCIA/);
   assert.equal(legalFilled("[FECHA_VIGENCIA]"), false);
 });
+
+test("open gaps and the plan are not published", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(legal, /Brechas en curso|Open gaps|Falhas em curso|\nPlan:|\nPlano:/);
+});

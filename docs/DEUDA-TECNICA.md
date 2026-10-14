@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10 | **L-IP** (ZIP) · **A-11** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11 | **L-IP** (ZIP) · **A-13** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-11**. Sacar «Brechas en curso» y «Plan:» de la página. Van al TODO interno. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-13**. El aviso de vulneración no dice «cuando corresponda». No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -69,7 +69,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | **A-08** | P1 | Hecho en el repo (textos 2.9). 14 reglas en es, pt y en. La regla 12 muestra 5 días hábiles y no un plazo de disputa. La licencia de la ficha armada no se afirma. Falta el ZIP. | No se pega «sigue la ODbL» sobre la ficha. |
 | **A-09** | P1 | Hecho en el repo. Contacto, comercio, comunidad, anuncio, experiencia y parche mandan la versión y el formulario. Una IP en claro no se guarda. Falta el ZIP. | El hash de IP no se ensancha en este corte. |
 | **A-10** | P1 | Hecho en el repo. Título «Textos legales» / «Textos legais» / «Legal». Se nombran 2.0, 2.2 y 2.4. Falta el ZIP. | La fecha de vigencia no se imprime mientras sea un corchete. |
-| **A-11** | P1 | Sacar «Brechas en curso» y «Plan:» de la página. El plan pasa a `TODO-legal.md`. | No nombrar el resumen de precios hasta que exista A-23. |
+| **A-11** | P1 | Hecho en el repo (textos 2.10). «Brechas en curso» y «Plan:» salieron de la página. Están en `TODO-legal.md`. Falta el ZIP. | No se nombra el resumen de precios. |
 | **A-13** | P1 | El aviso público de vulneración no dice «cuando corresponda». | El procedimiento de 24 h y 72 h ya se mira contra `docs/incidentes.md` (L-OPS). No se duplica el documento si ya está. |
 | **A-14** | P2 | Cron: códigos CARGA y de experiencias a los 30 días; pines a los 7. | Gmail no se borra desde el VPS. Es un aviso a Pablo. El plazo de logs no se inventa. |
 | **A-15** | P2 | Tabla de claves reales, dicho si son `localStorage` o `sessionStorage`. | `bitacora-hit*` se confirma antes. Si es una animación, no entra en la tabla. |

@@ -490,7 +490,7 @@
     {
       "id": "A-11",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "/legal no publica Brechas en curso ni Plan:"
     },
