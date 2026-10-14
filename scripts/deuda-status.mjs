@@ -225,6 +225,18 @@ function repoCheck(id) {
       !/recordConsent\("publish"/.test(server);
     return { pass: ok, detail: ok ? "versión y formulario en el envío; IP en claro no" : "el envío no manda versión o formulario" };
   }
+  if (id === "A-10") {
+    const i18n = read("src/lib/i18n.ts");
+    const page = read("src/components/dashboard/legal-eu.tsx");
+    const ok =
+      /legalTitle: "Textos legales"/.test(i18n) &&
+      /legalTitle: "Legal"/.test(i18n) &&
+      /legalTitle: "Textos legais"/.test(i18n) &&
+      /2\.0, 2\.2 y 2\.4/.test(i18n) &&
+      /legalFilled\(LEGAL\.vigencia\)/.test(page) &&
+      !/FECHA_VIGENCIA/.test(page);
+    return { pass: ok, detail: ok ? "título Textos legales; vigencia oculta" : "sigue el título viejo o la fecha" };
+  }
   return { pass: false, detail: "manual" };
 }
 

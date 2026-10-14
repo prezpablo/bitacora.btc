@@ -95,6 +95,10 @@ export function LegalEu() {
         <h1 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{t("legalTitle")}</h1>
         <p className="max-w-3xl text-sm text-pretty text-muted-foreground sm:text-base">{copy.lead}</p>
         <p className="text-xs text-muted-foreground">{t("legalVersion", { v: LEGAL.consentVersion })}</p>
+        <p className="text-xs text-muted-foreground">{t("legalEarlier")}</p>
+        {legalFilled(LEGAL.vigencia) ? (
+          <p className="text-xs text-muted-foreground">{t("legalInForce", { date: LEGAL.vigencia })}</p>
+        ) : null}
       </header>
       <nav aria-label={t("legalIndex")} className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
         {copy.blocks

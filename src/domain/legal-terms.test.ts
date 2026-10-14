@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { LEGAL_EU } from "./legal-eu.ts";
 import { legalHref } from "../lib/locale.ts";
+import { legalFilled } from "./legal-config.ts";
 
 const ANCHORS = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"];
 
@@ -34,4 +35,16 @@ test("legal links keep the language query and the anchor", () => {
   assert.equal(legalHref("terminos", "?lang=pt"), "/legal?lang=pt#terminos");
   assert.equal(legalHref("aviso", ""), "/legal#aviso");
   assert.equal(legalHref("legal", "?lang=en"), "/legal?lang=en");
+});
+
+test("the legal title names the texts and a bracket date stays hidden", () => {
+  const src = readFileSync(new URL("../lib/i18n.ts", import.meta.url), "utf8");
+  assert.match(src, /legalTitle: "Textos legales"/);
+  assert.match(src, /legalTitle: "Legal"/);
+  assert.match(src, /legalTitle: "Textos legais"/);
+  assert.match(src, /Versiones anteriores: 2\.0, 2\.2 y 2\.4/);
+  const page = readFileSync(new URL("../components/dashboard/legal-eu.tsx", import.meta.url), "utf8");
+  assert.match(page, /legalFilled\(LEGAL\.vigencia\)/);
+  assert.doesNotMatch(page, /FECHA_VIGENCIA/);
+  assert.equal(legalFilled("[FECHA_VIGENCIA]"), false);
 });

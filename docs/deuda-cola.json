@@ -483,7 +483,7 @@
     {
       "id": "A-10",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "título Textos legales; la fecha de vigencia no se imprime si sigue en corchetes"
     },
