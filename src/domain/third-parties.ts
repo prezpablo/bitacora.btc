@@ -143,9 +143,9 @@ export const THIRD_PARTIES: ThirdParty[] = [
     country: US,
     side: "browser",
     why: {
-      es: "Reenvía el formulario de Contacto hacia Gmail.",
-      en: "Forwards the Contact form to Gmail.",
-      pt: "Encaminha o formulário de Contato para o Gmail.",
+      es: "Reenvía el formulario de Contacto hacia Gmail. El navegador también le envía tu IP.",
+      en: "Forwards the Contact form to Gmail. The browser also sends it your IP.",
+      pt: "Encaminha o formulário de Contato para o Gmail. O navegador também lhe envia o seu IP.",
     },
   },
   {
