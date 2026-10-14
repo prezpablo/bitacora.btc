@@ -53,3 +53,12 @@ test("open gaps and the plan are not published", () => {
   const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
   assert.doesNotMatch(legal, /Brechas en curso|Open gaps|Falhas em curso|\nPlan:|\nPlano:/);
 });
+
+test("the breach notice does not say when it applies", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(legal, /cuando corresponda|quando for o caso|where it applies, the people/);
+  assert.match(legal, /en 24 horas se mitiga y en 72 horas se comunica a la URCDP/);
+  assert.match(legal, /contained within 24 hours and reported to the URCDP within 72 hours/);
+  assert.match(legal, /em 24 horas ela é contida e em 72 horas é comunicada à URCDP/);
+  assert.match(legal, /where the GDPR applies/);
+});

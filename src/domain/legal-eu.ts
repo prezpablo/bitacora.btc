@@ -109,7 +109,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Derechos",
       id: "derechos",
-      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace escribiendo a privacidad@bitacorabtc.org, sin captcha, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\n{{URCDP}}\n\nSi una violación de seguridad afecta datos personales, se avisa a la URCDP y, cuando corresponda, a las personas afectadas, dentro de 72 horas de conocida.",
+      body: "Podés ejercer acceso, rectificación, actualización, inclusión y supresión (arts. 14 a 16 de la Ley 18.331) y, si el RGPD resulta aplicable, también limitación, portabilidad y oposición, y a no ser objeto de una decisión automatizada: aquí no hay scoring de personas.\n\nEl pedido se hace escribiendo a privacidad@bitacorabtc.org, sin captcha, acreditando identidad. El plazo uruguayo es de 5 días hábiles (arts. 14 y 15). Reclamo ante la URCDP (Uruguay) y, en la UE, ante la autoridad de control del art. 77 RGPD.\n\n{{URCDP}}\n\nSi una violación de seguridad afecta datos personales, en 24 horas se mitiga y en 72 horas se comunica a la URCDP. Tras el cierre, si el impacto es significativo, se avisa a las personas afectadas.",
     },
     {
       title: "Almacenamiento en el terminal (cookies)",
@@ -234,7 +234,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Rights",
       id: "derechos",
-      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests are made by writing to privacidad@bitacorabtc.org, with no captcha, and with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\n{{URCDP}}\n\nIf a security breach affects personal data, the URCDP and, where it applies, the people affected are told within 72 hours of it becoming known.",
+      body: "You may exercise access, rectification, update, inclusion and erasure (arts. 14 to 16 of Act 18.331) and, where the GDPR applies, also restriction, portability and objection, and not to be subject to automated decision-making: we do not score people.\n\nRequests are made by writing to privacidad@bitacorabtc.org, with no captcha, and with proof of identity. The Uruguayan deadline is 5 business days (arts. 14 and 15). You may complain to the URCDP (Uruguay) and, in the EU, to the supervisory authority under GDPR art. 77.\n\n{{URCDP}}\n\nIf a security breach affects personal data, it is contained within 24 hours and reported to the URCDP within 72 hours. After it is closed, if the impact is significant, the people affected are told.",
     },
     {
       title: "Storage on the device (cookies)",
@@ -359,7 +359,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Direitos",
       id: "derechos",
-      body: "Você pode exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14 a 16 da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e o direito de não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido é feito escrevendo para privacidad@bitacorabtc.org, sem captcha, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14 e 15). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controle do art. 77 do RGPD.\n\n{{URCDP}}\n\nSe uma violação de segurança afetar dados pessoais, a URCDP e, quando for o caso, as pessoas afetadas são avisadas em até 72 horas depois que se souber.",
+      body: "Você pode exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14 a 16 da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e o direito de não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido é feito escrevendo para privacidad@bitacorabtc.org, sem captcha, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14 e 15). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controle do art. 77 do RGPD.\n\n{{URCDP}}\n\nSe uma violação de segurança afetar dados pessoais, em 24 horas ela é contida e em 72 horas é comunicada à URCDP. Depois do fechamento, se o impacto for significativo, as pessoas afetadas são avisadas.",
     },
     {
       title: "Armazenamento no aparelho (cookies)",

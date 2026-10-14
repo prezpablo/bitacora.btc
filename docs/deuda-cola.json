@@ -497,7 +497,7 @@
     {
       "id": "A-13",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "el aviso de vulneración no dice cuando corresponda"
     },

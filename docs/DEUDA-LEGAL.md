@@ -199,7 +199,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | A-09 | P1 | Hecho en el repo. Falta el ZIP. El envío manda versión y formulario. IP en claro no. |
 | A-10 | P1 | Hecho en el repo. Falta el ZIP. Título «Textos legales». Vigencia oculta. |
 | A-11 | P1 | Hecho en el repo (textos 2.10). Falta el ZIP. Brechas y plan fuera de la página. |
-| A-13 | P1 | El aviso de vulneración no dice «cuando corresponda». |
+| A-13 | P1 | Hecho en el repo (textos 2.11). Falta el ZIP. El aviso no dice «cuando corresponda». |
 | A-14 | P2 | Borrado de códigos y pines. Gmail no se borra desde el VPS. |
 | A-15 | P2 | Tabla de almacenamiento real. |
 | A-17 | P2 | `mailto:` junto al captcha. El audio queda. |

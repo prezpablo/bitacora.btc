@@ -2,7 +2,7 @@
 
 Registro interno. No se publica en el sitio.
 
-Si una violación de seguridad afecta datos personales, se avisa a la URCDP y, cuando corresponda, a las personas afectadas, dentro de 72 horas de conocida.
+El procedimiento de 24 h y 72 h está en [INCIDENTES-URCDP.md](INCIDENTES-URCDP.md). Este archivo es solo el registro. No se publica en el sitio.
 
 No hay incidentes anotados.
 

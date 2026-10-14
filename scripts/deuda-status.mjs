@@ -243,6 +243,14 @@ function repoCheck(id) {
     const ok = !/Brechas en curso|Open gaps|Falhas em curso|\nPlan:|\nPlano:/.test(legal) && /A-11/.test(todo);
     return { pass: ok, detail: ok ? "brechas y plan fuera de /legal" : "siguen publicadas" };
   }
+  if (id === "A-13") {
+    const legal = read("src/domain/legal-eu.ts");
+    const ok =
+      !/cuando corresponda|quando for o caso|where it applies, the people/.test(legal) &&
+      /en 24 horas se mitiga/.test(legal) &&
+      /within 72 hours/.test(legal);
+    return { pass: ok, detail: ok ? "aviso sin «cuando corresponda»" : "sigue el aviso condicional" };
+  }
   return { pass: false, detail: "manual" };
 }
 
