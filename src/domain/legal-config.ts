@@ -6,7 +6,7 @@ export const VPS_COUNTRY = { es: "Finlandia", en: "Finland", pt: "Finlândia" } 
 
 export const LEGAL = {
   controllerName: "Pablo Daniel Perez Correa",
-  address: "Domingo Baque 176, Colonia del Sacramento, Colonia, Uruguay",
+  address: "Colonia del Sacramento, Colonia, Uruguay",
   privacyEmail: "privacidad@bitacorabtc.org",
   a11yEmail: "accesibilidad@bitacorabtc.org",
   contributionLicense: "CC BY 4.0",
@@ -15,7 +15,7 @@ export const LEGAL = {
   expediente: "en trámite",
   inscription: "[N.º INSCRIPCIÓN]",
   vigencia: "[FECHA_VIGENCIA]",
-  consentVersion: "2.2",
+  consentVersion: "2.3",
 } as const;
 
 export function legalFilled(value: string) {
