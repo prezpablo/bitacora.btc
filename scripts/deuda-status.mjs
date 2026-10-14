@@ -364,6 +364,11 @@ function repoCheck(id) {
     const ok = /getEventHtml/.test(route) && /readLast<EventHtmlRow\[\]>\("events-html"\)/.test(fn) && !/fetchLuma/.test(fn);
     return { pass: ok, detail: ok ? "seis próximos en el HTML, sin scraper nuevo" : "el home vuelve a raspar o no lista" };
   }
+  if (id === "D-STATUE") {
+    const src = read("src/domain/statues.ts");
+    const ok = /id: "budapest"/.test(src) && /id: "el-zonte"/.test(src) && !/id: "(lugano|viena|vienna|nyse)"/.test(src);
+    return { pass: ok, detail: ok ? "Budapest y El Zonte; sin Lugano, Viena ni NYSE" : "entró una pieza que no correspondía" };
+  }
   return { pass: false, detail: "manual" };
 }
 

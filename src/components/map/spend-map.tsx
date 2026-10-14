@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import { pinAsPlace, refineShopIcon } from "@/domain";
-import type { GlobeFocus } from "@/domain/globe";
-import { FOUNDING_UY } from "@/domain/globe";
+import { STATUES } from "@/domain/statues";
+import { FOUNDING_UY, type GlobeFocus } from "@/domain/globe";
 import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic, withFoundingProfile } from "@/domain";
 import { dedupeCommunities, dedupeShops, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
 import { coinPinSize, pinBadgeSize } from "@/domain/map-pin-size";
@@ -885,10 +885,33 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
         m.addTo(group);
       }
+      for (const s of STATUES) {
+        const size = coinPinSize(zoom, "community", focus?.id === s.id);
+        const face = coinFaceHtml(s.img, Math.max(8, size - 2));
+        const ring = size < 14 ? 1 : 1.5;
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#f7931a;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden">${face}</div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+        const photo = escapeHtml(s.img);
+        const card = `<div style="max-width:180px">
+          <img src="${photo}" alt="" width="160" height="160" style="width:100%;height:auto;border-radius:8px;background:#f7931a;display:block" />
+          <strong>${escapeHtml(t(s.nameKey))}</strong><br/>
+          <span>${escapeHtml(t(s.whereKey))}</span><br/>
+          <span>${escapeHtml(t(s.aboutKey))}</span><br/>
+          <span style="opacity:.7">${escapeHtml(t(s.creditKey))}</span>
+        </div>`;
+        const sm = L.marker([s.lat, s.lon], { icon, zIndexOffset: 650 });
+        sm.bindPopup(card, { maxWidth: 200 });
+        if (focus?.id === s.id) sm.openPopup();
+        sm.addTo(group);
+      }
     } catch {
       /* un pin malo no deja el mapa en blanco */
     }
-  }, [places, store, visibleComms, hit, mapReady, zoom, t]);
+  }, [places, store, visibleComms, hit, mapReady, zoom, t, focus?.id]);
 
   useEffect(() => {
     const map = mapRef.current;

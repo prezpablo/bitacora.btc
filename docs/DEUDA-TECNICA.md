@@ -59,7 +59,7 @@ Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE. **D-DEPS*
 | **D-BAK-OFF** | P2 | Una copia de ese gzip está fuera de ese disco. El camino es `deploy/pull-backup.ps1`, una vez por semana. | No se suma un servicio de backups. |
 | **D-SQL-ONE** | P3 | Sigue un solo proceso escribiendo `bitacora.sqlite`. No se sube Node ni el tope de 400 filas o 350.000 caracteres mientras `node:sqlite` sea experimental. | No se parte la base. |
 
-**Siguiente fase de código:** ninguna que no espere. **D-STATUE** espera la foto. **D-FOSS** sigue siendo un clic en GitHub. **D-DEPS** no entra. En el VPS quedan **D-BAK-ON** y **D-BAK-OFF**.
+**Siguiente fase de código:** ninguna que no espere. **D-FOSS** sigue siendo un clic en GitHub. **D-DEPS** no entra. En el VPS quedan **D-BAK-ON** y **D-BAK-OFF**.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -134,7 +134,7 @@ Sondeo de las 20:41 superado por el de las 22:22. Experiencias, la versión 2.4 
 
 **Experiencias (D-EXPERIENCIA).** Chip dentro de Comunidad, al lado de anuncios y eventos. No es la quinta entrada de la barra. Misma prueba pública. Campos extra, todos visibles: qué es la actividad, ciudad, fecha o «recurrente», precio en sats o «a convenir», y el enlace de la prueba. Bitácora no cobra ni custodia. Hasta que haya fichas propias no entra al sitemap (igual que D-SEO-CITY).
 
-**Estatuas (D-STATUE).** Capa propia, miniatura y ficha. Solo piezas con foto pública y lugar confirmado. Entran como primera tanda: Budapest (Graphisoft Park, 2021, la de bronce con cara espejada) y El Zonte (2025, serie de Valentina Picozzi). Nueva York (NYSE, diciembre 2025) se agrega si la foto y la dirección se confirman. Lugano no se pincha: el monumento fue retirado. Viena se anuncia el 14 oct 2026: no va al mapa hasta que esté inaugurada. No scrapear satoshistatues.com.
+**Estatuas (D-STATUE).** Hecho en el repo. Miniatura naranja `#F7931A` en el globo y en el mapa, con ficha. Entran Budapest (Graphisoft Park, 2021, foto de Fekist, CC BY-SA 4.0) y El Zonte (Bitcoin Beach, 2025). Nueva York no entra: no apareció una foto de la pieza. Lugano no se pincha. Viena se descubre el 14 oct 2026 a las 17: no va hasta después. Falta el ZIP.
 
 ### Informe ATP 23 set — qué entra y qué no
 

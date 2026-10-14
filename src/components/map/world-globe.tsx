@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { GlobeFocus } from "@/domain/globe";
-import { FOUNDING_UY } from "@/domain/globe";
+import { STATUES } from "@/domain/statues";
+import { FOUNDING_UY, type GlobeFocus } from "@/domain/globe";
 import { capitalOf } from "@/domain/capitals";
 import { mapKeys, useGlobeStats } from "@/lib/map-query";
 import { localeTag } from "@/lib/display";
@@ -253,8 +253,17 @@ function GlobeCanvas({
         px: pxFor(p.id),
       })),
       ...(!far ? ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const, px: pxFor(p.id) })) : []),
+      ...STATUES.map((s) => ({
+        id: s.id,
+        name: t(s.nameKey),
+        lat: s.lat,
+        lon: s.lon,
+        logo: s.img,
+        face: "logo" as const,
+        px: pxFor(s.id),
+      })),
     ];
-  }, [coinPins, ownShops, far, alt, overlayPins]);
+  }, [coinPins, ownShops, far, alt, overlayPins, t]);
 
   const enterRef = useRef(enter);
   enterRef.current = enter;

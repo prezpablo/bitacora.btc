@@ -315,7 +315,7 @@
     {
       "id": "D-STATUE",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "capa mapa+globo con miniatura; solo instaladas con foto; sin Lugano retirada ni Viena antes del 14 oct 2026"
     },
