@@ -48,3 +48,17 @@ test("rights name the challenge to a personal valuation, and the five-day term s
   assert.match(legal, /5 business days \(arts\. 14 and 15\)/);
   assert.match(legal, /5 dias úteis \(arts\. 14 e 15\)/);
 });
+
+test("PSAV cites Act 20.446 art. 693 and Circular 2507, and does not exempt a natural person", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  const note = readFileSync(new URL("../lib/i18n.ts", import.meta.url), "utf8");
+  for (const src of [legal, note]) {
+    assert.match(src, /20\.446/);
+    assert.match(src, /2507/);
+  }
+  assert.match(legal, /art\. 127\.22/);
+  assert.match(legal, /16\.696, art\. 37, literal H/);
+  assert.match(legal, /Act 16\.696, art\. 37, letter H/);
+  assert.match(legal, /Lei n\.º 16\.696, art\. 37, literal H/);
+  assert.doesNotMatch(legal, /persona física no es PSAV|natural person is not a VASP|pessoa física não é PSAV/);
+});

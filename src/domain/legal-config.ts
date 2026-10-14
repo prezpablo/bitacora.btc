@@ -21,7 +21,7 @@ export const LEGAL = {
   /** Fecha de presentación. No se publica hasta que Pablo la confirme. */
   filingDate: "[FECHA_PRESENTACION]",
   vigencia: "[FECHA_VIGENCIA]",
-  consentVersion: "2.15",
+  consentVersion: "2.16",
 } as const;
 
 export const LEGAL_CITY = {

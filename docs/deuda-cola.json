@@ -427,7 +427,7 @@
     {
       "id": "L-PSAV",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "manual",
       "done": "cita de Ley 20.446 y Circular BCU 2507 solo después de leer el texto; hoy solo 20.345"
     },
