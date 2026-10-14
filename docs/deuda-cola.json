@@ -434,7 +434,7 @@
     {
       "id": "L-MKT-COPY",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "live",
       "done": "el home no dice barre shorts"
     },

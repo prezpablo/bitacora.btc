@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22, A-23, A-25, A-26, A-29, A-31, A-30, L-VALOR | **L-IP** (ZIP) · **L-MKT-COPY** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22, A-23, A-25, A-26, A-29, A-31, A-30, L-VALOR, L-MKT-COPY | **L-IP** (ZIP) · **L-PSAV** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -46,12 +46,12 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 | 6 | **L-VALOR** | P2 | D7 | **En GitHub, no en el .org.** Textos 2.15. El art. 16 nombra impugnar la valoración. El plazo de 5 días hábiles sigue en los arts. 14 y 15. | ZIP |
 | 7 | **L-TAKEDOWN** | P2 | A-08 r.12 | **En GitHub, no en el .org.** La regla 12 no publica un plazo propio. Muestra 5 días hábiles. | ZIP |
 | 8 | **L-PSAV** | P2 | T4 | Solo Ley 20.345. La 20.446 y la Circular BCU 2507 no se citan hasta leerlas. | Confirmar, después código |
-| 9 | **L-MKT-COPY** | P2 | T5 | En vivo: «si BTC sube hasta ahí, barre shorts». Distinto de A-07. | Código |
+| 9 | **L-MKT-COPY** | P2 | T5 | **En GitHub, no en el .org.** El punto de control ya no dice que el precio barre shorts ni longs. Sigue la explicación de qué es el POC. | ZIP |
 | 10 | **L-LABIT** | P3 | A-27 | No etiquetar hasta un sí o un no. El v2 lo baja a P3. | Pablo |
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **L-MKT-COPY**. En vivo: «si BTC sube hasta ahí, barre shorts». No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **L-PSAV**. No se cita la Ley 20.446 ni la Circular BCU 2507 hasta leerlas. Hoy solo está la 20.345. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 

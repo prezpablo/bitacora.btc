@@ -213,7 +213,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | A-31 | P3 | Hecho en el repo. No se nombra el art. 14. No está «niños y adolescentes». |
 | L-VALOR | P2 | Hecho en el repo (textos 2.15). Falta el ZIP. El art. 16 nombra impugnar la valoración. |
 | L-PSAV | P2 | 20.446 y Circular 2507 solo después de leerlas. |
-| L-MKT-COPY | P2 | Sacar «barre shorts». |
+| L-MKT-COPY | P2 | Hecho en el repo. Falta el ZIP. El punto de control no dice «barre shorts» ni «barre longs». |
 | L-LABIT (A-27) | P3 | No etiquetar LABITCONF hasta el sí o el no. |
 | D-FOSS (A-05) | P1 | Repo 200 anónimo, o paquete de fuentes. Recién ahí el hash y el enlace. |
 

@@ -541,13 +541,7 @@ function PocCallout({ poc, price }: { poc: number | null; price: number }) {
         ) : null}
       </div>
       <p className="mt-2 text-sm text-pretty text-muted-foreground">
-        {ready ? (
-          <>
-            {t("pocBody")} {above ? t("pocUp") : t("pocDown")}
-          </>
-        ) : (
-          t("pocWait")
-        )}
+        {ready ? t("pocBody") : t("pocWait")}
       </p>
     </section>
   );

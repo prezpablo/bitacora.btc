@@ -330,6 +330,12 @@ function repoCheck(id) {
     const ok = /impugnar esa valoración \(art\. 16\)/.test(legal) && /challenge that valuation \(art\. 16\)/.test(legal) && /impugnar essa valoração \(art\. 16\)/.test(legal) && !/arts\. 14 a 16/.test(legal);
     return { pass: ok, detail: ok ? "el art. 16 nombra impugnar la valoración; el plazo de 5 días queda en 14 y 15" : "los derechos siguen sin el art. 16" };
   }
+  if (id === "L-MKT-COPY") {
+    const i18n = read("src/lib/i18n.ts");
+    const desk = read("src/components/dashboard/desk.tsx");
+    const ok = !/barre shorts|barre longs|sweeps shorts|sweeps longs|varre shorts|varre longs/.test(i18n) && !/pocUp|pocDown/.test(desk);
+    return { pass: ok, detail: ok ? "el punto de control no dice que el precio barre shorts ni longs" : "la frase sigue en el mercado" };
+  }
   return { pass: false, detail: "manual" };
 }
 
