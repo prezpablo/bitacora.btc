@@ -15,7 +15,7 @@ export const LEGAL = {
   expediente: "en trámite",
   inscription: "[N.º INSCRIPCIÓN]",
   vigencia: "[FECHA_VIGENCIA]",
-  consentVersion: "2.3",
+  consentVersion: "2.4",
 } as const;
 
 export function legalFilled(value: string) {

@@ -68,6 +68,10 @@ const es = {
     "Nombre, correo y mensaje son obligatorios; sin ellos no podemos responderte. Pasan por FormSubmit (Estados Unidos) hacia Gmail y se conservan hasta 12 meses. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
   consentPublishInfo:
     "{keep} Se publica en GitHub (Estados Unidos). Declarás que los datos son ciertos y que tenés derecho a publicar el logo. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
+  consentPublishXp: "Acepto publicar esta experiencia, según los",
+  consentKeepXp: "Queda pública mientras exista: actividad, ciudad, fecha o «recurrente», precio en sats o «convenio» y el enlace de prueba.",
+  consentXpInfo:
+    "{keep} Se guarda en el servidor de Bitácora. El CSV público no incluye el código de edición. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
   consentWhoName: "Responsable: {name}.",
   consentWhoAddress: "Domicilio: {address}.",
   consentLicense: "Licencia de los aportes: {license}.",
@@ -677,6 +681,10 @@ const en: Record<keyof typeof es, string> = {
     "Name, email and message are required; without them we cannot reply. They go through FormSubmit (United States) to Gmail and are kept for up to 12 months. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
   consentPublishInfo:
     "{keep} It is published on GitHub (United States). You state that the data is true and that you have the right to publish the logo. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
+  consentPublishXp: "I agree to publish this experience, under the",
+  consentKeepXp: "It stays public while it exists: activity, city, date or “recurrent”, price in sats or “deal”, and the proof link.",
+  consentXpInfo:
+    "{keep} It is stored on Bitácora’s server. The public CSV does not include the edit code. Exercising your rights is free, needs no captcha and the deadline is 5 business days. Email:",
   consentWhoName: "Controller: {name}.",
   consentWhoAddress: "Address: {address}.",
   consentLicense: "Contribution license: {license}.",
@@ -1286,6 +1294,10 @@ const pt: Record<keyof typeof es, string> = {
     "Nome, e-mail e mensagem são obrigatórios; sem eles não dá para responder. Passam pelo FormSubmit (Estados Unidos) até o Gmail e ficam guardados por até 12 meses. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
   consentPublishInfo:
     "{keep} Publica-se no GitHub (Estados Unidos). Você declara que os dados são verdadeiros e que tem direito de publicar o logo. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
+  consentPublishXp: "Aceito publicar esta experiência, segundo os",
+  consentKeepXp: "Fica pública enquanto existir: atividade, cidade, data ou «recorrente», preço em sats ou «convênio» e o link de prova.",
+  consentXpInfo:
+    "{keep} Fica no servidor da Bitácora. O CSV público não inclui o código de edição. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
   consentWhoName: "Responsável: {name}.",
   consentWhoAddress: "Endereço: {address}.",
   consentLicense: "Licença dos aportes: {license}.",

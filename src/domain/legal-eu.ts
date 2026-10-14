@@ -19,7 +19,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
         {
       title: "Términos y condiciones",
       id: "terminos",
-      body: "Estas nueve reglas son las condiciones de uso.",
+      body: "Estas diez reglas son las condiciones de uso.",
       clauses: [
         { title: "1. Aceptación", body: "Al usar el sitio aceptás estas reglas." },
         { title: "2. Qué no es", body: "Bitácora.btc no custodia, no intermedia y no administra llaves (Ley n.º 20.345: no es PSAV)." },
@@ -30,6 +30,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
         { title: "7. Mercado", body: "El módulo Mercado es información educativa: no es asesoramiento financiero ni recomendación de inversión." },
         { title: "8. Estrella de verificado", body: "La estrella de verificado indica dos enlaces públicos, un promedio alto con votos o la allowlist de fundación. No es un sello del BCU ni una garantía comercial." },
         { title: "9. Ley y tribunales", body: "Ley aplicable: República Oriental del Uruguay. Jurisdicción: tribunales de Uruguay. Privacidad: esta misma página, ancla Privacidad." },
+        { title: "10. Experiencias", body: "Quien publica una experiencia declara que la actividad, la ciudad, la fecha o el carácter recurrente, el precio en sats o el convenio y el enlace de prueba son ciertos. Eso se hace público bajo CC BY 4.0, citando a Bitácora.btc. El código de edición no se publica y se borra a los 30 días." },
       ],
     },
     {
@@ -40,7 +41,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Qué datos se tratan y para qué",
       id: "privacidad",
-      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación a privacidad@bitacorabtc.org.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil no se publica aquí hasta que esté cargado en esta página. Las finalidades son responder el contacto, publicar el directorio y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha, mientras exista.",
+      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación a privacidad@bitacorabtc.org.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil y el domicilio de notificación figuran en esta página. Las finalidades son responder el contacto, publicar el directorio y las experiencias, y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha y experiencia, mientras existan; código de edición de la experiencia, 30 días.",
       table: {
         head: ["Interacción", "Datos", "Base (Ley 18.331)", "Conservación"],
         rows: [
@@ -61,6 +62,12 @@ const es: { lead: string; blocks: LegalBlock[] } = {
             "Nombre, texto, URL de prueba y redes, código CARGA",
             "Consentimiento al publicar, con caducidad semanal",
             "7 días en el tablero. El código CARGA se conserva 30 días y no sale en el CSV público",
+          ],
+          [
+            "Experiencias",
+            "Actividad, ciudad, fecha o «recurrente», precio en sats o «convenio», URL de prueba",
+            "Consentimiento al publicar (art. 9). El código de edición no se publica",
+            "Mientras exista. El código de edición se borra a los 30 días",
           ],
           [
             "Ubicación GPS",
@@ -133,7 +140,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
         {
       title: "Terms of use",
       id: "terminos",
-      body: "These nine rules are the terms of use.",
+      body: "These ten rules are the terms of use.",
       clauses: [
         { title: "1. Acceptance", body: "By using the site you accept these rules." },
         { title: "2. What it is not", body: "Bitácora.btc does not custody, intermediate or hold keys (Act 20.345: it is not a VASP)." },
@@ -144,6 +151,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
         { title: "7. Market", body: "The Market module is educational information: it is not financial advice or an investment recommendation." },
         { title: "8. Verified star", body: "The verified star means two public links, a high average with votes, or the founding allowlist. It is not a BCU seal or a commercial warranty." },
         { title: "9. Law and courts", body: "Governing law: Oriental Republic of Uruguay. Jurisdiction: Uruguayan courts. Privacy: this page, Privacy anchor." },
+        { title: "10. Experiences", body: "Whoever publishes an experience states that the activity, city, date or recurrent character, the price in sats or the deal, and the proof link are accurate. That becomes public under CC BY 4.0, with attribution to Bitácora.btc. The edit code is not published and is deleted after 30 days." },
       ],
     },
     {
@@ -154,7 +162,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "What data we process and why",
       id: "privacidad",
-      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification at privacidad@bitacorabtc.org.\n\nArt. 13 information. The controller is a natural person in Colonia del Sacramento, Uruguay; the civil name is not published here until it is filled in on this page. The purposes are to reply to contact, publish the directory and limit abuse. Recipients are in the third-party section. On Contact, name, email and message are required: without them there is no reply. On the map, the name is required to publish. You may request access, rectification, update, inclusion and erasure, free of charge, within 5 business days, at privacidad@bitacorabtc.org. Retention: contact, 12 months; announcement, 7 days; CARGA code, 30 days; listing, while it exists.",
+      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification at privacidad@bitacorabtc.org.\n\nArt. 13 information. The controller is a natural person in Colonia del Sacramento, Uruguay; the civil name and the notice address are on this page. The purposes are to reply to contact, publish the directory and experiences, and limit abuse. Recipients are in the third-party section. On Contact, name, email and message are required: without them there is no reply. On the map, the name is required to publish. You may request access, rectification, update, inclusion and erasure, free of charge, within 5 business days, at privacidad@bitacorabtc.org. Retention: contact, 12 months; announcement, 7 days; CARGA code, 30 days; listing and experience, while they exist; the experience edit code, 30 days.",
       table: {
         head: ["Interaction", "Data", "Legal basis (Act 18.331)", "Retention"],
         rows: [
@@ -175,6 +183,12 @@ const en: { lead: string; blocks: LegalBlock[] } = {
             "Name, text, proof URL and socials, CARGA code",
             "Consent to publish, weekly TTL",
             "7 days on the board. The CARGA code is kept 30 days and is not in the public CSV",
+          ],
+          [
+            "Experiences",
+            "Activity, city, date or “recurrent”, price in sats or “deal”, proof URL",
+            "Consent to publish (art. 9). The edit code is not published",
+            "While it exists. The edit code is deleted after 30 days",
           ],
           [
             "GPS location",
@@ -247,7 +261,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Termos e condições",
       id: "terminos",
-      body: "Estas nove regras são as condições de uso.",
+      body: "Estas dez regras são as condições de uso.",
       clauses: [
         { title: "1. Aceitação", body: "Ao usar o site você aceita estas regras." },
         { title: "2. O que não é", body: "A Bitácora.btc não custodia, não intermedia e não administra chaves (Lei n.º 20.345: não é PSAV)." },
@@ -258,6 +272,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
         { title: "7. Mercado", body: "O módulo Mercado é informação educativa: não é aconselhamento financeiro nem recomendação de investimento." },
         { title: "8. Estrela de verificado", body: "A estrela de verificado indica dois links públicos, uma média alta com votos ou a allowlist de fundação. Não é um selo do BCU nem garantia comercial." },
         { title: "9. Lei e tribunais", body: "Lei aplicável: República Oriental do Uruguai. Jurisdição: tribunais do Uruguai. Privacidade: esta mesma página, âncora Privacidade." },
+        { title: "10. Experiências", body: "Quem publica uma experiência declara que a atividade, a cidade, a data ou o caráter recorrente, o preço em sats ou o convênio e o link de prova são verdadeiros. Isso fica público sob CC BY 4.0, citando a Bitácora.btc. O código de edição não é publicado e é apagado em 30 dias." },
       ],
     },
     {
@@ -268,7 +283,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Que dados se tratam e para quê",
       id: "privacidad",
-      body: "Vale o princípio de minimização (arts. 7 e 8 da Lei 18.331): só o necessário para cada finalidade, verdadeiro e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão coletamos senhas, documentos de identidade, biometria, histórico financeiro nem chaves de criptoativos. O diretório público não inclui e-mail nem telefone de pessoas: só redes sociais ou identificadores que você publica.\n\nO art. 2 da Lei 18.331 também alcança, quando couber, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação em privacidad@bitacorabtc.org.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil e o endereço para notificações estão nesta página. As finalidades são responder o contato, publicar o diretório e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha, enquanto existir.",
+      body: "Vale o princípio de minimização (arts. 7 e 8 da Lei 18.331): só o necessário para cada finalidade, verdadeiro e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão coletamos senhas, documentos de identidade, biometria, histórico financeiro nem chaves de criptoativos. O diretório público não inclui e-mail nem telefone de pessoas: só redes sociais ou identificadores que você publica.\n\nO art. 2 da Lei 18.331 também alcança, quando couber, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação em privacidad@bitacorabtc.org.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil e o endereço para notificações estão nesta página. As finalidades são responder o contato, publicar o diretório e as experiências, e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha e experiência, enquanto existirem; código de edição da experiência, 30 dias.",
       table: {
         head: ["Interação", "Dados", "Base (Lei 18.331)", "Conservação"],
         rows: [
@@ -289,6 +304,12 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
             "Nome, texto, URL de prova e redes, código CARGA",
             "Consentimento ao publicar, com prazo semanal",
             "7 dias no quadro. O código CARGA fica 30 dias e não sai no CSV público",
+          ],
+          [
+            "Experiências",
+            "Atividade, cidade, data ou «recorrente», preço em sats ou «convênio», URL de prova",
+            "Consentimento ao publicar (art. 9). O código de edição não é publicado",
+            "Enquanto existir. O código de edição é apagado em 30 dias",
           ],
           [
             "Localização GPS",

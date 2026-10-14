@@ -10,9 +10,9 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.equal(LEGAL.contributionLicense, "CC BY 4.0");
   assert.equal(legalFilled(LEGAL.translator), false);
   assert.equal(legalFilled(LEGAL.privacyEmail), true);
-  assert.equal(LEGAL.consentVersion, "2.3");
+  assert.equal(LEGAL.consentVersion, "2.4");
   const terms = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
-  assert.equal(terms.match(/CC BY 4\.0/g)?.length, 3);
+  assert.equal(terms.match(/CC BY 4\.0/g)?.length, 6);
   assert.match(terms, /ODbL/);
   assert.match(terms, /AGPL-3\.0/);
   assert.equal(LEGAL.expediente, "en trámite");
@@ -20,6 +20,10 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.match(terms, /Número de trámite: en trámite/);
   assert.match(terms, /Procedure number: in progress/);
   assert.match(terms, /Número do processo: em tramitação/);
+  assert.doesNotMatch(terms, /no se publica aquí hasta que esté cargado|not published here until it is filled/);
+  assert.match(terms, /10\. Experiencias/);
+  assert.match(terms, /10\. Experiences/);
+  assert.match(terms, /10\. Experiências/);
 });
 
 test("publish consent is not the contact form", () => {
@@ -35,6 +39,14 @@ test("publish consent is not the contact form", () => {
   for (const row of contacts) {
     assert.match(row, /FormSubmit/);
     assert.doesNotMatch(row, /\{name\}|\{address\}|\[NOMBRE|\[DOMICILIO/);
+  }
+  const xp = readFileSync(new URL("../components/dashboard/experiences.tsx", import.meta.url), "utf8");
+  assert.match(xp, /keep="xp"/);
+  const infos = [...src.matchAll(/consentXpInfo:\n\s*"([^"]+)"/g)].map((m) => m[1]);
+  assert.equal(infos.length, 3);
+  for (const row of infos) {
+    assert.doesNotMatch(row, /GitHub|FormSubmit/);
+    assert.match(row, /\{keep\}/);
   }
   const lead = [...src.matchAll(/thirdLead: "([^"]+)"/g)].map((m) => m[1]);
   assert.equal(lead.length, 3);

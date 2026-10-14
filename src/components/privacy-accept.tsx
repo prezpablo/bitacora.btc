@@ -15,12 +15,12 @@ export function PrivacyAccept({
   id: string;
   /** Contacto habla de FormSubmit. El resto publica en GitHub. */
   variant?: "contact" | "publish";
-  /** Ficha = mientras exista. Anuncio = 7 días. */
-  keep?: "listing" | "pin";
+  /** Ficha = mientras exista. Anuncio = 7 días. Experiencia = texto propio, no el del directorio. */
+  keep?: "listing" | "pin" | "xp";
 }) {
   const t = useT();
   const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
-  const keepText = keep === "pin" ? t("consentKeepPin") : t("consentKeepListing");
+  const keepText = keep === "pin" ? t("consentKeepPin") : keep === "xp" ? t("consentKeepXp") : t("consentKeepListing");
   const who = [
     legalFilled(LEGAL.controllerName) ? t("consentWhoName", { name: LEGAL.controllerName }) : "",
     legalFilled(LEGAL.address) ? t("consentWhoAddress", { address: LEGAL.address }) : "",
@@ -28,7 +28,7 @@ export function PrivacyAccept({
   ]
     .filter(Boolean)
     .join(" ");
-  const info = variant === "contact" ? t("consentContactInfo") : t("consentPublishInfo", { keep: keepText });
+  const info = variant === "contact" ? t("consentContactInfo") : keep === "xp" ? t("consentXpInfo", { keep: keepText }) : t("consentPublishInfo", { keep: keepText });
   return (
     <div className="flex items-start gap-2 text-sm text-foreground">
       <input
@@ -42,7 +42,7 @@ export function PrivacyAccept({
       />
       <div className="min-w-0">
         <p className="text-pretty leading-snug">
-          <label htmlFor={id}>{variant === "contact" ? t("consentContact") : t("consentPublish")} </label>
+          <label htmlFor={id}>{variant === "contact" ? t("consentContact") : keep === "xp" ? t("consentPublishXp") : t("consentPublish")} </label>
           {variant === "publish" ? (
             <>
               <a href={legalHref("terminos", String(search || ""))} className="font-medium text-foreground underline underline-offset-2">

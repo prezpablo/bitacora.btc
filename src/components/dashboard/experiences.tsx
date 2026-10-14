@@ -222,7 +222,7 @@ export function ExperiencesBoard() {
               {t("xpDeal")}
             </label>
             <div className="sm:col-span-2">
-              <PrivacyAccept id="privacy-xp" variant="publish" keep="listing" checked={privacyOk} onChange={setPrivacyOk} />
+              <PrivacyAccept id="privacy-xp" variant="publish" keep="xp" checked={privacyOk} onChange={setPrivacyOk} />
             </div>
             <div className="sm:col-span-2">
               <CaptchaBox ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
