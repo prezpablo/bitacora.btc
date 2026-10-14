@@ -2,9 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import type { EventHtmlRow } from "@/domain/event-html";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
 import { formatMarketClock } from "@/domain/market-clock";
 import { COMMUNITY_HUB, MARKET_HUB, sectorOf } from "@/domain/nav";
+import { EventHtmlList } from "./event-html-list";
 import { HubIndex } from "./hub-index";
 import { LabitconfBanner } from "./labitconf-banner";
 import { buildModelMarket } from "@/application";
@@ -79,7 +81,7 @@ function asLiq(range: ChartRange): LiqRange {
   return range === "6m" ? "1m" : range;
 }
 
-export function Desk() {
+export function Desk({ eventHtml = [] }: { eventHtml?: EventHtmlRow[] }) {
   const [range, setRange] = useState<ChartRange>("1w");
   const [ma, setMa] = useState(defaultMa);
   const [heatOn, setHeatOn] = useState(true);
@@ -305,6 +307,7 @@ export function Desk() {
         </Suspense>
         </section>
         <section id="eventos" className="scroll-mt-[4.5rem]">
+        <EventHtmlList rows={eventHtml} />
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="28rem">
             <NetworkEvents />

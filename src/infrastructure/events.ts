@@ -1,5 +1,7 @@
 import type { ContinentId, EventKind, EventsPayload, NetworkEvent } from "@/domain";
 import { continentFromLabel, continentOf, eventIsLive, isoFromCountryName } from "@/domain";
+import { upcomingEventHtml } from "@/domain/event-html";
+import { writeLast } from "./last-known.server";
 
 const BTC =
   /\b(bitcoin|btc|sats?|satoshi|lightning|nostr|ordinals?|taproot|runes?|bitaxe|mempool|hodl|bitcoiner|satsconf|adopting bitcoin|plan b)\b/i;
@@ -410,5 +412,6 @@ export async function fetchNetworkEvents(): Promise<EventsPayload> {
   const sources = [...new Set(events.map((e) => e.platform))];
   const payload: EventsPayload = { events, asOf: Date.now(), sources };
   cache = { at: Date.now(), payload };
+  writeLast("events-html", upcomingEventHtml(events));
   return payload;
 }

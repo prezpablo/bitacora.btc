@@ -3,6 +3,7 @@ import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, 
 import type { GlobeStats } from "@/domain/globe";
 import { fetchLiveMarket, fetchTick } from "./compose";
 import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
+import { upcomingEventHtml, type EventHtmlRow } from "@/domain/event-html";
 import { withLastKnown, readLast } from "./last-known.server";
 import { fetchBtcCommunities, fetchMerchant, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
@@ -172,6 +173,12 @@ export const getNetworkEvents = createServerFn({ method: "POST" })
     const raw = await withLastKnown("events", fetchNetworkEvents, (d) => d.events.length > 0);
     return buildEventBoard(raw.events, data, { asOf: raw.asOf, sources: raw.sources });
   });
+
+export const getEventHtml = createServerFn({ method: "POST" }).handler(async (): Promise<EventHtmlRow[]> => {
+  const snap = readLast<EventHtmlRow[]>("events-html");
+  if (!snap || !Array.isArray(snap.data)) return [];
+  return upcomingEventHtml(snap.data);
+});
 
 export const getCityFrame = createServerFn({ method: "POST" })
   .validator((input: { lat: number; lon: number; zoom?: number }) => input)

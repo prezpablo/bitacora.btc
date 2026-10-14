@@ -287,7 +287,7 @@
     {
       "id": "D-EVT-HTML",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "6 próximos eventos en HTML (título, ciudad, fecha); sin scraper nuevo"
     },

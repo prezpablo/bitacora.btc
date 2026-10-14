@@ -358,6 +358,12 @@ function repoCheck(id) {
     const ok = /t\("globeFed"\)/.test(globe) && /red federada, no el overlay/.test(i18n) && /federated network, not the overlay/.test(i18n) && /rede federada, não o overlay/.test(i18n);
     return { pass: ok, detail: ok ? "la cifra grande dice BTC Map, no el overlay" : "la cifra grande no nombra la fuente" };
   }
+  if (id === "D-EVT-HTML") {
+    const route = read("src/routes/index.tsx");
+    const fn = read("src/infrastructure/server-fns.ts");
+    const ok = /getEventHtml/.test(route) && /readLast<EventHtmlRow\[\]>\("events-html"\)/.test(fn) && !/fetchLuma/.test(fn);
+    return { pass: ok, detail: ok ? "seis próximos en el HTML, sin scraper nuevo" : "el home vuelve a raspar o no lista" };
+  }
   return { pass: false, detail: "manual" };
 }
 
