@@ -194,7 +194,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | L-PAIS (A-03) | P0 | Hecho en el repo (textos 2.7). Falta el ZIP. Hungría solo con la fuente de OpenFreeMap. |
 | A-04 | P0 | Hecho en el repo (textos 2.8). Falta el ZIP. Cita del inciso 2º, literal A. |
 | L-IP | P1 | Falta el ZIP `9bd3b6d`. |
-| A-07 | P1 | Hora con zona. La serie modelo dice que no es cotización. |
+| A-07 | P1 | Hecho en el repo. Falta el ZIP. Hora de Uruguay con zona. La serie modelo dice que no es cotización. |
 | A-08 | P1 | 14 reglas. Plazo de disputas oculto. ODbL de fichas derivadas, sin verificar, no se publica. |
 | A-09 | P1 | Versión del consentimiento en el envío. IP nunca en claro. |
 | A-10 | P1 | Título «Textos legales». Vigencia oculta si es un corchete. |

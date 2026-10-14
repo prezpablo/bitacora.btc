@@ -3,6 +3,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { applyTick, type ChartRange, type LiqRange, type MaKey } from "@/domain";
+import { formatMarketClock } from "@/domain/market-clock";
 import { COMMUNITY_HUB, MARKET_HUB, sectorOf } from "@/domain/nav";
 import { HubIndex } from "./hub-index";
 import { LabitconfBanner } from "./labitconf-banner";
@@ -76,14 +77,6 @@ function fgLabel(classification: string, t: (k: "fgExtFear" | "fgExtGreed" | "fg
 
 function asLiq(range: ChartRange): LiqRange {
   return range === "6m" ? "1m" : range;
-}
-
-function formatClock(ts: number) {
-  return new Date(ts).toLocaleTimeString("es-UY", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
 }
 
 export function Desk() {
@@ -368,7 +361,7 @@ export function Desk() {
               </Badge>
               {updatedAt ? (
                 <p className="mt-1 font-mono text-xs tabular-nums text-muted-foreground">
-                  {query.isFetching ? t("updating") : `act. ${formatClock(updatedAt)}`}
+                  {query.isFetching ? t("updating") : `act. ${formatMarketClock(updatedAt)}`}
                 </p>
               ) : null}
             </div>
@@ -389,10 +382,10 @@ export function Desk() {
 
       <section className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         <Stat
-          label={t("statPrice")}
+          label={market.source === "modelo" ? t("srcModel") : t("statPrice")}
           value={formatUsd(market.price, 0)}
-          hint={formatPct(market.change24h)}
-          hintClass={up ? "text-long" : "text-short"}
+          hint={market.source === "modelo" ? t("notQuote") : formatPct(market.change24h)}
+          hintClass={market.source === "modelo" ? undefined : up ? "text-long" : "text-short"}
         />
         <Stat
           label={t("statEma")}

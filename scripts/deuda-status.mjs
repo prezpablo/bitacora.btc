@@ -189,6 +189,18 @@ function repoCheck(id) {
       !/\[PLAZO_LOGS\]|\[PLAZO_FORMSUBMIT\]/.test(legal);
     return { pass: ok, detail: ok ? "art. 23 inciso 2º literal A" : "sigue la cita corta" };
   }
+  if (id === "A-07") {
+    const clock = read("src/domain/market-clock.ts");
+    const desk = read("src/components/dashboard/desk.tsx");
+    const i18n = read("src/lib/i18n.ts");
+    const ok =
+      /America\/Montevideo/.test(clock) &&
+      /timeZoneName: "short"/.test(clock) &&
+      /formatMarketClock/.test(desk) &&
+      /notQuote: "no es cotización"/.test(i18n) &&
+      /source === "modelo" \? t\("notQuote"\)/.test(desk);
+    return { pass: ok, detail: ok ? "hora con zona; la serie modelo no es cotización" : "falta zona o el aviso de la serie" };
+  }
   return { pass: false, detail: "manual" };
 }
 

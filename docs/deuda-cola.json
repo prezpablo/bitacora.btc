@@ -462,7 +462,7 @@
     {
       "id": "A-07",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "la hora del mercado lleva zona; la serie modelo no muestra una cifra sin decir que no es cotización"
     },
