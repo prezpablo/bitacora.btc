@@ -171,6 +171,15 @@ function repoCheck(id) {
       /todavía no asignó número de trámite/.test(legal);
     return { pass: ok, detail: ok ? "sin número de trámite inventado" : "sigue «en trámite» como número" };
   }
+  if (id === "L-PAIS") {
+    const parties = read("src/domain/third-parties.ts");
+    const ok =
+      !/no declarado/.test(parties) &&
+      /countrySource: "https:\/\/openfreemap.org\/tos\/"/.test(parties) &&
+      /país no informado por el proveedor/.test(parties) &&
+      /lingva\.ml/.test(parties);
+    return { pass: ok, detail: ok ? "país con fuente o no informado" : "sigue no declarado" };
+  }
   return { pass: false, detail: "manual" };
 }
 

@@ -191,7 +191,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 |---|---|---|
 | A-01 | P0 | Hecho en el repo (textos 2.5). Falta el ZIP. Sin calle. |
 | L-URCDP (A-02) | P0 | Hecho en el repo (textos 2.6). Falta el ZIP. Sin número, la URCDP no lo asignó. |
-| L-PAIS (A-03) | P0 | «No declarado» pelado se reemplaza por fuente o por «el proveedor no informa el país». |
+| L-PAIS (A-03) | P0 | Hecho en el repo (textos 2.7). Falta el ZIP. Hungría solo con la fuente de OpenFreeMap. |
 | A-04 | P0 | Cita del art. 23, inciso 2º, literal A. Sin inventar plazos. |
 | L-IP | P1 | Falta el ZIP `9bd3b6d`. |
 | A-07 | P1 | Hora con zona. La serie modelo dice que no es cotización. |

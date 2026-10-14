@@ -28,3 +28,18 @@ test("the FormSubmit row says the browser also sends the IP", () => {
   assert.match(row.why.en, /IP/);
   assert.match(row.why.pt, /IP/);
 });
+
+test("undeclared countries are not guessed", () => {
+  const src = readFileSync(new URL("./third-parties.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(src, /no declarado|not stated|não declarado/);
+  const ofm = THIRD_PARTIES.find((p) => p.name === "OpenFreeMap");
+  assert.equal(ofm?.country.es, "Hungría");
+  assert.equal(ofm?.countrySource, "https://openfreemap.org/tos/");
+  for (const name of ["BTC Map", "GeoJS", "ipwho.is", "Lingva"]) {
+    const row = THIRD_PARTIES.find((p) => p.name === name);
+    assert.equal(row?.country.es, "país no informado por el proveedor");
+    assert.equal(row?.countrySource, undefined);
+  }
+  const lingva = THIRD_PARTIES.find((p) => p.name === "Lingva");
+  assert.deepEqual(lingva?.hosts, ["lingva.ml"]);
+});

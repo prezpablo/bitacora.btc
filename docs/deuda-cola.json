@@ -399,7 +399,7 @@
     {
       "id": "L-PAIS",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "A-03: OpenFreeMap, BTC Map, GeoJS, ipwho.is y Lingva no dicen no declarado pelado; país con fuente o país no informado por el proveedor; no se inventa"
     },

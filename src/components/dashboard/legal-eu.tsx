@@ -29,7 +29,20 @@ function PartyList({ title, side, lang }: { title: string; side: ThirdParty["sid
           return (
             <li key={`${side}-${p.name}`} className="text-sm leading-relaxed text-pretty text-muted-foreground">
               <span className="font-medium text-foreground">{p.name}</span>
-              {shown ? ` · ${shown}` : ""}
+              {shown ? (
+                <>
+                  {" · "}
+                  {p.countrySource ? (
+                    <a className="underline underline-offset-2" href={p.countrySource} rel="noreferrer">
+                      {shown}
+                    </a>
+                  ) : (
+                    shown
+                  )}
+                </>
+              ) : (
+                ""
+              )}
               {p.hosts.length ? ` · ${p.hosts.join(", ")}` : ""}. {p.why[lang]}
             </li>
           );

@@ -6,12 +6,18 @@ export type ThirdParty = {
   hosts: string[];
   name: string;
   country: Phrase;
+  /** Página del proveedor que dice el país. Sin ella, no se adivina. */
+  countrySource?: string;
   side: "browser" | "server" | "recipient";
   why: Phrase;
 };
 
 const US: Phrase = { es: "Estados Unidos", en: "United States", pt: "Estados Unidos" };
-const UNDECLARED: Phrase = { es: "no declarado", en: "not stated", pt: "não declarado" };
+const UNDECLARED: Phrase = {
+  es: "país no informado por el proveedor",
+  en: "country not reported by the provider",
+  pt: "país não informado pelo provedor",
+};
 const SEVERAL: Phrase = { es: "varios", en: "several", pt: "vários" };
 
 /** Fichas de terceros. `hosts` de `browser` tienen que coincidir con la CSP, token por token. */
@@ -19,7 +25,8 @@ export const THIRD_PARTIES: ThirdParty[] = [
   {
     hosts: ["tiles.openfreemap.org"],
     name: "OpenFreeMap",
-    country: UNDECLARED,
+    country: { es: "Hungría", en: "Hungary", pt: "Hungria" },
+    countrySource: "https://openfreemap.org/tos/",
     side: "browser",
     why: {
       es: "Teselas del mapa. También está en font-src.",
