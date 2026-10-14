@@ -504,7 +504,7 @@
     {
       "id": "A-14",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "cron borra CARGA y el código de experiencias a los 30 días y los pines a los 7; Gmail no se borra desde el VPS"
     },

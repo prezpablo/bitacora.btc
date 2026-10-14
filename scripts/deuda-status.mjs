@@ -251,6 +251,12 @@ function repoCheck(id) {
       /within 72 hours/.test(legal);
     return { pass: ok, detail: ok ? "aviso sin «cuando corresponda»" : "sigue el aviso condicional" };
   }
+  if (id === "A-14") {
+    const src = read("src/infrastructure/retention.ts");
+    const job = read("scripts/retain.mjs");
+    const ok = /PIN_RETAIN_MS = 7 \* DAY/.test(src) && /DELETE FROM pins/.test(src) && /RETAIN_MS = 30 \* DAY/.test(src) && /loadPins/.test(job) && !/gmail/i.test(src);
+    return { pass: ok, detail: ok ? "pines a 7 días; códigos a 30; sin Gmail" : "el cron no separa los plazos" };
+  }
   return { pass: false, detail: "manual" };
 }
 

@@ -20,7 +20,9 @@ No hay Cláusulas Contractuales Tipo ni evaluación de impacto documentada. Si h
 
 ## Código CARGA
 
-La política dice 30 días. El job `scripts/retain.mjs` (timer `bitacora-retain`) borra el token viejo y deja la ficha. Hay que tener el timer activo en el VPS.
+La política dice 30 días para el código y 7 días para el anuncio. El job `scripts/retain.mjs` (timer `bitacora-retain`) borra el anuncio vencido y deja vacíos los códigos viejos de comercio y de experiencia. Hay que tener el timer activo en el VPS.
+
+Gmail no se borra desde el VPS. El borrado de la casilla lo hace Pablo a mano. No hay un plazo de logs distinto del que el job ya usa.
 
 ## Datos que Pablo completa
 
