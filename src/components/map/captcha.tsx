@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { RefreshCw, Volume2 } from "lucide-react";
 import { issueCaptcha } from "@/infrastructure/server-fns";
+import { LEGAL } from "@/domain/legal-config";
 import { speakChallenge, spokenCode } from "@/lib/captcha-speech";
 import { minePow } from "@/lib/pow";
 import { useAppLang, useT } from "@/lib/i18n";
@@ -205,6 +206,12 @@ export function CaptchaBox({
           <RefreshCw className="size-4" />
         </button>
       </div>
+      <a
+        href={`mailto:${LEGAL.a11yEmail}`}
+        className="inline-flex min-h-6 items-center text-xs font-medium text-foreground underline underline-offset-2"
+      >
+        {t("captchaMail")}
+      </a>
       <p id={spokenId} className="sr-only" aria-live="polite">
         {code && !loading ? t("captchaSpoken", { code: spokenCode(code).replaceAll(". ", ", ") }) : t("captchaPow")}
       </p>

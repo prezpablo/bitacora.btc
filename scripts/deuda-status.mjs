@@ -266,6 +266,12 @@ function repoCheck(id) {
       !/bitacora-hit/.test(legal);
     return { pass: ok, detail: ok ? "tabla de claves reales; el pulso no entra" : "falta la tabla o entra una clave que no es" };
   }
+  if (id === "A-17") {
+    const ui = read("src/components/map/captcha.tsx");
+    const i18n = read("src/lib/i18n.ts");
+    const ok = /speakChallenge/.test(ui) && /mailto:\$\{LEGAL\.a11yEmail\}/.test(ui) && /captchaMail:/.test(i18n);
+    return { pass: ok, detail: ok ? "mailto junto al captcha; el audio queda" : "falta el correo o se fue el audio" };
+  }
   return { pass: false, detail: "manual" };
 }
 

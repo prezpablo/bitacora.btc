@@ -518,7 +518,7 @@
     {
       "id": "A-17",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "mailto visible junto al captcha en los formularios que lo usan"
     },

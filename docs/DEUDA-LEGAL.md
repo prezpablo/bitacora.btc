@@ -202,7 +202,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | A-13 | P1 | Hecho en el repo (textos 2.11). Falta el ZIP. El aviso no dice «cuando corresponda». |
 | A-14 | P2 | Hecho en el repo. Falta el ZIP y el timer en el VPS. Anuncios a 7 días. Códigos a 30. Gmail no se toca. |
 | A-15 | P2 | Hecho en el repo (textos 2.12). Falta el ZIP. Tabla de claves reales. |
-| A-17 | P2 | `mailto:` junto al captcha. El audio queda. |
+| A-17 | P2 | Hecho en el repo. Falta el ZIP. `mailto:` junto al captcha. El audio queda. |
 | A-18 | P2 | Anexo Brasil y Argentina. El párrafo del EEE no vino: no se inventa. |
 | A-21 | P2 | Lenguaje claro. Allowlist no es «lista de fundadores». |
 | A-22 | P2 | 24 px. |
