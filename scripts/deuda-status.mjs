@@ -347,6 +347,11 @@ function repoCheck(id) {
     const ok = /labitconf\.com/.test(banner) && !/labitKicker|Destacado|Patrocinado|Sponsored/.test(banner + i18n);
     return { pass: ok, detail: ok ? "el banner enlaza LABITCONF y no lleva sello de destacado ni de patrocinado" : "el sello sigue" };
   }
+  if (id === "D-AEO-FAQ") {
+    const seo = read("src/lib/seo.ts");
+    const ok = /No es un clon\. El overlay propio/.test(seo) && /It is not a clone\. The own overlay/.test(seo) && /Não é um clone\. O overlay próprio/.test(seo);
+    return { pass: ok, detail: ok ? "FAQ es/pt/en: no es un clon; overlay propio, resto federado" : "falta la frase en algún idioma" };
+  }
   return { pass: false, detail: "manual" };
 }
 

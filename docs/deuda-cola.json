@@ -247,12 +247,33 @@
       "pri": "P3",
       "open": true,
       "kind": "repo",
-      "done": "package.json sin firebase ni better-auth; npm ci; no bump tanstack a ciegas"
+      "done": "package.json sin firebase ni better-auth; npm ci; no bump tanstack a ciegas. Diferido: no se saca en este corte."
+    },
+    {
+      "id": "D-BAK-ON",
+      "pri": "P2",
+      "open": true,
+      "kind": "manual",
+      "done": "en el VPS, bitacora-backup.timer (03:17) y bitacora-retain.timer (04:10) enabled; hay un sqlite.gz del día en /var/backups/bitacora. Los unit ya están en deploy/. No se escribe otro script."
+    },
+    {
+      "id": "D-BAK-OFF",
+      "pri": "P2",
+      "open": true,
+      "kind": "manual",
+      "done": "una copia del gzip fuera de ese disco, con deploy/pull-backup.ps1, una vez por semana. Sin servicio nuevo."
+    },
+    {
+      "id": "D-SQL-ONE",
+      "pri": "P3",
+      "open": true,
+      "kind": "manual",
+      "done": "un solo proceso escribe bitacora.sqlite. No se sube Node ni el tope de 400 filas o 350000 caracteres mientras node:sqlite sea experimental."
     },
     {
       "id": "D-AEO-FAQ",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "FAQ es/pt/en visible: Bitácora no clona BTC Map; overlay propio, resto federado"
     },

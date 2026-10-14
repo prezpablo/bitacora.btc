@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22, A-23, A-25, A-26, A-29, A-31, A-30, L-VALOR, L-MKT-COPY, L-PSAV, L-LABIT | **L-IP** (ZIP) · **D-DEPS** · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04, A-07, A-08, A-09, A-10, A-11, A-13, A-14, A-15, A-17, A-18, A-21, A-22, A-23, A-25, A-26, A-29, A-31, A-30, L-VALOR, L-MKT-COPY, L-PSAV, L-LABIT | **L-IP** (ZIP) · **D-BAK-ON** · **D-BAK-OFF** · **D-DEPS** (diferido) · **D-FOSS** · **D-STATUE** · **D-SQL-ONE** |
 
 ---
 
@@ -49,9 +49,17 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 | 9 | **L-MKT-COPY** | P2 | T5 | **En GitHub, no en el .org.** El punto de control ya no dice que el precio barre shorts ni longs. Sigue la explicación de qué es el POC. | ZIP |
 | 10 | **L-LABIT** | P3 | A-27 | **En GitHub, no en el .org.** Pablo: no hay contraprestación. El banner enlaza el evento y no lleva sello de destacado ni de patrocinado. | ZIP |
 
-Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
+Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE. **D-DEPS** (Firebase) queda abierto y diferido: no se saca del paquete en este corte.
 
-**Siguiente fase de código, si se acepta:** **D-DEPS**. Sacar Firebase del bundle si no se usa. Si se va a usar, se informa como tercero. No las dos cosas. No mezclar con D-STATUE.
+**Archivo (14 oct).** No se cambia el motor. Tres deudas, en este orden, para que la carga no dependa de un solo disco:
+
+| Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|
+| **D-BAK-ON** | P2 | En el VPS están activos `bitacora-backup.timer` (03:17) y `bitacora-retain.timer` (04:10), y hay un `.sqlite.gz` del día en `/var/backups/bitacora`. | No se escribe otro script. Los unit ya están en `deploy/`. |
+| **D-BAK-OFF** | P2 | Una copia de ese gzip está fuera de ese disco. El camino es `deploy/pull-backup.ps1`, una vez por semana. | No se suma un servicio de backups. |
+| **D-SQL-ONE** | P3 | Sigue un solo proceso escribiendo `bitacora.sqlite`. No se sube Node ni el tope de 400 filas o 350.000 caracteres mientras `node:sqlite` sea experimental. | No se parte la base. |
+
+**Siguiente fase de código:** **D-COPY-FED**. La leyenda del globo tiene que decir que la cifra grande es BTC Map, no el overlay. D-STATUE espera la foto. D-FOSS sigue siendo un clic en GitHub. D-DEPS no entra.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -134,7 +142,7 @@ Semilla útil: intención local + primer uso + confianza. **No** tráfico de pre
 
 | Entra (cola 5–7) | Por qué no rompe lo hecho |
 |---|---|
-| **D-AEO-FAQ** | Misma FAQ y mismo `#faq-seo`. Cero rutas. Texto real (lector de pantalla y crawler). |
+| **D-AEO-FAQ** | Hecho en el repo. Misma FAQ y mismo `#faq-seo`. Una pregunta en es, pt y en: no es un clon; overlay propio, el resto federado. Falta el ZIP. |
 | **D-COPY-FED** | D-STATS ya separó Latam / mundo. Solo rotula que el número grande es BTC Map. |
 | **D-EVT-HTML** | Reusa Luma/Meetup/Eventbrite. Tope 6 para no inflar el HTML ni el TTFB. |
 

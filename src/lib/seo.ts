@@ -203,6 +203,10 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
       a: "Ninguna de las dos. Es una bitácora comunitaria, sin custodia de fondos. Educación, mapa y datos públicos de la red Bitcoin. No vendemos cuentas ni guardamos tus llaves.",
     },
     {
+      q: "¿Bitácora.btc copia BTC Map?",
+      a: "No. No es un clon. El overlay propio son las fichas que se cargan y se verifican acá. El resto de comercios y comunidades llega federado de BTC Map.",
+    },
+    {
       q: "¿Hay mapa de Bitcoin en Uruguay y el resto de Latam?",
       a: "Sí. Bitácora.btc nace en Colonia del Sacramento y cubre Latinoamérica: Montevideo, Buenos Aires, São Paulo, Santiago, Asunción, Bogotá, Ciudad de México y más. El pin de Consciencia Bitcoin está en el mapa; el resto de comercios llega de BTC Map y de cargas verificadas.",
     },
@@ -225,6 +229,10 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
       a: "Neither. It is a community logbook with no custody of funds. Education, a map and public Bitcoin-network data. We do not sell accounts or hold your keys.",
     },
     {
+      q: "Does Bitácora.btc clone BTC Map?",
+      a: "No. It is not a clone. The own overlay is the listings submitted and verified here. The other shops and communities come federated from BTC Map.",
+    },
+    {
       q: "Is there a Bitcoin map for Uruguay and the rest of Latam?",
       a: "Yes. Bitácora.btc started in Colonia del Sacramento and covers Latin America: Montevideo, Buenos Aires, São Paulo, Santiago, Asunción, Bogotá, Mexico City and more. Consciencia Bitcoin is on the map; other shops come from BTC Map and verified submissions.",
     },
@@ -245,6 +253,10 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     {
       q: "A Bitácora.btc é uma empresa ou um exchange?",
       a: "Nenhuma das duas. É uma bitácora comunitária, sem custódia de fundos. Educação, mapa e dados públicos da rede Bitcoin. Não vendemos contas nem guardamos as suas chaves.",
+    },
+    {
+      q: "A Bitácora.btc copia o BTC Map?",
+      a: "Não. Não é um clone. O overlay próprio são as fichas carregadas e verificadas aqui. O restante dos comércios e comunidades vem federado do BTC Map.",
     },
     {
       q: "Há mapa de Bitcoin no Uruguai e no resto da Latam?",
