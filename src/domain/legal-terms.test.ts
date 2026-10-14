@@ -72,3 +72,16 @@ test("storage keys are the real ones and the map pulse is not a key", () => {
   assert.doesNotMatch(legal, /bitacora-hit/);
   assert.doesNotMatch(legal, /grok-auth/);
 });
+
+test("the opening stays on Uruguayan law and points at the annex", () => {
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  const leads = [...legal.matchAll(/\n  lead: "([^"]+)"/g)].map((m) => m[1] ?? "");
+  assert.equal(leads.length, 3);
+  for (const lead of leads) {
+    assert.match(lead, /18\.331/);
+    assert.match(lead, /anexo|annex/);
+    assert.doesNotMatch(lead, /RGPD|GDPR|ePrivacy|EEE|EEA/);
+  }
+  assert.match(legal, /13\.709\/2018/);
+  assert.match(legal, /25\.326/);
+});

@@ -10,7 +10,7 @@ export type LegalBlock = {
 };
 
 const es: { lead: string; blocks: LegalBlock[] } = {
-  lead: "Bitácora.btc es una bitácora comunitaria impulsada desde Colonia del Sacramento, Uruguay. No es un exchange, no custodia fondos y no abre cuentas. El régimen primario es la Ley n.º 18.331 de Protección de Datos Personales y Acción de Habeas Data, reglamentada por el Decreto n.º 414/009, con control de la URCDP. Si nos escribís o publicás desde el Espacio Económico Europeo, además aplican el RGPD (UE 2016/679) y la Directiva ePrivacy. Este texto cumple el deber de información del art. 13 de la Ley 18.331. Describe lo que el sitio hace hoy: no es un certificado de conformidad ni un dictamen jurídico.",
+  lead: "Bitácora.btc es una bitácora comunitaria impulsada desde Colonia del Sacramento, Uruguay. No es un exchange, no custodia fondos y no abre cuentas. El régimen que ordena este texto es la Ley n.º 18.331 de Protección de Datos Personales y Acción de Habeas Data, reglamentada por el Decreto n.º 414/009, con control de la URCDP. Brasil y Argentina están en el anexo. Este texto cumple el deber de información del art. 13 de la Ley 18.331. Describe lo que el sitio hace hoy: no es un certificado de conformidad ni un dictamen jurídico.",
   blocks: [
     {
       title: "Aviso legal · responsable",
@@ -151,7 +151,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
 };
 
 const en: { lead: string; blocks: LegalBlock[] } = {
-  lead: "Bitácora.btc is a community logbook run from Colonia del Sacramento, Uruguay. It is not an exchange, it does not custody funds and it does not open accounts. The primary law is Uruguay’s Act 18.331 on Personal Data Protection and Habeas Data, regulated by Decree 414/009, under the URCDP. If you write to us or publish from the European Economic Area, the GDPR (EU 2016/679) and the ePrivacy Directive also apply. This notice meets the information duty in art. 13 of Act 18.331. It describes what the site does today. It is not a certificate of compliance or legal advice.",
+  lead: "Bitácora.btc is a community logbook run from Colonia del Sacramento, Uruguay. It is not an exchange, it does not custody funds and it does not open accounts. The law that orders this text is Uruguay’s Act 18.331 on Personal Data Protection and Habeas Data, regulated by Decree 414/009, under the URCDP. Brazil and Argentina are in the annex. This notice meets the information duty in art. 13 of Act 18.331. It describes what the site does today. It is not a certificate of compliance or legal advice.",
   blocks: [
     {
       title: "Legal notice · controller",
@@ -292,7 +292,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
 };
 
 const pt: { lead: string; blocks: LegalBlock[] } = {
-  lead: "A Bitácora.btc é uma bitácora comunitária tocada a partir de Colonia del Sacramento, Uruguai. Não é uma exchange, não custodia fundos e não abre contas. O regime principal é a Lei n.º 18.331 de Proteção de Dados Pessoais e Ação de Habeas Data, regulamentada pelo Decreto n.º 414/009, sob controle da URCDP. Se você nos escreve ou publica a partir do Espaço Econômico Europeu, também valem o RGPD (UE 2016/679) e a Diretiva ePrivacy. Este texto cumpre o dever de informação do art. 13 da Lei 18.331. Descreve o que o site faz hoje: não é um certificado de conformidade nem aconselhamento jurídico.",
+  lead: "A Bitácora.btc é uma bitácora comunitária tocada a partir de Colonia del Sacramento, Uruguai. Não é uma exchange, não custodia fundos e não abre contas. O regime que ordena este texto é a Lei n.º 18.331 de Proteção de Dados Pessoais e Ação de Habeas Data, regulamentada pelo Decreto n.º 414/009, sob controle da URCDP. Brasil e Argentina estão no anexo. Este texto cumpre o dever de informação do art. 13 da Lei 18.331. Descreve o que o site faz hoje: não é um certificado de conformidade nem aconselhamento jurídico.",
   blocks: [
     {
       title: "Aviso legal · responsável",

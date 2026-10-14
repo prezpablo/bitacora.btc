@@ -525,7 +525,7 @@
     {
       "id": "A-18",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "la apertura no lidera con el RGPD; anexo Brasil y Argentina; el párrafo del EEE no se inventa"
     },

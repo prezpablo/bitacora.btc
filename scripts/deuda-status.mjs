@@ -272,6 +272,12 @@ function repoCheck(id) {
     const ok = /speakChallenge/.test(ui) && /mailto:\$\{LEGAL\.a11yEmail\}/.test(ui) && /captchaMail:/.test(i18n);
     return { pass: ok, detail: ok ? "mailto junto al captcha; el audio queda" : "falta el correo o se fue el audio" };
   }
+  if (id === "A-18") {
+    const legal = read("src/domain/legal-eu.ts");
+    const leads = [...legal.matchAll(/\n  lead: "([^"]+)"/g)].map((m) => m[1] || "");
+    const ok = leads.length === 3 && leads.every((lead) => /18\.331/.test(lead) && /anexo|annex/.test(lead) && !/RGPD|GDPR|ePrivacy/.test(lead)) && /13\.709\/2018/.test(legal) && /25\.326/.test(legal);
+    return { pass: ok, detail: ok ? "apertura uruguaya; anexo ya escrito" : "la apertura sigue con el RGPD" };
+  }
   return { pass: false, detail: "manual" };
 }
 
