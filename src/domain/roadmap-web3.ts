@@ -176,8 +176,8 @@ const en: RoadCopy = {
 
 const pt: RoadCopy = {
   lead: "O destino não é uma lista de ferramentas: é uma bitácora que se sustente sozinha, aberta a qualquer pessoa e sem um dono que possa fechá-la. Até o halving de abril de 2028 soltamos dependências para que a comunidade leia, some e se encontre sem pedir licença a uma empresa.",
-  note: "Regra de sempre: entra-se, lê-se e participa-se sem conta, sem documento e sem que ninguém guarde as tuas chaves. A Bitácora não custodia fundos nem vende acessos.",
-  done: "Hoje o mapa, as comunidades, o contato e o sítio público já estão no ar. O que segue é independência: isto não deve precisar de um intermediário para existir.",
+  note: "Regra de sempre: você entra, lê e participa sem conta, sem documento e sem que ninguém guarde as suas chaves. A Bitácora não custodia fundos nem vende acessos.",
+  done: "Hoje o mapa, as comunidades, o contato e o site público já estão no ar. O que segue é independência: isto não deve precisar de um intermediário para existir.",
   bar: [
     "Aberta: qualquer pessoa vê o mapa e se informa sem se cadastrar.",
     "Comunitária: não há lista de espera nem um comitê que decida quem entra.",
@@ -192,10 +192,10 @@ const pt: RoadCopy = {
       when: "set 2026 – jan 2027",
       items: [
         "A bitácora deixa de pedir emprestada toda a informação da rede: um nó em Colonia lê a cadeia em casa.",
-        "Se esse nó descansar, o sítio segue. O mapa e a comunidade não dependem de uma só máquina.",
+        "Se esse nó descansar, o site segue. O mapa e a comunidade não dependem de uma só máquina.",
       ],
       checks: [
-        "Dá para apontar o nó próprio e ver que o sítio não cai quando ele descansa.",
+        "Dá para apontar o nó próprio e ver que o site não cai quando ele descansa.",
         "Ninguém de fora entra nessa máquina: é da iniciativa, não um serviço público aberto.",
       ],
     },
@@ -217,7 +217,7 @@ const pt: RoadCopy = {
       title: "Q3 · Confiança sem papéis",
       when: "jul 2027 – nov 2027",
       items: [
-        "Somar um comércio ou uma comunidade se prova em público (tua rede, teu site), não com documento nem telefone.",
+        "Somar um comércio ou uma comunidade se prova em público (sua rede, seu site), não com documento nem telefone.",
         "Quem quiser pode deixar um sinal em bitcoin. É prova de presença, não uma conta nem um saldo nosso.",
       ],
       checks: [
@@ -236,7 +236,7 @@ const pt: RoadCopy = {
       ],
       checks: [
         "Dá para contribuir sem cartão e sem plataforma que congele fundos.",
-        "Se o nó próprio descansar, o sítio não apaga: usa um respaldo público.",
+        "Se o nó próprio descansar, o site não apaga: usa um respaldo público.",
       ],
     },
     {
@@ -250,7 +250,7 @@ const pt: RoadCopy = {
       ],
       checks: [
         "Se a guia apagar, o mapa segue.",
-        "Não há API de um terceiro no chat. Quem não quiser usá-la igualmente lê o sítio.",
+        "Não há API de um terceiro no chat. Quem não quiser usá-la igualmente lê o site.",
       ],
     },
   ],

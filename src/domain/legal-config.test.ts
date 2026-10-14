@@ -19,7 +19,7 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.equal(legalFilled(LEGAL.inscription), false);
   assert.match(terms, /Número de trámite: en trámite/);
   assert.match(terms, /Procedure number: in progress/);
-  assert.match(terms, /Número de trâmite: em tramitação/);
+  assert.match(terms, /Número do processo: em tramitação/);
 });
 
 test("publish consent is not the contact form", () => {

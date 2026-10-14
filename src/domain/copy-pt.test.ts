@@ -9,9 +9,17 @@ test("pt copy is Brazilian, not European", () => {
   const dict = src.slice(src.indexOf("const pt:"), src.indexOf("export const COPY"));
   const conciencia = src.slice(src.indexOf("export const CONCIENCIA"));
   const ptBlock = conciencia.slice(conciencia.indexOf("\n  pt: {"), conciencia.indexOf("\n  },\n};"));
-  assert.doesNotMatch(dict, PT_PT);
-  assert.doesNotMatch(ptBlock, PT_PT);
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  const legalPt = legal.slice(legal.indexOf("const pt:"));
+  const seo = readFileSync(new URL("../lib/seo.ts", import.meta.url), "utf8");
+  const road = readFileSync(new URL("./roadmap-web3.ts", import.meta.url), "utf8");
+  const roadPt = road.slice(road.lastIndexOf("const pt:"));
+  const sov = readFileSync(new URL("./soberania.ts", import.meta.url), "utf8");
+  const sovPt = sov.slice(sov.lastIndexOf("const pt:"));
+  for (const block of [dict, ptBlock, legalPt, seo, roadPt, sovPt]) assert.doesNotMatch(block, PT_PT);
   assert.match(dict, /você/i);
+  assert.match(legalPt, /você/);
+  assert.doesNotMatch(legalPt, /sítio|ecrã|utilizador|morada|controlo da/);
 });
 
 test("COPYRIGHT notice does not replace the AGPL", () => {

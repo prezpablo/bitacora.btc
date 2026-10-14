@@ -237,14 +237,14 @@ const en: { lead: string; blocks: LegalBlock[] } = {
 };
 
 const pt: { lead: string; blocks: LegalBlock[] } = {
-  lead: "A Bitácora.btc é uma bitácora comunitária impulsionada a partir de Colonia del Sacramento, Uruguai. Não é um exchange, não custodia fundos e não abre contas. O regime primário é a Lei n.º 18.331 de Proteção de Dados Pessoais e Ação de Habeas Data, regulamentada pelo Decreto n.º 414/009, com controlo da URCDP. Se nos escreves ou publicas a partir do Espaço Económico Europeu, aplicam-se também o RGPD (UE 2016/679) e a Diretiva ePrivacy. Este texto cumpre o dever de informação do art. 13.º da Lei 18.331. Descreve o que o sítio faz hoje: não é um certificado de conformidade nem aconselhamento jurídico.",
+  lead: "A Bitácora.btc é uma bitácora comunitária tocada a partir de Colonia del Sacramento, Uruguai. Não é uma exchange, não custodia fundos e não abre contas. O regime principal é a Lei n.º 18.331 de Proteção de Dados Pessoais e Ação de Habeas Data, regulamentada pelo Decreto n.º 414/009, sob controle da URCDP. Se você nos escreve ou publica a partir do Espaço Econômico Europeu, também valem o RGPD (UE 2016/679) e a Diretiva ePrivacy. Este texto cumpre o dever de informação do art. 13 da Lei 18.331. Descreve o que o site faz hoje: não é um certificado de conformidade nem aconselhamento jurídico.",
   blocks: [
     {
       title: "Aviso legal · responsável",
       id: "aviso",
-      body: "A marca do sítio é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil e o endereço para notificações constam nesta página. A inscrição na URCDP continua em tramitação. Quem exerce direitos escreve para privacidad@bitacorabtc.org, sem captcha, comprovando a própria.\n\nNão há Encarregado de Proteção de Dados: não é obrigatório (Lei n.º 19.670 art. 40.º e Decreto n.º 64/020) porque não somos entidade pública, não tratamos dados sensíveis como atividade principal nem operamos em grande escala. Não há representante na União Europeia (art. 27.º RGPD). O serviço oferece-se a partir do Uruguai à comunidade bitcoiner da América Latina; se se dirigir de forma efetiva ao mercado do EEE, será designado representante.\n\nO canal para notificações e para exercer direitos é privacidad@bitacorabtc.org, sem captcha. Não há registo de utilizadores, não há autenticação, não há custódia de fundos nem vinculação de carteiras. A Bitácora.btc não é um Prestador de Serviços de Ativos Virtuais (Lei n.º 20.345).",
+      body: "A marca do site é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil e o endereço para notificações estão nesta página. A inscrição na URCDP continua em tramitação. Quem exerce direitos escreve para privacidad@bitacorabtc.org, sem captcha, comprovando a própria identidade.\n\nNão há Encarregado de Proteção de Dados: não é obrigatório (Lei n.º 19.670, art. 40, e Decreto n.º 64/020) porque não somos entidade pública, não tratamos dados sensíveis como atividade principal nem operamos em grande escala. Não há representante na União Europeia (art. 27 do RGPD). O serviço é oferecido a partir do Uruguai para a comunidade bitcoiner da América Latina; se passar a se dirigir de fato ao mercado do EEE, um representante será designado.\n\nO canal para notificações e para exercer direitos é privacidad@bitacorabtc.org, sem captcha. Não há cadastro de usuários, não há autenticação, não há custódia de fundos nem vínculo de carteiras. A Bitácora.btc não é um Prestador de Serviços de Ativos Virtuais (Lei n.º 20.345).",
     },
-        {
+    {
       title: "Termos e condições",
       id: "terminos",
       body: "Estas nove regras são as condições de uso.",
@@ -268,51 +268,51 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Que dados se tratam e para quê",
       id: "privacidad",
-      body: "Aplica-se o princípio de minimização (arts. 7.º e 8.º da Lei 18.331): só o necessário para cada finalidade, veraz e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão recolhemos palavras-passe, documentos de identidade, biometria, historial financeiro nem chaves de criptoativos. O diretório público não inclui correio nem telefone de particulares: só redes sociais ou identificadores que tu publicas.\n\nO art. 2.º da Lei 18.331 também alcança, quando corresponda, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação em privacidad@bitacorabtc.org.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil não é publicado aqui até estar carregado nesta página. As finalidades são responder o contato, publicar o diretório e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha, enquanto existir.",
+      body: "Vale o princípio de minimização (arts. 7 e 8 da Lei 18.331): só o necessário para cada finalidade, verdadeiro e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão coletamos senhas, documentos de identidade, biometria, histórico financeiro nem chaves de criptoativos. O diretório público não inclui e-mail nem telefone de pessoas: só redes sociais ou identificadores que você publica.\n\nO art. 2 da Lei 18.331 também alcança, quando couber, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação em privacidad@bitacorabtc.org.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil e o endereço para notificações estão nesta página. As finalidades são responder o contato, publicar o diretório e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha, enquanto existir.",
       table: {
         head: ["Interação", "Dados", "Base (Lei 18.331)", "Conservação"],
         rows: [
           [
-            "Contacto",
-            "Nome, correio, motivo e mensagem",
-            "Consentimento livre, prévio, expresso e informado (art. 9.º), documentado com a caixa do formulário",
+            "Contato",
+            "Nome, e-mail, motivo e mensagem",
+            "Consentimento livre, prévio, expresso e informado (art. 9), documentado com a caixa do formulário",
             "Até 12 meses, salvo reclamação ou obrigação legal",
           ],
           [
             "Mapa / fichas",
-            "Nome do lugar, descrição, morada, horários, redes, URL do logo, coordenadas, votos",
-            "Consentimento ao publicar um diretório aberto (art. 9.º). O que carregas torna-se público",
-            "Enquanto a ficha existir. O histórico do GitHub pode persistir",
+            "Nome do lugar, descrição, endereço, horários, redes, URL do logo, coordenadas, votos",
+            "Consentimento ao publicar um diretório aberto (art. 9). O que você carrega fica público",
+            "Enquanto a ficha existir. O histórico do GitHub pode continuar",
           ],
           [
             "Anúncios comunitários",
             "Nome, texto, URL de prova e redes, código CARGA",
-            "Consentimento ao publicar, com caducidade semanal",
+            "Consentimento ao publicar, com prazo semanal",
             "7 dias no quadro. O código CARGA fica 30 dias e não sai no CSV público",
           ],
           [
             "Localização GPS",
             "Coordenadas do dispositivo",
-            "Consentimento do browser. Não se ativa sozinha",
-            "Não se guarda no servidor; só centra o mapa na sessão",
+            "Consentimento do navegador. Não liga sozinha",
+            "Não fica no servidor; só centraliza o mapa na sessão",
           ],
           [
             "Cidade por IP",
             "Cidade aproximada (GeoJS / ipwho.is)",
             "Consentimento: extras do dispositivo ou o botão de localização",
-            "Não se persiste. Em caso de abuso, guarda-se um HMAC-SHA256 truncado do IP: dado pseudonimizado, não o IP em claro",
+            "Não fica gravada. Em caso de abuso, guarda-se um HMAC-SHA256 truncado do IP: dado pseudonimizado, não o IP em claro",
           ],
           [
             "Segurança",
             "HMAC-SHA256 truncado do IP (dado pseudonimizado), ticket de captcha, limite de envios",
-            "Necessário para prestar o serviço e mitigar spam ou ataques (não é telemetria nem analítica)",
-            "Janela do limite: 2 horas. O captcha caduca",
+            "Necessário para prestar o serviço e reduzir spam ou ataques (não é telemetria nem analítica)",
+            "Janela do limite: 2 horas. O captcha expira",
           ],
           [
             "Este dispositivo",
-            "Idioma; se aceitares, alcunha e cache do mapa",
-            "Idioma: necessário para mostrar o sítio. O resto, consentimento do aviso (ePrivacy)",
-            "Até apagares os dados do browser ou escolheres «Só necessário»",
+            "Idioma; se você aceitar, apelido e cache do mapa",
+            "Idioma: necessário para mostrar o site. O resto, consentimento do aviso (ePrivacy)",
+            "Até você apagar os dados do navegador ou escolher «Só o necessário»",
           ],
         ],
       },
@@ -320,27 +320,27 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transferências, terceiros e imutabilidade",
       id: "terceros",
-      body: "O tratamento faz-se num servidor contratado (VPS Njalla) e no teu browser. Há encarregados e destinatários fora do Uruguai e, em alguns casos, fora do EEE. A lista, com nome e país, está abaixo.\n\nO GitHub (EUA) aloja o CSV público do mapa e dos anúncios, sem códigos CARGA nem correios. O FormSubmit reenvia o formulário de Contacto para o Gmail. O Nominatim/OpenStreetMap resolve moradas. O GeoJS ou o ipwho.is estimam a cidade se o autorizares. APIs de mercado e de eventos alimentam o desk. A caixa de privacidade documenta o teu consentimento a estas transferências (art. 23.º A da Lei 18.331).\n\nO que publicas no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se pode apagar por completo. O direito de apagamento exerce-se sobre as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso informa-se antes de publicar.",
+      body: "O tratamento é feito num servidor contratado (VPS Njalla) e no seu navegador. Há operadores e destinatários fora do Uruguai e, em alguns casos, fora do EEE. A lista, com nome e país, está abaixo.\n\nO GitHub (EUA) hospeda o CSV público do mapa e dos anúncios, sem códigos CARGA nem e-mails. O FormSubmit reenvia o formulário de Contato para o Gmail. O Nominatim/OpenStreetMap resolve endereços. O GeoJS ou o ipwho.is estimam a cidade se você autorizar. APIs de mercado e de eventos alimentam o desk. A caixa de privacidade documenta o seu consentimento a estas transferências (art. 23 A da Lei 18.331).\n\nO que você publica no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se apaga por completo. O direito de apagamento vale para as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso é informado antes de publicar.",
     },
     {
       title: "Direitos",
       id: "derechos",
-      body: "Podes exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14.º a 16.º da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e a não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido é feito escrevendo para privacidad@bitacorabtc.org, sem captcha, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14.º e 15.º). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controlo do art. 77.º RGPD.\n\nA inscrição da base de contacto e de segurança perante a URCDP foi apresentada a 2 de setembro de 2026. Número de trâmite: em tramitação. O número de inscrição publicar-se-á aqui quando estiver aprovado. O diretório do mapa, por ser uma lista pública que tu próprio publicas, informa-se como tal nessa apresentação.\n\nSe uma violação de segurança afetar dados pessoais, a URCDP e, quando couber, as pessoas afetadas são avisadas em até 72 horas depois de sabido.",
+      body: "Você pode exercer acesso, retificação, atualização, inclusão e apagamento (arts. 14 a 16 da Lei 18.331) e, se o RGPD for aplicável, também limitação, portabilidade e oposição, e o direito de não ser objeto de uma decisão automatizada: aqui não há scoring de pessoas.\n\nO pedido é feito escrevendo para privacidad@bitacorabtc.org, sem captcha, com prova de identidade. O prazo uruguaio é de 5 dias úteis (arts. 14 e 15). Reclamação perante a URCDP (Uruguai) e, na UE, perante a autoridade de controle do art. 77 do RGPD.\n\nA inscrição da base de contato e de segurança perante a URCDP foi apresentada em 2 de setembro de 2026. Número do processo: em tramitação. O número de inscrição será publicado aqui quando for aprovado. O diretório do mapa, por ser uma lista pública que você mesmo publica, é informado como tal nessa apresentação.\n\nSe uma violação de segurança afetar dados pessoais, a URCDP e, quando for o caso, as pessoas afetadas são avisadas em até 72 horas depois que se souber.",
     },
     {
-      title: "Armazenamento no terminal (cookies)",
+      title: "Armazenamento no aparelho (cookies)",
       id: "cookies",
-      body: "Não usamos cookies de analítica, de publicidade nem de redes sociais de terceiros. Não há gtag, pixel nem CMP de marketing.\n\nHá localStorage: o idioma (necessário para prestar o serviço) e, só se aceitares no aviso deste dispositivo, a alcunha e a cache do mapa. Isso é armazenamento no terminal (art. 5.º, n.º 3 ePrivacy). O aviso permite «Só necessário» ou aceitar a cache. As tipografias vêm deste sítio (não Google Fonts). A cidade por IP não se pede até aceitares extras ou usares o botão de localização.\n\nPara retirar o consentimento: «Só necessário» no aviso, ou apagar os dados deste sítio no browser.",
+      body: "Não usamos cookies de analítica, de publicidade nem de redes sociais de terceiros. Não há gtag, pixel nem CMP de marketing.\n\nHá localStorage: o idioma (necessário para prestar o serviço) e, só se você aceitar no aviso deste aparelho, o apelido e o cache do mapa. Isso é armazenamento no aparelho (art. 5, n. 3, da ePrivacy). O aviso permite «Só o necessário» ou aceitar o cache. As fontes vêm deste site (não do Google Fonts). A cidade por IP não é pedida até você aceitar extras ou usar o botão de localização.\n\nPara retirar o consentimento: «Só o necessário» no aviso, ou apagar os dados deste site no navegador.",
     },
     {
       title: "Acessibilidade",
       id: "accesibilidad",
-      body: "A soberania tecnológica inclui poder usar o sítio com teclado e leitor de ecrã. Declaração de autoavaliação, 7 de setembro de 2026: revisão de código e teclado. Não é auditoria externa nem certificado WCAG 2.2 AA nem Diretiva (UE) 2019/882.\n\nHoje: ligação de salto para o conteúdo (primeiro controlo ao tabular, também no LABIF), seletor de idioma com aria, landmarks, anel de foco ao tabular, barra de armazenamento como região (não modal), QR com texto alternativo, navegação etiquetada, lista textual de lugares sob o mapa, prefers-reduced-motion no globo (sem auto-rotação) e nos voos do mapa, e captcha com áudio e anúncio para leitor (o desenho é apoio visual).\n\nFalhas em curso: o globo 3D e o gráfico de velas não são usáveis com teclado nem leitor; alguns controlos podem falhar os 24 px (2.5.8).\n\nPlano: avisos aria-live em todos os campos.",
+      body: "A soberania tecnológica inclui poder usar o site com teclado e leitor de tela. Declaração de autoavaliação, 7 de setembro de 2026: revisão de código e teclado. Não é auditoria externa nem certificado WCAG 2.2 AA nem Diretiva (UE) 2019/882.\n\nHoje: link de salto para o conteúdo (primeiro controle ao usar Tab, também no LABIF), seletor de idioma com aria, landmarks, anel de foco ao usar Tab, barra de armazenamento como região (não modal), QR com texto alternativo, navegação rotulada, lista textual de lugares sob o mapa, prefers-reduced-motion no globo (sem rotação automática) e nos deslocamentos do mapa, e captcha com áudio e aviso para leitor de tela (o desenho é apoio visual).\n\nFalhas em curso: o globo 3D e o gráfico de velas não são usáveis com teclado nem leitor de tela; alguns controles podem ficar abaixo dos 24 px (2.5.8).\n\nPlano: avisos aria-live em todos os campos.",
     },
     {
       title: "Menores",
       id: "menores",
-      body: "O sítio não se dirige a crianças. A Lei 18.331 não fixa uma idade de consentimento digital: aplica-se o Código da Infância e da Adolescência e a capacidade progressiva; em regra consente o representante legal. Para visitantes do EEE, aplica-se também o limiar de 16 anos do art. 8.º RGPD. Não verificamos idade. Se um adulto provar que recolhemos dados de um menor, apagamo-los.",
+      body: "O site não se destina a crianças. A Lei 18.331 não fixa uma idade de consentimento digital: vale o Código da Infância e da Adolescência e a capacidade progressiva; em regra, consente o representante legal. Para visitantes do EEE, também vale o limite de 16 anos do art. 8 do RGPD. Não verificamos idade. Se um adulto provar que coletamos dados de uma criança, nós os apagamos.",
     },
     {
       title: "Código · licença",

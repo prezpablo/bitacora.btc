@@ -80,7 +80,7 @@ export const PAGE_SEO: Record<
     pt: {
       title: "Mapa de comércios e comunidades Bitcoin na América Latina | Bitácora.btc",
       description:
-        "Encontra nós, meetups e comércios que aceitam Bitcoin na Latam. Soma o teu. Sem contas nem custódia. Consciencia Bitcoin, Colonia.",
+        "Encontre nós, meetups e comércios que aceitam Bitcoin na Latam. Some o seu. Sem contas nem custódia. Consciencia Bitcoin, Colonia.",
     },
   },
   "/legal": {
@@ -236,15 +236,15 @@ export const FAQ: Record<AppLang, { q: string; a: string }[]> = {
     },
     {
       q: "Onde encontro comunidades Bitcoin perto de mim?",
-      a: "No mapa da Bitácora.btc. Pede a tua localização ou pesquisa por cidade, comércio ou comunidade. O globo conta primeiro a América Latina; abaixo, o total mundial do BTC Map. Ao fazer zoom vês os pinos verificados.",
+      a: "No mapa da Bitácora.btc. Peça sua localização ou pesquise por cidade, comércio ou comunidade. O globo conta primeiro a América Latina; abaixo, o total mundial do BTC Map. Ao dar zoom você vê os pinos verificados.",
     },
     {
       q: "Como somo a minha comunidade ou comércio ao mapa?",
-      a: "No mapa, propõe um ponto, carrega nome, descrição, redes e um logo. Publica o código CARGA-XXXX na tua web ou rede; um scraper verifica e acende a estrela laranja. Também se verifica com duas redes públicas ou nota ≥ 4 com três votos.",
+      a: "No mapa, proponha um ponto, carregue nome, descrição, redes e um logo. Publique o código CARGA-XXXX no seu site ou rede; um scraper verifica e acende a estrela laranja. Também se verifica com duas redes públicas ou nota ≥ 4 com três votos.",
     },
     {
       q: "A Bitácora.btc é uma empresa ou um exchange?",
-      a: "Nenhuma das duas. É uma bitácora comunitária, sem custódia de fundos. Educação, mapa e dados públicos da rede Bitcoin. Não vendemos contas nem guardamos as tuas chaves.",
+      a: "Nenhuma das duas. É uma bitácora comunitária, sem custódia de fundos. Educação, mapa e dados públicos da rede Bitcoin. Não vendemos contas nem guardamos as suas chaves.",
     },
     {
       q: "Há mapa de Bitcoin no Uruguai e no resto da Latam?",

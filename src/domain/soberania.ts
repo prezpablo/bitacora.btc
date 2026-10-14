@@ -65,12 +65,12 @@ const en: { lead: string; gmail: string; blocks: SovBlock[] } = {
 };
 
 const pt: { lead: string; gmail: string; blocks: SovBlock[] } = {
-  lead: "Proposta para aproximar a Bitácora.btc do arquétipo bitcoiner sem deitar abaixo a estética (branco, laranja Bitcoin, bitcoin.org). Mapa, história e QR ficam. Corta-se dependência, não o design.",
-  gmail: "Não aplicamos a API do Gmail. Meter OAuth da Google no sítio é o contrário de soberania: KYC da Google, ToS, e um interruptor em Mountain View. A caixa da Latam Cripto Mom pode continuar a ser Gmail — decisão da operadora, não do visitante. O sítio não deve falar a API da Google. Contacto: relé sem Google (Web3Forms/SMTP próprio) ou, melhor, npub Nostr / lightning:. O mail pode chegar à caixa; a Google não entra no código.",
+  lead: "Proposta para aproximar a Bitácora.btc do arquétipo bitcoiner sem derrubar a estética (branco, laranja Bitcoin, bitcoin.org). Mapa, história e QR ficam. Cortamos a dependência, não o design.",
+  gmail: "Não aplicamos a API do Gmail. Colocar OAuth da Google no site é o contrário de soberania: KYC da Google, ToS, e um interruptor em Mountain View. A caixa da Latam Cripto Mom pode continuar a ser Gmail — decisão da operadora, não do visitante. O site não deve falar a API da Google. Contato: relé sem Google (Web3Forms/SMTP próprio) ou, melhor, npub Nostr / lightning:. O e-mail pode chegar à caixa; a Google não entra no código.",
   blocks: [
     {
       title: "O que não se toca (estética e relato)",
-      body: "Tipografia, laranja Bitcoin, globo na primeira visita, mapa Leaflet, fichas, história, i18n ES/PT/EN, QR de contribuição, Consciencia Bitcoin. O visitante continua a ver a mesma bitácora. Globo e Mercado passam a opt-in (modo leve por defeito em redes lentas); não se apagam.",
+      body: "Tipografia, laranja Bitcoin, globo na primeira visita, mapa Leaflet, fichas, história, i18n ES/PT/EN, QR de contribuição, Consciencia Bitcoin. O visitante continua a ver a mesma bitácora. Globo e Mercado passam a opt-in (modo leve por padrão em redes lentas); não são apagados.",
     },
     {
       title: "Onde hospedar",
@@ -78,19 +78,19 @@ const pt: { lead: string; gmail: string; blocks: SovBlock[] } = {
     },
     {
       title: "Como é soberana de verdade",
-      body: "Soberana para o visitante = ler sem conta, sem pixel, sem KYC. Soberana para a operadora = publicar um mirror sem pedir licença ao GitHub nem ao Gmail. Isso exige: front estático + CSV clonável + QR on-chain/LN. As server functions (velas, Nominatim, scrape) são um BFF opcional: se morrerem, o sítio não morre; só se apagam Mercado e a geocodificação. Assina-se o CSV (commit GPG ou evento Nostr) para um mirror não mentir.",
+      body: "Soberana para o visitante = ler sem conta, sem pixel, sem KYC. Soberana para a operadora = publicar um mirror sem pedir licença ao GitHub nem ao Gmail. Isso exige: front estático + CSV clonável + QR on-chain/LN. As server functions (velas, Nominatim, scrape) são um BFF opcional: se morrerem, o site não morre; só se apagam Mercado e a geocodificação. O CSV é assinado (commit GPG ou evento Nostr) para um mirror não mentir.",
     },
     {
       title: "Mudanças concretas, sem redesenhar",
-      body: "Modo leve: sem Three.js nem heat até o utilizador pedir. Contacto: email opcional; campo npub ou lightning address. Contribuição: o mesmo QR + URI bitcoin: e lightning:, sem processador. Nunca login; se houver assinatura, BIP-322 ou nota Nostr, não Google. Eventos: o nosso quadro primeiro, Luma como link, não como dono. IP do rate-limit com hash e caducidade. Zero Firebase no bundle de produção.",
+      body: "Modo leve: sem Three.js nem heat até o usuário pedir. Contato: email opcional; campo npub ou lightning address. Contribuição: o mesmo QR + URI bitcoin: e lightning:, sem processador. Nunca login; se houver assinatura, BIP-322 ou nota Nostr, não Google. Eventos: o nosso quadro primeiro, Luma como link, não como dono. IP do rate-limit com hash e prazo. Zero Firebase no bundle de produção.",
     },
     {
       title: "Pagamentos",
-      body: "Única pasarela: Bitcoin. Curto prazo: URI bitcoin: do QR atual + LNURL/BTCPay (self-host ou Blink) para sats pequenos. Nada de Gmail Pay, Stripe ou Mercado Pago. O sítio não custodia.",
+      body: "Única via: Bitcoin. Curto prazo: URI bitcoin: do QR atual + LNURL/BTCPay (self-host ou Blink) para sats pequenos. Nada de Gmail Pay, Stripe ou Mercado Pago. O site não custodia.",
     },
     {
       title: "Ordem de aplicação",
-      body: "A) Sem API Gmail. B) Modo leve + URIs de pagamento no QR (vê-se igual). C) Contacto com npub opcional e relé sem Google. D) Export estático e pin IPFS (CID no rodapé). E) VPS/nó próprio, GitHub só git. F) Assinatura do CSV e .onion. Estética intacta em A–C; D–F não se veem, sentem-se quando desligam o host.",
+      body: "A) Sem API Gmail. B) Modo leve + URIs de pagamento no QR (a aparência continua igual). C) Contato com npub opcional e relé sem Google. D) Export estático e pin IPFS (CID no rodapé). E) VPS/nó próprio, GitHub só git. F) Assinatura do CSV e .onion. Estética intacta em A–C; D–F não se veem, e se sentem quando desligam o host.",
     },
   ],
 };
