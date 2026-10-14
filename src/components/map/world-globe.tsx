@@ -319,6 +319,7 @@ function GlobeCanvas({
               <span className="ml-1 font-medium">{t("globeEvents")}</span>
             </li>
           </ul>
+          <p className="mt-1 text-[10px] text-neutral-600 sm:text-xs">{t("globeFed")}</p>
           {latam ? (
             <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-1.5 text-[10px] text-neutral-600 sm:text-xs">
               <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>

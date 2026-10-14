@@ -59,7 +59,7 @@ Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE. **D-DEPS*
 | **D-BAK-OFF** | P2 | Una copia de ese gzip está fuera de ese disco. El camino es `deploy/pull-backup.ps1`, una vez por semana. | No se suma un servicio de backups. |
 | **D-SQL-ONE** | P3 | Sigue un solo proceso escribiendo `bitacora.sqlite`. No se sube Node ni el tope de 400 filas o 350.000 caracteres mientras `node:sqlite` sea experimental. | No se parte la base. |
 
-**Siguiente fase de código:** **D-COPY-FED**. La leyenda del globo tiene que decir que la cifra grande es BTC Map, no el overlay. D-STATUE espera la foto. D-FOSS sigue siendo un clic en GitHub. D-DEPS no entra.
+**Siguiente fase de código:** **D-EVT-HTML**. Seis próximos eventos en el HTML, con título, ciudad y fecha. Sin scraper nuevo. D-STATUE espera la foto. D-FOSS sigue siendo un clic en GitHub. D-DEPS no entra.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -143,7 +143,7 @@ Semilla útil: intención local + primer uso + confianza. **No** tráfico de pre
 | Entra (cola 5–7) | Por qué no rompe lo hecho |
 |---|---|
 | **D-AEO-FAQ** | Hecho en el repo. Misma FAQ y mismo `#faq-seo`. Una pregunta en es, pt y en: no es un clon; overlay propio, el resto federado. Falta el ZIP. |
-| **D-COPY-FED** | D-STATS ya separó Latam / mundo. Solo rotula que el número grande es BTC Map. |
+| **D-COPY-FED** | Hecho en el repo. Bajo la cifra grande dice «BTC Map · red federada, no el overlay», en es, pt y en. No vuelve «Mundo». El conteo no se tocó. Falta el ZIP. |
 | **D-EVT-HTML** | Reusa Luma/Meetup/Eventbrite. Tope 6 para no inflar el HTML ni el TTFB. |
 
 **Congelado (no fase):** **D-SEO-CITY**. Páginas «comercios en Montevideo» solo con ≥ 3 pines **del overlay** en esa ciudad, mismas reglas de skip/H1/idioma, y sin volcar fichas federadas como dato nuevo. Hasta entonces no entran al sitemap (H1.4 del plan híbrido).

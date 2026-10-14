@@ -352,6 +352,12 @@ function repoCheck(id) {
     const ok = /No es un clon\. El overlay propio/.test(seo) && /It is not a clone\. The own overlay/.test(seo) && /Não é um clone\. O overlay próprio/.test(seo);
     return { pass: ok, detail: ok ? "FAQ es/pt/en: no es un clon; overlay propio, resto federado" : "falta la frase en algún idioma" };
   }
+  if (id === "D-COPY-FED") {
+    const i18n = read("src/lib/i18n.ts");
+    const globe = read("src/components/map/world-globe.tsx");
+    const ok = /t\("globeFed"\)/.test(globe) && /red federada, no el overlay/.test(i18n) && /federated network, not the overlay/.test(i18n) && /rede federada, não o overlay/.test(i18n);
+    return { pass: ok, detail: ok ? "la cifra grande dice BTC Map, no el overlay" : "la cifra grande no nombra la fuente" };
+  }
   return { pass: false, detail: "manual" };
 }
 

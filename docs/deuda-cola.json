@@ -280,7 +280,7 @@
     {
       "id": "D-COPY-FED",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "leyenda del globo: cifras = red federada BTC Map, no el overlay"
     },
