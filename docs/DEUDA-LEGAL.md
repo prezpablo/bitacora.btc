@@ -207,7 +207,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | A-21 | P2 | Hecho en el repo (textos 2.14). Falta el ZIP. Allowlist = direcciones permitidas. LABIF sin definir. |
 | A-22 | P2 | Hecho en el repo. Falta el ZIP. Piso 24 px. El corte no sube a 44. |
 | A-23 | P2 | Hecho en el repo. Falta el ZIP. Lista visible y precio escrito, con hora de Uruguay. El globo sigue en el teclado. |
-| A-25 | P3 | Claves i18n muertas, si no se usan. |
+| A-25 | P3 | Hecho en el repo. Falta el ZIP. La clave no se usaba. El aviso del art. 13 queda. |
 | A-26 | P3 | Aviso junto al QR de sats. |
 | A-29 | P3 | Errores anunciados. |
 | A-31 | P3 | LGPD art. 14 solo para menores de 12, si se publica. |

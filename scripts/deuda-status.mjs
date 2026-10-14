@@ -297,6 +297,12 @@ function repoCheck(id) {
     const ok = /id="map-list-title"/.test(map) && !/<details[\s\S]{0,180}mapListTitle/.test(map) && /summary=\{priceSum\}/.test(desk) && /Hora de Uruguay/.test(read("src/lib/i18n.ts")) && /tabIndex=\{0\}/.test(globe);
     return { pass: ok, detail: ok ? "lista visible y precio escrito; globo en el teclado" : "falta la lista, el precio o se escondió el globo" };
   }
+  if (id === "A-25") {
+    const i18n = read("src/lib/i18n.ts");
+    const legal = read("src/domain/legal-eu.ts");
+    const ok = !/privacyArt13/.test(i18n) && /Información del art\. 13/.test(legal);
+    return { pass: ok, detail: ok ? "clave muerta fuera; el aviso del art. 13 queda" : "la clave sigue o se tocó el aviso" };
+  }
   return { pass: false, detail: "manual" };
 }
 

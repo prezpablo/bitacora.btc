@@ -553,7 +553,7 @@
     {
       "id": "A-25",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "privacyArt13 no viaja en el bundle si ninguna pantalla la usa"
     },
