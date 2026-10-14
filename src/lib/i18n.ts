@@ -81,7 +81,9 @@ const es = {
   footerRights: "Ejercer mis derechos",
   legalRightsChannel:
     "También podés ejercer derechos sin captcha, gratis, en 5 días hábiles, escribiendo a {email}.",
-  legalWho: "Responsable: {name}. Domicilio para notificaciones: {address}.",
+  legalWho: "Responsable: {name}. Domicilio constituido para notificaciones: {address}. Correo: {email}.",
+  legalWhoPending:
+    "Responsable: {name} ({city}). El domicilio para notificaciones se publicará en esta página en cuanto esté constituido. Mientras tanto, las notificaciones y los pedidos sobre datos personales se reciben en {email}.",
   thirdBrowser: "Tu navegador contacta directamente",
   thirdRecipients: "Reciben lo que publicás o lo que nos escribís",
   thirdServer: "Nuestro servidor consulta (no reciben tus datos)",
@@ -697,7 +699,9 @@ const en: Record<keyof typeof es, string> = {
   footerRights: "Exercise my rights",
   legalRightsChannel:
     "You can also exercise your rights with no captcha, free of charge, within 5 business days, by writing to {email}.",
-  legalWho: "Controller: {name}. Address for notices: {address}.",
+  legalWho: "Controller: {name}. Address for legal notices: {address}. Email: {email}.",
+  legalWhoPending:
+    "Controller: {name} ({city}). The address for legal notices will be published on this page once it is set up. Until then, notices and personal-data requests are received at {email}.",
   thirdBrowser: "Your browser contacts these directly",
   thirdRecipients: "These receive what you publish or what you write to us",
   thirdServer: "Our server asks these (they do not get your data)",
@@ -1313,7 +1317,9 @@ const pt: Record<keyof typeof es, string> = {
   footerRights: "Exercer meus direitos",
   legalRightsChannel:
     "Você também pode exercer direitos sem captcha, de graça, em 5 dias úteis, escrevendo para {email}.",
-  legalWho: "Responsável: {name}. Endereço para notificações: {address}.",
+  legalWho: "Responsável: {name}. Endereço constituído para notificações: {address}. E-mail: {email}.",
+  legalWhoPending:
+    "Responsável: {name} ({city}). O endereço para notificações será publicado nesta página assim que estiver constituído. Enquanto isso, notificações e pedidos sobre dados pessoais são recebidos em {email}.",
   thirdBrowser: "Seu navegador chama estes direto",
   thirdRecipients: "Estes recebem o que você publica ou o que nos escreve",
   thirdServer: "Nosso servidor consulta estes (não recebem seus dados)",

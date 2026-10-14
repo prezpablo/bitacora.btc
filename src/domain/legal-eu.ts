@@ -1,3 +1,4 @@
+import { LEGAL, legalFilled } from "./legal-config.ts";
 import type { AppLang } from "@/lib/locale";
 
 export type LegalBlock = {
@@ -14,7 +15,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Aviso legal · responsable",
       id: "aviso",
-      body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil y el domicilio de notificación figuran en esta página. La inscripción ante la URCDP sigue en trámite. Quien ejerza derechos escribe a privacidad@bitacorabtc.org, sin captcha, acreditando la suya.\n\nNo hay Delegado de Protección de Datos: no es obligatorio (Ley n.º 19.670 art. 40 y Decreto n.º 64/020) porque no somos entidad pública, no tratamos datos sensibles como actividad principal ni operamos a gran escala. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es privacidad@bitacorabtc.org, sin captcha. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras. Bitácora.btc no es un Proveedor de Servicios de Activos Virtuales (Ley n.º 20.345).",
+      body: "La marca del sitio es Bitácora.btc. El responsable del tratamiento es una persona física, con domicilio en Colonia del Sacramento, Departamento de Colonia, República Oriental del Uruguay, en el marco de la iniciativa Consciencia Bitcoin by LATAM Cripto Mom. La identidad civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido. La inscripción ante la URCDP sigue en trámite. Quien ejerza derechos escribe a privacidad@bitacorabtc.org, sin captcha, acreditando la suya.\n\nNo hay Delegado de Protección de Datos: no es obligatorio (Ley n.º 19.670 art. 40 y Decreto n.º 64/020) porque no somos entidad pública, no tratamos datos sensibles como actividad principal ni operamos a gran escala. No hay representante en la Unión Europea (art. 27 RGPD). El servicio se ofrece desde Uruguay a la comunidad bitcoiner de Latinoamérica; si se dirigiera de forma efectiva al mercado del EEE, se designará representante.\n\nEl canal para notificaciones y para ejercer derechos es privacidad@bitacorabtc.org, sin captcha. No hay registro de usuarios, no hay autenticación, no hay custodia de fondos ni vinculación de billeteras. Bitácora.btc no es un Proveedor de Servicios de Activos Virtuales (Ley n.º 20.345).",
     },
         {
       title: "Términos y condiciones",
@@ -41,7 +42,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Qué datos se tratan y para qué",
       id: "privacidad",
-      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación a privacidad@bitacorabtc.org.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil y el domicilio de notificación figuran en esta página. Las finalidades son responder el contacto, publicar el directorio y las experiencias, y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha y experiencia, mientras existan; código de edición de la experiencia, 30 días.",
+      body: "Se aplica el principio de minimización (arts. 7 y 8 de la Ley 18.331): solo lo necesario para cada finalidad, veraz y no excesivo. No hay scoring de personas, no se venden datos y no hay publicidad comportamental.\n\nNo recabamos contraseñas, documentos de identidad, datos biométricos, historial financiero ni claves de criptoactivos. El directorio público no incluye correo ni teléfono de particulares: solo redes sociales o identificadores que vos publicás.\n\nEl art. 2 de la Ley 18.331 alcanza también, en cuanto corresponda, a las personas jurídicas. Las fichas y los votos de comercios son datos de un tercero con efecto reputacional: el comercio puede pedir rectificación a privacidad@bitacorabtc.org.\n\nInformación del art. 13. El responsable es una persona física en Colonia del Sacramento, Uruguay; el nombre civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido. Las finalidades son responder el contacto, publicar el directorio y las experiencias, y limitar el abuso. Los destinatarios están en la sección de terceros. En Contacto, nombre, correo y mensaje son obligatorios: sin ellos no hay respuesta. En el mapa, el nombre es obligatorio para publicar. Podés pedir acceso, rectificación, actualización, inclusión y supresión, gratis, en 5 días hábiles, a privacidad@bitacorabtc.org. Conservación: contacto, 12 meses; anuncio, 7 días; código CARGA, 30 días; ficha y experiencia, mientras existan; código de edición de la experiencia, 30 días.",
       table: {
         head: ["Interacción", "Datos", "Base (Ley 18.331)", "Conservación"],
         rows: [
@@ -135,7 +136,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Legal notice · controller",
       id: "aviso",
-      body: "The site’s brand is Bitácora.btc. The controller is a natural person, domiciled in Colonia del Sacramento, Department of Colonia, Oriental Republic of Uruguay, under the Consciencia Bitcoin by LATAM Cripto Mom initiative. The controller’s civil identity and notice address are on this page. The URCDP filing is still in progress. Anyone exercising their rights writes to privacidad@bitacorabtc.org, with no captcha, after proving their own identity.\n\nNo Data Protection Officer is appointed: it is not required (Act 19.670 art. 40 and Decree 64/020) because we are not a public body, we do not process sensitive data as a core activity and we do not operate at large scale. There is no EU representative (GDPR art. 27). The service is offered from Uruguay to the Latin-American bitcoiner community; if it is later aimed at the EEA market, a representative will be designated.\n\nNotices and rights requests go to privacidad@bitacorabtc.org, with no captcha. There is no user registration, no authentication, no custody of funds and no wallet linking. Bitácora.btc is not a Virtual Asset Service Provider (Act 20.345).",
+      body: "The site’s brand is Bitácora.btc. The controller is a natural person, domiciled in Colonia del Sacramento, Department of Colonia, Oriental Republic of Uruguay, under the Consciencia Bitcoin by LATAM Cripto Mom initiative. The civil identity is on this page; the address for legal notices will be added once it is set up. The URCDP filing is still in progress. Anyone exercising their rights writes to privacidad@bitacorabtc.org, with no captcha, after proving their own identity.\n\nNo Data Protection Officer is appointed: it is not required (Act 19.670 art. 40 and Decree 64/020) because we are not a public body, we do not process sensitive data as a core activity and we do not operate at large scale. There is no EU representative (GDPR art. 27). The service is offered from Uruguay to the Latin-American bitcoiner community; if it is later aimed at the EEA market, a representative will be designated.\n\nNotices and rights requests go to privacidad@bitacorabtc.org, with no captcha. There is no user registration, no authentication, no custody of funds and no wallet linking. Bitácora.btc is not a Virtual Asset Service Provider (Act 20.345).",
     },
         {
       title: "Terms of use",
@@ -162,7 +163,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "What data we process and why",
       id: "privacidad",
-      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification at privacidad@bitacorabtc.org.\n\nArt. 13 information. The controller is a natural person in Colonia del Sacramento, Uruguay; the civil name and the notice address are on this page. The purposes are to reply to contact, publish the directory and experiences, and limit abuse. Recipients are in the third-party section. On Contact, name, email and message are required: without them there is no reply. On the map, the name is required to publish. You may request access, rectification, update, inclusion and erasure, free of charge, within 5 business days, at privacidad@bitacorabtc.org. Retention: contact, 12 months; announcement, 7 days; CARGA code, 30 days; listing and experience, while they exist; the experience edit code, 30 days.",
+      body: "We apply data minimisation (arts. 7 and 8 of Act 18.331): only what is needed for each purpose, accurate and not excessive. We do not score people, sell data or run behavioural ads.\n\nWe do not collect passwords, identity documents, biometrics, financial history or crypto keys. The public directory does not include private email or phone numbers: only socials or identifiers you publish.\n\nArt. 2 of Act 18.331 also covers legal persons where it applies. Shop listings and votes are third-party data with reputational effect: the business may request rectification at privacidad@bitacorabtc.org.\n\nArt. 13 information. The controller is a natural person in Colonia del Sacramento, Uruguay; the civil name is on this page; the address for notices will be added once it is set up. The purposes are to reply to contact, publish the directory and experiences, and limit abuse. Recipients are in the third-party section. On Contact, name, email and message are required: without them there is no reply. On the map, the name is required to publish. You may request access, rectification, update, inclusion and erasure, free of charge, within 5 business days, at privacidad@bitacorabtc.org. Retention: contact, 12 months; announcement, 7 days; CARGA code, 30 days; listing and experience, while they exist; the experience edit code, 30 days.",
       table: {
         head: ["Interaction", "Data", "Legal basis (Act 18.331)", "Retention"],
         rows: [
@@ -256,7 +257,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Aviso legal · responsável",
       id: "aviso",
-      body: "A marca do site é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil e o endereço para notificações estão nesta página. A inscrição na URCDP continua em tramitação. Quem exerce direitos escreve para privacidad@bitacorabtc.org, sem captcha, comprovando a própria identidade.\n\nNão há Encarregado de Proteção de Dados: não é obrigatório (Lei n.º 19.670, art. 40, e Decreto n.º 64/020) porque não somos entidade pública, não tratamos dados sensíveis como atividade principal nem operamos em grande escala. Não há representante na União Europeia (art. 27 do RGPD). O serviço é oferecido a partir do Uruguai para a comunidade bitcoiner da América Latina; se passar a se dirigir de fato ao mercado do EEE, um representante será designado.\n\nO canal para notificações e para exercer direitos é privacidad@bitacorabtc.org, sem captcha. Não há cadastro de usuários, não há autenticação, não há custódia de fundos nem vínculo de carteiras. A Bitácora.btc não é um Prestador de Serviços de Ativos Virtuais (Lei n.º 20.345).",
+      body: "A marca do site é Bitácora.btc. O responsável pelo tratamento é uma pessoa física, com domicílio em Colonia del Sacramento, Departamento de Colonia, República Oriental do Uruguai, no âmbito da iniciativa Consciencia Bitcoin by LATAM Cripto Mom. A identidade civil figura nesta página; o endereço para notificações será acrescentado quando estiver constituído. A inscrição na URCDP continua em tramitação. Quem exerce direitos escreve para privacidad@bitacorabtc.org, sem captcha, comprovando a própria identidade.\n\nNão há Encarregado de Proteção de Dados: não é obrigatório (Lei n.º 19.670, art. 40, e Decreto n.º 64/020) porque não somos entidade pública, não tratamos dados sensíveis como atividade principal nem operamos em grande escala. Não há representante na União Europeia (art. 27 do RGPD). O serviço é oferecido a partir do Uruguai para a comunidade bitcoiner da América Latina; se passar a se dirigir de fato ao mercado do EEE, um representante será designado.\n\nO canal para notificações e para exercer direitos é privacidad@bitacorabtc.org, sem captcha. Não há cadastro de usuários, não há autenticação, não há custódia de fundos nem vínculo de carteiras. A Bitácora.btc não é um Prestador de Serviços de Ativos Virtuais (Lei n.º 20.345).",
     },
     {
       title: "Termos e condições",
@@ -283,7 +284,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Que dados se tratam e para quê",
       id: "privacidad",
-      body: "Vale o princípio de minimização (arts. 7 e 8 da Lei 18.331): só o necessário para cada finalidade, verdadeiro e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão coletamos senhas, documentos de identidade, biometria, histórico financeiro nem chaves de criptoativos. O diretório público não inclui e-mail nem telefone de pessoas: só redes sociais ou identificadores que você publica.\n\nO art. 2 da Lei 18.331 também alcança, quando couber, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação em privacidad@bitacorabtc.org.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil e o endereço para notificações estão nesta página. As finalidades são responder o contato, publicar o diretório e as experiências, e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha e experiência, enquanto existirem; código de edição da experiência, 30 dias.",
+      body: "Vale o princípio de minimização (arts. 7 e 8 da Lei 18.331): só o necessário para cada finalidade, verdadeiro e não excessivo. Não há scoring de pessoas, não se vendem dados e não há publicidade comportamental.\n\nNão coletamos senhas, documentos de identidade, biometria, histórico financeiro nem chaves de criptoativos. O diretório público não inclui e-mail nem telefone de pessoas: só redes sociais ou identificadores que você publica.\n\nO art. 2 da Lei 18.331 também alcança, quando couber, as pessoas jurídicas. As fichas e os votos de comércios são dados de um terceiro com efeito reputacional: o comércio pode pedir retificação em privacidad@bitacorabtc.org.\n\nInformação do art. 13. O responsável é uma pessoa física em Colonia del Sacramento, Uruguai; o nome civil figura nesta página; o endereço para notificações será acrescentado quando estiver constituído. As finalidades são responder o contato, publicar o diretório e as experiências, e limitar o abuso. Os destinatários estão na seção de terceiros. No Contato, nome, e-mail e mensagem são obrigatórios: sem eles não há resposta. No mapa, o nome é obrigatório para publicar. Você pode pedir acesso, retificação, atualização, inclusão e apagamento, de graça, em 5 dias úteis, em privacidad@bitacorabtc.org. Conservação: contato, 12 meses; anúncio, 7 dias; código CARGA, 30 dias; ficha e experiência, enquanto existirem; código de edição da experiência, 30 dias.",
       table: {
         head: ["Interação", "Dados", "Base (Lei 18.331)", "Conservação"],
         rows: [
@@ -372,3 +373,42 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
 };
 
 export const LEGAL_EU: Record<AppLang, { lead: string; blocks: LegalBlock[] }> = { es, en, pt };
+
+/** Con domicilio cargado, la frase vuelve a decir que figura en la página. Sin él, no. */
+const NOTICE_READY: Record<AppLang, Array<[string, string]>> = {
+  es: [
+    [
+      "La identidad civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido.",
+      "La identidad civil y el domicilio de notificación figuran en esta página.",
+    ],
+    [
+      "el nombre civil figura en esta página; el domicilio para notificaciones se agregará cuando esté constituido.",
+      "el nombre civil y el domicilio de notificación figuran en esta página.",
+    ],
+  ],
+  en: [
+    [
+      "The civil identity is on this page; the address for legal notices will be added once it is set up.",
+      "The controller’s civil identity and notice address are on this page.",
+    ],
+    [
+      "the civil name is on this page; the address for notices will be added once it is set up.",
+      "the civil name and the notice address are on this page.",
+    ],
+  ],
+  pt: [
+    [
+      "A identidade civil figura nesta página; o endereço para notificações será acrescentado quando estiver constituído.",
+      "A identidade civil e o endereço para notificações estão nesta página.",
+    ],
+    [
+      "o nome civil figura nesta página; o endereço para notificações será acrescentado quando estiver constituído.",
+      "o nome civil e o endereço para notificações estão nesta página.",
+    ],
+  ],
+};
+
+export function withNoticeAddress(text: string, lang: AppLang) {
+  if (!legalFilled(LEGAL.address)) return text;
+  return (NOTICE_READY[lang] || []).reduce((out, [from, to]) => out.split(from).join(to), text);
+}

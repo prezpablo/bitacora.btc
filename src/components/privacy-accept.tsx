@@ -1,5 +1,5 @@
-import { LEGAL, legalFilled } from "@/domain/legal-config";
-import { useT } from "@/lib/i18n";
+import { LEGAL, LEGAL_CITY, legalFilled } from "@/domain/legal-config";
+import { useAppLang, useT } from "@/lib/i18n";
 import { legalHref } from "@/lib/locale";
 import { useRouterState } from "@tanstack/react-router";
 
@@ -19,11 +19,21 @@ export function PrivacyAccept({
   keep?: "listing" | "pin" | "xp";
 }) {
   const t = useT();
+  const lang = useAppLang();
   const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const keepText = keep === "pin" ? t("consentKeepPin") : keep === "xp" ? t("consentKeepXp") : t("consentKeepListing");
   const who = [
-    legalFilled(LEGAL.controllerName) ? t("consentWhoName", { name: LEGAL.controllerName }) : "",
-    legalFilled(LEGAL.address) ? t("consentWhoAddress", { address: LEGAL.address }) : "",
+    variant === "contact" && legalFilled(LEGAL.controllerName)
+      ? t(legalFilled(LEGAL.address) ? "legalWho" : "legalWhoPending", {
+          name: LEGAL.controllerName,
+          address: LEGAL.address,
+          city: LEGAL_CITY[lang],
+          email: LEGAL.privacyEmail,
+        })
+      : legalFilled(LEGAL.controllerName)
+        ? t("consentWhoName", { name: LEGAL.controllerName })
+        : "",
+    variant !== "contact" && legalFilled(LEGAL.address) ? t("consentWhoAddress", { address: LEGAL.address }) : "",
     variant === "publish" && legalFilled(LEGAL.contributionLicense) ? t("consentLicense", { license: LEGAL.contributionLicense }) : "",
   ]
     .filter(Boolean)

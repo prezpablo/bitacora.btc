@@ -149,6 +149,18 @@ function repoCheck(id) {
     const ok = /name: "FormSubmit"[\s\S]{0,280}navegador también le envía tu IP/.test(row);
     return { pass: ok, detail: ok ? "FormSubmit declara la IP" : "el renglón no nombra la IP" };
   }
+  if (id === "A-01") {
+    const cfg = read("src/domain/legal-config.ts");
+    const legal = read("src/domain/legal-eu.ts");
+    const i18n = read("src/lib/i18n.ts");
+    const ok =
+      /address: "\[DOMICILIO_NOTIFICACIONES\]"/.test(cfg) &&
+      /city: "Colonia del Sacramento, Colonia, Uruguay"/.test(cfg) &&
+      /se agregará cuando esté constituido/.test(legal) &&
+      !/y el domicilio de notificación figuran en esta página/.test(legal.split("NOTICE_READY")[0] || legal) &&
+      /legalWhoPending:/.test(i18n);
+    return { pass: ok, detail: ok ? "sin domicilio de notificación publicado" : "el aviso todavía dice que el domicilio figura" };
+  }
   return { pass: false, detail: "manual" };
 }
 

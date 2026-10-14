@@ -58,7 +58,7 @@ const PLACE_WORDS = new Set([
 
 /**
  * Photon/OSM quieren la calle, no "calle, ciudad, depto, país".
- * "Domingo baqué 200, colonia del sacramento, uruguay" → "Domingo baqué 200".
+ * "18 de Julio 200, colonia del sacramento, uruguay" → "18 de Julio 200".
  */
 export function searchStreetQuery(q: string) {
   const raw = expandStreetQuery(q);

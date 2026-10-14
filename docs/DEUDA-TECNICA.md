@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER | **A-01** · **L-URCDP** · **L-PAIS** · **A-04** · **L-IP** (ZIP) · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01 | **L-URCDP** · **L-PAIS** · **A-04** · **L-IP** (ZIP) · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-01**. No publicar una calle. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **L-URCDP** (A-02). No imprimir «en trámite» como si fuera el número. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -61,7 +61,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 
 | Id | Pri | Qué se hace | No se hace |
 |---|---|---|---|
-| **A-01** | P0 | Si no hay domicilio de notificación, el aviso deja de decir que «figura en esta página». Queda la ciudad. Cuando Pablo pase el domicilio, se muestra. | No se republica ninguna calle. |
+| **A-01** | P0 | Hecho en el repo (textos 2.5). Sin domicilio de notificación, el aviso no dice que figura. Queda la ciudad. Falta el ZIP para el .org. | No se publica una calle. |
 | **L-URCDP** (A-02) | P0 | Tres estados. Hoy: la solicitud está en curso y la URCDP no asignó número. Bases: contacto y seguridad. | No se imprime «en trámite» como si fuera el número. La fecha del 2 de setiembre se omite hasta que Pablo la confirme (B-03). No se agregan anuncios ni experiencias a las bases. |
 | **L-PAIS** (A-03) | P0 | País con enlace a la fuente del proveedor, o «país no informado por el proveedor». | No se adivina el país ni la instancia de Lingva. |
 | **A-04** | P0 | La cita pasa a «Ley 18.331, art. 23, inciso 2º, literal A» (y el equivalente en pt y en). Gmail: 12 meses, que ya está dicho. | No se inventan `[PLAZO_LOGS]` ni `[PLAZO_FORMSUBMIT]`. Si no están, no se muestran. |

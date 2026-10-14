@@ -448,7 +448,7 @@
     {
       "id": "A-01",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "sin domicilio de notificación el aviso no dice que figura en la página; queda la ciudad; ninguna calle se publica"
     },

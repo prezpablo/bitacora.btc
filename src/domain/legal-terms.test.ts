@@ -6,13 +6,13 @@ import { legalHref } from "../lib/locale.ts";
 
 const ANCHORS = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"];
 
-test("old legal anchors stay and terms has nine clauses", () => {
+test("old legal anchors stay and terms has ten clauses", () => {
   for (const lang of ["es", "en", "pt"] as const) {
     const ids = LEGAL_EU[lang].blocks.map((b) => b.id).filter(Boolean);
     for (const id of ANCHORS) assert.ok(ids.includes(id), `${lang} ${id}`);
     assert.ok(ids.includes("anexo"));
     const terms = LEGAL_EU[lang].blocks.find((b) => b.id === "terminos");
-    assert.equal(terms?.clauses?.length, 9);
+    assert.equal(terms?.clauses?.length, 10);
   }
 });
 

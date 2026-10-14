@@ -2,15 +2,18 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { LEGAL, legalFilled } from "./legal-config.ts";
+import { LEGAL_EU, withNoticeAddress } from "./legal-eu.ts";
 
 test("legal config uses the stated controller and does not invent the rest", () => {
   assert.equal(LEGAL.controllerName, "Pablo Daniel Perez Correa");
-  assert.equal(LEGAL.address, "Colonia del Sacramento, Colonia, Uruguay");
+  assert.equal(LEGAL.city, "Colonia del Sacramento, Colonia, Uruguay");
+  assert.equal(LEGAL.address, "[DOMICILIO_NOTIFICACIONES]");
+  assert.equal(legalFilled(LEGAL.address), false);
   assert.equal(legalFilled(LEGAL.vpsCountry), true);
   assert.equal(LEGAL.contributionLicense, "CC BY 4.0");
   assert.equal(legalFilled(LEGAL.translator), false);
   assert.equal(legalFilled(LEGAL.privacyEmail), true);
-  assert.equal(LEGAL.consentVersion, "2.4");
+  assert.equal(LEGAL.consentVersion, "2.5");
   const terms = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
   assert.equal(terms.match(/CC BY 4\.0/g)?.length, 6);
   assert.match(terms, /ODbL/);
@@ -58,6 +61,18 @@ test("an unfilled legal field is not printed", () => {
   assert.equal(legalFilled("[PROVEEDOR_TRADUCCION]"), false);
   assert.equal(legalFilled("[LICENCIA_CONTRIBUCIONES]"), false);
   assert.equal(legalFilled("privacidad@bitacorabtc.org"), true);
+});
+
+test("without a notice address the page does not say it is already published", () => {
+  for (const lang of ["es", "en", "pt"] as const) {
+    const aviso = LEGAL_EU[lang].blocks.find((b) => b.id === "aviso")?.body || "";
+    const rights = LEGAL_EU[lang].blocks.find((b) => b.id === "derechos")?.body || "";
+    const shown = withNoticeAddress(`${aviso}\n${rights}`, lang);
+    assert.doesNotMatch(shown, /domicilio de notificación figuran|notice address are on this page|endereço para notificações estão nesta página/);
+    assert.match(shown, /se agregará cuando esté constituido|will be added once it is set up|será acrescentado quando estiver constituído/);
+  }
+  const i18n = readFileSync(new URL("../lib/i18n.ts", import.meta.url), "utf8");
+  assert.equal([...i18n.matchAll(/legalWhoPending:/g)].length, 3);
 });
 
 test("rights go to the privacy mailbox, not the contact form, and market cites no Act 17.250", () => {

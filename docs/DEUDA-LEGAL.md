@@ -189,7 +189,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 
 | Id | Pri | Falta |
 |---|---|---|
-| A-01 | P0 | El aviso no dice que el domicilio de notificación figura en la página. Sin calle. |
+| A-01 | P0 | Hecho en el repo (textos 2.5). Falta el ZIP. Sin calle. |
 | L-URCDP (A-02) | P0 | No imprimir «Número de trámite: en trámite». Sin número, decir que no fue asignado. |
 | L-PAIS (A-03) | P0 | «No declarado» pelado se reemplaza por fuente o por «el proveedor no informa el país». |
 | A-04 | P0 | Cita del art. 23, inciso 2º, literal A. Sin inventar plazos. |

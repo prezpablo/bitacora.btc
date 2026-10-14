@@ -74,12 +74,12 @@ test("gral flores expands to general flores", () => {
 
 test("full pasted address is reduced to the street for search", () => {
   assert.equal(
-    searchStreetQuery("Domingo baqué 200, colonia del sacramento,colonia, uruguay"),
-    "Domingo baqué 200",
+    searchStreetQuery("18 de Julio 200, colonia del sacramento,colonia, uruguay"),
+    "18 de Julio 200",
   );
   assert.equal(searchStreetQuery("gral flores, paysandu"), "general flores");
   assert.equal(
-    streetMatchesQuery({ label: "Domingo Baque", street: "Domingo Baque" }, "Domingo baqué 200, colonia del sacramento"),
+    streetMatchesQuery({ label: "18 de Julio", street: "18 de Julio" }, "18 de Julio 200, colonia del sacramento"),
     true,
   );
 });
