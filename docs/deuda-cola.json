@@ -385,9 +385,9 @@
     {
       "id": "L-XFER",
       "pri": "P0",
-      "open": true,
-      "kind": "live",
-      "done": "la casilla de Contacto nombra la transferencia a FormSubmit, o /legal deja de decir que esa casilla documenta el art. 23"
+      "open": false,
+      "kind": "repo",
+      "done": "casilla aparte de Contacto nombra FormSubmit; /legal ya no dice que una casilla cubre todas las transferencias"
     },
     {
       "id": "L-IP",

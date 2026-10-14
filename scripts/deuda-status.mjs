@@ -138,6 +138,12 @@ function repoCheck(id) {
     const ok = gh && gm && shown;
     return { pass: ok, detail: ok ? "GitHub y Gmail fuera de no-reciben" : "siguen en side server" };
   }
+  if (id === "L-XFER") {
+    const form = read("src/components/dashboard/contact.tsx");
+    const legal = read("src/domain/legal-eu.ts");
+    const ok = form.includes("privacy-transfer") && form.includes("consentTransfer") && !legal.includes("casilla de privacidad documenta tu consentimiento a estas transferencias");
+    return { pass: ok, detail: ok ? "casilla FormSubmit aparte" : "sigue una sola casilla" };
+  }
   return { pass: false, detail: "manual" };
 }
 

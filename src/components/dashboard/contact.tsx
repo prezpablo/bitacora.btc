@@ -4,6 +4,8 @@ import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { sendContact } from "@/infrastructure/server-fns";
 import { useT, type CopyKey } from "@/lib/i18n";
+import { legalHref } from "@/lib/locale";
+import { useRouterState } from "@tanstack/react-router";
 
 const TOPICS = [
   { id: "general", label: "contactTopicGeneral", auto: "contactAutoGeneral" },
@@ -61,6 +63,7 @@ function postHiddenForm(action: string, fields: Record<string, string>) {
 
 export function ContactBlock() {
   const t = useT();
+  const search = useRouterState({ select: (s) => s.location.searchStr ?? s.location.search });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -69,6 +72,7 @@ export function ContactBlock() {
   const [hp, setHp] = useState("");
   const [captchaOk, setCaptchaOk] = useState(false);
   const [privacyOk, setPrivacyOk] = useState(false);
+  const [transferOk, setTransferOk] = useState(false);
   const [wantAck, setWantAck] = useState(false);
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
@@ -105,6 +109,10 @@ export function ContactBlock() {
       setErr(t("privacyAcceptNeed"));
       return;
     }
+    if (!transferOk) {
+      setErr(t("consentTransferNeed"));
+      return;
+    }
     setBusy(true);
     try {
       const autoKey = (TOPICS.find((x) => x.id === topic) ?? TOPICS[0]).auto;
@@ -122,6 +130,7 @@ export function ContactBlock() {
           captcha: ticket?.answer,
           captchaNonce: ticket?.nonce,
           consent: true,
+          transfer: true,
           ack: wantAck,
         },
       });
@@ -274,6 +283,24 @@ export function ContactBlock() {
         </div>
         <div className="sm:col-span-2">
           <PrivacyAccept id="privacy-contact" variant="contact" checked={privacyOk} onChange={setPrivacyOk} />
+          <label htmlFor="privacy-transfer" className="mt-3 flex items-start gap-2 text-sm text-foreground">
+            <input
+              id="privacy-transfer"
+              type="checkbox"
+              className="mt-1 size-4 shrink-0 accent-primary"
+              checked={transferOk}
+              aria-required="true"
+              required
+              onChange={(e) => setTransferOk(e.target.checked)}
+            />
+            <span className="text-pretty leading-snug">
+              {t("consentTransfer")}{" "}
+              <a href={legalHref("privacidad", String(search || ""))} className="font-medium text-foreground underline underline-offset-2">
+                {t("legalPrivacy")}
+              </a>
+              .
+            </span>
+          </label>
         </div>
         <label className="flex items-start gap-2 text-sm text-foreground sm:col-span-2">
           <input
@@ -299,7 +326,7 @@ export function ContactBlock() {
         <button
           type="submit"
           className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50 sm:col-span-2"
-          disabled={busy || !captchaOk || !privacyOk}
+          disabled={busy || !captchaOk || !privacyOk || !transferOk}
         >
           {busy ? t("loading") : t("contactSend")}
         </button>

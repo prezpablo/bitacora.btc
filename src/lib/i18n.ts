@@ -66,6 +66,8 @@ const es = {
   consentKeepPin: "El anuncio queda 7 días.",
   consentContactInfo:
     "Nombre, correo y mensaje son obligatorios; sin ellos no podemos responderte. Pasan por FormSubmit (Estados Unidos) hacia Gmail y se conservan hasta 12 meses. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
+  consentTransfer: "Acepto que mi nombre, correo y mensaje se transfieran a FormSubmit (Estados Unidos) para reenviarlos al buzón del responsable, según la",
+  consentTransferNeed: "Marcá también la casilla de la transferencia a FormSubmit.",
   consentPublishInfo:
     "{keep} Se publica en GitHub (Estados Unidos). Declarás que los datos son ciertos y que tenés derecho a publicar el logo. Ejercer derechos es gratis, no pide captcha y tiene un plazo de 5 días hábiles. Correo:",
   consentPublishXp: "Acepto publicar esta experiencia, según los",
@@ -680,6 +682,8 @@ const en: Record<keyof typeof es, string> = {
   consentKeepPin: "The announcement stays up for 7 days.",
   consentContactInfo:
     "Name, email and message are required; without them we cannot reply. They go through FormSubmit (United States) to Gmail and are kept for up to 12 months. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
+  consentTransfer: "I agree that my name, email and message are transferred to FormSubmit (United States) to be forwarded to the controller’s inbox, under the",
+  consentTransferNeed: "Tick the FormSubmit transfer box as well.",
   consentPublishInfo:
     "{keep} It is published on GitHub (United States). You state that the data is true and that you have the right to publish the logo. Exercising your rights is free, needs no captcha, and the deadline is 5 business days. Email:",
   consentPublishXp: "I agree to publish this experience, under the",
@@ -1294,6 +1298,8 @@ const pt: Record<keyof typeof es, string> = {
   consentKeepPin: "O anúncio fica 7 dias.",
   consentContactInfo:
     "Nome, e-mail e mensagem são obrigatórios; sem eles não dá para responder. Passam pelo FormSubmit (Estados Unidos) até o Gmail e ficam guardados por até 12 meses. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
+  consentTransfer: "Aceito que meu nome, e-mail e mensagem sejam transferidos ao FormSubmit (Estados Unidos) para serem encaminhados à caixa do responsável, segundo a",
+  consentTransferNeed: "Marque também a caixa da transferência ao FormSubmit.",
   consentPublishInfo:
     "{keep} Publica-se no GitHub (Estados Unidos). Você declara que os dados são verdadeiros e que tem direito de publicar o logo. Exercer direitos é grátis, não pede captcha e o prazo é de 5 dias úteis. E-mail:",
   consentPublishXp: "Aceito publicar esta experiência, segundo os",

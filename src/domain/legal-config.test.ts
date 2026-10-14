@@ -68,6 +68,23 @@ test("rights go to the privacy mailbox, not the contact form, and market cites n
   assert.match(src, /privacidad@bitacorabtc\.org/);
 });
 
+test("contact transfer consent names FormSubmit and is not every third party", () => {
+  const i18n = readFileSync(new URL("../lib/i18n.ts", import.meta.url), "utf8");
+  const labels = [...i18n.matchAll(/consentTransfer: "([^"]+)"/g)].map((m) => m[1]);
+  assert.equal(labels.length, 3);
+  for (const label of labels) assert.match(label, /FormSubmit/);
+  const legal = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(legal, /casilla de privacidad documenta tu consentimiento a estas transferencias/);
+  assert.doesNotMatch(legal, /privacy checkbox records your consent to these transfers/);
+  assert.doesNotMatch(legal, /caixa de privacidade documenta o seu consentimento a estas transferências/);
+  assert.match(legal, /casilla de Contacto que nombra a FormSubmit/);
+  const form = readFileSync(new URL("../components/dashboard/contact.tsx", import.meta.url), "utf8");
+  const server = readFileSync(new URL("../infrastructure/server-fns.ts", import.meta.url), "utf8");
+  assert.match(form, /privacy-transfer/);
+  assert.match(form, /transfer: true/);
+  assert.match(server, /data\.transfer !== true/);
+});
+
 test("contact acknowledgement is sent only when asked", () => {
   const server = readFileSync(new URL("../infrastructure/server-fns.ts", import.meta.url), "utf8");
   const form = readFileSync(new URL("../components/dashboard/contact.tsx", import.meta.url), "utf8");

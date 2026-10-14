@@ -748,6 +748,7 @@ export const sendContact = createServerFn({ method: "POST" })
     captcha?: string;
     captchaNonce?: string;
     consent?: boolean;
+    transfer?: boolean;
     ack?: boolean;
   }) => input)
   .handler(async ({ data }): Promise<{
@@ -760,7 +761,7 @@ export const sendContact = createServerFn({ method: "POST" })
     ticket?: string;
   }> => {
     if ((data.hp || "").trim()) return { ok: true };
-    if (data.consent !== true) return { ok: false, error: "consent" };
+    if (data.consent !== true || data.transfer !== true) return { ok: false, error: "consent" };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
     const name = (data.name || "").trim().slice(0, 80);
     const email = (data.email || "").trim().toLowerCase().slice(0, 120);
