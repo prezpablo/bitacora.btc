@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Pin } from "lucide-react";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
@@ -8,6 +8,7 @@ import { LEGAL } from "@/domain/legal-config";
 import { pinOnBoard, pinPending, pinTimeLeft, formatPinLeft, pinWeekPose, type CommunityPin } from "@/domain/community-pins";
 import { useQuery } from "@tanstack/react-query";
 import { useT } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 import { cn } from "@/lib/utils";
 import { VerifyIgHow } from "@/components/map/verify-ig-how";
 import { CargaPendingView, holdCargaSpinner } from "@/components/map/carga-proof-step";
@@ -61,6 +62,11 @@ export function CommunityPinsBoard() {
   const ticketRef = useRef<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const errId = useId();
+  const nameBad = err === t("pinNeed");
+  const linksBad = err === t("pinNoIg") || err === t("verifyNeedLink");
+  const captchaBad = err === t("captchaNeed") || err === t("captchaSlow");
+  const privacyBad = err === t("privacyAcceptNeed");
   const [_copied, setCopied] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -294,6 +300,7 @@ export function CommunityPinsBoard() {
                 maxLength={80}
                 aria-required="true"
                 required
+                {...fieldErr(errId, nameBad)}
               />
             </label>
             <label className="block text-sm sm:col-span-2">
@@ -312,10 +319,11 @@ export function CommunityPinsBoard() {
                 value={links}
                 onChange={(e) => setLinks(e.target.value)}
                 placeholder="https://x.com/…  https://t.me/…"
+                {...fieldErr(errId, linksBad)}
               />
             </label>
             <div className="sm:col-span-2">
-              <PrivacyAccept id="privacy-pin" variant="publish" keep="pin" checked={privacyOk} onChange={setPrivacyOk} />
+              <PrivacyAccept id="privacy-pin" variant="publish" keep="pin" checked={privacyOk} onChange={setPrivacyOk} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
             </div>
             <div className="sm:col-span-2">
               <CaptchaBox
@@ -325,9 +333,11 @@ export function CommunityPinsBoard() {
                 onTicket={(next) => {
                   ticketRef.current = next;
                 }}
+                invalid={captchaBad}
+                describedBy={captchaBad ? errId : undefined}
               />
             </div>
-            {err ? <p role="alert" className="text-sm text-primary sm:col-span-2">{err}</p> : null}
+            {err ? <p id={errId} role="alert" className="text-sm text-primary sm:col-span-2">{err}</p> : null}
             <div className="flex flex-wrap gap-2 sm:col-span-2">
               <button
                 type="submit"

@@ -9,6 +9,8 @@ export function PrivacyAccept({
   id,
   variant = "publish",
   keep = "listing",
+  invalid = false,
+  describedBy,
 }: {
   checked: boolean;
   onChange: (value: boolean) => void;
@@ -17,6 +19,8 @@ export function PrivacyAccept({
   variant?: "contact" | "publish";
   /** Ficha = mientras exista. Anuncio = 7 días. Experiencia = texto propio, no el del directorio. */
   keep?: "listing" | "pin" | "xp";
+  invalid?: boolean;
+  describedBy?: string;
 }) {
   const t = useT();
   const lang = useAppLang();
@@ -47,6 +51,8 @@ export function PrivacyAccept({
         className="mt-1 size-4 shrink-0 accent-primary"
         checked={checked}
         aria-required="true"
+        aria-invalid={invalid ? true : undefined}
+        aria-describedby={describedBy || undefined}
         required
         onChange={(e) => onChange(e.target.checked)}
       />

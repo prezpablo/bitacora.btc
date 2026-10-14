@@ -35,10 +35,14 @@ export function CaptchaBox({
   ok,
   onOk,
   onTicket,
+  invalid = false,
+  describedBy,
 }: {
   ok: boolean;
   onOk: (v: boolean) => void;
   onTicket?: (t: CaptchaTicket | null) => void;
+  invalid?: boolean;
+  describedBy?: string;
 }) {
   const t = useT();
   const lang = useAppLang();
@@ -46,6 +50,7 @@ export function CaptchaBox({
   const uid = useId();
   const spokenId = `${uid}-spoken`;
   const altId = `${uid}-alt`;
+  const failId = `${uid}-fail`;
   const [id, setId] = useState("");
   const [code, setCode] = useState("");
   const [typed, setTyped] = useState("");
@@ -244,12 +249,12 @@ export function CaptchaBox({
           }}
           placeholder={t("captchaHint")}
           aria-label={t("captchaHint")}
-          aria-describedby={`${altId} ${spokenId}`}
+          aria-describedby={[altId, spokenId, fail ? failId : "", describedBy || ""].filter(Boolean).join(" ")}
           autoComplete="off"
           spellCheck={false}
           maxLength={8}
           disabled={loading || !code}
-          aria-invalid={fail ? true : undefined}
+          aria-invalid={fail || invalid ? true : undefined}
         />
         <button
           type="button"
@@ -269,7 +274,7 @@ export function CaptchaBox({
         </p>
       ) : null}
       {fail ? (
-        <p role="alert" className="text-xs text-short">
+        <p id={failId} role="alert" className="text-xs text-short">
           {fail}
         </p>
       ) : null}

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useT } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 import { VerifyIgHow } from "./verify-ig-how";
 
 /** Mínimo de spinner, igual en anuncio / comercio / comunidad. */
@@ -158,11 +159,12 @@ export function CargaProofStep({
           placeholder={t("patchPhProof")}
           inputMode="url"
           autoComplete="url"
+          {...fieldErr(errId, Boolean(err))}
         />
       </label>
       {name ? <p className="truncate text-xs text-muted-foreground">{name}</p> : null}
       {err ? (
-        <p className="text-sm text-primary" role="alert">
+        <p id={errId} className="text-sm text-primary" role="alert">
           {err}
         </p>
       ) : null}
@@ -206,6 +208,7 @@ export function CargaPendingView({
   onCancel: () => void;
 }) {
   const t = useT();
+  const errId = useId();
   if (generating && !token) {
     return (
       <div className="flex min-h-32 flex-col items-center justify-center gap-2" role="status" aria-live="polite" aria-busy="true">

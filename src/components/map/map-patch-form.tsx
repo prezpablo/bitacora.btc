@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { submitListingPatch, verifyListingPatch, cancelListingPatch } from "@/infrastructure/server-fns";
 import { LEGAL } from "@/domain/legal-config";
 import { useT } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 import { Button } from "@/components/ui/button";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
@@ -76,6 +77,10 @@ export function ListingPatchForm({
   }
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const errId = useId();
+  const nameBad = err === t("pinNeed");
+  const captchaBad = err === t("captchaNeed") || err === t("captchaSlow");
+  const privacyBad = err === t("privacyAcceptNeed");
   const [pending, setPending] = useState<{ id: string; token: string } | null>(null);
 
   function fail(code?: string) {
@@ -186,7 +191,7 @@ export function ListingPatchForm({
         <span className="text-primary" aria-hidden="true">
           *
         </span>
-        <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextName} onChange={(e) => setNextName(e.target.value)} aria-required="true" required />
+        <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={nextName} onChange={(e) => setNextName(e.target.value)} aria-required="true" required {...fieldErr(errId, nameBad)} />
       </label>
       <label className="block text-sm">
         {t("fldDesc")}
@@ -215,13 +220,15 @@ export function ListingPatchForm({
       ) : (
         <LogoPicker value={nextLogo} onChange={setNextLogo} />
       )}
-      <PrivacyAccept id={`privacy-patch-${listingId}`} variant="publish" keep="listing" checked={privacyOk} onChange={setPrivacyOk} />
+      <PrivacyAccept id={`privacy-patch-${listingId}`} variant="publish" keep="listing" checked={privacyOk} onChange={setPrivacyOk} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
       <CaptchaBox
         ok={captchaOk}
         onOk={setCaptchaOk}
         onTicket={keepTicket}
+        invalid={captchaBad}
+        describedBy={captchaBad ? errId : undefined}
       />
-      {err ? <p role="alert" className="text-sm text-primary">{err}</p> : null}
+      {err ? <p id={errId} role="alert" className="text-sm text-primary">{err}</p> : null}
       <div className="grid grid-cols-2 gap-2">
         <Button type="submit" size="sm" disabled={busy || !nextName.trim() || !captchaOk || !privacyOk} title={nextName.trim() && captchaOk && privacyOk ? undefined : t("reqHint")}>
           {t("patchSubmit")}

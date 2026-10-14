@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
@@ -6,6 +6,7 @@ import { CargaPendingView, holdCargaSpinner } from "@/components/map/carga-proof
 import { cancelExperience, getExperiences, submitExperience, verifyExperience } from "@/infrastructure/server-fns";
 import { LEGAL } from "@/domain/legal-config";
 import { useT } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 
 const PENDING_KEY = "bitacora-xp-pending";
 
@@ -38,6 +39,12 @@ export function ExperiencesBoard() {
   const [ticket, setTicket] = useState<CaptchaTicket | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const errId = useId();
+  const cityBad = err === t("xpNeedCity");
+  const whenBad = err === t("xpNeedWhen");
+  const priceBad = err === t("xpNeedPrice");
+  const captchaBad = err === t("captchaNeed") || err === t("captchaSlow");
+  const privacyBad = err === t("privacyAcceptNeed");
   const [pending, setPending] = useState<Pending | null>(null);
   const [generating, setGenerating] = useState(false);
   const [open, setOpen] = useState(false);
@@ -206,11 +213,11 @@ export function ExperiencesBoard() {
             <label className="block text-sm">
               {t("xpCity")}{" "}
               <span className="text-primary" aria-hidden="true">*</span>
-              <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={city} onChange={(e) => setCity(e.target.value)} maxLength={80} required aria-required="true" />
+              <input className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={city} onChange={(e) => setCity(e.target.value)} maxLength={80} required aria-required="true" {...fieldErr(errId, cityBad)} />
             </label>
             <label className="block text-sm">
               {t("xpWhen")}
-              <input type="date" className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={recurrent ? "" : when} disabled={recurrent} onChange={(e) => setWhen(e.target.value)} />
+              <input type="date" className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={recurrent ? "" : when} disabled={recurrent} onChange={(e) => setWhen(e.target.value)} {...fieldErr(errId, whenBad)} />
             </label>
             <label className="flex items-center gap-2 text-sm sm:col-span-2">
               <input type="checkbox" checked={recurrent} onChange={(e) => setRecurrent(e.target.checked)} />
@@ -218,19 +225,19 @@ export function ExperiencesBoard() {
             </label>
             <label className="block text-sm">
               {t("xpPrice")}
-              <input inputMode="numeric" className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={deal ? "" : price} disabled={deal} onChange={(e) => setPrice(e.target.value.replace(/[^\d]/g, "").slice(0, 9))} placeholder="21000" />
+              <input inputMode="numeric" className="mt-1 h-10 w-full rounded-md bg-elevated px-3 text-sm shadow-[var(--shadow-border)]" value={deal ? "" : price} disabled={deal} onChange={(e) => setPrice(e.target.value.replace(/[^\d]/g, "").slice(0, 9))} placeholder="21000" {...fieldErr(errId, priceBad)} />
             </label>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={deal} onChange={(e) => setDeal(e.target.checked)} />
               {t("xpDeal")}
             </label>
             <div className="sm:col-span-2">
-              <PrivacyAccept id="privacy-xp" variant="publish" keep="xp" checked={privacyOk} onChange={setPrivacyOk} />
+              <PrivacyAccept id="privacy-xp" variant="publish" keep="xp" checked={privacyOk} onChange={setPrivacyOk} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
             </div>
             <div className="sm:col-span-2">
-              <CaptchaBox ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+              <CaptchaBox ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} invalid={captchaBad} describedBy={captchaBad ? errId : undefined} />
             </div>
-            {err ? <p role="alert" className="text-sm text-primary sm:col-span-2">{err}</p> : null}
+            {err ? <p id={errId} role="alert" className="text-sm text-primary sm:col-span-2">{err}</p> : null}
             <div className="flex flex-wrap gap-2 sm:col-span-2">
               <button type="submit" className="h-10 rounded-md bg-primary px-3 text-sm font-medium text-white disabled:opacity-50" disabled={busy || !ready}>
                 {t("pinSubmit")}

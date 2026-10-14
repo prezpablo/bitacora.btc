@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { Star } from "lucide-react";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { Button } from "@/components/ui/button";
@@ -175,6 +176,9 @@ export function MapVotePanel({
   onPatch?: () => void;
 }) {
   const t = useT();
+  const errId = useId();
+  const captchaBad = err === t("captchaNeed") || err === t("captchaSlow");
+  const privacyBad = err === t("privacyAcceptNeed");
   if (!open) {
     return <MapPlaceActions onGo={onGo} going={going} onOpen={onOpen} onPatch={onPatch} onDismiss={onDismiss} />;
   }
@@ -216,9 +220,9 @@ export function MapVotePanel({
           </button>
         ))}
       </div>
-      <CaptchaBox key={captchaKey} ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
-      <PrivacyAccept id={privacyId} variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} />
-      {err ? <p role="alert" className="text-sm text-short">{err}</p> : null}
+      <CaptchaBox key={captchaKey} ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} invalid={captchaBad} describedBy={captchaBad ? errId : undefined} />
+      <PrivacyAccept id={privacyId} variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
+      {err ? <p id={errId} role="alert" className="text-sm text-short">{err}</p> : null}
       <Button type="button" className="w-full" onClick={onPublish} disabled={!captchaOk || !privacyOk}>
         {t("publishVote")}
       </Button>

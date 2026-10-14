@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { Button } from "@/components/ui/button";
 import type { WeekHours } from "@/domain/hours";
@@ -6,6 +7,7 @@ import type { SocialKey } from "@/domain/socials";
 import { formatStreet, type StreetHit } from "@/infrastructure/address";
 import type { AppLang } from "@/lib/locale";
 import { useT } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 import { AddressSearch } from "./address-search";
 import { CaptchaBox, type CaptchaTicket } from "./captcha";
 import { HoursEditor } from "./hours-editor";
@@ -94,6 +96,11 @@ export function MapComposeForm({
   onCancel: () => void;
 }) {
   const t = useT();
+  const errId = useId();
+  const nameBad = formErr === t("pinNeed") || formErr === t("fldName");
+  const slugBad = formErr === t("needSlug") || formErr === t("slugTaken");
+  const captchaBad = formErr === t("captchaNeed") || formErr === t("captchaSlow");
+  const privacyBad = formErr === t("privacyAcceptNeed");
   // Comercio y comunidad: pin + nombre + captcha + privacidad. La dirección es opcional.
   const shopReady = Boolean(shopName.trim()) && captchaOk && privacyOk;
   const commReady = Boolean(form.name.trim()) && captchaOk && privacyOk;
@@ -115,6 +122,7 @@ export function MapComposeForm({
             placeholder={t("phName")}
             aria-required="true"
             required
+            {...fieldErr(errId, nameBad)}
           />
         </label>
         <label className="block text-sm">
@@ -149,9 +157,9 @@ export function MapComposeForm({
         <HoursEditor value={shopHours} onChange={onShopHours} />
         <PayPicker value={shopPays} onChange={onShopPays} />
         <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
-        <PrivacyAccept id="privacy-map-shop" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} />
-        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
-        {formErr ? <p role="alert" className="text-sm text-short">{formErr}</p> : null}
+        <PrivacyAccept id="privacy-map-shop" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
+        <CaptchaBox key="shop" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} invalid={captchaBad} describedBy={captchaBad ? errId : undefined} />
+        {formErr ? <p id={errId} role="alert" className="text-sm text-short">{formErr}</p> : null}
         <Button type="button" className="w-full" onClick={onPublish} disabled={!shopReady} title={shopReady ? undefined : t("reqHint")}>
           {t("proposeShop")}
         </Button>
@@ -177,6 +185,7 @@ export function MapComposeForm({
           onChange={(e) => onForm((f) => ({ ...f, name: e.target.value }))}
           aria-required="true"
           required
+          {...fieldErr(errId, nameBad)}
         />
       </label>
       <label className="block text-sm">
@@ -186,6 +195,7 @@ export function MapComposeForm({
           placeholder={t("phSlug")}
           value={form.slug}
           onChange={(e) => onForm((f) => ({ ...f, slug: e.target.value }))}
+          {...fieldErr(errId, slugBad)}
         />
       </label>
       <label className="block text-sm">
@@ -199,9 +209,9 @@ export function MapComposeForm({
       </label>
       <LogoPicker value={form.logo} onChange={(logo) => onForm((f) => ({ ...f, logo }))} />
       <SocialPicker picked={picked} handles={handles} onToggle={onToggleSocial} onHandle={onHandle} />
-      <PrivacyAccept id="privacy-map-comm" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} />
-      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} />
-      {formErr ? <p role="alert" className="text-sm text-short">{formErr}</p> : null}
+      <PrivacyAccept id="privacy-map-comm" variant="publish" keep="listing" checked={privacyOk} onChange={onPrivacy} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
+      <CaptchaBox key="comm" ok={captchaOk} onOk={onCaptcha} onTicket={onTicket} invalid={captchaBad} describedBy={captchaBad ? errId : undefined} />
+      {formErr ? <p id={errId} role="alert" className="text-sm text-short">{formErr}</p> : null}
       <Button type="button" className="w-full" onClick={onPublish} disabled={!commReady} title={commReady ? undefined : t("reqHint")}>
         {t("publishComm")}
       </Button>

@@ -567,7 +567,7 @@
     {
       "id": "A-29",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "el error de un formulario se anuncia y queda ligado al campo"
     },

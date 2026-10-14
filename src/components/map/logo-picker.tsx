@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useT } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 import { imgSrc, logoUrl } from "@/domain";
 
 export function LogoPicker({
@@ -10,6 +11,7 @@ export function LogoPicker({
   onChange: (url: string) => void;
 }) {
   const t = useT();
+  const errId = useId();
   const [err, setErr] = useState("");
   const preview = imgSrc(value);
 
@@ -48,6 +50,7 @@ export function LogoPicker({
             placeholder="https://"
             inputMode="url"
             autoComplete="url"
+            {...fieldErr(errId, Boolean(err))}
           />
         </label>
       </div>
@@ -56,7 +59,7 @@ export function LogoPicker({
       {err ? (
         <div className="relative pt-1">
           <span className="absolute top-0 left-6 size-2 rotate-45 bg-primary" aria-hidden />
-          <p role="alert" className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-white">{err}</p>
+          <p id={errId} role="alert" className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-white">{err}</p>
         </div>
       ) : null}
     </div>

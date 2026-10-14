@@ -309,6 +309,12 @@ function repoCheck(id) {
     const ok = /t\("donate"\)/.test(ui) && /t\("contributeGift"\)/.test(ui) && /sin contraprestación/.test(i18n) && !/size-6/.test(ui);
     return { pass: ok, detail: ok ? "Donar abre la ficha; el aviso está junto al QR" : "sigue el QR a la vista o falta el aviso" };
   }
+  if (id === "A-29") {
+    const contact = read("src/components/dashboard/contact.tsx");
+    const captcha = read("src/components/map/captcha.tsx");
+    const ok = /id=\{errId\} role="alert"/.test(contact) && /fieldErr\(errId, emailBad\)/.test(contact) && /id=\{failId\} role="alert"/.test(captcha);
+    return { pass: ok, detail: ok ? "el error se anuncia y queda ligado al campo" : "falta el aviso o el lazo al campo" };
+  }
   return { pass: false, detail: "manual" };
 }
 

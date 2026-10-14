@@ -1,10 +1,11 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { ContributeQr } from "@/components/contribute-qr";
 import { CaptchaBox, type CaptchaTicket } from "@/components/map/captcha";
 import { PrivacyAccept } from "@/components/privacy-accept";
 import { sendContact } from "@/infrastructure/server-fns";
 import { LEGAL } from "@/domain/legal-config";
 import { useT, type CopyKey } from "@/lib/i18n";
+import { fieldErr } from "@/lib/field-err";
 import { legalHref } from "@/lib/locale";
 import { useRouterState } from "@tanstack/react-router";
 
@@ -82,6 +83,12 @@ export function ContactBlock() {
   const [caseId, setCaseId] = useState("");
   const [err, setErr] = useState("");
   const [hint, setHint] = useState("");
+  const errId = useId();
+  const need = err === t("contactNeed");
+  const emailBad = need || err === t("contactEmailBad");
+  const captchaBad = err === t("captchaNeed");
+  const privacyBad = err === t("privacyAcceptNeed");
+  const transferBad = err === t("consentTransferNeed");
 
   useEffect(() => {
     try {
@@ -228,6 +235,7 @@ export function ContactBlock() {
             placeholder={t("contactPhName")}
             autoComplete="name"
             required
+            {...fieldErr(errId, need)}
           />
         </label>
         <label className="block text-sm sm:col-span-1">
@@ -240,6 +248,7 @@ export function ContactBlock() {
             placeholder={t("contactPhEmail")}
             autoComplete="email"
             required
+            {...fieldErr(errId, emailBad)}
           />
         </label>
         <label className="block text-sm sm:col-span-2">
@@ -276,16 +285,17 @@ export function ContactBlock() {
             placeholder={t("contactPhMsg")}
             minLength={2}
             required
+            {...fieldErr(errId, need)}
           />
         </label>
         <div className="hidden" aria-hidden="true">
           <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={hp} onChange={(e) => setHp(e.target.value)} />
         </div>
         <div className="sm:col-span-2">
-          <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} />
+          <CaptchaBox key={ok ? "ok" : "form"} ok={captchaOk} onOk={setCaptchaOk} onTicket={setTicket} invalid={captchaBad} describedBy={captchaBad ? errId : undefined} />
         </div>
         <div className="sm:col-span-2">
-          <PrivacyAccept id="privacy-contact" variant="contact" checked={privacyOk} onChange={setPrivacyOk} />
+          <PrivacyAccept id="privacy-contact" variant="contact" checked={privacyOk} onChange={setPrivacyOk} invalid={privacyBad} describedBy={privacyBad ? errId : undefined} />
           <label htmlFor="privacy-transfer" className="mt-3 flex items-start gap-2 text-sm text-foreground">
             <input
               id="privacy-transfer"
@@ -294,6 +304,7 @@ export function ContactBlock() {
               checked={transferOk}
               aria-required="true"
               required
+              {...fieldErr(errId, transferBad)}
               onChange={(e) => setTransferOk(e.target.checked)}
             />
             <span className="text-pretty leading-snug">
@@ -315,7 +326,7 @@ export function ContactBlock() {
           <span>{t("contactWantAck")}</span>
         </label>
         {err ? (
-          <p role="alert" className="text-sm text-short sm:col-span-2">
+          <p id={errId} role="alert" className="text-sm text-short sm:col-span-2">
             {err}
           </p>
         ) : null}
