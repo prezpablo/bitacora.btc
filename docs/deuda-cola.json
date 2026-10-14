@@ -455,7 +455,7 @@
     {
       "id": "A-04",
       "pri": "P0",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "la cita es Ley 18.331, art. 23, inciso 2º, literal A; no se inventa el plazo de logs ni el de FormSubmit"
     },

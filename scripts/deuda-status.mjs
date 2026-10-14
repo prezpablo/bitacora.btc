@@ -180,6 +180,15 @@ function repoCheck(id) {
       /lingva\.ml/.test(parties);
     return { pass: ok, detail: ok ? "país con fuente o no informado" : "sigue no declarado" };
   }
+  if (id === "A-04") {
+    const legal = read("src/domain/legal-eu.ts");
+    const ok =
+      /Ley 18\.331, art\. 23, inciso 2º, literal A/.test(legal) &&
+      /Act 18\.331, art\. 23, subsection 2, letter A/.test(legal) &&
+      /Lei 18\.331, art\. 23, inciso 2º, alínea A/.test(legal) &&
+      !/\[PLAZO_LOGS\]|\[PLAZO_FORMSUBMIT\]/.test(legal);
+    return { pass: ok, detail: ok ? "art. 23 inciso 2º literal A" : "sigue la cita corta" };
+  }
   return { pass: false, detail: "manual" };
 }
 

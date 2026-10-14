@@ -12,8 +12,8 @@ test("a consent row is stored and an old CARGA code is wiped", async () => {
   const { openSqlite } = await import("../infrastructure/sqlite.ts");
   const cfg = readFileSync(new URL("./legal-config.ts", import.meta.url), "utf8");
   const log = readFileSync(new URL("../infrastructure/consent-log.ts", import.meta.url), "utf8");
-  assert.match(cfg, /consentVersion: "2.7"/);
-  assert.match(log, /CONSENT_VERSION = "2.7"/);
+  assert.match(cfg, /consentVersion: "2.8"/);
+  assert.match(log, /CONSENT_VERSION = "2.8"/);
   const ip = "203.0.113.44";
   const hash = hashClientIp(ip);
   assert.equal(safeIpHash(ip), "");

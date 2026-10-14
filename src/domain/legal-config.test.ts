@@ -13,7 +13,7 @@ test("legal config uses the stated controller and does not invent the rest", () 
   assert.equal(LEGAL.contributionLicense, "CC BY 4.0");
   assert.equal(legalFilled(LEGAL.translator), false);
   assert.equal(legalFilled(LEGAL.privacyEmail), true);
-  assert.equal(LEGAL.consentVersion, "2.7");
+  assert.equal(LEGAL.consentVersion, "2.8");
   const terms = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
   assert.equal(terms.match(/CC BY 4\.0/g)?.length, 6);
   assert.match(terms, /ODbL/);
@@ -94,6 +94,16 @@ test("URCDP filing has three states and does not invent a procedure number", () 
   const dated = urcdpParagraph("es", { date: "2 de setiembre de 2026", file: "[N.º TRÁMITE]", reg: "[N.º INSCRIPCIÓN]" });
   assert.match(dated, /se presentó el 2 de setiembre de 2026/);
   assert.match(dated, /todavía no asignó/);
+});
+
+test("the transfer citation names article 23 subsection 2 letter A and invents no retention period", () => {
+  const terms = readFileSync(new URL("./legal-eu.ts", import.meta.url), "utf8");
+  assert.match(terms, /Ley 18\.331, art\. 23, inciso 2º, literal A/);
+  assert.match(terms, /Act 18\.331, art\. 23, subsection 2, letter A/);
+  assert.match(terms, /Lei 18\.331, art\. 23, inciso 2º, alínea A/);
+  assert.doesNotMatch(terms, /art\. 23 A/);
+  assert.doesNotMatch(terms, /\[PLAZO_LOGS\]|\[PLAZO_FORMSUBMIT\]/);
+  assert.match(terms, /Hasta 12 meses/);
 });
 
 test("rights go to the privacy mailbox, not the contact form, and market cites no Act 17.250", () => {

@@ -13,7 +13,7 @@ Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponibl
 
 | Retirado (no backlog P0) | Queda abierto |
 |---|---|
-| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS | **A-04** · **L-IP** (ZIP) · **D-FOSS** · **D-STATUE** |
+| `/health` 404, CSV token, snapshot ausente, lang fijo, legal API, serverFn CVE, www/SAN, Geo-IP, REST v1, Mercado=down, globo=no hay mapa, P0-09/P0-12 del probe viejo, L-BRACKET, L-CONTRA, L-ACK, L-N1, L-XFER, A-01, L-URCDP, L-PAIS, A-04 | **L-IP** (ZIP) · **A-07** · **D-FOSS** · **D-STATUE** |
 
 ---
 
@@ -51,7 +51,7 @@ Informe «Datos personales y accesibilidad» (dos pasadas, 21:01 y 21:19). Esa p
 
 Siguen sin duplicar: captcha de audio (L2.1, hecho), D-FOSS, D-STATUE, D-DEPS (Firebase = A-24).
 
-**Siguiente fase de código, si se acepta:** **A-04**. La cita pasa a «Ley 18.331, art. 23, inciso 2º, literal A». No inventar plazos. No mezclar con D-STATUE.
+**Siguiente fase de código, si se acepta:** **A-07**. La hora del mercado lleva zona. La serie modelo dice que no es cotización. No mezclar con D-STATUE.
 
 ### Informe v2 — 13 oct 22:23 -03
 
@@ -64,7 +64,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 | **A-01** | P0 | Hecho en el repo (textos 2.5). Sin domicilio de notificación, el aviso no dice que figura. Queda la ciudad. Falta el ZIP para el .org. | No se publica una calle. |
 | **L-URCDP** (A-02) | P0 | Hecho en el repo (textos 2.6). Sin número, dice que la URCDP no lo asignó. La fecha no se publica. Bases: contacto y seguridad. Falta el ZIP. | No se imprime «en trámite» como número. No se agregan anuncios ni experiencias. |
 | **L-PAIS** (A-03) | P0 | Hecho en el repo (textos 2.7). OpenFreeMap enlaza Hungría a sus términos. BTC Map, GeoJS, ipwho.is y Lingva dicen que el proveedor no informa el país. Falta el ZIP. | No se adivina el país ni la instancia de Lingva. |
-| **A-04** | P0 | La cita pasa a «Ley 18.331, art. 23, inciso 2º, literal A» (y el equivalente en pt y en). Gmail: 12 meses, que ya está dicho. | No se inventan `[PLAZO_LOGS]` ni `[PLAZO_FORMSUBMIT]`. Si no están, no se muestran. |
+| **A-04** | P0 | Hecho en el repo (textos 2.8). La cita es «Ley 18.331, art. 23, inciso 2º, literal A». Gmail sigue en 12 meses. Falta el ZIP. | No se inventan plazos de logs ni de FormSubmit. |
 | **A-07** | P1 | La hora del mercado lleva zona. En serie modelo, la cifra dice que no es cotización. | Las fuentes del aviso son las que el desk ya usa. No se inventa una lista. |
 | **A-08** | P1 | Reglas 1, 6, 10 y 11 a 14, en los tres idiomas. El plazo de disputas queda oculto y se muestra el de 5 días hábiles. | La frase de que la ficha derivada de OSM «sigue la ODbL» queda en `[verificar]` (B-06). No se pega hasta leerla. |
 | **A-09** | P1 | Cada envío manda la versión del texto y el formulario. | La IP no se guarda en claro. El hash, si entra, ensancha la base de seguridad y va con B-01. No en el mismo corte que el texto. |
