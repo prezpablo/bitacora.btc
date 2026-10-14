@@ -284,6 +284,12 @@ function repoCheck(id) {
     const ok = /lista de direcciones permitidas/.test(es) && !/allowlist|lista de fundadores|Impact Fund/.test(es) && /también en LABIF/.test(es);
     return { pass: ok, detail: ok ? "términos en castellano; LABIF sin definir" : "sigue un término en inglés o se definió LABIF" };
   }
+  if (id === "A-22") {
+    const seg = read("src/components/dashboard/segmented.tsx");
+    const css = read("src/styles.css");
+    const ok = /min-h-6 min-w-6/.test(seg) && !/min-h-11/.test(seg) && /min-height: 1\.5rem/.test(css) && !/wcag22aaa/.test(read("scripts/probe-a11y.mjs"));
+    return { pass: ok, detail: ok ? "piso 24 px; el corte no sube a 44" : "falta el piso o se subió a 44" };
+  }
   return { pass: false, detail: "manual" };
 }
 

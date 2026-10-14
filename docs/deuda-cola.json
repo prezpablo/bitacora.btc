@@ -539,7 +539,7 @@
     {
       "id": "A-22",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "selector de idioma, rangos del gráfico, controles del mapa y captcha miden al menos 24 px o tienen el espacio equivalente"
     },

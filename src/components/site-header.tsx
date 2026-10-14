@@ -40,7 +40,7 @@ function LangButtons() {
           type="button"
           onClick={() => setLang(l.value)}
           className={cn(
-            "h-8 min-w-9 rounded px-2 font-mono text-xs font-medium sm:h-9 sm:min-w-11 sm:px-2.5 sm:text-sm",
+            "h-8 min-h-6 min-w-6 rounded px-2 font-mono text-xs font-medium sm:h-9 sm:min-w-11 sm:px-2.5 sm:text-sm",
             lang === l.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
           )}
           aria-pressed={lang === l.value}

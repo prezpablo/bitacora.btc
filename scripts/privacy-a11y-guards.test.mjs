@@ -88,6 +88,22 @@ test("Geo-IP on the map waits for extras or a locate gesture", () => {
   assert.match(window, /locateBest\(false/);
 });
 
+test("language, ranges, map zoom and captcha stay at 24px, not 44", () => {
+  const header = read("src/components/site-header.tsx");
+  const pulse = read("src/components/dashboard/news-cycle.tsx");
+  const seg = read("src/components/dashboard/segmented.tsx");
+  const cap = read("src/components/map/captcha.tsx");
+  const css = read("src/styles.css");
+  assert.match(header, /min-h-6 min-w-6/);
+  assert.match(pulse, /min-h-6 min-w-6/);
+  assert.match(seg, /min-h-6 min-w-6/);
+  assert.doesNotMatch(seg, /min-h-11/);
+  assert.match(cap, /min-h-6 min-w-6/);
+  assert.match(css, /\.leaflet-bar a \{[^}]*min-height: 1\.5rem/);
+  assert.match(css, /\.chip \{[^}]*min-width: 1\.5rem/);
+  assert.doesNotMatch(read("scripts/probe-a11y.mjs"), /wcag22aaa/);
+});
+
 test("public CSV snapshots drop CARGA tokens", () => {
   assert.match(read("src/infrastructure/map-csv-io.ts"), /stringifyMapCsvPublic/);
   assert.match(read("src/infrastructure/pins-io.ts"), /stringifyPinsCsvPublic/);

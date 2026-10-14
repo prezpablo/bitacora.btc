@@ -57,7 +57,7 @@ export function NewsCycle({ data, fetching = false }: { data: PulsePayload | nul
                 type="button"
                 onClick={() => setLang(l.value)}
                 className={cn(
-                  "h-8 min-w-10 rounded px-2 font-mono text-xs font-medium",
+                  "h-8 min-h-6 min-w-6 rounded px-2 font-mono text-xs font-medium",
                   lang === l.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-pressed={lang === l.value}

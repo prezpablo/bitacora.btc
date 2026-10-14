@@ -205,7 +205,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | A-17 | P2 | Hecho en el repo. Falta el ZIP. `mailto:` junto al captcha. El audio queda. |
 | A-18 | P2 | Hecho en el repo (textos 2.13). Falta el ZIP. Apertura uruguaya. El párrafo del EEE no se inventó. |
 | A-21 | P2 | Hecho en el repo (textos 2.14). Falta el ZIP. Allowlist = direcciones permitidas. LABIF sin definir. |
-| A-22 | P2 | 24 px. |
+| A-22 | P2 | Hecho en el repo. Falta el ZIP. Piso 24 px. El corte no sube a 44. |
 | A-23 | P2 | Lista y resumen de precio en texto. |
 | A-25 | P3 | Claves i18n muertas, si no se usan. |
 | A-26 | P3 | Aviso junto al QR de sats. |

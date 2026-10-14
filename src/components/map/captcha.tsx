@@ -153,7 +153,7 @@ export function CaptchaBox({
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("captchaTitle")}</p>
       <p id={altId} className="text-xs text-pretty text-muted-foreground">
         {t("captchaAlt")}{" "}
-        <a href={legalHref("accesibilidad", String(search || ""))} className="inline-flex min-h-6 items-center font-medium text-foreground underline underline-offset-2">
+        <a href={legalHref("accesibilidad", String(search || ""))} className="inline-flex min-h-6 min-w-6 items-center font-medium text-foreground underline underline-offset-2">
           {t("captchaA11y")}
         </a>
       </p>
@@ -188,7 +188,7 @@ export function CaptchaBox({
         </svg>
         <button
           type="button"
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-card text-primary"
+          className="inline-flex size-10 min-h-6 min-w-6 shrink-0 items-center justify-center rounded-md bg-card text-primary"
           onClick={listen}
           disabled={loading || !code}
           aria-label={t("captchaListen")}
@@ -198,7 +198,7 @@ export function CaptchaBox({
         </button>
         <button
           type="button"
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-card text-primary"
+          className="inline-flex size-10 min-h-6 min-w-6 shrink-0 items-center justify-center rounded-md bg-card text-primary"
           onClick={() => void load()}
           aria-label={t("captchaRefresh")}
           title={t("captchaRefresh")}
@@ -208,7 +208,7 @@ export function CaptchaBox({
       </div>
       <a
         href={`mailto:${LEGAL.a11yEmail}`}
-        className="inline-flex min-h-6 items-center text-xs font-medium text-foreground underline underline-offset-2"
+        className="inline-flex min-h-6 min-w-6 items-center text-xs font-medium text-foreground underline underline-offset-2"
       >
         {t("captchaMail")}
       </a>

@@ -169,6 +169,7 @@ body {
   z-index: 1;
   height: 2rem;
   min-height: 1.5rem;
+  min-width: 1.5rem;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
@@ -411,4 +412,10 @@ main#contenido h2.font-display {
 
 .leaflet-routing-container {
   display: none !important;
+}
+
+/* El zoom del mapa no baja de 24 px. No se agranda a 44 en este corte. */
+.leaflet-bar a {
+  min-width: 1.5rem;
+  min-height: 1.5rem;
 }
