@@ -303,6 +303,12 @@ function repoCheck(id) {
     const ok = !/privacyArt13/.test(i18n) && /Información del art\. 13/.test(legal);
     return { pass: ok, detail: ok ? "clave muerta fuera; el aviso del art. 13 queda" : "la clave sigue o se tocó el aviso" };
   }
+  if (id === "A-26") {
+    const ui = read("src/components/contribute-qr.tsx");
+    const i18n = read("src/lib/i18n.ts");
+    const ok = /t\("donate"\)/.test(ui) && /t\("contributeGift"\)/.test(ui) && /sin contraprestación/.test(i18n) && !/size-6/.test(ui);
+    return { pass: ok, detail: ok ? "Donar abre la ficha; el aviso está junto al QR" : "sigue el QR a la vista o falta el aviso" };
+  }
   return { pass: false, detail: "manual" };
 }
 

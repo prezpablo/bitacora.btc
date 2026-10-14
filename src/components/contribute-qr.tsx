@@ -207,28 +207,13 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
       type="button"
       onClick={() => setOpen(true)}
       className={cn(
-        "group text-left",
-        compact ? "inline-flex items-center" : "flex shrink-0 flex-col items-center gap-2",
+        "inline-flex min-h-6 items-center rounded-md bg-primary font-medium text-white",
+        compact ? "h-7 px-2.5 text-xs" : "h-9 px-3 text-sm",
       )}
       aria-expanded={open}
       aria-controls={titleId}
-      aria-label={compact ? t("navAportes") : undefined}
     >
-      <img
-        src={SRC[rail]}
-        alt={rail === "ln" ? t("contributeAltLn") : t("contributeAlt")}
-        width={compact ? 24 : 168}
-        height={compact ? 24 : 168}
-        className={cn(
-          "rounded-md bg-card shadow-[var(--shadow-border)] transition-transform duration-[var(--motion-quick)] group-hover:scale-[1.03]",
-          compact ? "size-6" : "size-36 sm:size-40",
-        )}
-      />
-      {compact ? (
-        <span className="sr-only">{t("navAportes")}</span>
-      ) : (
-        <span className="max-w-40 text-center text-sm text-pretty text-muted-foreground">{t("contributeCaption")}</span>
-      )}
+      {t("donate")}
     </button>
   );
 
@@ -257,6 +242,7 @@ export function ContributeQr({ compact = false }: { compact?: boolean }) {
               <p id={titleId} className="mt-3 text-center text-sm text-pretty text-foreground">
                 {t("contributeCaption")}
               </p>
+              <p className="mt-2 max-w-md text-center text-xs text-pretty text-muted-foreground">{t("contributeGift")}</p>
               <CopyRow rail={rail} onRail={setRail} centered />
               <button
                 type="button"

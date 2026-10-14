@@ -24,6 +24,29 @@ test("hint shows both ends", () => {
   assert.ok(h.includes("…"));
 });
 
+test("the visible control is Donar and the gift notice sits with the QR", () => {
+  const ui = readFileSync(new URL("../components/contribute-qr.tsx", import.meta.url), "utf8");
+  const i18n = readFileSync(new URL("../lib/i18n.ts", import.meta.url), "utf8");
+  assert.match(ui, /t\("donate"\)/);
+  assert.match(ui, /t\("contributeGift"\)/);
+  assert.doesNotMatch(ui, /size-6/);
+  assert.match(i18n, /donate: "Donar"/);
+  assert.match(i18n, /donate: "Donate"/);
+  assert.match(i18n, /donate: "Doar"/);
+  assert.match(i18n, /sin contraprestación/);
+  assert.match(i18n, /no consideration in return/);
+  assert.match(i18n, /sem contraprestação/);
+  assert.match(i18n, /No se revierte/);
+  assert.match(i18n, /cannot be reversed/);
+  assert.match(i18n, /Não se reverte/);
+  assert.match(i18n, /La cadena es pública/);
+  assert.match(i18n, /The chain is public/);
+  assert.match(i18n, /A cadeia é pública/);
+  assert.match(i18n, /no custodia/);
+  assert.match(i18n, /does not take custody/);
+  assert.match(i18n, /não custodia/);
+});
+
 test("QR files exist and are PNG", () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
   for (const name of ["contribuir-qr.png", "contribuir-ln.png"]) {

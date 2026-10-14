@@ -245,8 +245,10 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
               {t("taglineShort")}
             </span>
           </p>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-2 sm:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem]">
-            <span className="hidden size-6 sm:block" aria-hidden="true" />
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-2 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+            <span className="hidden h-7 min-h-6 select-none items-center rounded-md px-2.5 text-xs font-medium opacity-0 sm:inline-flex" aria-hidden="true">
+              {t("donate")}
+            </span>
             <nav
               aria-label={t("footerNavAria")}
               className="grid w-full grid-cols-3 items-start justify-items-center gap-x-2 gap-y-1 text-[10px] leading-tight sm:gap-x-4 sm:text-xs sm:leading-none"
@@ -313,7 +315,7 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                 </div>
               </div>
             </nav>
-            <span id="aportes" className="flex size-6 shrink-0 items-end justify-end scroll-mt-[var(--header-offset)]">
+            <span id="aportes" className="flex shrink-0 items-end justify-end scroll-mt-[var(--header-offset)]">
               <Suspense fallback={null}>
                 <ContributeQr compact />
               </Suspense>

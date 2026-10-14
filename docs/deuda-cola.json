@@ -560,7 +560,7 @@
     {
       "id": "A-26",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "repo",
       "done": "junto al QR de sats se dice que el aporte es voluntario, público y no se revierte"
     },
