@@ -146,7 +146,7 @@ Origen: «Lista de mejoras» (Parte A código, Parte B trámites URCDP). No es d
 | A6.2 «Bircoiner» | No es un typo del build. El eslogan quedó así a pedido. No se revierte solo. |
 | A3.3 sacar FormSubmit | El informe pide confirmación antes de codear. Hasta un sí, no hay fase. |
 | A3.2 proxy de teselas e imágenes | P3 y choca con el uso de las teselas. Después de A3.1, no antes. |
-| A4.9 «Patrocinado» en LABITCONF | Falta el sí o el no. Sin eso no se etiqueta. |
+| A4.9 «Patrocinado» en LABITCONF | Cerrado. Pablo: no hay contraprestación. El sello no se publica. |
 | A6.3 voseo de todo el sitio | Pasa de copy, no de esta cola legal. No se mezcla con un ZIP de textos legales. |
 | Parte B (B1–B5, B7, B8) | Trámites de Pablo ante la URCDP. No son commits. B6 sí es código, cuando existan los números. |
 
@@ -214,7 +214,7 @@ Cotejo del `.org` a las 22:41: L-N1 y L-XFER ya están. L-IP está en GitHub `9b
 | L-VALOR | P2 | Hecho en el repo (textos 2.15). Falta el ZIP. El art. 16 nombra impugnar la valoración. |
 | L-PSAV | P2 | Hecho en el repo (textos 2.16). Falta el ZIP. Circular 2507 art. 127.22 y Ley 20.446 art. 693, leídas. |
 | L-MKT-COPY | P2 | Hecho en el repo. Falta el ZIP. El punto de control no dice «barre shorts» ni «barre longs». |
-| L-LABIT (A-27) | P3 | No etiquetar LABITCONF hasta el sí o el no. |
+| L-LABIT (A-27) | P3 | Hecho en el repo. Falta el ZIP. No hay contraprestación: el banner no lleva sello. |
 | D-FOSS (A-05) | P1 | Repo 200 anónimo, o paquete de fuentes. Recién ahí el hash y el enlace. |
 
 No entra: A-12 (Bircoiner, a pedido), A-06 (titular lo define Pablo), A-16 (FormSubmit, hasta un sí), A-20 (voseo, otro pase), A-28 (ya está), A-32 (proxy de teselas, no en esta VPS). A-30 está hecho en el repo: 14 de octubre de 2026.

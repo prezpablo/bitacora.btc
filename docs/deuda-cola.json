@@ -441,7 +441,7 @@
     {
       "id": "L-LABIT",
       "pri": "P3",
-      "open": true,
+      "open": false,
       "kind": "manual",
       "done": "A-27: el banner de LABITCONF se etiqueta solo cuando Pablo diga si hay contraprestación"
     },

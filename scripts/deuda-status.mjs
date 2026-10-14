@@ -341,6 +341,12 @@ function repoCheck(id) {
     const ok = /20\.446, art\. 693/.test(legal) && /2507, art\. 127\.22/.test(legal) && /16\.696, art\. 37, literal H/.test(legal) && !/persona física no es PSAV/.test(legal);
     return { pass: ok, detail: ok ? "20.446 art. 693 y Circular 2507 citadas; no se inventa una exclusión por ser persona física" : "sigue solo la 20.345 o se inventó una exclusión" };
   }
+  if (id === "L-LABIT") {
+    const banner = read("src/components/dashboard/labitconf-banner.tsx");
+    const i18n = read("src/lib/i18n.ts");
+    const ok = /labitconf\.com/.test(banner) && !/labitKicker|Destacado|Patrocinado|Sponsored/.test(banner + i18n);
+    return { pass: ok, detail: ok ? "el banner enlaza LABITCONF y no lleva sello de destacado ni de patrocinado" : "el sello sigue" };
+  }
   return { pass: false, detail: "manual" };
 }
 
