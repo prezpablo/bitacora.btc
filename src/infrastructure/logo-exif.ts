@@ -3,12 +3,12 @@ import { isSvgPayload } from "./logo-bytes.ts";
 const PIXELS = 25_000_000;
 
 /** JPEG nuevo, sin EXIF. sharp ya está; rotate aplica la orientación y no se vuelve a copiar el GPS. */
-export async function jpegWithoutExif(buf: Buffer, cover: boolean) {
+export async function jpegWithoutExif(buf: Buffer, cover: boolean, edge = 960) {
   const sharp = (await import("sharp")).default;
   let img = sharp(buf, { limitInputPixels: PIXELS, animated: false }).rotate();
   img = cover
     ? img.resize(540, 675, { fit: "cover", position: "centre" })
-    : img.resize(960, 960, { fit: "inside", withoutEnlargement: true });
+    : img.resize(edge, edge, { fit: "inside", withoutEnlargement: true });
   return await img.flatten({ background: "#ffffff" }).jpeg({ quality: 72, mozjpeg: true }).toBuffer();
 }
 

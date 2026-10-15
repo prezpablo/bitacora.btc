@@ -19,6 +19,7 @@ data/btcmap-shops.json
 data/btcmap-comms.json
 data/last-*.json
 data/logo-cache/
+data/logos/
 .node_modules.lock
 .DS_Store
 coverage/

@@ -23,6 +23,7 @@
     "test": "node --test --experimental-strip-types 'scripts/**/*.test.mjs' 'src/**/*.test.ts'",
     "catalog:seed": "node --experimental-strip-types --import ./scripts/register-ts-alias.mjs scripts/seed-catalog.ts",
     "catalog:sync": "node --experimental-strip-types --import ./scripts/register-ts-alias.mjs scripts/sync-catalog.ts",
+    "catalog:logos": "node --experimental-strip-types --import ./scripts/register-ts-alias.mjs scripts/mirror-community-logos.ts",
     "test:live": "node scripts/probe-live.mjs",
     "test:seo": "node scripts/probe-seo.mjs",
     "test:a11y": "node scripts/probe-a11y.mjs",
