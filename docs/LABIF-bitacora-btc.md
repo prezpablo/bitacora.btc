@@ -83,7 +83,7 @@ No inflamos visitas. Distinguimos **lo propio** de **lo que el mapa lee** de dir
 
 ### Lo federado (BTC Map · no es “nuestro padrón”)
 
-El mapa **no clona** el directorio: lo lee en vivo (`api.btcmap.org`, caché 6 h). Orden de magnitud del diseño: **~25.000 comercios** y **~690 comunidades** en el mundo. Bitácora suma el overlay local (Colonia) y las altas que la comunidad cargue.
+El mapa **guarda una copia local** del directorio (BTC Map). No lo consulta en cada visita. Orden de magnitud del diseño: **~25.000 comercios** y **~690 comunidades** en el mundo. Bitácora suma el overlay local (Colonia) y las altas que la comunidad cargue.
 
 Eso es el impacto que pedimos crecer con LABIF: que el overlay Latam deje de ser una ficha y pase a ser decenas de comunidades verificadas.
 

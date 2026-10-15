@@ -175,9 +175,9 @@ export function mergeNewCatalog(shops: MerchantPlace[], comms: Community[]) {
   return { addedShops, addedComms };
 }
 
-/** Once a week, compare BTC Map and insert only new rows. Never blocks the map. */
+/** La copia local es la fuente. El volcado a BTC Map solo corre si BITACORA_CATALOG_SYNC=1. */
 export function maybeWeeklyCatalogSync() {
-  if (process.env.BITACORA_CATALOG_SYNC === "0") return;
+  if (process.env.BITACORA_CATALOG_SYNC !== "1") return;
   const at = Number(metaGet("catalog_at") || 0);
   if (at && Date.now() - at < WEEK_MS) return;
   const lock = Number(metaGet("catalog_sync_lock") || 0);

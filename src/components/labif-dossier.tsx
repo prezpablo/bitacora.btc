@@ -200,7 +200,7 @@ export function LabifDossier() {
         </table>
         <h3>Lo federado (BTC Map)</h3>
         <p>
-          El mapa no clona el directorio: lo lee en vivo (caché 6 h). Orden de magnitud: unos 25.000 comercios y unas
+          El mapa guarda una copia local del directorio (BTC Map). No lo consulta en cada visita. Orden de magnitud: unos 25.000 comercios y unas
           690 comunidades en el mundo. Bitácora suma el overlay de Colonia. El impacto que pedimos crecer: que ese
           overlay Latam pase de una ficha a decenas de comunidades verificadas.
         </p>

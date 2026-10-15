@@ -2600,7 +2600,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
     },
     {
       title: "Mapa 2D",
-      body: "Leaflet + OSM. Comercios de BTC Map (api.btcmap.org/v2/elements, caché 6 h). Comunidades de BTC Map más el overlay propio. La fuente canónica de votos, horarios, logos y redes es public/data/map.csv (puntaje + cantidad de votos; cada estrella suma). GPS del dispositivo, no la IP. Verificado: dos enlaces (uno público) o promedio ≥ 4 con ≥ 3 votos; Consciencia Bitcoin va por allowlist de fundación. Captcha al publicar.",
+      body: "Leaflet + OSM. Comercios y comunidades salen de la base local (copia de BTC Map; no se consulta en cada visita). El overlay propio suma lo que carga la comunidad. La fuente canónica de votos, horarios, logos y redes es public/data/map.csv (puntaje + cantidad de votos; cada estrella suma). GPS del dispositivo, no la IP. Verificado: dos enlaces (uno público) o promedio ≥ 4 con ≥ 3 votos; Consciencia Bitcoin va por allowlist de fundación. Captcha al publicar.",
     },
     {
       title: "Eventos",
@@ -2658,7 +2658,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
     },
     {
       title: "2D map",
-      body: "Leaflet + OSM. Shops from BTC Map (api.btcmap.org/v2/elements, 6h cache). Communities from BTC Map plus our overlay. Canonical votes, hours, logos and socials live in public/data/map.csv (average + vote count; every star adds). Device GPS, not IP. Verified: two links (one public) or average ≥ 4 with ≥ 3 votes; Consciencia Bitcoin is on the founding allowlist. Captcha on publish.",
+      body: "Leaflet + OSM. Shops and communities come from the local database (a BTC Map copy; no query on each visit). Our overlay adds what the community publishes. Canonical votes, hours, logos and socials live in public/data/map.csv (average + vote count; every star adds). Device GPS, not IP. Verified: two links (one public) or average ≥ 4 with ≥ 3 votes; Consciencia Bitcoin is on the founding allowlist. Captcha on publish.",
     },
     {
       title: "Events",
@@ -2716,7 +2716,7 @@ export const DATOS: Record<AppLang, DatoBlock[]> = {
     },
     {
       title: "Mapa 2D",
-      body: "Leaflet + OSM. Comércios do BTC Map (api.btcmap.org/v2/elements, cache 6 h). Comunidades do BTC Map mais o overlay próprio. A fonte canônica de votos, horários, logos e redes é public/data/map.csv (média + número de votos; cada estrela soma). GPS do aparelho, não o IP. Verificado: dois links (um público) ou média ≥ 4 com ≥ 3 votos; Consciencia Bitcoin está na allowlist de fundação. Captcha ao publicar.",
+      body: "Leaflet + OSM. Comércios e comunidades saem da base local (cópia do BTC Map; não se consulta a cada visita). O overlay próprio soma o que a comunidade publica. A fonte canônica de votos, horários, logos e redes é public/data/map.csv (média + número de votos; cada estrela soma). GPS do aparelho, não o IP. Verificado: dois links (um público) ou média ≥ 4 com ≥ 3 votos; Consciencia Bitcoin está na allowlist de fundação. Captcha ao publicar.",
     },
     {
       title: "Eventos",

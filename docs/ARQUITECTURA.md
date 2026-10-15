@@ -165,7 +165,7 @@ flowchart LR
 
 | Capa | Fuente | Persistencia |
 |---|---|---|
-| Comercios mundiales | `api.btcmap.org/v2/elements` | ninguna (TTL 6 h en servidor) |
+| Comercios y comunidades | sqlite `catalog` (copia de BTC Map) | ninguna en la visita. Refresco solo con `npm run catalog:sync` |
 | Comunidades mundiales | `api.btcmap.org/v2/areas` `type=community` | ninguna |
 | Overlay usuario | votos `score`/`votes`, propuestas, comunidades nuevas, horarios, logo URL, redes | CSV + localStorage (+ Firebase/GitHub si hay config) |
 

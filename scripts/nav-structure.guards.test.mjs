@@ -116,7 +116,8 @@ test("globe keyboard rotates zooms and enters", () => {
 test("globe keeps overlay community logos when far", () => {
   const globe = read("src/components/map/world-globe.tsx");
   assert.match(globe, /FOUNDING_UY\.id/);
-  assert.match(globe, /own.has\(p.id\)/);
+  assert.match(globe, /face: p\.logo \? \("logo" as const\)/);
+  assert.doesNotMatch(globe, /own\.has\(p\.id\)/);
 });
 
 test("street-zoom shop pins can carry logo", () => {
