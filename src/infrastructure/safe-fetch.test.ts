@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isPublicHttp } from "./safe-fetch.ts";
+import { isPublicHttp, pinnedLookup } from "./safe-fetch.ts";
 
 test("scraper does not follow loopback or the VPS itself", () => {
   assert.equal(isPublicHttp("http://127.0.0.1:8080/admin"), false);
@@ -13,4 +13,17 @@ test("scraper does not follow loopback or the VPS itself", () => {
   assert.equal(isPublicHttp("http://x.com/consciencia"), false);
   assert.equal(isPublicHttp("file:///etc/passwd"), false);
   assert.equal(isPublicHttp("gopher://127.0.0.1:70/"), false);
+});
+
+test("S-REBIND the socket lookup returns the address already checked", () => {
+  const lookup = pinnedLookup("1.1.1.1", 4);
+  lookup("rebind.test", {}, (err, address, family) => {
+    assert.equal(err, null);
+    assert.equal(address, "1.1.1.1");
+    assert.equal(family, 4);
+  });
+  lookup("rebind.test", { all: true }, (err, rows) => {
+    assert.equal(err, null);
+    assert.deepEqual(rows, [{ address: "1.1.1.1", family: 4 }]);
+  });
 });

@@ -1,3 +1,4 @@
+import { getRequest } from "@tanstack/react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import type { ChartRange, Community, CommunityFeed, DeskExtras, EtfFlowPayload, EventBoardPage, EventBoardQuery, LiqRange, MarketPayload, MarketTick, MerchantPlace, OnchainPayload, PulsePayload, ShopPin } from "@/domain";
 import type { GlobeStats } from "@/domain/globe";
@@ -21,7 +22,7 @@ import { loadPatches, savePatch, replacePatches, countPendingPatches, saveContac
 import { scrapeShowsToken } from "./pin-verify";
 import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
-import { clientKey, tooMany } from "./rate-limit";
+import { clientKey, hashClientIp, peerFromHeaders, tooMany } from "./rate-limit";
 import { recordConsent } from "./consent-log";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
@@ -34,6 +35,7 @@ import { parseMapCsv, socialsFromCsv, socialsToCsv, stringifyMapCsv, stringifyMa
 import { mergeLiveFees } from "@/domain/fees";
 import { localeOf, translateFeed, translateNews } from "./translate";
 import { normalizeProofUrl, cargaVerifyGate } from "@/domain/verify";
+import { rewriteDataLogo } from "./logo-exif";
 
 export const getMarket = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange; liq: LiqRange }) => input)
@@ -251,12 +253,20 @@ export const issueCaptcha = createServerFn({ method: "POST" }).handler(
   },
 );
 
+function voterWho() {
+  try {
+    return hashClientIp(peerFromHeaders(getRequest().headers));
+  } catch {
+    return "";
+  }
+}
+
 export const saveMapCsv = createServerFn({ method: "POST" })
   .validator((input: { csv: string; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string }) => input)
   .handler(async ({ data }): Promise<{ ok: boolean }> => {
     if (tooMany(clientKey("csv"), 6, 60 * 60_000)) return { ok: false };
     if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false };
-    const ok = await savePublicMapCsv(data.csv);
+    const ok = await savePublicMapCsv(data.csv, voterWho());
     if (ok) clearGlobeStatsCache();
     return { ok };
   });
@@ -319,7 +329,7 @@ export const submitMapListing = createServerFn({ method: "POST" })
       notes: (data.notes || "").trim().slice(0, 280),
       score: 0,
       votes: 0,
-      logo: (data.logo || "").trim().slice(0, 500),
+      logo: await storedLogo(data.logo || ""),
       socials: (data.socials || "").trim().slice(0, 800),
       hours: (data.hours || "").replace(/\s+/g, "").slice(0, 200),
       pays: (data.pays || "").trim().slice(0, 80),
@@ -347,6 +357,12 @@ export const cancelMapListing = createServerFn({ method: "POST" })
     if (gone === "token") return { ok: false, error: "token" };
     return { ok: true };
   });
+
+async function storedLogo(raw: string) {
+  const next = await rewriteDataLogo(raw);
+  if (next.startsWith("data:")) return next.slice(0, 120_000);
+  return next.slice(0, 500);
+}
 
 function safeHttp(raw: string) {
   let u = raw.trim();
@@ -648,7 +664,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
       notes: (data.notes || "").trim(),
       score: 0,
       votes: 0,
-      logo: (data.logo || "").trim(),
+      logo: await storedLogo(data.logo || ""),
       socials: "",
       hours: "",
       pays: "",
@@ -665,7 +681,7 @@ export const submitListingPatch = createServerFn({ method: "POST" })
         description: data.description,
         address: data.address,
         notes: data.notes,
-        logo: data.logo,
+        logo: data.logo === undefined ? undefined : await storedLogo(data.logo),
         hours: data.hours,
         pays: data.pays,
         socials: data.socials,

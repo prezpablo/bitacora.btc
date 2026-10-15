@@ -48,6 +48,47 @@ test("map GET enqueues scrapes instead of awaiting them", () => {
   assert.equal(fn.includes("scrapeShowsToken"), false);
 });
 
+test("D-TR-CACHE stores a good translation by URL and not a failure", () => {
+  const src = read("src/infrastructure/translate.ts");
+  const db = read("src/infrastructure/sqlite.ts");
+  assert.match(db, /CREATE TABLE IF NOT EXISTS tr_cache/);
+  assert.match(src, /saveTr\(page, to, trimmed, result\.text, result\.from\)/);
+  assert.match(src, /if \(from === to\) return \{ text: trimmed, from, ok: true \}/);
+  assert.doesNotMatch(src, /saveTr\([\s\S]{0,80}ok: false/);
+  assert.match(read("src/lib/i18n.ts"), /pulseLead: "Traducción automática por API/);
+  assert.match(read("src/components/dashboard/news-cycle.tsx"), /trStatus !== "ok"/);
+});
+
+test("D-EXIF rewrites every logo and still rejects SVG", () => {
+  const route = read("server/routes/logo.get.ts");
+  const exif = read("src/infrastructure/logo-exif.ts");
+  assert.match(route, /jpegWithoutExif/);
+  assert.match(route, /isSvgPayload\(got\.type, got\.buf\)/);
+  assert.doesNotMatch(route, /out = got\.buf/);
+  assert.match(exif, /rewriteDataLogo/);
+  assert.match(read("src/infrastructure/server-fns.ts"), /storedLogo/);
+  assert.match(read("src/domain/listing-patch.ts"), /data:image\\\/jpeg;base64/);
+});
+
+test("D-LIQ-ZOOM recalculates the heatmap off the page thread", () => {
+  const chart = read("src/components/dashboard/price-chart.tsx");
+  const worker = read("src/components/dashboard/liq-zoom.worker.ts");
+  assert.equal(chart.includes("buildLiquidationMap"), false);
+  assert.match(chart, /new Worker/);
+  assert.match(chart, /atHome && market\.heatmap\.length >= 8/);
+  assert.match(worker, /buildLiquidationMap/);
+});
+
+test("D-CSV-LOCK serializes map writes and publishes the CSV with rename", () => {
+  const src = read("src/infrastructure/map-csv-io.ts");
+  const db = read("src/infrastructure/sqlite.ts");
+  assert.match(src, /oneAtATime\(\(\) => writeMapCsv\(csv\)\)/);
+  assert.match(src, /return oneAtATime\(async \(\) => \{\s*if \(!csv/);
+  assert.match(src, /await rename\(tmp, path\)/);
+  assert.doesNotMatch(src, /writeFile\(join\(process\.cwd\(\), SNAP\)/);
+  assert.match(db, /journal_mode = WAL/);
+});
+
 test("rate limit writes sqlite", () => {
   const src = read("src/infrastructure/rate-limit.ts");
   assert.match(src, /INSERT INTO rate_hits/);
@@ -70,6 +111,19 @@ test("Consciencia Bitcoin overlay describes LATAM Cripto Mom", () => {
   assert.match(read("src/components/map/social-row.tsx"), /<span>\{label\}<\/span>/);
 });
 
+test("S-VOTE-WHO remembers a hashed voter, not the IP", () => {
+  const io = read("src/infrastructure/map-csv-io.ts");
+  const fn = read("src/infrastructure/server-fns.ts");
+  const db = read("src/infrastructure/sqlite.ts");
+  assert.match(db, /CREATE TABLE IF NOT EXISTS vote_cast/);
+  assert.match(io, /vote_cast/);
+  assert.match(io, /votesAlreadyCast/);
+  assert.doesNotMatch(io, /x-forwarded-for/);
+  assert.match(fn, /savePublicMapCsv\(data\.csv, voterWho\(\)\)/);
+  assert.match(fn, /hashClientIp\(peerFromHeaders/);
+  assert.match(read("src/domain/map-csv.ts"), /new Set<string>\(already\)/);
+});
+
 test("verify endpoints are rate-limited", () => {
   const src = read("src/infrastructure/server-fns.ts");
   assert.match(src, /pin-verify-burst/);
@@ -83,6 +137,10 @@ test("scraper rejects loopback and self-host", () => {
   assert.match(src, /SELF_IP/);
   assert.match(src, /45\.158\.116\.49/);
   assert.match(src, /nip\\?\.io/);
+  assert.match(src, /pinnedLookup/);
+  assert.match(src, /AbortSignal\.timeout\(5000\)/);
+  assert.match(src, /200_000/);
+  assert.match(src, /hops > 2/);
 });
 
 test("map HTML escapes user names", () => {

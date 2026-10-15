@@ -654,6 +654,62 @@
       "open": false,
       "kind": "repo",
       "done": "14 oct: con la estrella, el parche público no escribe logo ni redes. El token CARGA sí. El texto vacío sigue pudiendo completarse."
+    },
+    {
+      "id": "S-VOTE-WHO",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: vote_cast guarda el HMAC por ficha. Un segundo envío de la misma IP no suma. La reputación de la estrella sigue. Falta el ZIP."
+    },
+    {
+      "id": "S-REBIND",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: el socket usa la IP ya validada. Siguen 5 s, 200 KB y los saltos a mano. Falta el ZIP."
+    },
+    {
+      "id": "S-CSP-NONCE",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: HTML de producción con nonce y script-src sin unsafe-inline. style-src no cambia. Falta el ZIP."
+    },
+    {
+      "id": "D-TR-CACHE",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: traducción buena en SQLite por URL, 24 h, también tras reiniciar. Mismo idioma no llama a la API. Un fallo no se guarda. Falta el ZIP."
+    },
+    {
+      "id": "D-LIQ-ZOOM",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: el zoom recalcula el mapa en un worker. La vista inicial sigue viniendo del servidor. Falta el ZIP."
+    },
+    {
+      "id": "D-EXIF",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: /logo reescribe toda imagen con sharp. Un data: pasa a JPEG antes del CSV. SVG sigue rechazado. Falta el ZIP."
+    },
+    {
+      "id": "D-CSV-LOCK",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "15 oct: leer, mezclar y escribir map_rows va de a una. El CSV público se publica con rename. Falta el ZIP."
+    },
+    {
+      "id": "D-NODO",
+      "pri": "P3",
+      "open": true,
+      "kind": "manual",
+      "done": "Cuando exista el nodo: WireGuard de salida, solo lectura, sin billetera. No se arma el túnel antes."
     }
   ],
   "guards": [

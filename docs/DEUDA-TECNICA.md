@@ -60,6 +60,32 @@ Cotejo de arquitectura y suite: 346 de 356 pruebas pasan. La página no se rearm
 
 Fuera de esta cola, y sin reabrir: la barra, las cuatro salas, los votos, el globo y el lugar de los textos legales. Siguen en su sitio **D-FOSS**, **D-BAK-ON**, **D-BAK-OFF**, **D-DEPS**, **D-SQL-ONE** y **L-TAKEDOWN**.
 
+## Cola 15 oct (tarde) — informe de arquitectura
+
+Se leyó el informe y se contrapuso con el sitio. El cierre de un voto por ficha vale solo dentro de un envío. La misma IP puede repetirlo. Una fase por ZIP, en este orden.
+
+| Orden | Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|---|
+| 1 | **S-VOTE-WHO** | P1 | Hecho en el repo. La misma IP no vota dos veces la misma ficha: se guarda el HMAC, no la IP. Tres notas de 5 desde un solo origen ya no encienden la estrella. Falta el ZIP. | No se apagó la reputación de la estrella. No se subió el captcha. No hay cuenta. |
+| 2 | **S-REBIND** | P1 | Hecho en el repo. El scraper abre el socket contra la IP que acaba de validar. No hay un segundo DNS. Siguen 5 s, 200 KB y los saltos a mano. Falta el ZIP. | No se reescribió el filtro de redes privadas ni el de `https`. |
+| 3 | **S-CSP-NONCE** | P2 | Hecho en el repo. El HTML de producción lleva nonce y `script-src` ya no tiene `'unsafe-inline'`. `style-src` sigue igual. Caddy no pisa esa cabecera. Falta el ZIP. | No se copió el resto de la plantilla. El preview de Vite conserva `'unsafe-inline'` para no romper el recargado. |
+| 4 | **D-TR-CACHE** | P2 | Hecho en el repo. Un titular traducido queda en SQLite, asociado a su URL, y se reusa después de un reinicio durante 24 h. Si el idioma ya es el del original, no se llama a la API y no sale el aviso de fallo. Un fallo de verdad muestra el original. Falta el ZIP. | No se ocultó «Traducción automática por API». Un fallo no se guarda. |
+| 5 | **D-LIQ-ZOOM** | P2 | Hecho en el repo. Al hacer zoom, el mapa de liquidaciones se recalcula en un worker. La vista inicial sigue siendo la que llega del servidor. Las velas no se movieron. Falta el ZIP. | No hay backend nuevo. |
+| 6 | **D-EXIF** | P2 | Hecho en el repo. `/logo` reescribe toda imagen con sharp, así el GPS no sale. Un logo `data:` se reescribe a JPEG antes del CSV. El SVG sigue rechazado. Falta el ZIP. | No se sumó otra librería. |
+| 7 | **D-CSV-LOCK** | P3 | Hecho en el repo. Leer, mezclar y escribir `map_rows` va de a una dentro del proceso. El CSV público se publica con archivo temporal y `rename`. Falta el ZIP. | Sigue SQLite en WAL. No se cambió la fuente. |
+| 8 | **D-NODO** | P3 | Cuando haya nodo en Colonia, la casa no abre puertos: WireGuard sale hacia el VPS y solo responde lectura (`getblockchaininfo`, `getmempoolinfo`, `estimatesmartfee`). | No se arma el túnel mientras el nodo no exista. No se expone la billetera ni un método de administración. No va por Cloudflare Tunnel. |
+
+**No entra** (ya está, o el informe se equivoca):
+
+- SQLite en lugar de `map.csv`. El CSV sigue siendo la copia pública.
+- Copiar la CSP entera del informe. Solo `script-src` era más estricta.
+- Prometer 5 días hábiles o registrar una base ante la URCDP por este texto. La baja ya sale de la ficha a Contacto.
+- Proxificar teselas. Precio y noticias ya pasan por el servidor.
+- Pausar Pulso. **A-PULSE-HOVER** ya está.
+- Cambiar «Bircoiner». Es la marca pedida.
+
+**Siguiente:** **D-NODO**, cuando exista el nodo en Colonia. No se arma el túnel antes. **S-VOTE-WHO**, **S-REBIND**, **S-CSP-NONCE**, **D-TR-CACHE**, **D-LIQ-ZOOM**, **D-EXIF** y **D-CSV-LOCK** entran con el próximo ZIP.
+
 ---
 
 ## Checklist legal — 13 oct 22:22 -03, cotejo del .org

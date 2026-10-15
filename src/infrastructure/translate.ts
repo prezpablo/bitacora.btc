@@ -179,20 +179,57 @@ const PROVIDERS: {
   { name: "lingva", run: lingva },
 ];
 
+async function savedTr(url: string, lang: string, src: string) {
+  try {
+    const { openSqlite } = await import("./sqlite.ts");
+    const row = openSqlite()
+      .prepare("SELECT text, from_lang, at FROM tr_cache WHERE url = ? AND lang = ? AND src = ?")
+      .get(url, lang, src);
+    if (!row) return null;
+    const at = Number(row.at);
+    if (!Number.isFinite(at) || Date.now() - at >= TTL_OK) return null;
+    return { text: String(row.text || ""), from: String(row.from_lang || ""), at };
+  } catch {
+    return null;
+  }
+}
+
+async function saveTr(url: string, lang: string, src: string, text: string, from: string) {
+  try {
+    const { openSqlite } = await import("./sqlite.ts");
+    const db = openSqlite();
+    db.prepare(
+      "INSERT INTO tr_cache(url, lang, src, text, from_lang, at) VALUES(?,?,?,?,?,?) ON CONFLICT(url, lang, src) DO UPDATE SET text = excluded.text, from_lang = excluded.from_lang, at = excluded.at",
+    ).run(url, lang, src, text, from, Date.now());
+    if (Math.random() < 0.02) {
+      db.prepare("DELETE FROM tr_cache WHERE at < ?").run(Date.now() - TTL_OK);
+    }
+  } catch {
+    /* sqlite optional */
+  }
+}
+
 /** Traduce con API. Nunca lanza: si todo falla, devuelve el original. */
 export async function translateAuto(
   text: string,
   to: string,
   signal: AbortSignal,
+  url = "",
 ): Promise<TranslateResult> {
   const trimmed = text.replace(/\s+/g, " ").trim();
   if (!trimmed) return { text: "", from: to, ok: true };
   const from = detectLang(trimmed);
   if (from === to) return { text: trimmed, from, ok: true };
-  const key = `${from}|${to}|${trimmed}`;
+  const page = url.slice(0, 500);
+  const key = `${from}|${to}|${page}|${trimmed}`;
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < (hit.ok ? TTL_OK : TTL_FAIL)) {
     return { text: hit.text, from: hit.from, ok: hit.ok };
+  }
+  const disk = await savedTr(page, to, trimmed);
+  if (disk?.text) {
+    cache.set(key, { at: disk.at, text: disk.text, from: disk.from || from, ok: true });
+    return { text: disk.text, from: disk.from || from, ok: true };
   }
   const pending = inflight.get(key);
   if (pending) return pending;
@@ -211,7 +248,9 @@ export async function translateAuto(
       try {
         const result = await once(() => p.run(trimmed, from, to, ctrl.signal), ctrl.signal);
         markOk(p.name);
-        cache.set(key, { at: Date.now(), text: result.text, from: result.from, ok: true });
+        const at = Date.now();
+        cache.set(key, { at, text: result.text, from: result.from, ok: true });
+        await saveTr(page, to, trimmed, result.text, result.from);
         return result;
       } catch (err) {
         const e = asApiError(err);
@@ -238,8 +277,8 @@ export async function translateNews(news: PulsePayload["news"], to: string, sign
     const originalTitle = item.originalTitle ?? item.title;
     const originalSummary = item.originalSummary ?? item.summary;
     const [titleTr, sumTr] = await Promise.all([
-      translateAuto(originalTitle, to, signal),
-      originalSummary ? translateAuto(originalSummary, to, signal) : Promise.resolve(null),
+      translateAuto(originalTitle, to, signal, item.url || ""),
+      originalSummary ? translateAuto(originalSummary, to, signal, item.url || "") : Promise.resolve(null),
     ]);
     const worked = titleTr.ok && (sumTr ? sumTr.ok : true);
     if (worked) ok += 1;
@@ -259,7 +298,7 @@ export async function translateNews(news: PulsePayload["news"], to: string, sign
 }
 
 export async function translateFeed(
-  posts: { id: string; title: string; body: string }[],
+  posts: { id: string; title: string; body: string; url?: string }[],
   to: string,
   signal: AbortSignal,
 ) {
@@ -267,8 +306,8 @@ export async function translateFeed(
   let fail = 0;
   const rows = await mapPool(posts, 3, async (item) => {
     const [titleTr, bodyTr] = await Promise.all([
-      translateAuto(item.title, to, signal),
-      item.body ? translateAuto(item.body, to, signal) : Promise.resolve(null),
+      translateAuto(item.title, to, signal, item.url || ""),
+      item.body ? translateAuto(item.body, to, signal, item.url || "") : Promise.resolve(null),
     ]);
     const worked = titleTr.ok && (bodyTr ? bodyTr.ok : true);
     if (worked) ok += 1;

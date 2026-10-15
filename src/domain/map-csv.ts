@@ -504,11 +504,15 @@ function sanitizeNewRow(r: MapCsvRow): MapCsvRow | null {
   };
 }
 
-/** POST público: altas nuevas (máx. 2) y un voto por id. El puntaje no se reemplaza: se promedia. */
-export function applyPublicMapPatch(current: MapCsvRow[], incoming: MapCsvRow[]): MapCsvRow[] | null {
+/** POST público: altas nuevas (máx. 2) y un voto por id. `already` son fichas que esta persona ya votó. */
+export function applyPublicMapPatch(
+  current: MapCsvRow[],
+  incoming: MapCsvRow[],
+  already?: ReadonlySet<string>,
+): MapCsvRow[] | null {
   const out = current.map((r) => ({ ...r }));
   const byId = new Map(out.map((r) => [r.id, r]));
-  const voted = new Set<string>();
+  const voted = new Set<string>(already);
   let added = 0;
   let voteBumps = 0;
   for (const r of incoming) {

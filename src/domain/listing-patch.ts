@@ -50,7 +50,10 @@ export function metersBetween(a: { lat: number; lon: number }, b: { lat: number;
 function cleanHttp(raw: string) {
   const t = String(raw || "").trim();
   if (!t || /^javascript:/i.test(t)) return "";
-  if (t.startsWith("data:") && !/^data:image\//i.test(t)) return "";
+  if (t.startsWith("data:")) {
+    if (!/^data:image\/jpeg;base64,[a-z0-9+/=\s]+$/i.test(t)) return "";
+    return t.slice(0, 120_000);
+  }
   return t.slice(0, 300);
 }
 

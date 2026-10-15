@@ -4,10 +4,10 @@ import { join } from "node:path";
 import { defineEventHandler, getQuery, setHeader, setResponseStatus } from "h3";
 import { isPublicHttp, urlResolvesPublic } from "../../src/infrastructure/safe-fetch";
 import { isSvgPayload } from "../../src/infrastructure/logo-bytes";
+import { jpegWithoutExif } from "../../src/infrastructure/logo-exif";
 
 const DIR = join(process.cwd(), "data", "logo-cache");
 const MAX = 2_000_000;
-const PIXELS = 25_000_000;
 
 const logoHits = new Map<string, number[]>();
 
@@ -64,19 +64,6 @@ async function readAtMost(res: Response, max: number) {
   return Buffer.concat(chunks);
 }
 
-async function toJpeg(buf: Buffer, cover: boolean) {
-  try {
-    const sharp = (await import("sharp")).default;
-    let img = sharp(buf, { limitInputPixels: PIXELS, animated: false }).rotate();
-    img = cover
-      ? img.resize(540, 675, { fit: "cover", position: "centre" })
-      : img.resize(960, 960, { fit: "inside", withoutEnlargement: true });
-    return await img.flatten({ background: "#ffffff" }).jpeg({ quality: 72, mozjpeg: true }).toBuffer();
-  } catch {
-    return null;
-  }
-}
-
 function lumaCompact(href: string) {
   try {
     const u = new URL(href);
@@ -119,7 +106,7 @@ export default defineEventHandler(async (event) => {
     return "";
   }
   const thumb = String(q.fit || "") === "thumb";
-  const id = createHash("sha256").update(`${thumb ? "ig45:" : ""}${href}`).digest("hex").slice(0, 32);
+  const id = createHash("sha256").update(`${thumb ? "ig45:" : "x1:"}${href}`).digest("hex").slice(0, 32);
   const file = join(DIR, id);
   const meta = `${file}.type`;
   try {
@@ -177,27 +164,23 @@ export default defineEventHandler(async (event) => {
       setResponseStatus(event, 404);
       return "";
     }
-    let out: Buffer = got.buf;
-    let outType = got.type.startsWith("image/") ? got.type : "image/jpeg";
     if (isSvgPayload(got.type, got.buf)) {
-      const cut = await toJpeg(got.buf, thumb);
-      if (!cut?.length) {
+      setResponseStatus(event, 404);
+      return "";
+    }
+    let out: Buffer;
+    try {
+      const cut = await jpegWithoutExif(got.buf, thumb);
+      if (!cut?.length || isSvgPayload("image/jpeg", cut)) {
         setResponseStatus(event, 404);
         return "";
       }
       out = cut;
-      outType = "image/jpeg";
-    } else if (thumb) {
-      const cut = await toJpeg(got.buf, true);
-      if (cut?.length) {
-        out = cut;
-        outType = "image/jpeg";
-      }
-    }
-    if (isSvgPayload(outType, out)) {
+    } catch {
       setResponseStatus(event, 404);
       return "";
     }
+    const outType = "image/jpeg";
     try {
       mkdirSync(DIR, { recursive: true });
       writeFileSync(file, out);

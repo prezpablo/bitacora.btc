@@ -1,9 +1,11 @@
-import { writeFile, mkdir } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { applyPublicMapPatch, mergeMapRows, parseMapCsv, stringifyMapCsv, stringifyMapCsvPublic, socialsToCsv, type MapCsvRow } from "@/domain/map-csv";
 import { FOUNDING_DESCRIPTION, FOUNDING_LINKS, FOUNDING_UY } from "@/domain/globe";
 import type { SocialLink } from "@/domain/socials";
 import { openSqlite, sqlTx } from "./sqlite";
+import { oneAtATime } from "./one-at-a-time";
 import { readFirstFile } from "./data-files";
 
 const SNAP = "public/data/map.csv";
@@ -115,12 +117,15 @@ function ensureSeed() {
 }
 
 async function snapCsv(rows: MapCsvRow[]) {
+  const path = join(process.cwd(), SNAP);
+  const tmp = `${path}.${randomBytes(6).toString("hex")}.tmp`;
   try {
     const csv = stringifyMapCsvPublic(rows);
-    await mkdir(dirname(join(process.cwd(), SNAP)), { recursive: true });
-    await writeFile(join(process.cwd(), SNAP), csv, "utf8");
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(tmp, csv, "utf8");
+    await rename(tmp, path);
   } catch {
-    /* snapshot optional */
+    await unlink(tmp).catch(() => undefined);
   }
 }
 
@@ -129,22 +134,24 @@ function allRows(): MapCsvRow[] {
 }
 
 export async function loadMapCsvText(): Promise<string> {
-  try {
-    await ensureSeed();
-    const rows = allRows();
-    if (!rows.some((r) => r.id === FOUNDING.id)) {
-      sqlTx(() => upsertMap(FOUNDING));
+  return oneAtATime(async () => {
+    try {
+      await ensureSeed();
+      const rows = allRows();
+      if (!rows.some((r) => r.id === FOUNDING.id)) {
+        sqlTx(() => upsertMap(FOUNDING));
+      }
+      const out = allRows();
+      if (out.length) return stringifyMapCsv(out);
+    } catch (err) {
+      console.error("[map-csv] sqlite", err);
     }
-    const out = allRows();
-    if (out.length) return stringifyMapCsv(out);
-  } catch (err) {
-    console.error("[map-csv] sqlite", err);
-  }
-  const file = await readFirstFile(SNAP);
-  return file.includes("id,tipo") ? file : stringifyMapCsv([FOUNDING]);
+    const file = await readFirstFile(SNAP);
+    return file.includes("id,tipo") ? file : stringifyMapCsv([FOUNDING]);
+  });
 }
 
-export async function saveMapCsvText(csv: string): Promise<boolean> {
+async function writeMapCsv(csv: string): Promise<boolean> {
   if (!csv || csv.length > 350_000) return false;
   const incoming = parseMapCsv(csv);
   if (incoming.length > 400) return false;
@@ -162,20 +169,40 @@ export async function saveMapCsvText(csv: string): Promise<boolean> {
   return true;
 }
 
-export async function savePublicMapCsv(csv: string): Promise<boolean> {
-  if (!csv || csv.length > 350_000) return false;
-  const incoming = parseMapCsv(csv);
-  if (incoming.length > 400) return false;
-  await ensureSeed();
-  const current = allRows();
-  const next = applyPublicMapPatch(current, incoming);
-  if (!next) return false;
-  if (!next.some((r) => r.id === FOUNDING.id)) next.push(FOUNDING);
-  sqlTx(() => {
-    for (const r of next) upsertMap(r);
+export async function saveMapCsvText(csv: string): Promise<boolean> {
+  return oneAtATime(() => writeMapCsv(csv));
+}
+
+/** `who` es el HMAC de la IP, no la IP. Vacío = no se recuerda. */
+function votesAlreadyCast(who: string): Set<string> {
+  if (!who) return new Set();
+  const rows = openSqlite().prepare("SELECT listing FROM vote_cast WHERE who = ?").all(who);
+  return new Set(rows.map((r) => String(r.listing || "")).filter(Boolean));
+}
+
+export async function savePublicMapCsv(csv: string, who = ""): Promise<boolean> {
+  return oneAtATime(async () => {
+    if (!csv || csv.length > 350_000) return false;
+    const voter = /^[a-f0-9]{16,64}$/.test(who) ? who : "";
+    const incoming = parseMapCsv(csv);
+    if (incoming.length > 400) return false;
+    await ensureSeed();
+    const current = allRows();
+    const before = new Map(current.map((r) => [r.id, r.votes || 0]));
+    const next = applyPublicMapPatch(current, incoming, votesAlreadyCast(voter));
+    if (!next) return false;
+    if (!next.some((r) => r.id === FOUNDING.id)) next.push(FOUNDING);
+    const gained = next.filter((r) => (r.votes || 0) > (before.get(r.id) || 0)).map((r) => r.id);
+    sqlTx(() => {
+      for (const r of next) upsertMap(r);
+      if (!voter || !gained.length) return;
+      const ins = openSqlite().prepare("INSERT OR IGNORE INTO vote_cast(listing, who, at) VALUES(?,?,?)");
+      const now = Date.now();
+      for (const id of gained) ins.run(id, voter, now);
+    });
+    await snapCsv(next);
+    return true;
   });
-  await snapCsv(next);
-  return true;
 }
 
 export async function countPendingMapRows(now = Date.now(), ttlMs = 7 * 24 * 60 * 60_000) {
@@ -191,15 +218,17 @@ export async function countPendingMapRows(now = Date.now(), ttlMs = 7 * 24 * 60 
 }
 
 export async function deleteUnverifiedMapRow(id: string, token: string): Promise<"ok" | "live" | "token"> {
-  await ensureSeed();
-  const row = openSqlite().prepare("SELECT token, verified_at FROM map_rows WHERE id = ?").get(id);
-  if (!row) return "ok";
-  if (Number(row.verified_at) > 0) return "live";
-  if (String(row.token || "") !== token) return "token";
-  sqlTx(() => {
-    openSqlite().prepare("DELETE FROM map_rows WHERE id = ? AND verified_at = 0").run(id);
+  return oneAtATime(async () => {
+    await ensureSeed();
+    const row = openSqlite().prepare("SELECT token, verified_at FROM map_rows WHERE id = ?").get(id);
+    if (!row) return "ok";
+    if (Number(row.verified_at) > 0) return "live";
+    if (String(row.token || "") !== token) return "token";
+    sqlTx(() => {
+      openSqlite().prepare("DELETE FROM map_rows WHERE id = ? AND verified_at = 0").run(id);
+    });
+    const left = allRows();
+    await snapCsv(left);
+    return "ok";
   });
-  const left = allRows();
-  await snapCsv(left);
-  return "ok";
 }

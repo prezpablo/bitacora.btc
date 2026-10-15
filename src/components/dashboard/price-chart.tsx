@@ -3,7 +3,6 @@ import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import {
   TF_SPEC,
   axisTicks,
-  buildLiquidationMap,
   candleKind,
   isDojiKind,
   liquidationEnvelope,
@@ -44,6 +43,26 @@ const HEAT_STOPS: [number, string][] = [
   [0.78, "var(--color-heat-4)"],
   [1, "var(--color-heat-5)"],
 ];
+
+type ZoomJob = {
+  key: string;
+  candles: Candle[];
+  bins: number;
+  maxCols: number;
+  min: number;
+  max: number;
+  t0: number;
+  t1: number;
+};
+
+let zoomWorker: Worker | null = null;
+
+function liqZoomWorker() {
+  if (!zoomWorker) {
+    zoomWorker = new Worker(new URL("./liq-zoom.worker.ts", import.meta.url), { type: "module" });
+  }
+  return zoomWorker;
+}
 
 function zoneShort(d: Date) {
   try {
@@ -359,6 +378,7 @@ export function PriceChart({
   const [liqHover, setLiqHover] = useState<number | null>(null);
   const [cross, setCross] = useState<{ x: number; y: number } | null>(null);
   const [view, setView] = useState<View | null>(null);
+  const [heatTick, setHeatTick] = useState(0);
   const home = useMemo(
     () => viewForRange(market.candles, market.lookbackMs || 7 * 86_400_000),
     [market.candles, market.lookbackMs],
@@ -528,6 +548,7 @@ export function PriceChart({
     let heatCols: HeatBucket[] = [];
     let clusters = market.clusters;
     let peak = 1e-9;
+    let zoomJob: ZoomJob | null = null;
     if (heatOn) {
       const cached = heatCache.current?.key === heatKey ? heatCache.current : null;
       if (cached) {
@@ -550,17 +571,22 @@ export function PriceChart({
           poc: null,
         };
       } else {
-        const heatSrc = all.slice(Math.max(0, i0 - 24), i1 + 1);
-        const map = buildLiquidationMap(heatSrc, { bins, maxCols, min: pMin, max: pMax });
-        const heatCols0 = map.heatmap.filter((col) => col.t >= t0 && col.t <= t1);
-        heatCols = heatCols0.length >= 2 ? heatCols0 : map.heatmap;
-        clusters = map.clusters;
-        for (const c of clusters) {
-          const v = c.long + c.short;
-          if (v > peak) peak = v;
+        const prev = heatCache.current;
+        if (prev) {
+          heatCols = prev.heatCols;
+          peak = prev.peak;
+          clusters = prev.map.clusters;
         }
-        peak = Math.max(peak * 0.92, 1e-9);
-        heatCache.current = { key: heatKey, map, heatCols, peak, poc: null };
+        zoomJob = {
+          key: heatKey,
+          candles: all.slice(Math.max(0, i0 - 24), i1 + 1),
+          bins,
+          maxCols,
+          min: pMin,
+          max: pMax,
+          t0,
+          t1,
+        };
       }
     }
 
@@ -624,11 +650,45 @@ export function PriceChart({
       home: rangeHome,
       atHome,
       zoomed: !atHome,
+      zoomJob,
     };
-  }, [market, activeView, view, frame.w, frame.h, heatOn]);
+  }, [market, activeView, view, frame.w, frame.h, heatOn, heatTick]);
 
   const layoutRef = useRef(layout);
   layoutRef.current = layout;
+
+  useEffect(() => {
+    const job = layout.zoomJob;
+    if (!job || typeof Worker === "undefined") return;
+    let worker: Worker;
+    try {
+      worker = liqZoomWorker();
+    } catch {
+      return;
+    }
+    let dead = false;
+    const onMsg = (ev: MessageEvent<{ key?: string; heatCols?: HeatBucket[]; peak?: number; map?: { heatmap: HeatBucket[]; clusters: MarketPayload["clusters"]; min: number; max: number } }>) => {
+      const data = ev.data;
+      if (dead || data?.key !== job.key || !data.heatCols || !data.map) return;
+      heatCache.current = {
+        key: job.key,
+        map: data.map,
+        heatCols: data.heatCols,
+        peak: data.peak || 1e-9,
+        poc: null,
+      };
+      setHeatTick((n) => n + 1);
+    };
+    worker.addEventListener("message", onMsg);
+    const timer = window.setTimeout(() => {
+      if (!dead) worker.postMessage(job);
+    }, 60);
+    return () => {
+      dead = true;
+      window.clearTimeout(timer);
+      worker.removeEventListener("message", onMsg);
+    };
+  }, [layout.zoomJob]);
 
   useEffect(() => {
     const node = wrapRef.current;

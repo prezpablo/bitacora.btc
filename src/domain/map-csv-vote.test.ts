@@ -33,3 +33,16 @@ test("S-VOTE un 5 suelto no reemplaza diez votos de 1", () => {
   assert.equal(tally?.votes, 11);
   assert.ok(tally && tally.score < 2);
 });
+
+test("S-VOTE-WHO un id ya votado no suma otra estrella", () => {
+  const prev = { id: "btcmap:9", score: 5, votes: 1 };
+  const step = takePublicVote(prev, { id: prev.id, score: 5, votes: 2 }, new Set(["btcmap:9"]), 0);
+  assert.equal(step.bumps, 0);
+  assert.equal(prev.votes, 1);
+  assert.equal(prev.score, 5);
+
+  const other = { id: "btcmap:9", score: 5, votes: 1 };
+  const second = takePublicVote(other, { id: other.id, score: 5, votes: 2 }, new Set(), 0);
+  assert.equal(second.bumps, 1);
+  assert.equal(other.votes, 2);
+});

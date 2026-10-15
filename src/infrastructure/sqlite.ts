@@ -117,6 +117,21 @@ CREATE TABLE IF NOT EXISTS experiences (
   verified_at INTEGER NOT NULL DEFAULT 0,
   created INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS vote_cast (
+  listing TEXT NOT NULL,
+  who TEXT NOT NULL,
+  at INTEGER NOT NULL,
+  PRIMARY KEY (listing, who)
+);
+CREATE TABLE IF NOT EXISTS tr_cache (
+  url TEXT NOT NULL,
+  lang TEXT NOT NULL,
+  src TEXT NOT NULL,
+  text TEXT NOT NULL,
+  from_lang TEXT NOT NULL,
+  at INTEGER NOT NULL,
+  PRIMARY KEY (url, lang, src)
+);
 CREATE INDEX IF NOT EXISTS pins_created ON pins (created);
 CREATE INDEX IF NOT EXISTS map_tipo ON map_rows (tipo);
 CREATE INDEX IF NOT EXISTS catalog_tipo ON catalog (tipo);

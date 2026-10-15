@@ -5,6 +5,7 @@ import { AppQueryProvider } from "@/lib/query";
 import { jsonLd, OG_IMAGE_PATH, PUBLIC_ORIGIN, hreflangHref, pageCanonical, pagePath, pageSeo, robotsFor } from "@/lib/seo";
 import { langFromLocation, langFromQuery, pickLang, langIsExplicit, retainLangSearch, type AppLang } from "@/lib/locale";
 import { SsrLangProvider } from "@/lib/ssr-lang";
+import { cspNonce } from "@/lib/csp-nonce";
 import { getRequestLang } from "@/infrastructure/request-lang";
 import appCss from "../styles.css?url";
 
@@ -104,7 +105,7 @@ function RootDoc() {
     <html lang={lang} className="antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld }} />
+        <script type="application/ld+json" nonce={cspNonce() || undefined} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: ld }} />
       </head>
       <body>
         <PreviewHostBridge />
