@@ -195,6 +195,10 @@ body {
   background: #9a5600;
   color: #fff;
 }
+.chip:focus-visible {
+  outline: 2px solid #f7931a;
+  outline-offset: 2px;
+}
 .bit-spin {
   display: inline-block;
   color: #f7931a;
@@ -205,6 +209,33 @@ body {
   to {
     transform: rotateY(360deg);
   }
+}
+.mine-step {
+  box-shadow: 0 0 0 1px #e6e6e6;
+}
+.mine-step[aria-pressed="true"] {
+  box-shadow: 0 0 0 1px #f7931a;
+}
+.mine-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d5d5d5;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mine-dots.is-live i {
+    animation: mine-dot 1.2s linear infinite;
+  }
+  .mine-dots.is-live i:nth-child(2) { animation-delay: 0.15s; }
+  .mine-dots.is-live i:nth-child(3) { animation-delay: 0.3s; }
+  .mine-dots.is-live i:nth-child(4) { animation-delay: 0.45s; }
+  .mine-dots.is-live i:nth-child(5) { animation-delay: 0.6s; }
+  .mine-dots.is-live i:nth-child(6) { animation-delay: 0.75s; }
+  .mine-dots.is-live i:nth-child(7) { animation-delay: 0.9s; }
+}
+@keyframes mine-dot {
+  0%, 55%, 100% { background: #d5d5d5; }
+  20% { background: #f7931a; }
 }
 .chip svg {
   width: 0.75rem;

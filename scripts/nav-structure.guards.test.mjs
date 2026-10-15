@@ -15,14 +15,15 @@ test("D-NAV bar order is Mapa, Aprender, Comunidad, Mercado", () => {
   assert.equal(ids[0], "mapa");
 });
 
-test("D-NAV-02 Aprender hub wraps conciencia, historia and pulso", () => {
+test("D-NAV-02 Aprender hub wraps conciencia, historia, pulso and minado", () => {
   const desk = read("src/components/dashboard/desk.tsx");
   const aprender = desk.indexOf('id="aprender"');
   const conciencia = desk.indexOf('id="conciencia"');
   const pulso = desk.indexOf('id="pulso"');
+  const minado = desk.indexOf('id="minado"');
   const comunidad = desk.indexOf('id="comunidad"');
   const roadmap = desk.indexOf("<RoadmapWeb3");
-  assert.ok(aprender > 0 && conciencia > aprender && pulso > conciencia && pulso < comunidad);
+  assert.ok(aprender > 0 && conciencia > aprender && minado > conciencia && pulso > minado && pulso < comunidad);
   assert.ok(roadmap > comunidad, "roadmap must not sit between Aprender and Comunidad");
   assert.match(desk, /LearnIndex/);
   assert.match(desk, /COMMUNITY_HUB/);

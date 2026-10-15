@@ -8,7 +8,7 @@ export function HistoryTimeline() {
   const localPaper = WHITEPAPER[lang];
 
   return (
-    <section id="historia" className="scroll-mt-[var(--header-offset)] space-y-5">
+    <section className="space-y-5">
       <div>
         <h2 className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
           {t("historyTitle")}

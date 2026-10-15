@@ -61,6 +61,12 @@ export function addrHint(str: string, head = 8, tail = 6): string {
   return `${str.slice(0, head)}…${str.slice(-tail)}`;
 }
 
+/** Primeros 8 y últimos 8, con tres puntos. El valor completo se copia aparte. */
+export function addrEnds(str: string, head = 8, tail = 8): string {
+  if (str.length <= head + tail + 3) return str;
+  return `${str.slice(0, head)}...${str.slice(-tail)}`;
+}
+
 /** Agrupa de a 4 para comparar a ojo. */
 export function addrGroups(str: string): string {
   const lower = str.toLowerCase();

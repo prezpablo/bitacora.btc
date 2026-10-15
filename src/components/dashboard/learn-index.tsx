@@ -6,6 +6,7 @@ const HUB_COPY: Record<string, CopyKey> = {
   conciencia: "learnWhat",
   historia: "navHistoria",
   pulso: "learnToday",
+  minado: "learnMine",
 };
 
 export function LearnIndex() {

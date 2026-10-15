@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { addrHint, bech32CharsetOk, bech32Ok, CONTRIBUTE_BOLT12, CONTRIBUTE_ONCHAIN, contributeValid } from "./contribute.ts";
+import { addrEnds, addrHint, bech32CharsetOk, bech32Ok, CONTRIBUTE_BOLT12, CONTRIBUTE_ONCHAIN, contributePayload, contributeValid } from "./contribute.ts";
 
 test("on-chain P2WPKH checksum", () => {
   assert.equal(bech32Ok(CONTRIBUTE_ONCHAIN, "bc"), true);
@@ -17,6 +17,12 @@ test("BOLT12 offer shape (charset; checksum largo no es BIP-173)", () => {
   assert.equal(bech32CharsetOk("lnbc1xyz", "lno"), false);
 });
 
+test("lightning offer shows first 8 and last 8", () => {
+  const shown = contributePayload("ln").grouped;
+  assert.equal(shown, "lno1pgqp...unsft5cs");
+  assert.equal(addrEnds(CONTRIBUTE_BOLT12), shown);
+  assert.equal(CONTRIBUTE_BOLT12.includes("..."), false);
+});
 test("hint shows both ends", () => {
   const h = addrHint(CONTRIBUTE_ONCHAIN);
   assert.match(h, /^bc1qe2f3/);

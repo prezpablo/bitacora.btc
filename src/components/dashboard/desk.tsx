@@ -23,6 +23,8 @@ import { OnchainPanel } from "./onchain-panel";
 import { OnchainLiveBar } from "./onchain-live";
 import { ConcienciaBlock } from "./conciencia";
 import { LearnIndex } from "./learn-index";
+import { MiningBlock } from "./mining-block";
+import { LearnQuiz } from "./learn-quiz";
 import { MapGate } from "@/components/map/map-gate";
 import { SiteShell } from "@/components/site-header";
 import { LazyMount } from "@/components/lazy-mount";
@@ -269,16 +271,16 @@ export function Desk({ eventHtml = [] }: { eventHtml?: EventHtmlRow[] }) {
         <section id="conciencia" className="scroll-mt-[4.5rem] space-y-4">
           <ConcienciaBlock />
         </section>
-        <Suspense fallback={<Soft />}>
-          <LazyMount fallback={<Soft />} minHeight="12rem">
-            <section id="historia" className="scroll-mt-[4.5rem]">
-              <HistoryTimeline />
-            </section>
-          </LazyMount>
-        </Suspense>
+        <section id="historia" className="scroll-mt-[4.5rem]">
+          <HistoryTimeline />
+        </section>
+        <section id="minado" className="scroll-mt-[4.5rem]">
+          <MiningBlock />
+        </section>
         <section id="pulso" className="scroll-mt-[4.5rem]">
           <NewsCycle data={pulse.data ?? extras.data?.pulse ?? null} fetching={pulse.isFetching} />
         </section>
+        <LearnQuiz />
       </section>
       </div>
 
