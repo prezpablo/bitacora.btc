@@ -11,7 +11,6 @@ import {
   injectGrokPwaHead,
   isDocumentPath,
   isInstallQuery,
-  langFromSearch,
   renderWebManifest,
   snapshotOgIdentity,
   stripGrokExtensions,
@@ -48,56 +47,42 @@ test("production host strips grok.com extensions.js (P2-16)", () => {
   assert.match(preview, /grok-app-builder\/extensions\.js/);
 });
 
-test("P1-03 ?lang=pt rewrites html lang and home title", () => {
+test("injector leaves html lang alone; the app reads ?lang=", () => {
   const src =
-    '<html lang="es"><head><title>Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica</title><meta property="og:locale" content="es_UY"><meta property="og:title" content="Bitácora.btc | Mapa Bitcoin Latinoamérica"></head></html>';
+    '<html lang="es"><head><title>Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica</title></head></html>';
   const out = injectGrokPwaHead(
     src,
     blank({ host: "www.bitacorabtc.org", search: "/?lang=pt", appName: "Bitácora.btc" }),
   );
-  assert.match(out, /<html lang="pt"/);
-  assert.match(out, /América Latina/);
-  assert.match(out, /og:locale" content="pt_BR"/);
-  assert.equal(langFromSearch("?lang=en"), "en");
-  assert.equal(langFromSearch("/mapa?lang=pt"), "pt");
-  const keep = injectGrokPwaHead(
-    '<html lang="en"><head><title>Wild Race</title></head></html>',
-    blank({ host: "wild-race.grok.me", lang: "pt", site: {} }),
-  );
-  assert.match(keep, /<html lang="pt"/);
-  assert.match(keep, /<title>Wild Race<\/title>/);
+  assert.match(out, /<html lang="es"/);
+  assert.doesNotMatch(out, /<html lang="pt"/);
+  const locale = readFileSync(join(TEMPLATE_ROOT, "src/lib/locale.ts"), "utf8");
+  assert.match(locale, /export function langFromQuery/);
 });
 
-test("P0 /mapa keeps its title and sets og:url from the request", () => {
+test("injector keeps the document title and does not invent og:url", () => {
   const src =
-    '<html lang="es"><head><title>Mapa Bitcoin Latam | Bitácora.btc</title><meta name="description" content="Mapa de comunidades y comercios que aceptan Bitcoin en Latinoamérica."></head></html>';
+    '<html lang="es"><head><title>Mapa Bitcoin Latam | Bitácora.btc</title></head></html>';
   const out = injectGrokPwaHead(
     src,
     blank({ host: "bitacorabtc.org", search: "/mapa?lang=pt", appName: "Bitácora.btc" }),
   );
-  assert.match(out, /<html lang="pt"/);
+  assert.match(out, /<html lang="es"/);
   assert.match(out, /<title>Mapa Bitcoin Latam \| Bitácora\.btc<\/title>/);
   assert.match(out, /property="og:title" content="Mapa Bitcoin Latam \| Bitácora\.btc"/);
-  assert.match(out, /property="og:url" content="https:\/\/bitacorabtc\.org\/mapa\?lang=pt"/);
-  assert.match(out, /name="twitter:image"/);
-  assert.match(out, /property="og:description"/);
+  assert.doesNotMatch(out, /property="og:url"/);
 });
 
-test("P0 404 is noindex and drops home canonical", () => {
+test("injector does not rewrite a 404 title; the app marks unknown paths noindex", () => {
   const src =
-    '<html lang="es"><head><title>Bitácora.btc | Mapa de comunidades y comercios Bitcoin en Latinoamérica</title><link rel="canonical" href="https://bitacorabtc.org/"><meta name="robots" content="index,follow"></head></html>';
+    '<html lang="es"><head><title>No encontrado | Bitácora.btc</title></head></html>';
   const out = injectGrokPwaHead(
     src,
     blank({ host: "bitacorabtc.org", search: "/no-existe", status: 404 }),
   );
-  assert.match(out, /name="robots" content="noindex,follow"/);
-  assert.doesNotMatch(out, /rel="canonical"/);
   assert.match(out, /<title>No encontrado \| Bitácora\.btc<\/title>/);
-  const en = injectGrokPwaHead(
-    src,
-    blank({ host: "bitacorabtc.org", search: "/missing?lang=en", status: 404 }),
-  );
-  assert.match(en, /<title>Not found \| Bitácora\.btc<\/title>/);
+  const seo = readFileSync(join(TEMPLATE_ROOT, "src/lib/seo.ts"), "utf8");
+  assert.match(seo, /noindex,follow/);
 });
 
 test("injects the extensions script without a project id", () => {
@@ -473,8 +458,8 @@ test("nitro middleware and its bundled assets exist", () => {
   const middleware = readFileSync(join(TEMPLATE_ROOT, "server/middleware/grok-pwa.ts"), "utf8");
   assert.match(middleware, /install-page\.html\?raw/);
   assert.match(middleware, /virtual:grok-og-identity/);
-  assert.match(middleware, /function injectHeadStreaming\(response: Response, host: string, search/);
-  assert.match(middleware, /\$\{event\.url\.pathname\}\$\{event\.url\.search\}/);
+  assert.match(middleware, /function injectHeadStreaming\(response: Response, host: string\)/);
+  assert.match(middleware, /event\.url\.search/);
   readFileSync(join(TEMPLATE_ROOT, "scripts/install-page.html"));
   readFileSync(join(TEMPLATE_ROOT, "public/__grok/icon-180.png"));
   readFileSync(join(TEMPLATE_ROOT, "public/__grok/install/styles.css"));

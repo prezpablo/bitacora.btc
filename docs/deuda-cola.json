@@ -19,6 +19,34 @@
       "done": "GET github.com/prezpablo/bitacora.btc 200 anónimo + archivo LICENSE"
     },
     {
+      "id": "L-MANIF",
+      "pri": "P1",
+      "open": true,
+      "kind": "manual",
+      "done": "Repo: un manifiesto propio no suma /__grok/; host bitacorabtc.org quita extensions.js. La vista previa lo conserva. El .org sigue duplicado hasta el ZIP."
+    },
+    {
+      "id": "L-GUARD",
+      "pri": "P2",
+      "open": false,
+      "kind": "manual",
+      "done": "15 oct: los 8 vigilantes leen takePublicVote, spokenId, legalHref y Junte-se. La página no se tocó."
+    },
+    {
+      "id": "L-PWA-LOAD",
+      "pri": "P3",
+      "open": false,
+      "kind": "manual",
+      "done": "15 oct: grok-pwa-plugin.test.mjs arranca, 45/45. No se inventó langFromSearch."
+    },
+    {
+      "id": "L-ARQ",
+      "pri": "P3",
+      "open": false,
+      "kind": "manual",
+      "done": "15 oct: ARQUITECTURA.md dice cuatro salas, casa en el globo, gráfico propio y /manifest.webmanifest."
+    },
+    {
       "id": "D-PIN-01",
       "pri": "P2",
       "open": false,

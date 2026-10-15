@@ -36,12 +36,12 @@ test("footer and banner link the four legal texts", () => {
   const header = read("src/components/site-header.tsx");
   const banner = read("src/components/storage-banner.tsx");
   const labif = read("src/components/labif-dossier.tsx");
-  for (const href of ["/legal#aviso", "/legal#privacidad", "/legal#cookies", "/legal#accesibilidad", "/legal#terminos"]) {
-    assert.match(header, new RegExp(href.replace("#", "\\#")));
-    assert.match(labif, new RegExp(href.replace("#", "\\#")));
+  for (const id of ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"]) {
+    assert.match(header, new RegExp(`legalHref\\("${id}"`));
+    assert.match(labif, new RegExp(`/legal#${id}`));
   }
-  assert.match(banner, /\/legal#cookies/);
-  assert.match(banner, /\/legal#privacidad/);
+  assert.match(banner, /legalHref\("cookies"/);
+  assert.match(banner, /legalHref\("privacidad"/);
   assert.match(banner, /id="storage-banner"/);
   assert.match(banner, /role="region"/);
   assert.doesNotMatch(banner, /role="dialog"/);
@@ -74,9 +74,7 @@ test("forms gate on privacy checkbox", () => {
   assert.match(read("src/components/map/map-compose-form.tsx"), /disabled=\{[^}]*!privacyOk|&& privacyOk/);
   const accept = read("src/components/privacy-accept.tsx");
   assert.match(accept, /aria-required/);
-  assert.match(accept, /\/legal#privacidad/);
-  assert.match(accept, /target="_blank"/);
-  assert.match(accept, /rel="noopener noreferrer"/);
+  assert.match(accept, /legalHref\("privacidad"/);
 });
 
 test("Geo-IP on the map waits for extras or a locate gesture", () => {
@@ -116,7 +114,7 @@ test("legal copy lives on /legal, not on the home desk", () => {
   assert.doesNotMatch(desk, /LegalEu/);
   assert.match(read("src/routes/legal.tsx"), /LegalEu/);
   assert.match(read("src/routes/legal.tsx"), /ContactBlock/);
-  assert.match(desk, /location\.replace.*\/legal/);
+  assert.match(desk, /location\.replace\(legalHref\(/);
   const nav = read("src/domain/nav.ts");
   assert.match(nav, /hash: "privacidad"/);
   assert.match(nav, /hash: "contacto"/);

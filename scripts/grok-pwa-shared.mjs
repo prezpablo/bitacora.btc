@@ -388,6 +388,16 @@ function stripGrokExtensionsScript(html) {
   );
 }
 
+/** Preview (local / grok.me) keeps extensions.js. The published host does not. */
+export function wantGrokExtensions(host = "") {
+  const name = String(host).split(":")[0].trim().toLowerCase();
+  return name !== "bitacorabtc.org" && name !== "www.bitacorabtc.org";
+}
+
+export function stripGrokExtensions(html) {
+  return stripGrokExtensionsScript(html);
+}
+
 export function stripShareMetaTags(html) {
   return String(html).replace(/<meta\b[^>]*>/gi, (tag) => {
     const attrs = [...tag.matchAll(/\b(?:property|name)\s*=\s*["']([^"']+)["']/gi)];
@@ -446,11 +456,12 @@ export function injectGrokPwaHead(html, ctx = {}) {
     documentTitle,
   );
   let next = stripShareMetaTags(html);
-  if (!readGrokExtensionsEnabled()) next = stripGrokExtensionsScript(next);
+  const allowExtensions = readGrokExtensionsEnabled() && wantGrokExtensions(host);
+  if (!allowExtensions) next = stripGrokExtensionsScript(next);
 
   const missing = grokPwaHeadTags(appName)
     .filter(([key]) => {
-      if (key === "manifest") return !next.includes('href="/__grok/manifest.webmanifest"');
+      if (key === "manifest") return !/rel=["']manifest["']/i.test(next);
       if (key === "apple-touch-icon") return !next.includes('href="/__grok/icon-180.png"');
       return !next.includes(`name="${key}"`);
     })
@@ -461,7 +472,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
     grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
   );
 
-  if (readGrokExtensionsEnabled() && !next.includes("/grok-app-builder/extensions.js")) {
+  if (allowExtensions && !next.includes("/grok-app-builder/extensions.js")) {
     missing.push(...grokExtensionsHeadTags(projectId));
   } else if (projectId && !next.includes('name="grok-project-id"')) {
     missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);

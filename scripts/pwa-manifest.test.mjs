@@ -24,3 +24,14 @@ test("injector does not add /__grok/manifest if a manifest already exists", () =
   assert.equal((out.match(/rel="manifest"/g) || []).length, 1);
   assert.doesNotMatch(out, /__grok\/manifest/);
 });
+
+test("L-MANIF published host drops extensions.js; preview keeps it", () => {
+  const dirty =
+    '<html><head><link rel="manifest" href="/manifest.webmanifest"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>';
+  const org = injectGrokPwaHead(dirty, { host: "bitacorabtc.org" });
+  assert.equal((org.match(/rel="manifest"/g) || []).length, 1);
+  assert.doesNotMatch(org, /extensions\.js/);
+  const preview = injectGrokPwaHead('<html><head></head></html>', { host: "localhost:8080" });
+  assert.match(preview, /__grok\/manifest/);
+  assert.match(preview, /extensions\.js/);
+});

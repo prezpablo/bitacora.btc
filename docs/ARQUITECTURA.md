@@ -1,8 +1,8 @@
 # bitacora.btc — arquitectura vigente
 
-Informe al 26 ago 2026. Describe lo que el código hace hoy, no un plan.
+Informe al 15 oct 2026. Describe lo que el código hace hoy, no un plan.
 
-**Producto.** Desk público de Bitcoin: un gráfico (velas + EMAs + mapa de liquidaciones), pulso on-chain, flujos de ETF, mapa de gasto/comunidades, eventos y la historia de la red. Frase: *el nodo que te une al mundo Bitcoin*. Iniciativa Consciencia Bitcoin By LCM.
+**Producto.** Desk público de Bitcoin en cuatro salas: **Mapa**, **Aprender**, **Comunidad** y **Mercado**. La casa abre en el globo (sala Mapa). El gráfico de precio es SVG propio (`bit-stage`), no Recharts. Frase: *el nodo que te une al mundo Bitcoin*. Iniciativa Consciencia Bitcoin By LCM.
 
 **Auth.** Apagada (`VITE_AUTH_ENABLED=false`). No hay cuentas. Postgres/Better Auth están en el scaffold y no se usan.
 
@@ -12,10 +12,15 @@ Informe al 26 ago 2026. Describe lo que el código hace hoy, no un plan.
 
 | Ruta | UI | Qué muestra |
 |---|---|---|
-| `/` (`#mercado` por defecto) | `Desk` | Precio, long/short, miedo/codicia, on-chain en vivo, **flujos ETF spot**, velas 1D/1S/1M/6M, EMAs, heatmap de liquidaciones, QR, comunidad/eventos, pulso, red, historia |
-| `/mapa` | `SpendMap` | Leaflet + BTC Map + comunidades federadas + overlay propio |
+| `/` | `Desk` | Cuatro salas. Sin hash, abre la sala **llegar**: el globo y, en el mismo scroll, Aprender. No abre en Mercado. |
+| `/#mapa` | globo | Sala Mapa. «Entrar al mapa» pasa a Leaflet. |
+| `/#aprender` | hub | Conciencia, historia, pulso y minado. |
+| `/#comunidad` | hub | Anuncios, eventos, experiencias y el feed. |
+| `/#mercado` | hub | Velas, EMAs, heatmap, ETF y la Red. El precio se pide al entrar a esta sala. |
+| `/mapa` | `SpendMap` | Página propia del mapa: Leaflet + BTC Map + comunidades federadas + overlay propio. |
+| `/legal` | textos | Aviso, privacidad, cookies, accesibilidad y términos. |
 
-Idioma: ES / PT / EN (`useLocale` + `i18n.ts`). Menú tipo bitcoin.org.
+Barra: Mapa · Aprender · Comunidad · Mercado. Sumate es un enlace a Telegram, no una quinta sala. Idioma: ES / PT / EN (`useLocale` + `i18n.ts`).
 
 ---
 
@@ -50,7 +55,7 @@ El servidor de TanStack Start (`createServerFn`) es el borde: el browser no pega
 ```mermaid
 flowchart TB
   subgraph cliente["Navegador"]
-    Desk["Desk / Mercado"]
+    Desk["Desk: Mapa · Aprender · Comunidad · Mercado"]
     Mapa["SpendMap"]
     RQ["React Query"]
     Desk --> RQ
@@ -169,10 +174,10 @@ flowchart LR
 `id,tipo,name,lat,lon,address,description,notes,score,votes,logo,socials,hours,pays,created`
 
 - `tipo`: `shop` \| `community`
-- Estrellas **solo comercios**: cada clic suma. `score` = promedio; `votes` = cantidad. Render: `score` llena las 5 estrellas.
+- Estrellas **solo comercios**: un id vota una vez por envío. El promedio solo cambia si el número que llega es el de sumar una estrella (1 a 5). Un salto de más de un voto no toca la fila.
 - Horarios compactos: `lun0800120014001900mar…` (huecos = `0`).
 - Logo: **URL https**, no archivo.
-- Un nick no bloquea votos: cada clic cuenta.
+- Un id no vota dos veces en el mismo envío.
 
 **Escritura.** Captcha → `saveMapCsv` (merge por `id` en disco). Opcional: commit GitHub si hay `GITHUB_TOKEN`; Firestore si hay `VITE_FIREBASE_*`. Sin eso: este dispositivo + archivo local.
 
@@ -233,9 +238,9 @@ flowchart TB
 ## 8. Stack
 
 - React 19, Vite, TanStack Start / Router / Query
-- Tailwind 4, Leaflet, Recharts (paneles), SVG propio del gráfico
+- Tailwind 4, Leaflet, SVG propio del gráfico (`bit-stage`). No hay Recharts.
 - i18n casero ES/PT/EN
-- PWA (`/__grok/manifest.webmanifest`)
+- PWA de primera parte (`/manifest.webmanifest`). El de `/__grok/` no se suma si la página ya tiene uno.
 - Repo: [prezpablo/bitacora.btc](https://github.com/prezpablo/bitacora.btc)
 
 ---

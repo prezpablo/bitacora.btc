@@ -26,7 +26,10 @@ function walkTs(rel) {
 test("public map patch still caps new rows and vote jumps", () => {
   const src = read("src/domain/map-csv.ts");
   assert.match(src, /added >= 2/);
-  assert.match(src, /nextVotes > \(prev\.votes \|\| 0\) \+ 1/);
+  assert.match(src, /takePublicVote/);
+  const vote = read("src/domain/public-vote.ts");
+  assert.match(vote, /nextVotes > \(prev\.votes \|\| 0\) \+ 1/);
+  assert.match(vote, /voted\.has\(prev\.id\)/);
 });
 
 test("cancel pin requires CARGA token", () => {
@@ -109,7 +112,7 @@ test("captcha has audio and screen-reader alternatives", () => {
   const src = read("src/components/map/captcha.tsx");
   assert.match(src, /speakChallenge/);
   assert.match(src, /captchaListen/);
-  assert.match(src, /captchaSpoken/);
+  assert.match(src, /spokenId/);
   assert.match(src, /sr-only/);
   assert.match(src, /aria-live/);
   assert.match(src, /role="alert"/);

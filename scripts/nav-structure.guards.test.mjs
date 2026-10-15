@@ -56,7 +56,7 @@ test("home and contact point crawlers at /mapa", () => {
   assert.match(read("src/components/dashboard/conciencia.tsx"), /href="\/mapa"/);
   assert.match(read("src/components/dashboard/contact.tsx"), /href="\/mapa"/);
   assert.match(read("src/components/site-header.tsx"), /href="\/mapa"/);
-  assert.match(read("server/middleware/grok-pwa.ts"), /bitacorabtc\.org/);
+  assert.match(read("scripts/grok-pwa-shared.mjs"), /bitacorabtc\.org/);
 });
 
 test("footer does not list Privacidad twice", () => {
@@ -67,7 +67,7 @@ test("footer does not list Privacidad twice", () => {
   assert.match(head, /sm:grid-cols-3|grid-cols-3/);
   assert.match(head, /footerJoinShort/);
   assert.match(head, /footerHaciaShort/);
-  assert.match(read("src/components/contribute-qr.tsx"), /compact \? "size-6"/);
+  assert.match(read("src/components/contribute-qr.tsx"), /compact \? "h-7 px-2\.5 text-xs"/);
   assert.match(head, /min-h-6/);
   assert.match(head, /size-5/);
   assert.doesNotMatch(read("src/domain/nav.ts").slice(
@@ -189,7 +189,7 @@ test("footer links Telegram Consciencia Bitcoin once", () => {
   const copy = read("src/lib/i18n.ts");
   assert.match(copy, /Unite a Consciencia Bitcoin/);
   assert.match(copy, /Join Consciencia Bitcoin/);
-  assert.match(copy, /Junta-te à Consciencia Bitcoin/);
+  assert.match(copy, /Junte-se à Consciencia Bitcoin/);
 });
 
 test("Comunidad features LABITCONF 26 banner above anuncios", () => {

@@ -45,7 +45,20 @@ El PDF fechó el sitio en la versión 2.0 y el commit `79d2b76`. A las 13:27 `/l
 
 **S-PATCH** cerrada en el repo el 14 oct. Si la ficha ya tiene la estrella, el parche público no le escribe logo ni redes. Con el token CARGA, sí. Una ficha sin estrella se puede completar, y el texto vacío también. No está en el sitio hasta el próximo ZIP.
 
-**Siguiente:** **D-FOSS**, con el próximo ZIP (el pie con el hash, y estos tres arreglos). **D-DEPS** no entra. **D-SQL-ONE** no es un cambio: sigue un solo proceso escribiendo la base. La pimienta se rotó el 14 oct 2026; la próxima es el 12 ene 2027. La copia semanal avisa los miércoles.
+**Siguiente de producto:** **D-FOSS**, con el próximo ZIP (el pie con el hash, y S-SVG, S-VOTE, S-PATCH). **D-DEPS** no entra. **D-SQL-ONE** no es un cambio: sigue un solo proceso escribiendo la base. La pimienta se rotó el 14 oct 2026; la próxima es el 12 ene 2027. La copia semanal avisa los miércoles.
+
+## Limpieza — 15 oct 2026
+
+Cotejo de arquitectura y suite: 346 de 356 pruebas pasan. La página no se rearma. Esta cola es aparte de D-FOSS. Una fase por vez, y se puede volver atrás.
+
+| Orden | Id | Hecho cuando | No se hace |
+|---|---|---|---|
+| 1 | **L-MANIF** | Hecho en el repo. Si la página ya tiene un manifiesto, no se agrega el de `/__grok/`. En `bitacorabtc.org` se quita `extensions.js`. La vista previa, con otro host, lo conserva. En el sitio sigue duplicado hasta el próximo ZIP. | No se apaga el inyector de la vista previa. No se borra el complemento. |
+| 2 | **L-GUARD** | Hecho. Los 8 vigilantes leen el código de ahora: voto público, región hablada del captcha, `legalHref`, `Junte-se à Consciencia Bitcoin`. La página no se tocó. | No se vuelve el código atrás para que el texto coincida. |
+| 3 | **L-PWA-LOAD** | Hecho. `scripts/grok-pwa-plugin.test.mjs` arranca: 45 de 45. No se inventó `langFromSearch`. El idioma lo lee la app. | No se inventa `langFromSearch` si el módulo ya no la exporta. |
+| 4 | **L-ARQ** | Hecho. `docs/ARQUITECTURA.md` dice las cuatro salas, la casa en el globo, el gráfico propio y `/manifest.webmanifest`. | No se toca la página para obedecer el documento de agosto. |
+
+Fuera de esta cola, y sin reabrir: la barra, las cuatro salas, los votos, el globo y el lugar de los textos legales. Siguen en su sitio **D-FOSS**, **D-BAK-ON**, **D-BAK-OFF**, **D-DEPS**, **D-SQL-ONE** y **L-TAKEDOWN**.
 
 ---
 
