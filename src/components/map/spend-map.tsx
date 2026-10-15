@@ -117,6 +117,35 @@ function saveCommunities(rows: Community[]) {
   writeExtra(COMM, JSON.stringify(rows));
 }
 
+function ListFace({ logo }: { logo?: string }) {
+  const [ok, setOk] = useState(true);
+  const src = imgSrc(logo || "");
+  if (!src || !ok) {
+    return (
+      <span aria-hidden className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+        ₿
+      </span>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt=""
+      width={32}
+      height={32}
+      referrerPolicy="no-referrer"
+      decoding="async"
+      className="size-8 shrink-0 rounded-full object-cover"
+      onError={() => setOk(false)}
+    />
+  );
+}
+
+function isListPlace(p: { id: string; name?: string; category?: string }) {
+  if (p.category === "cluster" || p.id.startsWith("cluster:")) return false;
+  return !/^\d+$/.test((p.name || "").trim());
+}
+
 function coinFaceHtml(logo: string, size: number) {
   const src = escapeHtml(imgSrc(logo)).replace(/"/g, "");
   if (src) {
@@ -491,7 +520,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           lat: local?.lat ?? place.lat,
           lon: local?.lon ?? place.lon,
           name: local?.name || place.name || p.id,
-          logo: pickListingLogo(local?.logo),
+          logo: pickListingLogo(local?.logo, place.logo),
         };
       });
     const rows = dedupeShops([...extra, ...api]);
@@ -1453,6 +1482,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
   const _hasPin = Boolean(sel || selComm || pendingCarga);
+  const listedPlaces = places.filter(isListPlace).slice(0, 80);
 
   const body = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -1877,14 +1907,15 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
       <section className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]" aria-labelledby="map-list-title">
         <h2 id="map-list-title" className="text-sm font-medium text-foreground">
-          {t("mapListTitle")} ({visibleComms.length + Math.min(places.length, 80)})
+          {t("mapListTitle")} ({visibleComms.length + listedPlaces.length})
         </h2>
-        <ul className="mt-3 columns-1 gap-x-6 text-sm sm:columns-2">
+        <ul className="mt-3 grid max-h-72 grid-cols-1 gap-x-6 overflow-y-auto text-sm sm:grid-cols-2">
           {visibleComms.map((c) => (
-            <li key={`c-${c.id}`} className="break-inside-avoid py-0.5">
+            <li key={`c-${c.id}`} className="flex items-center gap-2 py-1">
+              <ListFace logo={c.logo} />
               <button
                 type="button"
-                className="text-left text-foreground underline-offset-2 hover:underline"
+                className="min-w-0 text-left text-foreground underline-offset-2 hover:underline"
                 onClick={() => {
                   setSelComm(withFoundingProfile(c));
                   setSel(null);
@@ -1892,16 +1923,17 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   setDrop(null);
                 }}
               >
-                {c.name}
+                <span className="block truncate">{c.name}</span>
+                <span className="block truncate text-xs text-muted-foreground">{c.slug}</span>
               </button>
-              <span className="text-muted-foreground"> · {c.slug}</span>
             </li>
           ))}
-          {places.slice(0, 80).map((p) => (
-            <li key={`p-${p.id}`} className="break-inside-avoid py-0.5">
+          {listedPlaces.map((p) => (
+            <li key={`p-${p.id}`} className="flex items-center gap-2 py-1">
+              <ListFace logo={p.logo} />
               <button
                 type="button"
-                className="text-left text-foreground underline-offset-2 hover:underline"
+                className="min-w-0 text-left text-foreground underline-offset-2 hover:underline"
                 onClick={() => {
                   setSel(p);
                   setSelComm(null);
@@ -1915,11 +1947,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   }
                 }}
               >
-                {p.name}
+                <span className="block truncate">{p.name}</span>
+                {p.category && p.category !== "other" && p.category !== "lugar" && p.category !== "cluster" ? (
+                  <span className="block truncate text-xs text-muted-foreground">{p.category}</span>
+                ) : null}
               </button>
-              {p.category && p.category !== "other" && p.category !== "lugar" && p.category !== "cluster" ? (
-                <span className="text-muted-foreground"> · {p.category}</span>
-              ) : null}
             </li>
           ))}
         </ul>

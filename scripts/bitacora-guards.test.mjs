@@ -86,6 +86,10 @@ test("community logos show on the globe and /logos is not sandboxed", () => {
   assert.doesNotMatch(globe, /face: !far/);
   assert.match(caddy, /@logo path \/logo \/logo\//);
   assert.doesNotMatch(caddy, /path \/logo\*/);
+  const map = read("src/components/map/spend-map.tsx");
+  assert.match(map, /function isListPlace/);
+  assert.doesNotMatch(map, /columns-2/);
+  assert.match(map, /pickListingLogo\(local\?\.logo, place\.logo\)/);
 });
 
 test("D-CSV-LOCK serializes map writes and publishes the CSV with rename", () => {
