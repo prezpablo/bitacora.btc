@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { STATUES } from "@/domain/statues";
+import { STATUES, statueGlow } from "@/domain/statues";
 import { FOUNDING_UY, type GlobeFocus } from "@/domain/globe";
 import { capitalOf } from "@/domain/capitals";
 import { mapKeys, useGlobeStats } from "@/lib/map-query";
@@ -270,7 +270,8 @@ function GlobeCanvas({
         lon: s.lon,
         logo: s.img,
         face: "logo" as const,
-        px: pxFor(s.id),
+        halo: true,
+        px: pxFor(s.id) + 8,
       })),
     ];
   }, [coinPins, ownShops, far, alt, overlayPins, t]);
@@ -278,14 +279,23 @@ function GlobeCanvas({
   const enterRef = useRef(enter);
   enterRef.current = enter;
   const htmlElement = useCallback(
-    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo"; px?: number }) => {
+    (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo"; halo?: boolean; px?: number }) => {
       const el = document.createElement("button");
       const sizePx = d.px ?? globeCoinSize(2.35, d.id === FOUNDING_UY.id);
       const ring = sizePx < 14 ? 1 : 1.5;
       el.type = "button";
       el.tabIndex = -1;
       el.title = d.name || "";
-      el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+      const face = d.halo ? document.createElement("span") : null;
+      if (d.halo && face) {
+        const glow = statueGlow(sizePx);
+        const box = sizePx + glow.pad * 2;
+        el.style.cssText = `width:${box}px;height:${box}px;padding:0;border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;overflow:visible;cursor:pointer;pointer-events:auto`;
+        face.style.cssText = `display:block;width:${sizePx}px;height:${sizePx}px;border-radius:50%;overflow:hidden;background:#f7931a;box-shadow:${glow.shadow}`;
+      } else {
+        el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+      }
+      const host = face ?? el;
       const logo = d.face === "logo" ? imgSrc(d.logo || "") : "";
       if (logo) {
         const img = document.createElement("img");
@@ -297,12 +307,13 @@ function GlobeCanvas({
         img.height = sizePx;
         img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;background:#f7931a";
         img.onerror = () => {
-          el.innerHTML = BITCOIN_MARK_SVG;
+          host.innerHTML = BITCOIN_MARK_SVG;
         };
-        el.appendChild(img);
+        host.appendChild(img);
       } else {
-        el.innerHTML = BITCOIN_MARK_SVG;
+        host.innerHTML = BITCOIN_MARK_SVG;
       }
+      if (face) el.appendChild(face);
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
         enterRef.current(d.lat0 ?? d.lat, d.lon0 ?? d.lon, 13, undefined, d);
@@ -456,7 +467,7 @@ function GlobeCanvas({
           htmlElementsData={htmlPins}
           htmlLat="lat"
           htmlLng={(d: { lng?: number; lon?: number }) => d.lng ?? d.lon}
-          htmlAltitude={0.008}
+          htmlAltitude={(d: { halo?: boolean }) => (d.halo ? 0.03 : 0.008)}
           htmlTransitionDuration={0}
           htmlElement={htmlElement}
           pointsData={[]}

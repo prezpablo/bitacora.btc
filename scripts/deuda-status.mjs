@@ -377,8 +377,8 @@ function repoCheck(id) {
   }
   if (id === "D-STATUE") {
     const src = read("src/domain/statues.ts");
-    const ok = /id: "budapest"/.test(src) && /id: "el-zonte"/.test(src) && !/id: "(lugano|viena|vienna|nyse)"/.test(src);
-    return { pass: ok, detail: ok ? "Budapest y El Zonte; sin Lugano, Viena ni NYSE" : "entró una pieza que no correspondía" };
+    const ok = /id: "budapest"/.test(src) && /id: "el-zonte"/.test(src) && /id: "vienna"/.test(src) && !/id: "(lugano|nyse)"/.test(src);
+    return { pass: ok, detail: ok ? "Budapest, El Zonte y Viena; sin Lugano ni NYSE" : "falta Viena o entró una pieza que no correspondía" };
   }
   if (id === "A-COLOR") {
     const etf = read("src/components/dashboard/etf-flow.tsx");

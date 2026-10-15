@@ -179,7 +179,7 @@ Sondeo de las 20:41 superado por el de las 22:22. Experiencias, la versión 2.4 
 
 **Experiencias (D-EXPERIENCIA).** Chip dentro de Comunidad, al lado de anuncios y eventos. No es la quinta entrada de la barra. Misma prueba pública. Campos extra, todos visibles: qué es la actividad, ciudad, fecha o «recurrente», precio en sats o «a convenir», y el enlace de la prueba. Bitácora no cobra ni custodia. Hasta que haya fichas propias no entra al sitemap (igual que D-SEO-CITY).
 
-**Estatuas (D-STATUE).** Hecho en el repo. Miniatura naranja `#F7931A` en el globo y en el mapa, con ficha. Entran Budapest (Graphisoft Park, 2021, foto de Fekist, CC BY-SA 4.0) y El Zonte (Bitcoin Beach, 2025). Nueva York no entra: no apareció una foto de la pieza. Lugano no se pincha. Viena se descubre el 14 oct 2026 a las 17: no va hasta después. Falta el ZIP.
+**Estatuas (D-STATUE).** Hecho en el repo. Miniatura naranja `#F7931A` en el globo y en el mapa, con ficha y halo dorado. La foto de cada pieza va sin el lugar: se recorta el fondo y se reemplaza por `#F7931A`, cuadrada. Entran Budapest (Graphisoft Park, 2021, foto de Fekist, CC BY-SA 4.0), El Zonte (Bitcoin Beach, 2025) y Viena (inicio del lago junto a Hoch Zwei, Viertel Zwei, 14 oct 2026, 48.21344, 16.41383, foto de Max Peternell). Nueva York no entra: no apareció una foto de la pieza. Lugano no se pincha. Falta el ZIP.
 
 ### Informe ATP 23 set — qué entra y qué no
 

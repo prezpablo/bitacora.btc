@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import { pinAsPlace, refineShopIcon } from "@/domain";
-import { STATUES } from "@/domain/statues";
+import { STATUES, statueGlow } from "@/domain/statues";
 import { FOUNDING_UY, type GlobeFocus } from "@/domain/globe";
 import { canRemove, communityIsPublic, communityTrust, dumpMapCsv, hydrateMapCsv, imgSrc, listingTrust, shopIsPublic, withFoundingProfile } from "@/domain";
 import { dedupeCommunities, dedupeShops, pickListingLogo, placeTruePins } from "@/domain/community-dedupe";
@@ -888,14 +888,15 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         m.addTo(group);
       }
       for (const s of STATUES) {
-        const size = coinPinSize(zoom, "community", focus?.id === s.id);
+        const size = Math.min(34, coinPinSize(zoom, "community", true) + 8);
         const face = coinFaceHtml(s.img, Math.max(8, size - 2));
-        const ring = size < 14 ? 1 : 1.5;
+        const glow = statueGlow(size);
+        const box = size + glow.pad * 2;
         const icon = L.divIcon({
           className: "",
-          html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#f7931a;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden">${face}</div>`,
-          iconSize: [size, size],
-          iconAnchor: [size / 2, size / 2],
+          html: `<div style="width:${box}px;height:${box}px;display:flex;align-items:center;justify-content:center"><div style="width:${size}px;height:${size}px;border-radius:50%;background:#f7931a;box-shadow:${glow.shadow};overflow:hidden">${face}</div></div>`,
+          iconSize: [box, box],
+          iconAnchor: [box / 2, box / 2],
         });
         const photo = escapeHtml(s.img);
         const card = `<div style="max-width:180px">
@@ -905,7 +906,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           <span>${escapeHtml(t(s.aboutKey))}</span><br/>
           <span style="opacity:.7">${escapeHtml(t(s.creditKey))}</span>
         </div>`;
-        const sm = L.marker([s.lat, s.lon], { icon, zIndexOffset: 650 });
+        const sm = L.marker([s.lat, s.lon], { icon, zIndexOffset: 1000 });
         sm.bindPopup(card, { maxWidth: 200 });
         if (focus?.id === s.id) sm.openPopup();
         sm.addTo(group);
