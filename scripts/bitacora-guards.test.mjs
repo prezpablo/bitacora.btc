@@ -92,6 +92,7 @@ test("community logos show on the globe and /logos is not sandboxed", () => {
   assert.match(map, /pickListingLogo\(local\?\.logo, place\.logo\)/);
   const cat = read("src/infrastructure/catalog.ts");
   assert.match(cat, /BITACORA_CATALOG_SYNC !== "1"/);
+  assert.match(read("package.json"), /register-ts-alias\.mjs scripts\/sync-catalog\.ts/);
 });
 
 test("D-CSV-LOCK serializes map writes and publishes the CSV with rename", () => {
