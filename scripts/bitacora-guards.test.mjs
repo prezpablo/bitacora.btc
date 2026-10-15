@@ -79,6 +79,15 @@ test("D-LIQ-ZOOM recalculates the heatmap off the page thread", () => {
   assert.match(worker, /buildLiquidationMap/);
 });
 
+test("community logos show on the globe and /logos is not sandboxed", () => {
+  const globe = read("src/components/map/world-globe.tsx");
+  const caddy = read("deploy/Caddyfile");
+  assert.match(globe, /face: p\.logo \? \("logo" as const\) : \("btc" as const\)/);
+  assert.doesNotMatch(globe, /face: !far/);
+  assert.match(caddy, /@logo path \/logo \/logo\//);
+  assert.doesNotMatch(caddy, /path \/logo\*/);
+});
+
 test("D-CSV-LOCK serializes map writes and publishes the CSV with rename", () => {
   const src = read("src/infrastructure/map-csv-io.ts");
   const db = read("src/infrastructure/sqlite.ts");

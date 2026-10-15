@@ -252,14 +252,11 @@ function GlobeCanvas({
   const far = alt > 1.48;
   const htmlPins = useMemo(() => {
     const pxFor = (id?: string) => globeCoinSize(alt, id === FOUNDING_UY.id);
-    const own = new Set(
-      overlayPins.filter((p) => p.kind === "community" && p.id).map((p) => String(p.id)),
-    );
-    own.add(FOUNDING_UY.id);
     return [
       ...coinPins.map((p) => ({
         ...p,
-        face: !far || own.has(p.id) ? ("logo" as const) : ("btc" as const),
+        // La foto entra desde la primera vista. El ₿ solo queda si no hay logo.
+        face: p.logo ? ("logo" as const) : ("btc" as const),
         px: pxFor(p.id),
       })),
       ...(!far ? ownShops.map((p) => ({ ...p, face: "logo" as const, kind: "shop" as const, px: pxFor(p.id) })) : []),
@@ -274,7 +271,7 @@ function GlobeCanvas({
         px: pxFor(s.id) + 8,
       })),
     ];
-  }, [coinPins, ownShops, far, alt, overlayPins, t]);
+  }, [coinPins, ownShops, far, alt, t]);
 
   const enterRef = useRef(enter);
   enterRef.current = enter;
