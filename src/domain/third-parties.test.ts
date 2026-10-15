@@ -35,7 +35,7 @@ test("undeclared countries are not guessed", () => {
   const ofm = THIRD_PARTIES.find((p) => p.name === "OpenFreeMap");
   assert.equal(ofm?.country.es, "Hungría");
   assert.equal(ofm?.countrySource, "https://openfreemap.org/tos/");
-  for (const name of ["BTC Map", "GeoJS", "ipwho.is", "Lingva"]) {
+  for (const name of ["BTC Map", "GeoJS", "Lingva"]) {
     const row = THIRD_PARTIES.find((p) => p.name === name);
     assert.equal(row?.country.es, "país no informado por el proveedor");
     assert.equal(row?.countrySource, undefined);

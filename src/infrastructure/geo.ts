@@ -1,6 +1,6 @@
-/** IP solo para el primer encuadre. Tras el clic (consentimiento), GPS/Wi‑Fi del navegador. */
+/** Una sola escucha de GPS. La ciudad por IP es una sola llamada, y solo si el GPS no responde. */
 
-import { pickBestFix, type GpsSession } from "@/domain/geo-fix";
+import { MIN_STREET_ACCURACY_M, pickBestFix, type GpsSession } from "@/domain/geo-fix";
 import { boxAround, frameFromFix, type CityFrame, type GeoFix } from "@/domain/geo-frame";
 
 export type { CityFrame, GeoFix };
@@ -20,93 +20,87 @@ function fromPos(pos: GeolocationPosition): GeoFix {
   };
 }
 
-/** Start inside the click handler so the browser shows the GPS prompt. */
+const GPS_LOCK_M = 30;
+const GPS_QUIET_MS = 4_000;
+const GPS_WALL_MS = 15_000;
+
+/** Una escucha. La primera muestra mueve el mapa; se queda hasta 30 m, o 15 s. */
 export function startGpsFromGesture(): GpsSession {
   let best: GeoFix | null = null;
-  const notes: ((f: GeoFix) => void)[] = [];
-  const note = (fix: GeoFix) => {
-    best = pickBestFix(best, fix);
-    if (best) for (const n of notes) n(best);
-  };
+  let watchId = 0;
+  let wall = 0;
+  let quiet = 0;
+  let firstDone = false;
+  let bestDone = false;
+
+  let resolveFirst: (fix: GeoFix) => void = () => {};
+  let rejectFirst: (err: unknown) => void = () => {};
+  let resolveBest: (fix: GeoFix) => void = () => {};
+  let rejectBest: (err: unknown) => void = () => {};
 
   const first = new Promise<GeoFix>((resolve, reject) => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      reject(new Error("no-geo"));
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const f = fromPos(pos);
-        note(f);
-        resolve(f);
-      },
-      (err) => reject(err),
-      { enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 },
-    );
+    resolveFirst = resolve;
+    rejectFirst = reject;
   });
-
   const bestP = new Promise<GeoFix>((resolve, reject) => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      reject(new Error("no-geo"));
-      return;
-    }
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const f = fromPos(pos);
-        note(f);
-        if (f.accuracy <= 40 && best) {
-          navigator.geolocation.clearWatch(watchId);
-          resolve(best);
-        }
-      },
-      (err) => {
-        if (best) resolve(best);
-        else reject(err);
-      },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 15_000 },
-    );
-    notes.push((f) => {
-      if (f.accuracy <= 40) {
-        navigator.geolocation.clearWatch(watchId);
-        resolve(f);
-      }
-    });
-    window.setTimeout(() => {
-      navigator.geolocation.clearWatch(watchId);
-      if (best) resolve(best);
-      else reject(new Error("no-fix"));
-    }, 6_000);
+    resolveBest = resolve;
+    rejectBest = reject;
   });
 
-  return { first, best: bestP, note };
-}
+  const finish = (fix: GeoFix | null, err?: unknown) => {
+    if (watchId && typeof navigator !== "undefined") navigator.geolocation.clearWatch(watchId);
+    watchId = 0;
+    window.clearTimeout(wall);
+    window.clearTimeout(quiet);
+    if (!firstDone) {
+      firstDone = true;
+      if (fix) resolveFirst(fix);
+      else rejectFirst(err ?? new Error("no-fix"));
+    }
+    if (!bestDone) {
+      bestDone = true;
+      if (fix) resolveBest(fix);
+      else rejectBest(err ?? new Error("no-fix"));
+    }
+  };
 
-export function requestGpsOnGesture(): Promise<GeoFix> {
-  return startGpsFromGesture().first;
+  const note = (fix: GeoFix) => {
+    const next = pickBestFix(best, fix);
+    if (!next) return;
+    best = next;
+    if (!firstDone) {
+      firstDone = true;
+      resolveFirst(best);
+    }
+    if (bestDone) return;
+    if (best.accuracy <= GPS_LOCK_M) {
+      finish(best);
+      return;
+    }
+    if (best.accuracy <= MIN_STREET_ACCURACY_M && !quiet) {
+      quiet = window.setTimeout(() => {
+        if (best) finish(best);
+      }, GPS_QUIET_MS);
+    }
+  };
+
+  if (typeof navigator === "undefined" || !navigator.geolocation) {
+    const err = new Error("no-geo");
+    queueMicrotask(() => finish(null, err));
+    return { first, best: bestP, note };
+  }
+
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => note(fromPos(pos)),
+    (err) => finish(best, err),
+    { enableHighAccuracy: true, maximumAge: 30_000, timeout: 12_000 },
+  );
+  wall = window.setTimeout(() => finish(best, new Error("no-fix")), GPS_WALL_MS);
+  return { first, best: bestP, note };
 }
 
 export function requestGpsPrecise(): Promise<GeoFix> {
   return startGpsFromGesture().best;
-}
-
-export async function requestBeaconFix(ip?: string): Promise<GeoFix> {
-  const res = await fetch("https://api.beacondb.net/v1/geolocate", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "User-Agent": "bitacora.btc/1.0 (https://bitacorabtc.org)",
-      ...(ip ? { "X-Forwarded-For": ip } : {}),
-    },
-    body: JSON.stringify({ considerIp: true, fallbacks: { ipf: true } }),
-    signal: AbortSignal.timeout(5_000),
-  });
-  if (!res.ok) throw new Error(`beacon ${res.status}`);
-  const j = (await res.json()) as { location?: { lat?: number; lng?: number }; accuracy?: number };
-  const lat = num(j.location?.lat);
-  const lon = num(j.location?.lng);
-  if (lat == null || lon == null) throw new Error("beacon");
-  return { lat, lon, accuracy: Number(j.accuracy) || 8_000, source: "ip" };
 }
 
 async function ipFrom(url: string, pick: (j: Record<string, unknown>) => GeoFix | null): Promise<GeoFix> {
@@ -124,39 +118,22 @@ async function ipFrom(url: string, pick: (j: Record<string, unknown>) => GeoFix 
   }
 }
 
+/** Una sola consulta. Si GeoJS no responde, no se prueba otro proveedor. */
 export async function requestIpFix(): Promise<GeoFix> {
-  try {
-    return await ipFrom("https://get.geojs.io/v1/ip/geo.json", (j) => {
-      const lat = num(j.latitude);
-      const lon = num(j.longitude);
-      if (lat == null || lon == null) return null;
-      return {
-        lat,
-        lon,
-        accuracy: 12_000,
-        city: [j.city, j.country].filter(Boolean).join(", "),
-        country: String(j.country || ""),
-        countryCode: String(j.country_code || "").toUpperCase(),
-        source: "ip",
-      };
-    });
-  } catch {
-    return ipFrom("https://ipwho.is/", (j) => {
-      if (j.success === false) return null;
-      const lat = num(j.latitude);
-      const lon = num(j.longitude);
-      if (lat == null || lon == null) return null;
-      return {
-        lat,
-        lon,
-        accuracy: 12_000,
-        city: [j.city, j.country].filter(Boolean).join(", "),
-        country: String(j.country || ""),
-        countryCode: String(j.country_code || "").toUpperCase(),
-        source: "ip",
-      };
-    });
-  }
+  return ipFrom("https://get.geojs.io/v1/ip/geo.json", (j) => {
+    const lat = num(j.latitude);
+    const lon = num(j.longitude);
+    if (lat == null || lon == null) return null;
+    return {
+      lat,
+      lon,
+      accuracy: 12_000,
+      city: [j.city, j.country].filter(Boolean).join(", "),
+      country: String(j.country || ""),
+      countryCode: String(j.country_code || "").toUpperCase(),
+      source: "ip",
+    };
+  });
 }
 
 export async function nominatimCity(lat: number, lon: number, zoom = 10): Promise<CityFrame> {

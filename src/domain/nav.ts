@@ -2,7 +2,7 @@
  * Información de arquitectura de la bitácora (D-NAV).
  * El header/pie solo pintan.
  * D-NAV-01: 4 destinos.
- * D-NAV-02: Aprender = #aprender (conciencia + historia + minado + pulso).
+ * D-NAV-02: Aprender = #aprender (conciencia + historia + minado + pulso + repaso).
  * D-NAV-03: Red vive dentro de Mercado.
  * D-NAV-04: Sumate del header es CTA a Telegram de Consciencia Bitcoin, no un 5º destino.
  * D-CTA: QR / Apoyá con sats vive en el pie `#aportes`, no junto a Sumate.
@@ -45,6 +45,7 @@ export const LEARN_HUB: readonly NavItem[] = [
   { id: "historia", hash: "historia" },
   { id: "minado", hash: "minado" },
   { id: "pulso", hash: "pulso" },
+  { id: "repaso", hash: "repaso" },
 ];
 
 /** D-NAV-03: Red vive dentro de Mercado. #red queda como ancla. */

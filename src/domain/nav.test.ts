@@ -13,7 +13,7 @@ test("D-NAV-02 Aprender hashes to the hub, not a inner block", () => {
   assert.equal(PRIMARY_NAV.find((n) => n.id === "aprender")?.hash, "aprender");
   assert.deepEqual(
     LEARN_HUB.map((n) => n.hash),
-    ["conciencia", "historia", "minado", "pulso"],
+    ["conciencia", "historia", "minado", "pulso", "repaso"],
   );
 });
 
@@ -110,7 +110,7 @@ test("Aprender chip: un solo foco, y la sala sigue siendo llegar", () => {
 
   assert.equal(sectorOf("repaso"), "llegar");
   assert.equal(spyOf("repaso"), "aprender");
-  assert.deepEqual(lit("repaso"), []);
+  assert.deepEqual(lit("repaso"), ["repaso"]);
 
   for (const outside of ["mapa", "comunidad", "anuncios", "eventos", "experiencias", "feed", "mercado", "red", "roadmap", "contacto"]) {
     assert.deepEqual(lit(outside), [], outside);

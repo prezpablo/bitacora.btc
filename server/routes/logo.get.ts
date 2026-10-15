@@ -69,7 +69,7 @@ async function toJpeg(buf: Buffer, cover: boolean) {
     const sharp = (await import("sharp")).default;
     let img = sharp(buf, { limitInputPixels: PIXELS, animated: false }).rotate();
     img = cover
-      ? img.resize(960, 720, { fit: "cover", position: "centre" })
+      ? img.resize(540, 675, { fit: "cover", position: "centre" })
       : img.resize(960, 960, { fit: "inside", withoutEnlargement: true });
     return await img.flatten({ background: "#ffffff" }).jpeg({ quality: 72, mozjpeg: true }).toBuffer();
   } catch {
@@ -84,7 +84,7 @@ function lumaCompact(href: string) {
     if (u.pathname.includes("/cdn-cgi/image/")) return href;
     const path = u.pathname.replace(/^\//, "");
     if (!path) return href;
-    return `https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
+    return `https://images.lumacdn.com/cdn-cgi/image/width=540,height=675,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
   } catch {
     return href;
   }
@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
     return "";
   }
   const thumb = String(q.fit || "") === "thumb";
-  const id = createHash("sha256").update(`${thumb ? "t1:" : ""}${href}`).digest("hex").slice(0, 32);
+  const id = createHash("sha256").update(`${thumb ? "ig45:" : ""}${href}`).digest("hex").slice(0, 32);
   const file = join(DIR, id);
   const meta = `${file}.type`;
   try {

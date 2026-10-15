@@ -82,7 +82,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
           ],
           [
             "Ciudad por IP",
-            "Ciudad aproximada (GeoJS / ipwho.is)",
+            "Ciudad aproximada (GeoJS)",
             "Consentimiento: extras del dispositivo o el botón de ubicación",
             "No se persiste. Si hay abuso, se guarda un resumen criptográfico truncado (HMAC-SHA256) de la IP: dato seudonimizado, no la IP en claro",
           ],
@@ -104,7 +104,7 @@ const es: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transferencias, terceros e inmutabilidad",
       id: "terceros",
-      body: "El tratamiento se hace en un servidor virtual contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo. La lista, con nombre y país, está debajo.\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS o ipwho.is estiman ciudad si lo autorizás. Las interfaces de mercado y de eventos alimentan la mesa de mercado (precio, datos de la cadena y agenda). La casilla de Contacto que nombra a FormSubmit documenta el consentimiento a esa transferencia a Estados Unidos (Ley 18.331, art. 23, inciso 2º, literal A). La casilla al publicar documenta la de GitHub. Las demás consultas no usan esa casilla.\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
+      body: "El tratamiento se hace en un servidor virtual contratado (VPS Njalla) y en tu navegador. Hay encargados y destinatarios fuera de Uruguay y, en algunos casos, fuera del Espacio Económico Europeo. La lista, con nombre y país, está debajo.\n\nGitHub (EE.UU.) aloja el CSV público del mapa y de los anuncios, sin códigos CARGA ni correos. FormSubmit reenvía el formulario de Contacto hacia Gmail. Nominatim/OpenStreetMap resuelve direcciones. GeoJS estima la ciudad si lo autorizás. Las interfaces de mercado y de eventos alimentan la mesa de mercado (precio, datos de la cadena y agenda). La casilla de Contacto que nombra a FormSubmit documenta el consentimiento a esa transferencia a Estados Unidos (Ley 18.331, art. 23, inciso 2º, literal A). La casilla al publicar documenta la de GitHub. Las demás consultas no usan esa casilla.\n\nLo que publicás en el mapa, en GitHub o en una red pública (Nostr, Lightning, cadena) no se puede borrar del todo. El derecho de supresión se ejerce sobre nuestras copias; el historial abierto y las redes públicas escapan a un olvido absoluto. Eso se informa antes de publicar.",
     },
     {
       title: "Derechos",
@@ -223,7 +223,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
           ],
           [
             "City by IP",
-            "Approximate city (GeoJS / ipwho.is)",
+            "Approximate city (GeoJS)",
             "Consent: device extras or the locate button",
             "Not persisted. On abuse, a truncated HMAC-SHA256 of the IP is stored: pseudonymised data, not the IP in the clear",
           ],
@@ -245,7 +245,7 @@ const en: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transfers, processors and immutability",
       id: "terceros",
-      body: "Processing runs on a contracted server (Njalla VPS) and in your browser. Processors and recipients sit outside Uruguay and, in some cases, outside the EEA. The list, with name and country, is below.\n\nGitHub (US) hosts the public map and announcement CSV, without CARGA codes or emails. FormSubmit forwards the Contact form to Gmail. Nominatim/OpenStreetMap resolves addresses. GeoJS or ipwho.is estimate city if you allow it. Market and event APIs feed the desk. The Contact checkbox that names FormSubmit records consent to that transfer to the United States (Act 18.331, art. 23, subsection 2, letter A). The checkbox on publish records the GitHub one. The other requests do not use that checkbox.\n\nWhat you publish on the map, on GitHub or on a public network (Nostr, Lightning, chain) cannot be fully erased. Erasure applies to our copies; open history and public networks are beyond absolute oblivion. That is stated before you publish.",
+      body: "Processing runs on a contracted server (Njalla VPS) and in your browser. Processors and recipients sit outside Uruguay and, in some cases, outside the EEA. The list, with name and country, is below.\n\nGitHub (US) hosts the public map and announcement CSV, without CARGA codes or emails. FormSubmit forwards the Contact form to Gmail. Nominatim/OpenStreetMap resolves addresses. GeoJS estimates the city if you allow it. Market and event APIs feed the desk. The Contact checkbox that names FormSubmit records consent to that transfer to the United States (Act 18.331, art. 23, subsection 2, letter A). The checkbox on publish records the GitHub one. The other requests do not use that checkbox.\n\nWhat you publish on the map, on GitHub or on a public network (Nostr, Lightning, chain) cannot be fully erased. Erasure applies to our copies; open history and public networks are beyond absolute oblivion. That is stated before you publish.",
     },
     {
       title: "Rights",
@@ -364,7 +364,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
           ],
           [
             "Cidade por IP",
-            "Cidade aproximada (GeoJS / ipwho.is)",
+            "Cidade aproximada (GeoJS)",
             "Consentimento: extras do dispositivo ou o botão de localização",
             "Não fica gravada. Em caso de abuso, guarda-se um HMAC-SHA256 truncado do IP: dado pseudonimizado, não o IP em claro",
           ],
@@ -386,7 +386,7 @@ const pt: { lead: string; blocks: LegalBlock[] } = {
     {
       title: "Transferências, terceiros e imutabilidade",
       id: "terceros",
-      body: "O tratamento é feito num servidor contratado (VPS Njalla) e no seu navegador. Há operadores e destinatários fora do Uruguai e, em alguns casos, fora do EEE. A lista, com nome e país, está abaixo.\n\nO GitHub (EUA) hospeda o CSV público do mapa e dos anúncios, sem códigos CARGA nem e-mails. O FormSubmit reenvia o formulário de Contato para o Gmail. O Nominatim/OpenStreetMap resolve endereços. O GeoJS ou o ipwho.is estimam a cidade se você autorizar. APIs de mercado e de eventos alimentam o desk. A caixa de Contato que nomeia o FormSubmit documenta o consentimento a essa transferência para os Estados Unidos (Lei 18.331, art. 23, inciso 2º, alínea A). A caixa ao publicar documenta a do GitHub. As outras consultas não usam essa caixa.\n\nO que você publica no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se apaga por completo. O direito de apagamento vale para as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso é informado antes de publicar.",
+      body: "O tratamento é feito num servidor contratado (VPS Njalla) e no seu navegador. Há operadores e destinatários fora do Uruguai e, em alguns casos, fora do EEE. A lista, com nome e país, está abaixo.\n\nO GitHub (EUA) hospeda o CSV público do mapa e dos anúncios, sem códigos CARGA nem e-mails. O FormSubmit reenvia o formulário de Contato para o Gmail. O Nominatim/OpenStreetMap resolve endereços. O GeoJS estima a cidade se você autorizar. APIs de mercado e de eventos alimentam o desk. A caixa de Contato que nomeia o FormSubmit documenta o consentimento a essa transferência para os Estados Unidos (Lei 18.331, art. 23, inciso 2º, alínea A). A caixa ao publicar documenta a do GitHub. As outras consultas não usam essa caixa.\n\nO que você publica no mapa, no GitHub ou numa rede pública (Nostr, Lightning, cadeia) não se apaga por completo. O direito de apagamento vale para as nossas cópias; o histórico aberto e as redes públicas escapam a um esquecimento absoluto. Isso é informado antes de publicar.",
     },
     {
       title: "Direitos",

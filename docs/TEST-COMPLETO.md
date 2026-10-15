@@ -27,8 +27,8 @@ Habitación COMUNIDAD: anuncios 7d, eventos, banner LABITCONF, feed. Destino, no
 Habitación MERCADO: precio, velas, disclaimer educativo. Destino, no cola.
 Habitación PIE: roadmap + datos + soberanía + contacto. Solo desde el footer. Roadmap NO está entre Aprender y Comunidad.
 Aprender = Qué es Bitácora · Historia de Bitcoin · Bitcoin hoy. H1 = bienvenida Consciencia Bitcoin (marca, no se traduce).
-Globo: cifras en recuadro centrado con borde semitransparente ARRIBA del planeta (no overlay). Botones Sumate acá + Entrar al mapa. Zoom rueda SOLO con foco.
-Mapa: Sumate acá + Volver al globo. Volver no aborta CARGA pendiente.
+Globo: cifras en recuadro centrado con borde semitransparente ARRIBA del planeta (no overlay). Botones Suma comercio o comunidad + Entrar al mapa. Zoom rueda SOLO con foco.
+Mapa: Suma comercio o comunidad + Volver al globo. Volver no aborta CARGA pendiente.
 Dirección de comercio/comunidad OPCIONAL. Pedir código = nombre + captcha + privacidad.
 Ficha Consciencia Bitcoin: texto educación y psicología financiera + iconos/enlaces YouTube, X, TikTok, Instagram, Telegram, Web.
 Red #red vive DENTRO de #mercado.
@@ -110,10 +110,10 @@ D) HABITACIÓN LLEGAR (Mapa + Aprender)
 - L3 H1 bienvenida (es Te damos la bienvenida / pt Boas-vindas / en Welcome). «Consciencia Bitcoin» intacta
 - L4 Historia de Bitcoin al bajar. Bitcoin hoy = pulso
 - L5 Globo: recuadro de cifras centrado (ciudades/comercios/comunidades/eventos) + línea LATINOAMÉRICA. El planeta NO queda tapado por el recuadro. Copy «Ya no estás solo»
-- L6 Sumate acá (izq/centro) + Entrar al mapa (der)
-- L7 Entrar al mapa: Leaflet + búsqueda. Sumate acá + Volver al globo
+- L6 Suma comercio o comunidad (izq/centro) + Entrar al mapa (der)
+- L7 Entrar al mapa: Leaflet + búsqueda. Suma comercio o comunidad + Volver al globo
 - L8 Volver al globo deshabilitado si hay CARGA pendiente
-- L9 Header Sumate (Telegram) NO debe sacar del mapa ni abrir carga; es comunidad Telegram. Carga = Sumate acá / pin en el mapa
+- L9 Header Sumate (Telegram) NO debe sacar del mapa ni abrir carga; es comunidad Telegram. Carga = Suma comercio o comunidad / pin en el mapa
 - L10 Rueda SIN foco en globo/mapa: no zoomea. Con foco, zoomea. +/− del mapa vivos
 - L11 Filtros todas / comercios / comunidades
 - L12 Ficha comercio: Ir · Opinar · Actualizar · Cancelar en una fila
@@ -190,7 +190,7 @@ K) ACCESIBILIDAD (A11Y) — si no hay browser, HTTP-only y marcar N/D-sin-browse
 L) P2 SEGURIDAD
 - P2-01 CSP, XFO SAMEORIGIN, nosniff, referrer no-referrer, permissions-policy
 - P2-02 object-src none; form-action self + formsubmit.co
-- P2-03 connect-src: geojs, ipwho.is, nominatim, OpenFreeMap, OpenTopo, OSM-FR (openstreetmap.fr), btcmap. Velas NO en connect-src. arcgisonline = regresión D-TILE-03
+- P2-03 connect-src: geojs, nominatim, OpenFreeMap, OpenTopo, OSM-FR (openstreetmap.fr), btcmap. Sin ipwho.is. Velas NO en connect-src. arcgisonline = regresión D-TILE-03
 - P2-04 sin gtag/fbq/pixel/hotjar
 - P2-06 sin login / wallet-connect / depósito / «enviá fondos»
 - P2-07 /api y /__grok no exponen admin, keys ni CARGA-
@@ -206,7 +206,7 @@ L) P2 SEGURIDAD
 - P2-21 /logo?u=https://127.0.0.1/ → 404. /logo sin u → 404
 
 M) P3 FEEDS — 1 GET/HEAD
-Mapa: D-BTCMAP-E https://api.btcmap.org/v2/elements · D-BTCMAP-A /v2/areas · D-OFM tiles.openfreemap.org/styles/liberty · D-OTM a.tile.opentopomap.org/4/5/6.png · D-NOM nominatim.openstreetmap.org · D-GEOJS get.geojs.io/v1/ip/geo.json · D-IPWHO ipwho.is
+Mapa: D-BTCMAP-E https://api.btcmap.org/v2/elements · D-BTCMAP-A /v2/areas · D-OFM tiles.openfreemap.org/styles/liberty · D-OTM a.tile.opentopomap.org/4/5/6.png · D-NOM nominatim.openstreetmap.org · D-GEOJS get.geojs.io/v1/ip/geo.json
 Desk (1 de 4 = precio_ok SI): D-BN api.binance.com · D-BN-VISION data-api.binance.vision · D-OKX okx.com · D-HL api.hyperliquid.xyz/info (405/404 = N/D, NO POST)
 On-chain: D-MP-FEE mempool.space/api/v1/fees/recommended · D-MP-TIP mempool.space/api/blocks/tip/height · D-MP-NINJA mempool.ninja/api/v1/fees/recommended · D-FNG api.alternative.me/fng/?limit=1 · D-BITBO bitbo.io/treasuries/etf-flows/ · D-POLY gamma-api.polymarket.com/markets?limit=1 (404 = N/D)
 Contacto: D-FS HEAD formsubmit.co

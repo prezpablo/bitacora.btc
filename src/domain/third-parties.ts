@@ -123,17 +123,6 @@ export const THIRD_PARTIES: ThirdParty[] = [
     },
   },
   {
-    hosts: ["ipwho.is"],
-    name: "ipwho.is",
-    country: UNDECLARED,
-    side: "browser",
-    why: {
-      es: "Respaldo de la ciudad aproximada.",
-      en: "Fallback for the approximate city.",
-      pt: "Reserva da cidade aproximada.",
-    },
-  },
-  {
     hosts: ["nominatim.openstreetmap.org"],
     name: "Nominatim (OpenStreetMap Foundation)",
     country: { es: "Reino Unido", en: "United Kingdom", pt: "Reino Unido" },

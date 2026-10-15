@@ -83,7 +83,7 @@ Formulario web con casilla de consentimiento desmarcada por defecto. Publicació
 - FormSubmit (relé del formulario) → Gmail (correo del responsable).  
 - GitHub, EE.UU.: CSV público del mapa y anuncios, **sin** correos ni códigos de verificación.  
 - Nominatim/OpenStreetMap: resolución de direcciones.  
-- GeoJS / ipwho.is: ciudad aproximada si hay consentimiento.  
+- GeoJS: ciudad aproximada si hay consentimiento.  
 - APIs de mercado y eventos: no reciben datos de titulares.  
 No hay cesión onerosa.
 

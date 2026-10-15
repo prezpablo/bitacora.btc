@@ -16,7 +16,7 @@ La auditoría redactó un clausulado para pegar en `legal-eu.tsx` y pidió datos
 | Cookies de analítica a bloquear | **No hay** gtag, pixel ni ads. Solo `localStorage` (idioma, apodo, caché del mapa). |
 | Vinculación de billetera cripto | **No hay** connect-wallet. Hay QR Lightning de contribución, pines públicos y menciones Nostr en el pulso. |
 | Formulario de contacto recaba datos | **Sí:** nombre, email, motivo, mensaje → FormSubmit → Gmail. Casilla de privacidad **obligatoria** (P0). |
-| Mapa / geolocalización | **Sí:** GPS del navegador (permiso) **y** ciudad por IP (GeoJS / ipwho.is) al cargar el mapa. |
+| Mapa / geolocalización | **Sí:** GPS del navegador (permiso) **y** ciudad por IP (GeoJS) al cargar el mapa. |
 | `www.bitacorabtc.org` inaccesible | Caddy redirige `www` → apex. Confirmar DNS/cert del `www` en el VPS. |
 
 **No construir:** pantalla de registro, checkbox de “cuenta”, connect-wallet, ni un CMP de analíticas. No existen.
@@ -91,7 +91,7 @@ Si se almacenan datos personales de forma estructurada, la base se inscribe en l
 | Tipos | Contacto: nombre, email, motivo, mensaje. Mapa/pines **públicos**: nombre de lugar o anuncio, descripción, dirección, horarios, redes, logo (URL), coords. Técnico: IP **hasheada** (rate-limit), tickets de captcha, idioma y (si acepta) apodo y caché local. **No:** contraseñas, KYC, billeteras, cuentas. |
 | Hosting | VPS Njalla, app en `/var/www/bitacora`, SQLite `data/bitacora.sqlite`. **Confirmar país del datacenter.** Contacto además transita por FormSubmit y Gmail. CSV público en GitHub (EE.UU.). |
 | Medidas | HTTPS (Caddy/Let’s Encrypt), SSH solo clave, root cerrado, `MemoryMax`, captcha + rate-limit, IP no en claro, backup gzip del SQLite, sin cookies de ads. |
-| Cesión a terceros | FormSubmit, Google (Gmail + **hoy** Google Fonts), GitHub, OSM/Nominatim, GeoJS o ipwho, APIs de mercado/eventos. Sin cesión comercial. Redes públicas (Nostr, Lightning, chain) si el usuario publica ahí. |
+| Cesión a terceros | FormSubmit, Google (Gmail + **hoy** Google Fonts), GitHub, OSM/Nominatim, GeoJS, APIs de mercado/eventos. Sin cesión comercial. Redes públicas (Nostr, Lightning, chain) si el usuario publica ahí. |
 
 | ID | Deuda | Quién |
 |---|---|---|

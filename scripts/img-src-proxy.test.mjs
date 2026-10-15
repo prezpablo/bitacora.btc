@@ -20,9 +20,11 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   assert.match(flyer, /export function eventFlyerSrc/);
   assert.match(flyer, /FLYER_HOST/);
   assert.match(flyer, /lumaFlyerUrl/);
+  assert.match(flyer, /width=540,height=675/);
   const eventsUi = read("src/components/dashboard/network-events.tsx");
   assert.match(eventsUi, /object-cover/);
   assert.match(eventsUi, /objectPosition: "center center"/);
+  assert.match(eventsUi, /aspect-\[4\/5\]/);
   const caddy = read("deploy/Caddyfile");
   assert.match(caddy, /img-src 'self'/);
   assert.doesNotMatch(caddy, /img-src[^"]*\shttps:\s/);
@@ -33,7 +35,7 @@ test("D-CSP-IMG imgSrc proxies remote URLs through /logo", () => {
   const logo = read("server/routes/logo.get.ts");
   assert.match(logo, /MAX = 2_000_000/);
   assert.match(logo, /img\.evbuc\.com/);
-  assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/);
+  assert.match(logo, /images\.lumacdn\.com\/cdn-cgi\/image\/width=540,height=675,fit=cover,gravity=center,quality=72,format=jpeg/);
   assert.match(logo, /fit: "cover"/);
   assert.match(logo, /position: "centre"/);
   assert.match(logo, /isSvgPayload/);

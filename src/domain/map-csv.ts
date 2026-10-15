@@ -190,7 +190,7 @@ export function imgSrc(raw: string) {
   return `/logo?u=${encodeURIComponent(u)}`;
 }
 
-/** Luma CDN already crops 4:3; other flyers use CSS object-cover. */
+/** Instagram feed post is 4:5 (1080×1350). The grid uses half of that. */
 export function lumaFlyerUrl(href: string) {
   try {
     const u = new URL(href);
@@ -198,7 +198,7 @@ export function lumaFlyerUrl(href: string) {
     if (u.pathname.includes("/cdn-cgi/image/")) return href;
     const path = u.pathname.replace(/^\//, "");
     if (!path) return href;
-    return `https://images.lumacdn.com/cdn-cgi/image/width=960,height=720,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
+    return `https://images.lumacdn.com/cdn-cgi/image/width=540,height=675,fit=cover,gravity=center,quality=72,format=jpeg/${path}`;
   } catch {
     return href;
   }

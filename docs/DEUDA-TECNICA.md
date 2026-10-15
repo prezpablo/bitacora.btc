@@ -116,7 +116,7 @@ Lista de 32 pedidos de código (Parte A) y 9 de Pablo (Parte B). No es dictamen.
 |---|---|---|---|
 | **A-01** | P0 | Hecho en el repo (textos 2.5). Sin domicilio de notificación, el aviso no dice que figura. Queda la ciudad. Falta el ZIP para el .org. | No se publica una calle. |
 | **L-URCDP** (A-02) | P0 | Hecho en el repo (textos 2.6). Sin número, dice que la URCDP no lo asignó. La fecha no se publica. Bases: contacto y seguridad. Falta el ZIP. | No se imprime «en trámite» como número. No se agregan anuncios ni experiencias. |
-| **L-PAIS** (A-03) | P0 | Hecho en el repo (textos 2.7). OpenFreeMap enlaza Hungría a sus términos. BTC Map, GeoJS, ipwho.is y Lingva dicen que el proveedor no informa el país. Falta el ZIP. | No se adivina el país ni la instancia de Lingva. |
+| **L-PAIS** (A-03) | P0 | Hecho en el repo (textos 2.7). OpenFreeMap enlaza Hungría a sus términos. BTC Map, GeoJS y Lingva dicen que el proveedor no informa el país. ipwho.is ya no se consulta. Falta el ZIP. | No se adivina el país ni la instancia de Lingva. |
 | **A-04** | P0 | Hecho en el repo (textos 2.8). La cita es «Ley 18.331, art. 23, inciso 2º, literal A». Gmail sigue en 12 meses. Falta el ZIP. | No se inventan plazos de logs ni de FormSubmit. |
 | **A-07** | P1 | Hecho en el repo. La hora del mercado es de Uruguay y nombra la zona. Si la cifra es de la serie modelo, dice que no es cotización. Falta el ZIP. | No se inventa una lista de fuentes. |
 | **A-08** | P1 | Hecho en el repo (textos 2.9). 14 reglas en es, pt y en. La regla 12 muestra 5 días hábiles y no un plazo de disputa. La licencia de la ficha armada no se afirma. Falta el ZIP. | No se pega «sigue la ODbL» sobre la ficha. |

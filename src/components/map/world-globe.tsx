@@ -517,7 +517,7 @@ function GlobeCanvas({
       ) : null}
       </div>
       {geoNotice ? <p className="px-3 pt-2 text-center text-xs text-pretty text-muted-foreground">{t("geoPurpose")}</p> : null}
-      <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
+      <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:overflow-visible">
         <span className="hidden sm:block" />
         <button
           type="button"

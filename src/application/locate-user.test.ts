@@ -19,6 +19,26 @@ test("permission denied skips the GPS watch and uses IP", async () => {
   assert.equal(out.fix?.source, "ip");
 });
 
+test("coarse GPS returns at once and does not call IP", async () => {
+  let calls = 0;
+  const coarse: GeoFix = { lat: -34.47, lon: -57.84, accuracy: 400, source: "gps" };
+  const session: GpsSession = {
+    first: Promise.resolve(coarse),
+    best: new Promise(() => {}),
+    note: () => {},
+  };
+  const out = await locateOnConsent(session, {
+    ip: async () => {
+      calls += 1;
+      return ip;
+    },
+  });
+  assert.equal(calls, 0);
+  assert.equal(out.gpsFail, null);
+  assert.equal(out.fix?.source, "gps");
+  assert.equal(out.fix?.accuracy, 400);
+});
+
 test("precise GPS returns without IP", async () => {
   const gps: GeoFix = { lat: -34.47, lon: -57.84, accuracy: 20, source: "gps" };
   const session: GpsSession = {

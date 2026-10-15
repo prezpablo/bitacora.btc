@@ -4,7 +4,7 @@ import type { GeoFix } from "@/domain/geo-frame";
 import { boxAround } from "@/domain/geo-frame";
 import { gpsFailOf, irFailKey, isPreciseFix, type GeoCause } from "@/domain/geo-fix";
 import { formatGuideStep, geodesicLine, kmBetween, type GuideStep } from "@/domain/guide";
-import { getApproxFix, getCityFrame, getGuidePath } from "@/infrastructure/server-fns";
+import { getCityFrame, getGuidePath } from "@/infrastructure/server-fns";
 import { locateBest, requestIpFix, startGpsFromGesture } from "@/infrastructure/geo";
 import { guideMarker } from "@/infrastructure/leaflet-router";
 import type { CopyKey } from "@/lib/i18n";
@@ -174,8 +174,7 @@ export function useMapGuide(lang: AppLang, t: (k: CopyKey) => string) {
     try {
       if (preferGps) {
         const session = startGpsFromGesture();
-        mapRef.current?.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
-        const { fix, gpsFail } = await locateOnConsent(session, { ip: async () => requestIpFix().catch(() => null) });
+        const { fix, refine, gpsFail } = await locateOnConsent(session, { ip: async () => requestIpFix().catch(() => null) });
         if (!fix) {
           setGeo(gpsFail || "timeout");
           return;
@@ -188,6 +187,16 @@ export function useMapGuide(lang: AppLang, t: (k: CopyKey) => string) {
         map.invalidateSize();
         setUserFix({ lat: fix.lat, lon: fix.lon });
         setGeo(fix.source === "gps" ? "ok" : gpsFail || "idle");
+        void refine.then((better) => {
+          if (!better || better.source !== "gps") return;
+          if (better.accuracy >= fix.accuracy - 20) return;
+          const L2 = leafletRef.current;
+          const map2 = mapRef.current;
+          if (!L2 || !map2) return;
+          applyFix(L2, map2, userMark.current, better.lat, better.lon, better.accuracy, boxAround(better.lat, better.lon, "acá", 0.04));
+          setUserFix({ lat: better.lat, lon: better.lon });
+          setGeo("ok");
+        });
         return;
       }
       const { fix, city } = await locateBest(false, (lat, lon, zoom) =>
@@ -209,19 +218,7 @@ export function useMapGuide(lang: AppLang, t: (k: CopyKey) => string) {
     guideToRef.current = to;
     try {
       const { fix, refine, gpsFail } = await locateOnConsent(session, {
-        ip: async () => {
-          try {
-            return await requestIpFix();
-          } catch {
-            /* beacon */
-          }
-          try {
-            const a = await getApproxFix();
-            return a ? { lat: a.lat, lon: a.lon, accuracy: a.accuracy, source: "ip" as const } : null;
-          } catch {
-            return null;
-          }
-        },
+        ip: () => requestIpFix().catch(() => null),
       });
       if (fix && (fix.source === "gps" || fix.source === "tap" || kmBetween(fix, to) >= 0.08)) {
         await drawFrom(fix, to);
@@ -257,18 +254,6 @@ export function useMapGuide(lang: AppLang, t: (k: CopyKey) => string) {
     const guess = userFix || (c ? { lat: c.lat, lon: c.lng } : null);
     if (guess && kmBetween(guess, to) >= 0.08) void drawFrom(guess, to);
     const session = startGpsFromGesture();
-    if (map) {
-      map.stopLocate();
-      map.once("locationfound", (e: { latlng: { lat: number; lng: number }; accuracy?: number }) => {
-        session.note({
-          lat: e.latlng.lat,
-          lon: e.latlng.lng,
-          accuracy: e.accuracy || 80,
-          source: "gps",
-        });
-      });
-      map.locate({ setView: false, enableHighAccuracy: true, timeout: 12_000, maximumAge: 8_000 });
-    }
     void runGuide(to, session);
   }
 
