@@ -21,9 +21,9 @@
     {
       "id": "L-MANIF",
       "pri": "P1",
-      "open": true,
-      "kind": "manual",
-      "done": "Repo: un manifiesto propio no suma /__grok/; host bitacorabtc.org quita extensions.js. La vista previa lo conserva. El .org sigue duplicado hasta el ZIP."
+      "open": false,
+      "kind": "live",
+      "done": "15 oct 14:22 UTC. bitacorabtc.org tiene un solo manifiesto. /__grok/manifest da 404. No hay extensions.js. healthz ok."
     },
     {
       "id": "L-GUARD",

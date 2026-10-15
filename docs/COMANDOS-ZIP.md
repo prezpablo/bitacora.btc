@@ -44,9 +44,14 @@ rm -rf "$KEEP" "$WORKDIR"
 cd "$APP"
 npm ci || npm install
 SOURCE_REV=""
-if REV_JSON=$(curl -fsS --max-time 8 -H "Accept: application/vnd.github+json" -H "User-Agent: bitacora.btc" https://api.github.com/repos/prezpablo/bitacora.btc/commits/main); then
+SHA=$(git ls-remote https://github.com/prezpablo/bitacora.btc.git refs/heads/main 2>/dev/null | awk 'NR==1{print $1}' || true)
+if printf '%s' "$SHA" | grep -qE '^[0-9a-f]{40}$'; then
+  SOURCE_REV=$SHA
+fi
+if [ -z "$SOURCE_REV" ] && REV_JSON=$(curl -fsS --max-time 8 -H "Accept: application/vnd.github+json" -H "User-Agent: bitacora.btc" https://api.github.com/repos/prezpablo/bitacora.btc/commits/main); then
   SOURCE_REV=$(printf '%s' "$REV_JSON" | grep -oE '"sha": "[0-9a-f]{40}"' | head -n1 | grep -oE '[0-9a-f]{40}' || true)
 fi
+echo "SOURCE_REV=${SOURCE_REV:-vacio}"
 NITRO_PRESET=node-server VITE_PUBLIC_HOSTNAME=bitacorabtc.org SOURCE_REV="$SOURCE_REV" npm run build:vps
 install -m 644 "$APP/deploy/Caddyfile" /etc/caddy/Caddyfile
 systemctl restart bitacora

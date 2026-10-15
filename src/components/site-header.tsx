@@ -270,15 +270,15 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
                   <a href="/#soberania" className="inline-flex min-h-6 min-w-6 items-center text-foreground">
                     {t("sovTitle")}
                   </a>
-                  {/^[0-9a-f]{7}$/.test(BUILD_REV) ? (
+                  {/^[0-9a-f]{7,40}$/i.test(BUILD_REV) ? (
                     <a
-                      href={`https://github.com/prezpablo/bitacora.btc/commit/${BUILD_REV}`}
+                      href={`https://github.com/prezpablo/bitacora.btc/commit/${BUILD_REV.slice(0, 7).toLowerCase()}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={t("footerCode")}
                       className="inline-flex min-h-6 min-w-6 items-center font-mono text-foreground"
                     >
-                      {BUILD_REV}
+                      {BUILD_REV.slice(0, 7).toLowerCase()}
                     </a>
                   ) : null}
                 </div>

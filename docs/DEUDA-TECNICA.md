@@ -37,7 +37,7 @@ El PDF fechó el sitio en la versión 2.0 y el commit `79d2b76`. A las 13:27 `/l
 
 **D-GLOBE** cerrada el 14 oct. No hay pantalla nueva. Se entra por el globo. Una CARGA a medias abre el mapa y «Volver al globo» no la suelta. Una red 3G no apaga el globo.
 
-**D-FOSS** está en el repo y no en el sitio. GitHub ya responde 200 sin login. El pie enlaza el commit corto solo si el build tiene `SOURCE_REV` (el ZIP ya lo pide). En bitacorabtc.org el pie todavía no muestra el hash. No se cierra hasta ver ese enlace en el HTML.
+**D-FOSS** está en el repo y no en el sitio. GitHub ya responde 200 sin login. El ZIP de GitHub no trae `.git` y la API se queda sin cupo, así que el build salía con el hash vacío y el pie no lo mostraba. Desde el 15 oct el archivo `src/build-rev.ts` pide a ese ZIP el commit (`export-subst`). El pie muestra 7 caracteres. No se cierra hasta ver el enlace en el HTML de bitacorabtc.org.
 
 **S-SVG** cerrada en el repo el 14 oct. `/logo` convierte un SVG a JPEG o responde 404. Esa ruta lleva `default-src 'none'`. No está en bitacorabtc.org hasta el próximo ZIP.
 
@@ -53,7 +53,7 @@ Cotejo de arquitectura y suite: 346 de 356 pruebas pasan. La página no se rearm
 
 | Orden | Id | Hecho cuando | No se hace |
 |---|---|---|---|
-| 1 | **L-MANIF** | Hecho en el repo. Si la página ya tiene un manifiesto, no se agrega el de `/__grok/`. En `bitacorabtc.org` se quita `extensions.js`. La vista previa, con otro host, lo conserva. En el sitio sigue duplicado hasta el próximo ZIP. | No se apaga el inyector de la vista previa. No se borra el complemento. |
+| 1 | **L-MANIF** | Hecho en el sitio (15 oct 14:22 UTC). Un solo manifiesto. `/__grok/manifest` da 404. No hay `extensions.js`. | No se apaga el inyector de la vista previa. No se borra el complemento. |
 | 2 | **L-GUARD** | Hecho. Los 8 vigilantes leen el código de ahora: voto público, región hablada del captcha, `legalHref`, `Junte-se à Consciencia Bitcoin`. La página no se tocó. | No se vuelve el código atrás para que el texto coincida. |
 | 3 | **L-PWA-LOAD** | Hecho. `scripts/grok-pwa-plugin.test.mjs` arranca: 45 de 45. No se inventó `langFromSearch`. El idioma lo lee la app. | No se inventa `langFromSearch` si el módulo ya no la exporta. |
 | 4 | **L-ARQ** | Hecho. `docs/ARQUITECTURA.md` dice las cuatro salas, la casa en el globo, el gráfico propio y `/manifest.webmanifest`. | No se toca la página para obedecer el documento de agosto. |

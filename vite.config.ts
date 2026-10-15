@@ -11,6 +11,7 @@ import { nitro } from "nitro/vite";
 import { grokPwaPlugin } from "./scripts/grok-pwa-plugin.mjs";
 // @ts-expect-error JS plugin alongside the TS vite config
 import { appEnvPlugin } from "./scripts/app-env-plugin.mjs";
+import { pickBuildRev, stampedRev } from "./scripts/build-rev.mjs";
 import { isMigrationFile } from "./scripts/migration-plan.mjs";
 
 /** The files `src/lib/db.ts` globs — same directory, same non-recursive scope. */
@@ -33,21 +34,22 @@ function hasGlobbedMigrations(root: string): boolean {
  */
 function sourceRev() {
   const env = process.env.SOURCE_REV || "";
-  if (/^[0-9a-f]{7,40}$/i.test(env)) return env.slice(0, 7).toLowerCase();
   try {
-    const sha = execSync("git rev-parse --short=7 HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
-    return /^[0-9a-f]{7}$/.test(sha) ? sha : "";
+    const sha = execSync("git rev-parse HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    return { env, git: sha };
   } catch {
-    return "";
+    return { env, git: "" };
   }
 }
 
-function revPlugin(rev: string): Plugin {
+function revPlugin(rev: { env: string; git: string }): Plugin {
   return {
     name: "bitacora-rev",
-    transform(_code, id) {
-      if (!id.replace(/\\/g, "/").endsWith("/src/build-rev.ts")) return;
-      return `export const BUILD_REV = ${JSON.stringify(rev)};\n`;
+    transform(code, id) {
+      const path = id.split("?")[0].replace(/\\/g, "/");
+      if (!path.endsWith("/src/build-rev.ts")) return;
+      const picked = pickBuildRev({ env: rev.env, git: rev.git, stamped: stampedRev(code) });
+      return `export const BUILD_REV = ${JSON.stringify(picked)};\n`;
     },
   };
 }
