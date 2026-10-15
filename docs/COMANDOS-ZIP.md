@@ -47,13 +47,16 @@ SOURCE_REV=""
 if REV_JSON=$(curl -fsS --max-time 8 -H "Accept: application/vnd.github+json" -H "User-Agent: bitacora.btc" https://api.github.com/repos/prezpablo/bitacora.btc/commits/main); then
   SOURCE_REV=$(printf '%s' "$REV_JSON" | grep -oE '"sha": "[0-9a-f]{40}"' | head -n1 | grep -oE '[0-9a-f]{40}' || true)
 fi
+SOURCE_REV=$(printf '%s' "$SOURCE_REV" | cut -c1-7)
+[ -n "$SOURCE_REV" ] || { echo "D-FOSS: GitHub no dio el commit. No se publica sin hash."; exit 1; }
+echo "SOURCE_REV=$SOURCE_REV"
 NITRO_PRESET=node-server VITE_PUBLIC_HOSTNAME=bitacorabtc.org SOURCE_REV="$SOURCE_REV" npm run build:vps
 install -m 644 "$APP/deploy/Caddyfile" /etc/caddy/Caddyfile
 systemctl restart bitacora
 systemctl reload caddy
 curl -s https://bitacorabtc.org/healthz
 echo
-curl -s https://bitacorabtc.org | grep -a -o Aprender | head
+curl -s https://bitacorabtc.org | grep -a -o "commit/$SOURCE_REV" | head
 curl -s https://bitacorabtc.org/sitemap.xml | grep -E 'lastmod|LICENSE'
 EOF
 ```

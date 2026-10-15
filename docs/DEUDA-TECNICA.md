@@ -37,7 +37,7 @@ El PDF fechó el sitio en la versión 2.0 y el commit `79d2b76`. A las 13:27 `/l
 
 **D-GLOBE** cerrada el 14 oct. No hay pantalla nueva. Se entra por el globo. Una CARGA a medias abre el mapa y «Volver al globo» no la suelta. Una red 3G no apaga el globo.
 
-**D-FOSS** está en el repo y no en el sitio. GitHub ya responde 200 sin login. El pie enlaza el commit corto solo si el build tiene `SOURCE_REV` (el ZIP ya lo pide). En bitacorabtc.org el pie todavía no muestra el hash. No se cierra hasta ver ese enlace en el HTML.
+**D-FOSS** sigue abierto el 15 oct 2026. GitHub responde 200 sin login, y `/LICENSE` también. El pie del repo ya enlaza `commit/` + 7 caracteres, pero solo si el build tiene hash. En bitacorabtc.org el HTML no trae ese enlace: el bundle `index-SClX2Mrk.js` no contiene `commit/`. El ZIP de GitHub no trae `.git`, así que el VPS depende de la API. Desde este corte, `build:vps` con `VITE_PUBLIC_HOSTNAME=bitacorabtc.org` no termina si `SOURCE_REV` viene vacío. No se cierra hasta ver `commit/` y esos 7 caracteres en el HTML del sitio.
 
 **S-SVG** cerrada en el repo el 14 oct. `/logo` convierte un SVG a JPEG o responde 404. Esa ruta lleva `default-src 'none'`. No está en bitacorabtc.org hasta el próximo ZIP.
 
@@ -46,6 +46,52 @@ El PDF fechó el sitio en la versión 2.0 y el commit `79d2b76`. A las 13:27 `/l
 **S-PATCH** cerrada en el repo el 14 oct. Si la ficha ya tiene la estrella, el parche público no le escribe logo ni redes. Con el token CARGA, sí. Una ficha sin estrella se puede completar, y el texto vacío también. No está en el sitio hasta el próximo ZIP.
 
 **Siguiente:** **D-FOSS**, con el próximo ZIP (el pie con el hash, y estos tres arreglos). **D-DEPS** no entra. **D-SQL-ONE** no es un cambio: sigue un solo proceso escribiendo la base. La pimienta se rotó el 14 oct 2026; la próxima es el 12 ene 2027. La copia semanal avisa los miércoles.
+
+## SOLARA · corte 800 — 15 oct 2026
+
+No es un ZIP de bitacorabtc.org. Paper, armed, feed live, caja 23.077 USD, sin posición. El trainer dice 800 muestras, 287 / 513. Ese `sumPnl +17` no es la caja. La curva desde el 5 sep va de 17.042 a 23.077 (**+6.035**). El libro que el export todavía guarda (14 sep – 15 oct) son 183 cierres, 36,1 % de acierto, **+3.029**. La peor caída de esa curva fue 575 USD (2,6 %), el 24 sep.
+
+El régimen ya está en conservador: las últimas 20 cerraron al 20 % (−163). Las últimas 40 siguen en +194.
+
+### Estrategias que están corriendo
+
+| Regla | Cómo cierra de verdad | Veredicto en este corte |
+|---|---|---|
+| Hunter Pump, playbook `launch` | Entra con score ~80–99, par fresco ≤ 45 min, tope de slip 2 %, tamaño 196 o 280 | El piso de 80 se queda. El score alto no mejora. |
+| Stop 12 % | 119 de 183 salidas finales. Pérdida media −32 USD. 60 de esos stops, antes de 15 min | No se abre. Es el que deja vivir a la cola. |
+| Take profit de launch 16 % | Casi no es la salida. La caja la hace el trail (arma al 18 %, devuelve 6 %) | No se aprieta. Sin las 8 colas el libro queda en +71. |
+| Parcial ~10–12 % | 26 caminos, **+1.092** (18 arriba, 8 abajo) | Se queda. |
+| Time-stop 19 min, flat 7 %, decay de score | El tiempo cerró 1 vez. El stop llega antes | No es la palanca. |
+| Jupiter obligatorio | El papel contra la cotización son −1,90 USD por entrada (−348 en el libro) | No es la fuga. |
+| Régimen por acierto de 20 | Conservador al 20 %. Halt ya disparado | Mientras siga así, mitad de tamaño. No se pasa a vivo. |
+
+Franja que sí separa: 21–30 min de vida, 61 cierres, +2.308, y +1.002 sin sus tres mejores. 11–20 min, 85 cierres, +345, y −591 sin sus tres mejores. Score ≥ 95: 9 cierres, −183. Market cap 400k+, donde está anotado: 7 cierres, cero ganados, −188. En 140 de 183 el mcap no quedó guardado.
+
+### Repos mirados el 15 oct (no se fusiona nada)
+
+| Repo | Qué dice ahora | Se toma | No se toma |
+|---|---|---|---|
+| [mivor7/pf](https://github.com/mivor7/pf) informe 18 jul 2026 | 7.552 lanzamientos. EV real del scalp ≈ −2,8 % por trade, el costo de ida y vuelta. Ninguna regla pasó el corte. | No ir a vivo. | Copiar una regla de ese estudio. |
+| [DeeKalshiWay/solana-pumpfun-bot](https://github.com/DeeKalshiWay/solana-pumpfun-bot) | Tamaño ×0,6 si el acierto de 20 baja de 30 %. El trail se afloja recién después de +100 %. | Mitad de tamaño con el régimen frío. | Su stop −10 % y su salida a los 4 min. El propio readme dice que ~60 % del resultado es un solo ticker. |
+| [sembraniteam/pump-sentry](https://github.com/sembraniteam/pump-sentry) | Paper por defecto. Quorum de 5 compradores en 10 s. Trail 5 % y moonbag 20 %. | Paper primero. Un quorum, más adelante, no en este corte. | Trail del 5 %: corta la cola que acá paga. |
+| [CosmoNebula/degen-club](https://github.com/CosmoNebula/degen-club) V2, may 2026 | Apagaron el loop que reescribe estrategias solo. Recomiendan stop −50/−60 % por los mechas. | No dejar que el trainer cambie las reglas solo. | Abrir nuestro stop. En este libro el stop corto es la estrategia. |
+| [yksanjo/pumpsniper](https://github.com/yksanjo/pumpsniper) | Conservador de ellos: take profit +100 %, stop −50 %. | Nada. | Es el espejo invertido de este corte. |
+| Cabal-Hunter ([paulf280-ui/solana-safe-sniper-mcp-template](https://github.com/paulf280-ui/solana-safe-sniper-mcp-template)) | Riesgo de ser la liquidez de salida, antes de comprar. | Recién a las 1.000 muestras, y solo si el score ≥ 95. | No es dependencia. No se firma nada. |
+| Bots «download now» (0 stars, un HTML) | — | — | No se bajan. |
+| [mapbox/supercluster](https://github.com/mapbox/supercluster/releases) | Sigue en **v9.1.0** (3 sep 2026). No hay release nuevo. | Ningún bump. | — |
+
+**Siguiente de SOLARA, en este orden.** Sigue en paper. No es el ZIP del sitio.
+
+| Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|
+| **SOL-REGIMEN** | P2 | Mitad de tamaño mientras el acierto de las últimas 20 esté bajo 30 %, o el régimen diga conservador. | No se pasa a vivo. No se apaga el halt. |
+| **SOL-FRESH** | P2 | Menos de 20 min de vida: mitad de tamaño. | No se veta la franja. Ahí también hubo cola. |
+| **SOL-SCORE** | P2 | Desde 95, mitad o skip. El piso sigue en 80. | No se sube el piso. 80–89 es donde está la caja. |
+| **SOL-MCAP** | P3 | Cada compra guarda el market cap. A las 1.000 muestras se decide si 400k queda afuera. | No se prohibe hoy: son 7 cierres. |
+
+**Congelado en SOLARA:** stop 12 %, trail, parcial, y el tope de slip. No se tocan en esta etapa.
+
+---
 
 ---
 
