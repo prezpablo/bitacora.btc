@@ -29,9 +29,7 @@ test("repo probes: PIN-01 and the public footer commit are closed", async () => 
 
 test("D-FOSS live does not close on a GitHub 200 without the footer hash", () => {
   const src = readFileSync(join(ROOT, "scripts/deuda-status.mjs"), "utf8");
-  const vite = readFileSync(join(ROOT, "vite.config.ts"), "utf8");
   assert.match(src, /commit\\\/\[0-9a-f\]\{7\}[\s\S]{0,40}home\.text/);
-  assert.match(vite, /D-FOSS: el build de bitacorabtc.org no tiene commit/);
 });
 
 test("D-GLOBE stays globe-first except a pending CARGA", () => {

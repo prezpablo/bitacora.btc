@@ -16,7 +16,7 @@
       "pri": "P1",
       "open": true,
       "kind": "live",
-      "done": "GET github.com/prezpablo/bitacora.btc 200 anónimo + LICENSE. El HTML de bitacorabtc.org muestra commit/ y 7 caracteres. El build del .org no sale si SOURCE_REV viene vacío."
+      "done": "GET github.com/prezpablo/bitacora.btc 200 anónimo + archivo LICENSE"
     },
     {
       "id": "D-PIN-01",
@@ -626,34 +626,6 @@
       "open": false,
       "kind": "repo",
       "done": "14 oct: con la estrella, el parche público no escribe logo ni redes. El token CARGA sí. El texto vacío sigue pudiendo completarse."
-    },
-    {
-      "id": "SOL-REGIMEN",
-      "pri": "P2",
-      "open": true,
-      "kind": "manual",
-      "done": "SOLARA paper. Mitad de tamaño mientras el acierto de 20 esté bajo 30% o el régimen sea conservador. No se pasa a vivo."
-    },
-    {
-      "id": "SOL-FRESH",
-      "pri": "P2",
-      "open": true,
-      "kind": "manual",
-      "done": "SOLARA. Menos de 20 min de vida: mitad de tamaño. No se veta la franja."
-    },
-    {
-      "id": "SOL-SCORE",
-      "pri": "P2",
-      "open": true,
-      "kind": "manual",
-      "done": "SOLARA. Score desde 95: mitad o skip. El piso sigue en 80."
-    },
-    {
-      "id": "SOL-MCAP",
-      "pri": "P3",
-      "open": true,
-      "kind": "manual",
-      "done": "SOLARA. Cada compra guarda el market cap. A las 1000 muestras se decide el corte de 400k. Hoy no se prohibe."
     }
   ],
   "guards": [

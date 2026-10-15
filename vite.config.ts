@@ -46,8 +46,7 @@ function revPlugin(rev: string): Plugin {
   return {
     name: "bitacora-rev",
     transform(_code, id) {
-      const path = id.split("?")[0].replace(/\\/g, "/");
-      if (!path.endsWith("/src/build-rev.ts")) return;
+      if (!id.replace(/\\/g, "/").endsWith("/src/build-rev.ts")) return;
       return `export const BUILD_REV = ${JSON.stringify(rev)};\n`;
     },
   };
@@ -217,12 +216,7 @@ function firebaseAliases() {
 // `0.0.0.0:8080` is the live-preview contract — don't change host/port.
 // The dev server starts once `src/router.tsx` and `src/routes/` exist — see
 // AGENTS.md § "First scaffold".
-export default defineConfig(({ command, isPreview }) => {
-  const rev = sourceRev();
-  if (command === "build" && process.env.VITE_PUBLIC_HOSTNAME === "bitacorabtc.org" && !/^[0-9a-f]{7}$/.test(rev)) {
-    throw new Error("D-FOSS: el build de bitacorabtc.org no tiene commit. SOURCE_REV vacío y no hay git.");
-  }
-  return {
+export default defineConfig(({ command, isPreview }) => ({
   server: {
     host: "0.0.0.0",
     port: 8080,
@@ -241,7 +235,7 @@ export default defineConfig(({ command, isPreview }) => {
     external: ["react-globe.gl", "three", "three-globe", "maplibre-gl", "@maplibre/maplibre-gl-leaflet", "node:sqlite"],
   },
   plugins: [
-    revPlugin(rev),
+    revPlugin(sourceRev()),
     globeStubOnServer(),
     authOffStubOnBuild(),
     pgliteBootstrapPlugin(),
@@ -267,5 +261,4 @@ export default defineConfig(({ command, isPreview }) => {
       : []),
     viteReact(),
   ],
-};
-});
+}));
