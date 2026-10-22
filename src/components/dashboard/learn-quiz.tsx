@@ -6,10 +6,14 @@ import {
   drawQuiz,
   quizPassed,
   quizText,
+  tallyDigits,
   type QuizQuestion,
 } from "@/domain/learn-quiz";
+import { bumpRepasoCount, getRepasoCount } from "@/infrastructure/server-fns";
 import { useAppLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+
+const COUNTED = "bitacora-repaso-counted";
 
 const COPY = {
   es: {
@@ -25,10 +29,12 @@ const COPY = {
     score: "{n} de {total}",
     right: "Correcto.",
     wrong: "No es esa. La respuesta correcta queda marcada.",
-    pass: "Más de la mitad. Esta imagen es tuya.",
+    congrats: "¡Felicitaciones, completaste el desafío!",
+    pass: "Esta imagen es tuya.",
     fail: "Menos de la mitad. Volvé a leer Aprender y probá de nuevo.",
     download: "Descargar",
-    poster: "Imagen ciberpunk del repaso",
+    poster: "Imagen del repaso",
+    tally: "Desafíos completados",
   },
   en: {
     title: "Review",
@@ -43,10 +49,12 @@ const COPY = {
     score: "{n} of {total}",
     right: "Correct.",
     wrong: "Not that one. The right answer is marked.",
-    pass: "More than half. This image is yours.",
+    congrats: "Congratulations, you completed the challenge!",
+    pass: "This image is yours.",
     fail: "Less than half. Read Learn again and try once more.",
     download: "Download",
-    poster: "Cyberpunk image from the review",
+    poster: "Image from the review",
+    tally: "Challenges completed",
   },
   pt: {
     title: "Revisão",
@@ -61,10 +69,12 @@ const COPY = {
     score: "{n} de {total}",
     right: "Certo.",
     wrong: "Não é essa. A resposta certa fica marcada.",
-    pass: "Mais da metade. Esta imagem é sua.",
+    congrats: "Parabéns, você completou o desafio!",
+    pass: "Esta imagem é sua.",
     fail: "Menos da metade. Leia Aprender de novo e tente outra vez.",
     download: "Baixar",
-    poster: "Imagem cyberpunk da revisão",
+    poster: "Imagem da revisão",
+    tally: "Desafios concluídos",
   },
 } as const;
 
@@ -72,6 +82,20 @@ const TOTAL = 5;
 
 function fill(text: string, n: number, total: number) {
   return text.replace("{n}", String(n)).replace("{total}", String(total));
+}
+
+function RetroTally({ n, label }: { n: number; label: string }) {
+  const digits = tallyDigits(n);
+  return (
+    <div className="shrink-0 text-right" aria-label={`${label} ${n}`}>
+      <p className="max-w-[11rem] font-mono text-[9px] leading-tight tracking-[0.14em] text-primary uppercase">{label}</p>
+      <div className="mt-0.5 rounded-sm bg-[#1d1d1b] px-2 py-1 shadow-[inset_0_0_0_1px_#f7931a,0_0_10px_rgba(247,147,26,0.28)]">
+        <span className="font-mono text-lg leading-none tracking-[0.18em] text-[#f7931a]" style={{ textShadow: "0 0 8px #f7931a" }}>
+          {digits}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export function LearnQuiz() {
@@ -85,6 +109,13 @@ export function LearnQuiz() {
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
   const [poster, setPoster] = useState(QUIZ_POSTERS[0]);
+  const [tally, setTally] = useState(0);
+
+  useEffect(() => {
+    getRepasoCount()
+      .then((n) => setTally(n))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setQuestions(drawQuiz(QUIZ_BANK, TOTAL));
@@ -94,6 +125,25 @@ export function LearnQuiz() {
     setScore(0);
     setDone(false);
   }, [round]);
+
+  useEffect(() => {
+    if (!done) return;
+    try {
+      if (window.localStorage.getItem(COUNTED)) return;
+    } catch {
+      return;
+    }
+    bumpRepasoCount()
+      .then((n) => {
+        setTally(n);
+        try {
+          window.localStorage.setItem(COUNTED, "1");
+        } catch {
+          /* el número ya quedó en el servidor */
+        }
+      })
+      .catch(() => {});
+  }, [done]);
 
   const question = questions?.[index];
   const passed = quizPassed(score, TOTAL);
@@ -127,10 +177,11 @@ export function LearnQuiz() {
 
   return (
     <section id="repaso" className="scroll-mt-[4.5rem] space-y-3 rounded-lg bg-card p-4 shadow-[var(--shadow-border)] sm:p-5">
-      <div>
+      <div className="flex items-start justify-between gap-3">
         <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{t.title}</h2>
-        <p className="mt-1 max-w-2xl text-base text-pretty text-muted-foreground">{t.lead}</p>
+        <RetroTally n={tally} label={t.tally} />
       </div>
+      <p className="-mt-2 max-w-2xl text-base text-pretty text-muted-foreground">{t.lead}</p>
       <div
         className="h-1.5 overflow-hidden rounded-full bg-border"
         role="progressbar"
@@ -191,11 +242,17 @@ export function LearnQuiz() {
       ) : null}
       {done ? (
         <div className="space-y-3">
-          <p className="text-base font-medium text-foreground">{fill(t.score, score, TOTAL)}</p>
+          <p className="text-base font-medium text-foreground">{passed ? t.congrats : fill(t.score, score, TOTAL)}</p>
           <p className="text-sm text-pretty text-muted-foreground">{passed ? t.pass : t.fail}</p>
           {passed ? (
             <figure className="space-y-2">
-              <img src={poster} alt={t.poster} className="w-full rounded-md" />
+              <img
+                src={poster}
+                alt={t.poster}
+                width={1008}
+                height={1792}
+                className="mx-auto h-auto w-full max-w-[17.5rem] rounded-md"
+              />
               <a
                 href={poster}
                 download="bitacora-repaso.jpg"

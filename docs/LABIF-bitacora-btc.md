@@ -57,7 +57,7 @@ Colonia del Sacramento, Uruguay
 | **Qué no es** | Empresa, exchange, custodio, token, ni producto de datos para vender perfiles. |
 | **Impacto buscado** | Que cada ciudad con un nodo, un café o un meetup sea encontrable; que la educación no dependa de un algoritmo ajeno. |
 | **Pedido a LABIF** | Apoyo 2026–2028 para operación, infraestructura soberana, verificación territorial y presencia en comunidades de Latam. |
-| **Indicadores** | Puntos propios verificables + lectura en vivo de BTC Map; 3 idiomas; 21 hitos; plan hasta abr 2028. |
+| **Indicadores** | Puntos propios verificables + lectura en vivo de BTC Map; 3 idiomas; 22 hitos; plan hasta abr 2028. |
 
 ---
 

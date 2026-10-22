@@ -36,6 +36,7 @@ import { mergeLiveFees } from "@/domain/fees";
 import { localeOf, translateFeed, translateNews } from "./translate";
 import { normalizeProofUrl, cargaVerifyGate } from "@/domain/verify";
 import { rewriteDataLogo } from "./logo-exif";
+import { addRepasoCount, readRepasoCount } from "./repaso-count";
 
 export const getMarket = createServerFn({ method: "POST" })
   .validator((input: { range: ChartRange; liq: LiqRange }) => input)
@@ -109,6 +110,13 @@ export const getGlobeStats = createServerFn({ method: "POST" }).handler(async ()
   } catch {
     return { world: { shops: 0, comms: 0, events: 0, cities: 0 }, latam: { shops: 0, comms: 0, events: 0, cities: 0 }, countries: [], points: [], overlay: [], asOf: Date.now() };
   }
+});
+
+export const getRepasoCount = createServerFn({ method: "POST" }).handler(async (): Promise<number> => readRepasoCount());
+
+export const bumpRepasoCount = createServerFn({ method: "POST" }).handler(async (): Promise<number> => {
+  if (tooMany(clientKey("repaso"), 4, 24 * 60 * 60_000)) return readRepasoCount();
+  return addRepasoCount();
 });
 
 export const getBtcCommunities = createServerFn({ method: "POST" }).handler(async (): Promise<Community[]> => {

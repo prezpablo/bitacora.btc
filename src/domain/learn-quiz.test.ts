@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { QUIZ_BANK, QUIZ_POSTERS, answerIsRight, drawQuiz, quizPassed } from "./learn-quiz.ts";
+import { QUIZ_BANK, QUIZ_POSTERS, answerIsRight, drawQuiz, quizPassed, tallyDigits } from "./learn-quiz.ts";
 
 test("learn quiz bank is answerable", () => {
-  assert.ok(QUIZ_BANK.length > 5);
-  assert.equal(QUIZ_POSTERS.length, 10);
+  assert.equal(QUIZ_BANK.length, 21);
+  assert.equal(QUIZ_POSTERS.length, 21);
+  assert.equal(QUIZ_POSTERS[0], "/repaso/v/01.jpg");
+  assert.equal(QUIZ_POSTERS[20], "/repaso/v/21.jpg");
   for (const q of QUIZ_BANK) {
     assert.equal(q.options.length, 4);
     assert.ok(q.options.some((item) => item.correct));
@@ -21,6 +23,12 @@ test("draw returns five shuffled questions", () => {
   const round = drawQuiz(QUIZ_BANK, 5, rand);
   assert.equal(round.length, 5);
   assert.equal(new Set(round.map((q) => q.id)).size, 5);
+});
+
+test("retro tally pads without cutting a bigger count", () => {
+  assert.equal(tallyDigits(0), "000000");
+  assert.equal(tallyDigits(7), "000007");
+  assert.equal(tallyDigits(1234567), "1234567");
 });
 
 test("a pass needs more than half", () => {

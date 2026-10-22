@@ -240,7 +240,7 @@ export function SiteShell({ children, fill = false }: { children: ReactNode; fil
             />
             <span className="hidden sm:inline">
               <a href="https://bitacorabtc.org" className="font-medium text-foreground underline underline-offset-2">
-                Bitácora.btc
+                Bitácora<span className="text-[#F7931A]">btc</span>.org
               </a>
               {" · "}
               {t("taglineShort")}

@@ -31,7 +31,7 @@ export function LabifDossier() {
           <div className="flex items-center gap-[0.14em] font-display text-2xl font-medium tracking-tight sm:text-3xl">
             <BitcoinMark className="h-[1em] w-[1em] shrink-0" />
             <span>
-              itacora<span className="text-[#9a5600]">.btc</span>
+              itácora<span className="text-[#F7931A]">btc</span>.org
             </span>
           </div>
           <p className="kicker m-0">LABIF 2026</p>
@@ -67,6 +67,7 @@ export function LabifDossier() {
 
         <h2>1. Nota de presentación</h2>
         <p>Colonia del Sacramento, 29 de agosto de 2026</p>
+        <p>Actualización de hechos: 16 de octubre de 2026. El sitio público es https://bitacorabtc.org (www redirige ahí).</p>
         <p>
           Al comité del Latin America Bitcoin Impact Fund (LABIF)
           <br />
@@ -117,7 +118,7 @@ export function LabifDossier() {
             </tr>
             <tr>
               <th>Qué hay hoy</th>
-              <td>Sitio trilingüe con mapa + globo, altas colaborativas, verificación sin KYC, eventos, historia, pulso y datos de mercado.</td>
+              <td>Sitio público trilingüe. Cuatro destinos: Mapa, Aprender, Comunidad y Mercado. Globo y mapa de calle, altas con prueba pública (código CARGA), eventos, historia, minado, repaso, pulso y mercado educativo.</td>
             </tr>
             <tr>
               <th>Qué no es</th>
@@ -129,13 +130,13 @@ export function LabifDossier() {
             </tr>
             <tr>
               <th>Código</th>
-              <td>https://github.com/prezpablo/bitacora.btc</td>
+              <td>https://github.com/prezpablo/bitacora.btc · licencia AGPL-3.0</td>
             </tr>
           </tbody>
         </table>
 
-        <h2>2.1 Cifras reales · 29 ago 2026</h2>
-        <p>No inflamos visitas. Distinguimos lo propio de lo que el mapa lee en directorios abiertos.</p>
+        <h2>2.1 Cifras reales · 16 oct 2026</h2>
+        <p>No inflamos visitas. Lo propio no se suma a la copia de BTC Map.</p>
         <h3>Lo propio</h3>
         <table>
           <thead>
@@ -153,8 +154,8 @@ export function LabifDossier() {
             </tr>
             <tr>
               <td>Overlay map.csv</td>
-              <td>1 + 1</td>
-              <td>1 comunidad; 1 ficha de comercio aún no contada como adopción Latam</td>
+              <td>2 fichas</td>
+              <td>Consciencia Bitcoin (comunidad, Colonia). Una ficha de comercio aún no se cuenta como adopción Latam.</td>
             </tr>
             <tr>
               <td>Anuncios de 7 días</td>
@@ -164,12 +165,12 @@ export function LabifDossier() {
             <tr>
               <td>Idiomas</td>
               <td>3</td>
-              <td>ES · PT · EN · 400 cadenas por idioma</td>
+              <td>ES · PT · EN, los mismos textos</td>
             </tr>
             <tr>
               <td>Secciones</td>
-              <td>10</td>
-              <td>Mapa, Consciencia, Roadmap, Comunidad, Pulso hoy, Historia, Red, Mercado, Privacidad, Contacto</td>
+              <td>4 destinos</td>
+              <td>Mapa, Aprender, Comunidad, Mercado. Aprender reúne Consciencia, Historia (22 hitos), Minado, Bitcoin hoy y un repaso de 21 preguntas. La red vive dentro de Mercado. Legal y contacto, en el pie.</td>
             </tr>
             <tr>
               <td>Hitos de historia</td>
@@ -178,13 +179,13 @@ export function LabifDossier() {
             </tr>
             <tr>
               <td>Origen de datos</td>
-              <td>14 bloques</td>
-              <td>Cada fuente se declara</td>
+              <td>Declarado</td>
+              <td>Cada precio, comisión o titular dice de dónde sale. Si una fuente calla, el resto del sitio sigue.</td>
             </tr>
             <tr>
               <td>Fases al halving</td>
-              <td>4</td>
-              <td>Q1 sep 2026 → Q4 abr 2028</td>
+              <td>4, más una guía</td>
+              <td>Q1 sep 2026 → Q4 abr 2028. La guía soberana no tiene fecha: vive en el nodo de casa o no se publica.</td>
             </tr>
             <tr>
               <td>Exchanges (liquidaciones)</td>
@@ -193,16 +194,14 @@ export function LabifDossier() {
             </tr>
             <tr>
               <td>Código</td>
-              <td>49 / 80</td>
-              <td>Componentes / módulos TypeScript · repo 25 ago 2026</td>
+              <td>AGPL-3.0</td>
+              <td>GitHub es respaldo del código, no el sitio. El sitio corre en un servidor propio.</td>
             </tr>
           </tbody>
         </table>
         <h3>Lo federado (BTC Map)</h3>
         <p>
-          El mapa guarda una copia local del directorio (BTC Map). No lo consulta en cada visita. Orden de magnitud: unos 25.000 comercios y unas
-          690 comunidades en el mundo. Bitácora suma el overlay de Colonia. El impacto que pedimos crecer: que ese
-          overlay Latam pase de una ficha a decenas de comunidades verificadas.
+          El mapa no consulta BTC Map en cada visita. Usa una copia local. Al 16 de octubre de 2026 esa copia tiene 27.403 comercios y 689 comunidades en el mundo. No son fichas de Bitácora. Lo propio es el overlay: hoy, Consciencia Bitcoin en Colonia y una ficha de comercio que todavía no cuenta como adopción. El impacto que pedimos crecer es ese overlay, de una comunidad verificada a decenas, no el directorio federado.
         </p>
 
         <h2>3. El problema</h2>
@@ -223,23 +222,24 @@ export function LabifDossier() {
         <h2>5. Qué está construido</h2>
         <h3>Territorio</h3>
         <ul>
-          <li>Globo de primera visita y mapa de calle.</li>
-          <li>BTC Map + registro propio para comunidades y excepciones de Latam.</li>
-          <li>Alta con dirección, horarios, pagos (on-chain, Lightning, sin contacto) y redes.</li>
-          <li>Calificación 1 a 5; verificación sin documento (código público o reputación). Marca naranja.</li>
-          <li>Búsqueda con autocompletar. GPS a pedido, no por IP.</li>
-          <li>Anuncios comunitarios de siete días.</li>
+          <li>Globo de primera visita y mapa de calle. En el teléfono el globo es el espacio de entrada.</li>
+          <li>Directorio de calle: copia local de BTC Map, más el overlay propio.</li>
+          <li>Alta de comercio o comunidad. La dirección es opcional. Horarios, pagos (on-chain, Lightning, sin contacto) y redes.</li>
+          <li>Prueba pública, sin documento: se pide un pin, se publica el código CARGA-XXXX en una web o red, y se pega ese enlace. También verifican dos redes públicas, o una nota de 4 o más con tres votos. La estrella naranja marca lo verificado.</li>
+          <li>Búsqueda por ciudad, comercio o comunidad. La ubicación es del aparato, a pedido, no de la IP.</li>
+          <li>Anuncios de la comunidad, con la misma prueba pública que el mapa.</li>
         </ul>
         <h3>Comunidad y tiempo</h3>
         <ul>
-          <li>Agenda con filtros de cercanía, país, continente y plataforma.</li>
-          <li>Historia con significado y llamados a la acción (White Paper, PizzaDAO, LABITCONF).</li>
-          <li>Pulso hoy: titulares en el idioma elegido. Contacto sin exponer el correo.</li>
+          <li>Comunidad: anuncios, eventos con su afiche, experiencias y el encuentro de LABITCONF.</li>
+          <li>Aprender: qué es Bitácora, 22 hitos con enlace (White Paper, PizzaDAO, LABITCONF), minado en palabras llanas, Bitcoin hoy y un repaso de 21 preguntas. Al aprobar se puede guardar una imagen vertical, para una historia o un fondo de celular.</li>
+          <li>Contacto sin exponer el correo. Sumate abre el Telegram de Consciencia Bitcoin.</li>
         </ul>
         <h3>Datos y oficio</h3>
         <ul>
-          <li>Velas, liquidaciones, ETF, miedo/codicia: con fuente, y no como “estado de la red”.</li>
-          <li>Tres idiomas en menús y legal. Diseño blanco y naranja Bitcoin. Roadmap público hasta abril 2028.</li>
+          <li>Mercado: velas y otras lecturas, con fuente y con un aviso de que es educativo. No es el estado de la red. La red (comisiones, bloque) vive en esa misma habitación, separada del precio.</li>
+          <li>Tres idiomas. Textos legales. Aporte con QR de bitcoin, sin tarjeta. Diseño blanco y naranja.</li>
+          <li>Lo que no está en el aire, y no se presenta como hecho: un nodo Umbrel o Start9 en Colonia, una copia en IPFS y un espejo .onion. Es el plan de soberanía. Hoy alcanza el servidor propio. Si ese servidor descansa, todavía no hay otra copia pública.</li>
         </ul>
 
         <h2>6. A quién sirve</h2>
@@ -315,24 +315,24 @@ export function LabifDossier() {
           </thead>
           <tbody>
             <tr>
-              <td>Q1 · Consolidación</td>
+              <td>Q1 · Datos en casa</td>
               <td>sep 2026 – ene 2027</td>
-              <td>Contacto fiable, menos abusos, mercado ≠ red</td>
+              <td>Un nodo en Colonia lee la cadena. Si esa máquina descansa, el sitio sigue.</td>
             </tr>
             <tr>
-              <td>Q2 · Claridad y acceso</td>
+              <td>Q2 · Que llegue a todos</td>
               <td>feb 2027 – jun 2027</td>
-              <td>Carga en el celular; el sitio sigue si falla una fuente</td>
+              <td>El mapa se usa en un teléfono sencillo. Si falla un precio, el resto no se apaga.</td>
             </tr>
             <tr>
-              <td>Q3 · Identidad sin custodia</td>
+              <td>Q3 · Confianza sin papeles</td>
               <td>jul 2027 – nov 2027</td>
-              <td>Alta y voto con perfil o Lightning como firma</td>
+              <td>Sumar un punto se prueba en público, no con documento. Quien quiera puede dejar una señal en bitcoin. No es una cuenta ni un saldo nuestro.</td>
             </tr>
             <tr>
-              <td>Q4 · Cercanía con la red</td>
+              <td>Q4 · Que se sostenga sola</td>
               <td>dic 2027 – abr 2028</td>
-              <td>Comisión y próximo bloque; el mapa nunca pide billetera</td>
+              <td>Aportes de persona a persona, además del QR. Bloques y comisiones salen del nodo propio cuando está encendido. Si descansa, queda un respaldo público. El mapa nunca pide una billetera.</td>
             </tr>
           </tbody>
         </table>
@@ -352,11 +352,11 @@ export function LabifDossier() {
             </tr>
             <tr>
               <td>Dependencia de un mapa global</td>
-              <td>BTC Map como base; CSV propio</td>
+              <td>La calle sale de una copia local. Lo nuestro es el overlay, chico y dicho aparte.</td>
             </tr>
             <tr>
-              <td>Un solo host o correo</td>
-              <td>Plan de soberanía; nodo propio</td>
+              <td>Un solo servidor</td>
+              <td>Hoy hay uno. El plan es una copia en un nodo Umbrel o Start9 en Colonia, no un nodo por meetup, y después una copia fija. Todavía no está.</td>
             </tr>
             <tr>
               <td>Confundir precio con red</td>
@@ -397,7 +397,7 @@ export function LabifDossier() {
             <div className="flex items-center gap-2 text-lg font-medium">
               <BitcoinMark className="size-8" />
               <span>
-                itacora<span className="text-[#9a5600]">.btc</span>
+                itácora<span className="text-[#F7931A]">btc</span>.org
               </span>
             </div>
             <img src="/logos/conciencia-bitcoin.png" alt="Consciencia Bitcoin" className="size-16 rounded-full object-cover" />
@@ -406,7 +406,7 @@ export function LabifDossier() {
           <p className="text-center text-sm text-[#5c6370]">
             Una iniciativa de Consciencia Bitcoin by LATAM Cripto Mom
             <br />
-            Colonia del Sacramento, Uruguay · Agosto 2026
+            Colonia del Sacramento, Uruguay · Octubre 2026
           </p>
           <nav aria-label="Textos legales" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm">
             <a href="/legal#aviso" className="text-[#1d1d1b] underline-offset-2 hover:underline">

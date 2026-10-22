@@ -23,7 +23,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
       <p
         className={cn(
           "font-display flex items-baseline leading-none font-medium tracking-tight text-foreground",
-          compact ? "text-2xl sm:text-3xl" : "text-[2rem] sm:text-5xl",
+          compact ? "text-xl sm:text-3xl" : "text-[2rem] sm:text-5xl",
         )}
       >
         <span className="flex items-baseline">
@@ -31,7 +31,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
             <span className="invisible">B</span>
             <BitcoinMark className="pointer-events-none absolute left-1/2 top-[0.16em] size-[1.12em] -translate-x-1/2" />
           </span>
-          itácora<span className="text-primary">.btc</span>
+          itácora<span className="text-[#F7931A]">btc</span>.org
         </span>
       </p>
       {compact ? null : (
