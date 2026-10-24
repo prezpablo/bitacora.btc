@@ -20,8 +20,9 @@ test("S-CSP-NONCE rejects a nonce that could break the header", () => {
   assert.equal(cspWithScriptNonce(CSP_POLICY, "'self'"), CSP_POLICY);
 });
 
-test("the Caddy fallback matches the app policy", () => {
+test("Caddy does not overwrite the app CSP", () => {
   const caddy = readFileSync(new URL("../../deploy/Caddyfile", import.meta.url), "utf8");
-  assert.match(caddy, />Content-Security-Policy "/);
-  assert.ok(caddy.includes(CSP_POLICY));
+  assert.equal(caddy.includes(CSP_POLICY), false);
+  assert.match(caddy, /header \{\s*# [^\n]*\n\s*defer\n\s*-Server/);
+  assert.match(caddy, /header @logo \{\s*defer\s*Content-Security-Policy "default-src 'none'; sandbox"/);
 });
