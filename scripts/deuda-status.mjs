@@ -42,6 +42,12 @@ async function pull(url, ms = 10_000) {
 }
 
 function repoCheck(id) {
+  if (id === "S-GUIDE") {
+    const guide = read("src/components/map/use-map-guide.ts");
+    const router = read("src/infrastructure/leaflet-router.ts");
+    const ok = /escapeHtml\(formatGuideStep/.test(guide) && /escapeHtml\(formatGuideStep/.test(router);
+    return { pass: ok, detail: ok ? "calle de la guía escapada" : "tooltip o instrucción sin escape" };
+  }
   if (id === "D-PIN-01") {
     const src = read("src/components/map/spend-map.tsx");
     const stale = /west:\s*-56\.35/.test(src);
@@ -415,6 +421,31 @@ function repoCheck(id) {
     const map = read("src/components/map/spend-map.tsx");
     const ok = /geoPurpose:/.test(i18n) && /geoPurpose/.test(globe) && /geoPurpose/.test(map);
     return { pass: ok, detail: ok ? "el permiso dice para qué y que no se guarda" : "el permiso del navegador sale sin ese aviso" };
+  }
+  if (id === "S-ZOD" || id === "S-URI" || id === "S-VITE") {
+    const lock = read("package-lock.json");
+    const pkg = read("package.json");
+    const ge = (v, floor) => {
+      const a = String(v).split(".").map((n) => Number(n) || 0);
+      const b = floor.split(".").map((n) => Number(n) || 0);
+      for (let i = 0; i < 3; i++) {
+        if (a[i] !== b[i]) return a[i] > b[i];
+      }
+      return true;
+    };
+    if (id === "S-ZOD") {
+      const v = (lock.match(/"node_modules\/zod": \{\s*"version": "([^"]+)"/) || [])[1] || "";
+      const ok = ge(v, "4.6.7");
+      return { pass: ok, detail: ok ? `zod ${v}` : `zod ${v || "ausente"} < 4.6.7` };
+    }
+    if (id === "S-URI") {
+      const pin = (pkg.match(/"fast-uri": "([^"]+)"/) || [])[1] || "";
+      const ok = ge(pin, "3.1.9");
+      return { pass: ok, detail: ok ? `fast-uri ${pin}` : `fast-uri ${pin || "sin override"}` };
+    }
+    const v = (lock.match(/"node_modules\/vite": \{\s*"version": "([^"]+)"/) || [])[1] || "";
+    const ok = ge(v, "8.2.4");
+    return { pass: ok, detail: ok ? `vite ${v}` : `vite ${v || "ausente"} < 8.2.4` };
   }
   return { pass: false, detail: "manual" };
 }

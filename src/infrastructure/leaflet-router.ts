@@ -1,4 +1,5 @@
 import { formatGuideStep, geodesicLine, kmBetween, type GuidePt } from "@/domain/guide";
+import { escapeHtml } from "@/lib/utils";
 import { getGuidePath } from "./server-fns";
 
 type LMod = typeof import("leaflet");
@@ -41,7 +42,7 @@ export function bitacoraRouter(L: LMod) {
             distance: s.distance,
             time: s.time,
             road: s.road,
-            text: formatGuideStep(s),
+            text: escapeHtml(formatGuideStep(s)),
             index: Math.min(i * 4, Math.max(0, coordinates.length - 1)),
           }));
           const km = (res?.distance || 0) / 1000 || kmBetween(from, to);

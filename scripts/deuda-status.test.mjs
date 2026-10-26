@@ -13,6 +13,7 @@ test("cola JSON has unique ids and a resume date", () => {
   const ids = doc.items.map((i) => i.id);
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(ids.includes("D-FOSS") && ids.includes("D-PIN-03+") && ids.includes("L-CONSENT"));
+  assert.ok(ids.includes("S-GUIDE") && ids.includes("S-ZOD") && ids.includes("S-URI") && ids.includes("S-VITE"));
   assert.ok(doc.guards.some((g) => g.id === "G-HEALTHZ"));
 });
 
@@ -37,6 +38,8 @@ test("D-GLOBE stays globe-first except a pending CARGA", () => {
   assert.match(gate, /mapHasPendingCarga\(\) \? "map" : "globe"/);
   assert.match(gate, /if \(!mapHasPendingCarga\(\)\) setMode\("globe"\)/);
   assert.doesNotMatch(gate, /slowNet/);
+  assert.match(gate, /globeReady\.then/);
+  assert.doesNotMatch(gate, /timeout: 800/);
 });
 
 test("guards are not run without --live", async () => {

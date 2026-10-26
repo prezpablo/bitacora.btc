@@ -710,6 +710,34 @@
       "open": true,
       "kind": "manual",
       "done": "Cuando exista el nodo: WireGuard de salida, solo lectura, sin billetera. No se arma el túnel antes."
+    },
+    {
+      "id": "S-GUIDE",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "26 oct: el nombre de la calle de la guía pasa por escapeHtml en el tooltip y en la instrucción del ruteo. Leaflet sigue en 1.9.4, no hay 1.9.5. Falta el ZIP."
+    },
+    {
+      "id": "S-ZOD",
+      "pri": "P1",
+      "open": false,
+      "kind": "repo",
+      "done": "26 oct: zod 4.6.7. El array enorme ya no acumula un error por elemento. Los esquemas no se tocaron. Falta el ZIP."
+    },
+    {
+      "id": "S-URI",
+      "pri": "P2",
+      "open": false,
+      "kind": "repo",
+      "done": "26 oct: override fast-uri 3.1.9. Ajv sigue en 8.20.0. Falta el ZIP."
+    },
+    {
+      "id": "S-VITE",
+      "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "26 oct: vite 8.2.4, rango ~8.2.4 para no saltar a 8.3. Solo el servidor de desarrollo. Falta el ZIP."
     }
   ],
   "guards": [

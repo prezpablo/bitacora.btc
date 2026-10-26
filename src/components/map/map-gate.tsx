@@ -16,7 +16,7 @@ const SpendMap = lazy(() => import("./spend-map").then((m) => ({ default: m.Spen
 const OFM = OFM_ORIGIN;
 let mapEngineWarm = false;
 
-/** DNS/TLS a teselas + chunk Leaflet mientras se ve el globo (sin pelear con eventos). */
+/** DNS/TLS a teselas + Leaflet y MapLibre. No llamarlo mientras baja el globo. */
 function warmMapEngine() {
   if (typeof document === "undefined" || mapEngineWarm) return;
   mapEngineWarm = true;
@@ -36,10 +36,9 @@ function warmMapEngine() {
   void fetch(OFM_STYLE, { mode: "cors", credentials: "omit" }).catch(() => undefined);
 }
 
-/** El chunk de react-globe.gl pesa ~1,9 MB: empezarlo ya, no a los 8 s. */
+/** El chunk de react-globe.gl pesa ~500 KB gzip: empieza ya. El mapa espera a que termine. */
 function warmGlobeEngine() {
-  void import("react-globe.gl");
-  void import("./world-globe");
+  return Promise.all([import("react-globe.gl"), import("./world-globe")]);
 }
 
 function MapFallback() {
@@ -70,19 +69,34 @@ export function MapGate({ embedded = false }: { embedded?: boolean }) {
   modeRef.current = mode;
 
   useEffect(() => {
-    warmGlobeEngine();
+    let cancel = false;
+    let idle = 0;
+    let timer = 0;
+    const globeReady = warmGlobeEngine();
     void prefetchGlobe(qc);
     if (modeRef.current === "map") {
       warmMapEngine();
       void prefetchMapPins(qc);
       return;
     }
-    if (typeof requestIdleCallback === "function") {
-      const idle = requestIdleCallback(() => warmMapEngine(), { timeout: 800 });
-      return () => cancelIdleCallback(idle);
-    }
-    const t = window.setTimeout(warmMapEngine, 0);
-    return () => clearTimeout(t);
+    // El mapa (Leaflet + MapLibre, ~200 KB gzip) no comparte el caudal con el globo.
+    void globeReady.then(() => {
+      if (cancel || modeRef.current === "map") return;
+      const start = () => {
+        if (cancel || modeRef.current === "map") return;
+        warmMapEngine();
+      };
+      if (typeof requestIdleCallback === "function") {
+        idle = requestIdleCallback(start, { timeout: 1500 });
+      } else {
+        timer = window.setTimeout(start, 400);
+      }
+    });
+    return () => {
+      cancel = true;
+      if (idle) cancelIdleCallback(idle);
+      if (timer) window.clearTimeout(timer);
+    };
   }, [qc]);
 
   function goMap(next?: GlobeFocus) {

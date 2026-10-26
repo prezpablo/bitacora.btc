@@ -167,6 +167,10 @@ test("map HTML escapes user names", () => {
   assert.match(src, /\{c\.name\}/);
   assert.match(src, /\{p\.name\}/);
   assert.equal(src.includes("innerHTML =") && src.includes("${c.name}"), false);
+  const guide = read("src/components/map/use-map-guide.ts");
+  assert.match(guide, /escapeHtml\(formatGuideStep/);
+  const router = read("src/infrastructure/leaflet-router.ts");
+  assert.match(router, /escapeHtml\(formatGuideStep/);
 });
 
 test("writes require a captcha ticket", () => {

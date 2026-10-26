@@ -78,6 +78,19 @@ Se leyó el informe y se contrapuso con el sitio. El cierre de un voto por ficha
 **No entra** (ya está, o el informe se equivoca):
 
 - SQLite en lugar de `map.csv`. El CSV sigue siendo la copia pública.
+
+## Cola 26 oct — avisos nuevos
+
+Cotejo del 26 oct contra el árbol instalado. No se reabre Next ni React Server Components: no están. TanStack Start ya está en 1.168.60 y `start-server-core` en 1.169.39. Node del VPS ya es 22.23.4. Una fase por vez.
+
+| Orden | Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|---|
+| 1 | **S-GUIDE** | P1 | Hecho en el repo. El nombre de la calle de la guía se escapa antes del tooltip y de la instrucción del ruteo. Leaflet queda en 1.9.4: no hay 1.9.5. Falta el ZIP. | No se cambia de mapa. No se pinta HTML crudo. |
+| 2 | **S-ZOD** | P1 | Hecho en el repo. zod quedó en 4.6.7. Un array enorme ya no acumula un error por cada elemento. Los esquemas no se tocaron. Falta el ZIP. | No se reescriben los esquemas. |
+| 3 | **S-URI** | P2 | Hecho en el repo. El override de `fast-uri` pasó de 3.1.8 a 3.1.9. Ajv sigue en 8.20.0. Falta el ZIP. | No se toca Ajv. |
+| 4 | **S-VITE** | P3 | Hecho en el repo. Vite quedó en 8.2.4, con rango `~8.2.4` para no pasar a 8.3. Es el servidor de desarrollo, no el sitio. Falta el ZIP. | No se sube a 8.3. No se redeploya el VPS por esto. |
+
+**Siguiente de esta cola:** ninguna. Las cuatro quedaron en el repo. Falta el ZIP.
 - Copiar la CSP entera del informe. Solo `script-src` era más estricta.
 - Prometer 5 días hábiles o registrar una base ante la URCDP por este texto. La baja ya sale de la ficha a Contacto.
 - Proxificar teselas. Precio y noticias ya pasan por el servidor.

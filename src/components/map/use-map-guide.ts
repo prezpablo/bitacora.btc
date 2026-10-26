@@ -10,6 +10,7 @@ import { guideMarker } from "@/infrastructure/leaflet-router";
 import type { CopyKey } from "@/lib/i18n";
 import type { AppLang } from "@/lib/locale";
 import { prefersReducedMotion } from "@/lib/motion";
+import { escapeHtml } from "@/lib/utils";
 import { applyFix } from "./leaflet-fix";
 
 type LeafletMap = import("leaflet").Map;
@@ -148,7 +149,7 @@ export function useMapGuide(lang: AppLang, t: (k: CopyKey) => string) {
         fillColor: "#f7931a",
         fillOpacity: 1,
       })
-        .bindTooltip(formatGuideStep(s, lang), { direction: "top", opacity: 0.95 })
+        .bindTooltip(escapeHtml(formatGuideStep(s, lang)), { direction: "top", opacity: 0.95 })
         .addTo(group);
     }
     setGuideSteps(steps);

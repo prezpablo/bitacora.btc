@@ -114,7 +114,7 @@ export function Desk({ eventHtml = [] }: { eventHtml?: EventHtmlRow[] }) {
   const wantLive = live.shown || sector === "mercado" || tab === "red" || tab === "datos";
   useEffect(() => {
     setAllowFetch(true);
-    const n = window.setTimeout(() => setLiveOk(true), slowNet() ? 2800 : 400);
+    const n = window.setTimeout(() => setLiveOk(true), slowNet() ? 10_000 : 400);
     return () => window.clearTimeout(n);
   }, []);
   useEffect(() => {
