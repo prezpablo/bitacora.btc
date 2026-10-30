@@ -114,30 +114,48 @@ body {
   }
 }
 
-/* Globo/mapa al entrar. Altura que cabe con header+pie (no flex-1: se recorta a 0). */
+/* Globo y mapa. El lienzo ocupa la tarjeta; la tarjeta no pasa del hueco
+   que dejan el encabezado, el título y el pie. Así se ve el borde de abajo. */
 .bit-globe {
   width: 100%;
-  flex-shrink: 0;
   display: block;
-  height: min(52dvh, calc(100dvh - 14.5rem));
-  min-height: 240px;
+  flex: 1 1 auto;
+  min-height: 220px;
+  height: auto;
+}
+.map-fit .bit-globe,
+.globe-fit .bit-globe {
+  min-height: 0;
+}
+.map-fit,
+.globe-fit {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.map-fit {
+  height: clamp(220px, calc(100dvh - 18.75rem), 640px);
+}
+.globe-fit {
+  height: clamp(260px, calc(100dvh - 11.5rem), 720px);
 }
 @media (width >= 40rem) {
-  .bit-globe {
-    height: min(58dvh, calc(100dvh - 14rem));
-    min-height: 360px;
+  .map-fit {
+    height: clamp(260px, calc(100dvh - 17.5rem), 680px);
+  }
+  .globe-fit {
+    height: clamp(300px, calc(100dvh - 11rem), 760px);
   }
 }
 @media (width >= 64rem) {
-  .bit-globe {
-    height: min(62dvh, 560px);
-    min-height: 400px;
+  .map-fit {
+    height: clamp(300px, calc(100dvh - 16.5rem), 720px);
   }
 }
 @media (max-height: 32rem) {
-  .bit-globe {
-    height: min(52dvh, 220px);
-    min-height: 180px;
+  .map-fit,
+  .globe-fit {
+    height: clamp(160px, calc(100dvh - 9rem), 280px);
   }
 }
 

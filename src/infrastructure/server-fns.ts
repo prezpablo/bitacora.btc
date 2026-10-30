@@ -15,23 +15,23 @@ import { searchStreets, reverseStreet, nearbyStreets, type StreetHit } from "./a
 import { fetchGuidePath, type GuidePath } from "./osrm";
 import { pickGuideMode, type GuideMode, type GuideStep } from "@/domain/guide";
 import { buildEventBoard } from "@/domain/event-board";
-import { loadMapCsvText, saveMapCsvText, savePublicMapCsv, countPendingMapRows, deleteUnverifiedMapRow } from "./map-csv-io";
-import { loadPins, savePins, replacePins, countPendingPins } from "./pins-io";
+import { loadMapCsvText, saveMapCsvText, savePublicMapCsv, deleteUnverifiedMapRow } from "./map-csv-io";
+import { loadPins, savePins, replacePins } from "./pins-io";
 import { loadExperiences, saveExperiences, replaceExperiences, countPendingExperiences } from "./experience-io";
 import { loadPatches, savePatch, replacePatches, countPendingPatches, saveContactTicket } from "./patches-io";
 import { scrapeShowsToken } from "./pin-verify";
 import { enqueuePendingMap, enqueuePendingPins } from "./pin-queue";
 import { persistContact, MAIL_RE, mailboxDomainOk, contactRelay, ackRelay, forwardFormSubmit, forwardAck } from "./contact-mail";
 import { clientKey, hashClientIp, peerFromHeaders, tooMany } from "./rate-limit";
+import { acceptCommunityPin, acceptMapListing } from "./carga-accept";
 import { recordConsent } from "./consent-log";
 import { isPublicHttp } from "./safe-fetch";
 import { issueCaptchaTicket, consumeCaptchaTicket } from "./captcha-ticket";
 import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/community-pins";
 import { cleanExperience, experienceOnBoard, experiencePublic, type Experience } from "@/domain/experience";
-import { localShopId, slugifyName } from "@/domain/map-compose";
 import { applyListingPatch, proposeListingPatch } from "@/application/map-listings";
 import { makeContactTicket, PATCH_TTL_MS, patchAlive } from "@/domain/listing-patch";
-import { parseMapCsv, socialsFromCsv, socialsToCsv, stringifyMapCsv, stringifyMapCsvPublic, type MapCsvRow } from "@/domain/map-csv";
+import { parseMapCsv, socialsFromCsv, socialsToCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
 import { mergeLiveFees } from "@/domain/fees";
 import { localeOf, translateFeed, translateNews } from "./translate";
 import { normalizeProofUrl, cargaVerifyGate } from "@/domain/verify";
@@ -301,59 +301,7 @@ export const submitMapListing = createServerFn({ method: "POST" })
     textVersion?: string;
     form?: string;
   }) => input)
-  .handler(async ({ data }): Promise<{ ok: boolean; id?: string; token?: string; error?: string }> => {
-    if ((data.hp || "").trim()) return { ok: true }; // honeypot: ok sin id/token, el formulario no avanza
-    if (data.consent !== true) return { ok: false, error: "consent" };
-    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
-      return { ok: false, error: "captcha" };
-    }
-    if (tooMany(clientKey("map-add"), 6, 60 * 60_000)) return { ok: false, error: "rate" };
-    if (tooMany("map-add:global", 24, 60 * 60_000)) return { ok: false, error: "rate" };
-    if ((await countPendingMapRows()) >= 80) return { ok: false, error: "rate" };
-    const lat = Number(data.lat);
-    const lon = Number(data.lon);
-    const name = (data.name || "").trim().slice(0, 80);
-    if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) return { ok: false, error: "need" };
-    const rows = parseMapCsv(await loadMapCsvText());
-    let id = "";
-    if (data.kind === "community") {
-      const slug = slugifyName(data.slug || data.name);
-      if (!slug) return { ok: false, error: "slug" };
-      id = `c:${slug}`;
-    } else {
-      id = localShopId(lat, lon);
-    }
-    const existing = rows.find((r) => r.id === id);
-    if (existing?.verifiedAt) return { ok: false, error: data.kind === "community" ? "slugTaken" : "need" };
-    if (existing) return { ok: false, error: "pending" };
-    const row: MapCsvRow = {
-      id,
-      tipo: data.kind === "community" ? "community" : "shop",
-      name,
-      lat,
-      lon,
-      address: (data.address || "").trim().slice(0, 160),
-      description: (data.description || "").trim().slice(0, 500),
-      notes: (data.notes || "").trim().slice(0, 280),
-      score: 0,
-      votes: 0,
-      logo: await storedLogo(data.logo || ""),
-      socials: (data.socials || "").trim().slice(0, 800),
-      hours: (data.hours || "").replace(/\s+/g, "").slice(0, 200),
-      pays: (data.pays || "").trim().slice(0, 80),
-      created: Date.now(),
-      token: makePinToken(),
-      verifiedAt: 0, // público recién cuando el scrape ve el código en la URL
-    };
-    const ok = await saveMapCsvText(stringifyMapCsv([...rows, row]));
-    if (!ok) return { ok: false, error: "save" };
-    try {
-      recordConsent(data.form || "", row.id, data.textVersion || "");
-    } catch {
-      /* el alta no depende del log */
-    }
-    return { ok: true, id: row.id, token: row.token };
-  });
+  .handler(async ({ data }) => acceptMapListing(data));
 
 export const cancelMapListing = createServerFn({ method: "POST" })
   .validator((input: { id: string; token: string }) => input)
@@ -398,48 +346,7 @@ export const getCommunityPins = createServerFn({ method: "POST" }).handler(async
 
 export const submitCommunityPin = createServerFn({ method: "POST" })
   .validator((input: { name: string; blurb: string; proof?: string; links?: string[]; captchaId?: string; captcha?: string; captchaNonce?: string; hp?: string; consent?: boolean; textVersion?: string; form?: string }) => input)
-  .handler(async ({ data }): Promise<{ ok: boolean; token?: string; id?: string; error?: string }> => {
-    if (data.consent !== true) return { ok: false, error: "consent" };
-    if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) return { ok: false, error: "captcha" };
-    const name = data.name.trim().slice(0, 80);
-    const blurb = data.blurb.trim().slice(0, 220);
-    if (!name) return { ok: false, error: "need" };
-    let proof = "";
-    if ((data.proof || "").trim()) {
-      const n = normalizeProofUrl(data.proof || "");
-      if ("error" in n) return { ok: false, error: n.error };
-      proof = safeHttp(n.url);
-      if (!proof) return { ok: false, error: "need" };
-    }
-    if (tooMany(clientKey("pin"), 8, 60 * 60_000)) return { ok: false, error: "rate" };
-    if (tooMany("pin:global", 30, 60 * 60_000)) return { ok: false, error: "rate" };
-    if ((await countPendingPins()) >= 80) return { ok: false, error: "rate" };
-    const links = (data.links || []).map(safeHttp).filter(Boolean).slice(0, 6);
-    const pin: CommunityPin = {
-      id: `pin:${Date.now().toString(36)}`,
-      name,
-      blurb,
-      proof,
-      links,
-      token: makePinToken(),
-      verified: false,
-      verifiedAt: 0,
-      created: Date.now(),
-    };
-    const rows = await loadPins();
-    const fresh = rows.filter((p) => Date.now() - p.created < 40 * PIN_TTL_MS);
-    try {
-      await savePins([...fresh, pin]);
-    } catch {
-      return { ok: false, error: "save" };
-    }
-    try {
-      recordConsent(data.form || "", pin.id, data.textVersion || "");
-    } catch {
-      /* el alta no depende del log */
-    }
-    return { ok: true, token: pin.token, id: pin.id };
-  });
+  .handler(async ({ data }) => acceptCommunityPin(data));
 
 export const verifyCommunityPin = createServerFn({ method: "POST" })
   .validator((input: { id: string; proof?: string }) => input)

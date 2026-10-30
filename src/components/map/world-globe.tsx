@@ -163,7 +163,10 @@ function GlobeCanvas({
     const apply = () => {
       const w = el.clientWidth || el.getBoundingClientRect().width;
       const h = el.clientHeight || el.getBoundingClientRect().height;
-      const next = { w: Math.max(Math.floor(w) || 320, 220), h: Math.max(Math.floor(h) || 220, 200) };
+      const next = {
+        w: Math.max(Math.floor(w) || 320, 220),
+        h: h > 40 ? Math.floor(h) : 200,
+      };
       setSize((s) => (Math.abs(s.w - next.w) < 8 && Math.abs(s.h - next.h) < 8 ? s : next));
     };
     apply();
@@ -321,8 +324,8 @@ function GlobeCanvas({
   );
 
   return (
-    <div className="overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
-      <header className="px-2 py-2 sm:px-4 sm:py-3">
+    <div className="globe-fit overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
+      <header className="shrink-0 px-2 py-2 sm:px-4 sm:py-3">
         <div className="mx-auto max-w-3xl rounded-lg bg-white/75 px-3 py-2 text-center shadow-[0_0_0_1px_rgba(29,29,27,0.12)] backdrop-blur-[2px] sm:px-5 sm:py-2.5">
         <p className="font-display text-sm text-neutral-900 sm:text-2xl">{t("globeKicker")}</p>
         <p className="hidden text-[11px] text-neutral-600 sm:mt-0.5 sm:block sm:text-sm">{t("globeTitle")}</p>
@@ -346,7 +349,6 @@ function GlobeCanvas({
               <span className="ml-1 font-medium">{t("globeEvents")}</span>
             </li>
           </ul>
-          <p className="mt-1 text-[10px] text-neutral-600 sm:text-xs">{t("globeFed")}</p>
           {latam ? (
             <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-1.5 text-[10px] text-neutral-600 sm:text-xs">
               <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>
@@ -525,7 +527,7 @@ function GlobeCanvas({
       ) : null}
       </div>
       {geoNotice ? <p className="px-3 pt-2 text-center text-xs text-pretty text-muted-foreground">{t("geoPurpose")}</p> : null}
-      <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:overflow-visible">
+      <div className="flex shrink-0 flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:overflow-visible">
         <span className="hidden sm:block" />
         <button
           type="button"

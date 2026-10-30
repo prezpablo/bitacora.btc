@@ -50,13 +50,23 @@ export function peerFromHeaders(h: { get: (n: string) => string | null }) {
   return xff.at(-1) || h.get("x-real-ip")?.trim() || "anon";
 }
 
-export function tooMany(key: string, max: number, windowMs: number) {
+function hitsSince(key: string, windowMs: number) {
   const now = Date.now();
   prune(now);
   const since = now - windowMs;
   const mem = (hits.get(key) || []).filter((t) => t > since);
   const disk = loadDisk(key, since);
-  const arr = [...new Set([...mem, ...disk])].sort((a, b) => a - b);
+  return [...new Set([...mem, ...disk])].sort((a, b) => a - b);
+}
+
+/** Sin anotar el intento: para rechazar antes de gastar el captcha. */
+export function atLimit(key: string, max: number, windowMs: number) {
+  return hitsSince(key, windowMs).length >= max;
+}
+
+export function tooMany(key: string, max: number, windowMs: number) {
+  const now = Date.now();
+  const arr = hitsSince(key, windowMs);
   if (arr.length >= max) {
     hits.set(key, arr);
     return true;

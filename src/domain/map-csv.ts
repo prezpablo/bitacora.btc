@@ -220,8 +220,13 @@ export function eventFlyerSrc(raw: string) {
 
 function cell(v: string | number) {
   let s = String(v ?? "").replace(/\r?\n/g, " ").trim();
-  if (/^[=+\-@|]/.test(s) || s.startsWith("\t")) s = `'${s}`;
+  // Un número negativo no es una fórmula. El apóstrofe rompía la latitud de todo el sur.
+  if (typeof v !== "number" && (/^[=+\-@|]/.test(s) || s.startsWith("\t"))) s = `'${s}`;
   return `"${s.replace(/"/g, '""')}"`;
+}
+
+function plainNum(raw: string) {
+  return Number(raw.trim().replace(/^'+/, ""));
 }
 
 function splitCsvLine(line: string): string[] {
@@ -300,8 +305,8 @@ export function parseMapCsv(text: string): MapCsvRow[] {
     const tipoRaw = get("tipo");
     const tipo = tipoRaw === "community" || tipoRaw === "comunidad" ? "community" : tipoRaw === "shop" || tipoRaw === "comercio" ? "shop" : null;
     if (!tipo) continue;
-    const lat = Number(get("lat"));
-    const lon = Number(get("lon"));
+    const lat = plainNum(get("lat"));
+    const lon = plainNum(get("lon"));
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
     rows.push({
       id,
@@ -312,15 +317,15 @@ export function parseMapCsv(text: string): MapCsvRow[] {
       address: get("address"),
       description: get("description"),
       notes: get("notes"),
-      score: Number(get("score")) || 0,
-      votes: Math.max(0, Math.floor(Number(get("votes")) || 0)),
+      score: plainNum(get("score")) || 0,
+      votes: Math.max(0, Math.floor(plainNum(get("votes")) || 0)),
       logo: logoUrl(get("logo")),
       socials: get("socials"),
       hours: get("hours").replace(/\s+/g, ""),
       pays: get("pays"),
-      created: Number(get("created")) || Date.now(),
+      created: plainNum(get("created")) || Date.now(),
       token: get("token"),
-      verifiedAt: Number(get("verifiedat") || get("verifiedAt")) || 0,
+      verifiedAt: plainNum(get("verifiedat") || get("verifiedAt")) || 0,
     });
   }
   return rows;

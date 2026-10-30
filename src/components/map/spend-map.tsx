@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Locate } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import { pinAsPlace, refineShopIcon } from "@/domain";
@@ -185,6 +186,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   onWorldRef.current = onWorld;
   const skipWorldRef = useRef(false);
   const lockWorldRef = useRef(false);
+  const lastZoomRef = useRef(focus?.zoom && focus.zoom > 2 ? focus.zoom : 16);
   const mapEl = useRef<HTMLDivElement>(null);
   const marks = useRef<import("leaflet").LayerGroup | null>(null);
   const hitMark = useRef<import("leaflet").Layer | null>(null);
@@ -404,25 +406,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     stayOnMap(focus.lat, focus.lon, 16);
   }, [mapReady, focus?.join, focus?.lat, focus?.lon]);
 
-  useEffect(() => {
-    if (!pendingCarga && !cargaGenerating) return;
-    // Mientras sale el código la página no se mueve: el foco se queda en la carga.
-    const box = document.querySelector(".scroll-free:not([inert])");
-    const y = box instanceof HTMLElement ? box.scrollTop : 0;
-    const win = window.scrollY;
-    const restore = () => {
-      if (box instanceof HTMLElement && box.scrollTop !== y) box.scrollTop = y;
-      if (window.scrollY !== win) window.scrollTo(0, win);
-    };
-    restore();
-    box?.addEventListener("scroll", restore, { passive: true });
-    window.addEventListener("scroll", restore, { passive: true });
-    return () => {
-      box?.removeEventListener("scroll", restore);
-      window.removeEventListener("scroll", restore);
-    };
-  }, [pendingCarga?.id, cargaGenerating]);
-
   const csvQ = useMapCsv();
   useEffect(() => {
     const text = csvQ.data;
@@ -589,23 +572,25 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     return rows;
   }, [allComms, bbox, filter, focus?.iso, selComm?.id, selComm?.slug]);
 
+  const openedFocus = useRef("");
   useEffect(() => {
-    if (!focus?.id) return;
+    if (!focus?.id || openedFocus.current === focus.id) return;
     const comm = allComms.find((c) => c.id === focus.id || c.slug === focus.id);
     if (comm) {
+      openedFocus.current = focus.id;
       setSelComm(comm);
       setSel(null);
       return;
     }
     const place = places.find((p) => p.id === focus.id);
-    if (place) {
-      setSel(place);
-      setSelComm(null);
-      if (!place.id.startsWith("local:") && !place.id.startsWith("cluster:")) {
-        void getMerchant({ data: { id: place.id } }).then((full) => {
-          if (full) setSel(full);
-        });
-      }
+    if (!place) return;
+    openedFocus.current = focus.id;
+    setSel(place);
+    setSelComm(null);
+    if (!place.id.startsWith("local:") && !place.id.startsWith("cluster:")) {
+      void getMerchant({ data: { id: place.id } }).then((full) => {
+        if (full) setSel(full);
+      });
     }
   }, [focus?.id, allComms, places]);
 
@@ -613,6 +598,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     if (!mapEl.current || mapRef.current) return;
     let dead = false;
     let map: import("leaflet").Map | null = null;
+    let ro: ResizeObserver | null = null;
     void import("leaflet/dist/leaflet.css");
     void import("leaflet").then((L) => {
       if (dead || !mapEl.current || mapRef.current) return;
@@ -657,6 +643,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           if (typeof gl !== "function") throw new Error("maplibreGL");
           const layer = gl({ style: OFM_STYLE, attributionControl: false }).addTo(map);
           const glMap = layer.getMaplibreMap?.();
+          glMap?.scrollZoom?.disable();
           glMap?.on("load", () => {
             try {
               if (glMap.getSource("openmaptiles")) streets.remove();
@@ -689,24 +676,39 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       const wheelOff = () => map?.scrollWheelZoom.disable();
       box.addEventListener("focus", wheelOn);
       box.addEventListener("blur", wheelOff);
+      // Sin foco, la rueda mueve la habitación. Si no, el borde de abajo queda tapado.
+      const wheelRoom = (ev: WheelEvent) => {
+        if (!map || map.scrollWheelZoom.enabled()) return;
+        const scroller = box.closest(".scroll-free");
+        if (!(scroller instanceof HTMLElement)) return;
+        if (scroller.scrollHeight <= scroller.clientHeight + 4) return;
+        scroller.scrollTop += ev.deltaY;
+        ev.preventDefault();
+      };
+      box.addEventListener("wheel", wheelRoom, { passive: false });
       setMapReady(true);
       setZoom(map.getZoom());
       const size = () => map?.invalidateSize({ animate: false });
       requestAnimationFrame(size);
       window.setTimeout(size, 120);
       window.setTimeout(size, 600);
+      const roSize = new ResizeObserver(() => size());
+      ro = roSize;
+      roSize.observe(box);
       map.on("zoomend", () => {
         pushBbox();
         if (!map) return;
         const z = map.getZoom();
+        if (Number.isFinite(z) && z > 2) lastZoomRef.current = z;
         // Leaflet, al volar o al achicar el panel, a veces dispara zoom 2 y nos sacaba al globo.
         if (skipWorldRef.current || !Number.isFinite(z) || z > 2) return;
         window.setTimeout(() => {
           const m = mapRef.current;
           if (!m || skipWorldRef.current) return;
           if (m.getZoom() > 2) return;
-          if (lockWorldRef.current) {
-            m.setZoom(3, { animate: false }); // no globo a mitad de una carga
+          const short = m.getContainer().clientHeight < 200;
+          if (lockWorldRef.current || short) {
+            m.setZoom(lastZoomRef.current || 16, { animate: false });
             return;
           }
           onWorldRef.current?.();
@@ -750,6 +752,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     });
     return () => {
       dead = true;
+      ro?.disconnect();
       setMapReady(false);
       if (mapRef.current) {
         mapRef.current.remove();
@@ -864,7 +867,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           iconAnchor: [size / 2, size / 2],
         });
         const founding = pin.comm && (pin.comm.id === FOUNDING_UY.id || pin.comm.slug === FOUNDING_UY.slug);
-        const z = founding ? 700 : pin.kind === "community" ? 400 : pin.kind === "city" ? 260 : pin.verified ? 280 : 200;
+        const z = founding ? 700 : pin.kind === "shop" ? 520 : pin.kind === "community" ? 400 : pin.kind === "city" ? 260 : 200;
         const m = L.marker([pin.lat, pin.lon], { icon, zIndexOffset: z });
         m.on("click", (ev) => {
           L.DomEvent.stopPropagation(ev);
@@ -1093,7 +1096,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     else if (code === "slug") setFormErr(t("needSlug"));
     else if (code === "instagram") setFormErr(t("pinNoIg"));
     else if (code === "links" || code === "need") setFormErr(t("verifyNeedLink"));
-    else if (code === "proof" || code === "token" || code === "live" || code === "missing") setFormErr(t("pinProofFail"));
+    else if (code === "proof") setFormErr(t("pinProofFail"));
+    else if (code === "missing" || code === "token") setFormErr(t("pinGone"));
+    else if (code === "live") setFormErr(t("pinProofFail"));
     else setFormErr(t("pinNeed"));
   }
 
@@ -1152,6 +1157,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         failCarga(res.error);
         return;
       }
+      keepPendingMap({
+        kind: "shop",
+        id: res.id,
+        token: res.token,
+        name: shopName.trim(),
+        lat: pin.lat,
+        lon: pin.lon,
+        created: Date.now(),
+      });
+      lockWorldRef.current = true;
       const out = publishShop(
         { store, comms },
         pin,
@@ -1170,26 +1185,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       );
       if (!out.ok) {
         setFormErr(t("fldName"));
-        return;
+      } else {
+        const local = { ...out.local, verifyToken: res.token, verifiedAt: 0 };
+        const place = { ...out.place, id: res.id };
+        const nextStore = { ...out.bundle.store, [res.id]: local };
+        setStore(nextStore);
+        saveStore(nextStore);
+        setSel(place);
+        setFormErr("");
       }
-      const local = { ...out.local, verifyToken: res.token, verifiedAt: 0 };
-      const place = { ...out.place, id: res.id };
-      const nextStore = { ...out.bundle.store, [res.id]: local };
-      setStore(nextStore);
-      saveStore(nextStore);
-      keepPendingMap({
-        kind: "shop",
-        id: res.id,
-        token: res.token,
-        name: shopName.trim(),
-        lat: pin.lat,
-        lon: pin.lon,
-        created: Date.now(),
-      });
-      // El listado queda pendiente: no volver al globo ni perder el paso «Ya cargué la prueba».
-      lockWorldRef.current = true;
       stayOnMap(pin.lat, pin.lon);
-      setSel(place);
       setSelComm(null);
       setDrop(null);
       setDropKind("pick");
@@ -1206,7 +1211,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setShopLogo("");
       setCaptchaOk(false);
       keepTicket(null);
-      setFormErr("");
     } catch {
       failCarga("save");
     } finally {
@@ -1495,7 +1499,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           <BitcoinMark className="h-[0.9em] w-[0.9em] shrink-0" />
         </h2>
         </div>
-        <p className="text-sm text-pretty text-muted-foreground sm:text-base">{t("mapLead")}</p>
         {countryStat ? (
           <p className="font-mono text-sm text-foreground">
             {(() => {
@@ -1515,8 +1518,6 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <span className="font-semibold text-foreground">{globe.data.world.shops.toLocaleString()}</span> {t("globeShops")} ·{" "}
             <span className="font-semibold text-foreground">{globe.data.world.comms.toLocaleString()}</span> {t("globeComms")} ·{" "}
             <span className="font-semibold text-foreground">{globe.data.world.events.toLocaleString()}</span> {t("globeEvents")}
-            {" · "}
-            {t("globeFed")}
             <br />
             <span className="font-semibold text-primary">{t("globeLatamName")}</span>
             {": "}
@@ -1526,9 +1527,11 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).events.toLocaleString()}</span> {t("globeEvents")}
           </p>
         ) : null}
-        <p className={cn("text-xs", sync === "fail" ? "text-primary" : "text-muted-foreground")}>
-          {sync === "on" ? t("mapCsvOn") : sync === "wait" ? t("mapSyncWait") : sync === "fail" ? t("mapSyncFail") : t("mapSyncOff")}
-        </p>
+        {sync !== "off" ? (
+          <p className={cn("text-xs", sync === "fail" ? "text-primary" : "text-muted-foreground")}>
+            {sync === "on" ? t("mapCsvOn") : sync === "wait" ? t("mapSyncWait") : t("mapSyncFail")}
+          </p>
+        ) : null}
         <div className="chip-row">
           {chips.map((k) => (
             <button
@@ -1547,8 +1550,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       </section>
 
       <div className="relative grid min-h-0 flex-1 gap-3 lg:grid-cols-[1fr_320px]">
-        <div className="isolate overflow-hidden rounded-lg bg-card shadow-[var(--shadow-border)]">
-          <div className="relative">
+        <div className="map-fit isolate overflow-hidden rounded-lg bg-card shadow-[var(--shadow-border)]">
+          <div className="relative min-h-0 flex-1">
           <div className="absolute top-3 right-3 left-3 z-[1500] max-w-lg">
             <MapSearch communities={allComms} places={places} onPick={flyTo} />
           </div>
@@ -1556,7 +1559,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             ref={mapEl}
             tabIndex={0}
             title={t("zoomNeedFocus")}
-            className="bit-globe"
+            className="bit-globe h-full"
           />
           {geoBannerKey(geo) ? (
             <p className="pointer-events-none absolute bottom-2 left-3 z-[1500] max-w-[16rem] rounded-md bg-card px-2.5 py-1 text-xs text-muted-foreground shadow-[var(--shadow-border)]">
@@ -1565,7 +1568,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           ) : null}
           </div>
           {geoNotice ? <p className="px-3 pt-2 text-center text-xs text-pretty text-muted-foreground">{t("geoPurpose")}</p> : null}
-          <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:overflow-visible">
+          <div className="flex shrink-0 flex-nowrap items-center justify-center gap-2 overflow-x-auto border-t border-border px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:overflow-visible">
             <button
               type="button"
               className="inline-flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-white sm:justify-self-start"
@@ -1627,6 +1630,80 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
               onCheck={(proof) => void checkPending(proof)}
               onCancel={abortPending}
             />
+          ) : drop && dropKind === "pick" ? (
+            <MapDropPick
+              onShop={() => {
+                setDropKind("comercio");
+                setMode("comercio");
+                setFormErr("");
+              }}
+              onComm={() => {
+                setDropKind("comunidad");
+                setMode("comunidad");
+                setFormErr("");
+              }}
+              onCancel={cancelDrop}
+            />
+          ) : drop ? (
+            <div className="space-y-3">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
+                {dropKind === "comunidad" || mode === "comunidad" ? t("mapLoadComm") : t("mapLoadShop")}
+              </p>
+              <MapComposeForm
+                kind={dropKind === "comunidad" || mode === "comunidad" ? "comunidad" : "comercio"}
+                lang={lang}
+                shopName={shopName}
+                shopDesc={shopDesc}
+                shopNotes={shopNotes}
+                shopHours={shopHours}
+                shopPays={shopPays}
+                shopAddr={shopAddr}
+                addrHit={addrHit}
+                near={drop}
+                shopLogo={shopLogo}
+                form={form}
+                picked={picked}
+                handles={handles}
+                captchaOk={captchaOk}
+                privacyOk={privacyOk}
+                linkOk={linkOk}
+                formErr={formErr}
+                onShopName={setShopName}
+                onShopDesc={setShopDesc}
+                onShopNotes={setShopNotes}
+                onShopHours={setShopHours}
+                onShopPays={setShopPays}
+                onShopAddr={setShopAddr}
+                onAddrHit={setAddrHit}
+                onShopLogo={setShopLogo}
+                onForm={setForm}
+                onToggleSocial={toggleSocial}
+                onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
+                onCaptcha={setCaptchaOk}
+                onTicket={keepTicket}
+                onPrivacy={setPrivacyOk}
+                onPickAddress={pinFromAddress}
+                onPublish={dropKind === "comunidad" || mode === "comunidad" ? saveCommunity : propose}
+                onCancel={cancelDrop}
+                shopGate={
+                  dropKind === "comunidad" || mode === "comunidad" ? null : (
+                    <label htmlFor="shop-link" className="flex items-start gap-2 text-sm text-pretty text-foreground">
+                      <input
+                        id="shop-link"
+                        type="checkbox"
+                        className="mt-1 size-4 shrink-0 accent-primary"
+                        checked={linkOk}
+                        aria-required="true"
+                        aria-invalid={formErr === t("linkNeed") ? true : undefined}
+                        required
+                        onChange={(e) => setLinkOk(e.target.checked)}
+                      />
+                      <span>{t("consentLink")}</span>
+                    </label>
+                  )
+                }
+              />
+            </div>
           ) : selComm ? (
             <div className="space-y-3">
               <CommunityCard
@@ -1794,115 +1871,43 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 </ol>
               ) : null}
             </div>
-          ) : drop && dropKind === "pick" ? (
-            <MapDropPick
-              onShop={() => {
-                setDropKind("comercio");
-                setMode("comercio");
-                setFormErr("");
-              }}
-              onComm={() => {
-                setDropKind("comunidad");
-                setMode("comunidad");
-                setFormErr("");
-              }}
-              onCancel={cancelDrop}
-            />
-          ) : drop ? (
-            <div className="space-y-3">
-              <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                {dropKind === "comunidad" || mode === "comunidad" ? t("mapLoadComm") : t("mapLoadShop")}
-              </p>
-              <MapComposeForm
-                kind={dropKind === "comunidad" || mode === "comunidad" ? "comunidad" : "comercio"}
-                lang={lang}
-                shopName={shopName}
-                shopDesc={shopDesc}
-                shopNotes={shopNotes}
-                shopHours={shopHours}
-                shopPays={shopPays}
-                shopAddr={shopAddr}
-                addrHit={addrHit}
-                near={drop}
-                shopLogo={shopLogo}
-                form={form}
-                picked={picked}
-                handles={handles}
-                captchaOk={captchaOk}
-                privacyOk={privacyOk}
-                linkOk={linkOk}
-                formErr={formErr}
-                onShopName={setShopName}
-                onShopDesc={setShopDesc}
-                onShopNotes={setShopNotes}
-                onShopHours={setShopHours}
-                onShopPays={setShopPays}
-                onShopAddr={setShopAddr}
-                onAddrHit={setAddrHit}
-                onShopLogo={setShopLogo}
-                onForm={setForm}
-                onToggleSocial={toggleSocial}
-                onHandle={(k, v) => setHandles((h) => ({ ...h, [k]: v }))}
-                onCaptcha={setCaptchaOk}
-                onTicket={keepTicket}
-                onPrivacy={setPrivacyOk}
-                onPickAddress={pinFromAddress}
-                onPublish={dropKind === "comunidad" || mode === "comunidad" ? saveCommunity : propose}
-                onCancel={cancelDrop}
-                shopGate={
-                  dropKind === "comunidad" || mode === "comunidad" ? null : (
-                    <label htmlFor="shop-link" className="flex items-start gap-2 text-sm text-pretty text-foreground">
-                      <input
-                        id="shop-link"
-                        type="checkbox"
-                        className="mt-1 size-4 shrink-0 accent-primary"
-                        checked={linkOk}
-                        aria-required="true"
-                        aria-invalid={formErr === t("linkNeed") ? true : undefined}
-                        required
-                        onChange={(e) => setLinkOk(e.target.checked)}
-                      />
-                      <span>{t("consentLink")}</span>
-                    </label>
-                  )
-                }
-              />
-            </div>
           ) : (
             <p className="text-sm text-muted-foreground">{t("pickSpot")}</p>
           )}
         </aside>
-        {pendingCarga || cargaGenerating ? (
-          <div
-            className="absolute inset-0 z-[4000] flex items-start justify-center overflow-auto bg-background/90 p-3 pt-8 sm:items-center"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="carga-proof-title"
-          >
-            <div
-              ref={proofRef}
-              id="carga-proof"
-              tabIndex={-1}
-              className="w-full max-w-md rounded-lg bg-card p-4 shadow-[var(--shadow-border)] outline-none sm:p-5"
-            >
-              <p id="carga-proof-title" className="text-sm font-medium text-foreground">
-                {t("pinFormTitle")}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">{t("composeHow")}</p>
-              <div className="mt-4">
-                <CargaPendingView
-                  generating={cargaGenerating}
-                  token={pendingCarga?.token}
-                  name={pendingCarga?.name}
-                  busy={cargaBusy}
-                  err={formErr}
-                  onCheck={(proof) => void checkPending(proof)}
-                  onCancel={abortPending}
-                />
-              </div>
-            </div>
-          </div>
-        ) : null}
+        {typeof document !== "undefined" && (pendingCarga || cargaGenerating)
+          ? createPortal(
+              <div
+                className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto overscroll-contain bg-background/95 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="carga-proof-title"
+              >
+                <div
+                  ref={proofRef}
+                  id="carga-proof"
+                  tabIndex={-1}
+                  className="my-2 w-full max-w-md rounded-lg bg-card p-4 shadow-[var(--shadow-border)] outline-none sm:p-5"
+                >
+                  <p id="carga-proof-title" className="text-center font-mono text-3xl font-bold tracking-widest text-primary">
+                    {pendingCarga?.token || t("pinGenerating")}
+                  </p>
+                  <div className="mt-4">
+                    <CargaPendingView
+                      generating={cargaGenerating && !pendingCarga?.token}
+                      token={pendingCarga?.token}
+                      name={pendingCarga?.name}
+                      busy={cargaBusy}
+                      err={formErr}
+                      onCheck={(proof) => void checkPending(proof)}
+                      onCancel={abortPending}
+                    />
+                  </div>
+                </div>
+              </div>,
+              document.body,
+            )
+          : null}
       </div>
 
       <section className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]" aria-labelledby="map-list-title">

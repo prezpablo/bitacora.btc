@@ -37,6 +37,8 @@ export function scrapeMirrors(url: string): string[] {
     return [];
   }
   const u = new URL(href);
+  u.search = "";
+  u.hash = "";
   const host = u.hostname.replace(/^www\./, "").toLowerCase();
   const path = u.pathname;
   const out: string[] = [];
@@ -44,30 +46,37 @@ export function scrapeMirrors(url: string): string[] {
     if (isPublicHttp(x) && !out.includes(x)) out.push(x);
   };
 
-  if (host === "x.com" || host === "twitter.com" || host === "mobile.twitter.com" || host === "fxtwitter.com") {
-    const rest = href.replace(/^https?:\/\/(www\.)?(mobile\.)?(twitter\.com|x\.com|fxtwitter\.com)/i, "");
-    push(`https://api.fxtwitter.com${rest}`);
-    push(`https://fxtwitter.com${rest}`);
-    push(`https://r.jina.ai/https://x.com${rest}`);
+  if (host === "x.com" || host === "twitter.com" || host === "mobile.twitter.com" || host === "fxtwitter.com" || host === "vxtwitter.com") {
+    const parts = path.split("/").filter(Boolean);
+    const id = [...parts].reverse().find((p) => /^\d{8,}$/.test(p)) || "";
+    const user = parts.length >= 3 && parts[1] === "status" ? parts[0] : "";
+    if (user && user !== "i" && id) {
+      push(`https://api.fxtwitter.com/${user}/status/${id}`);
+      push(`https://api.vxtwitter.com/${user}/status/${id}`);
+      push(`https://r.jina.ai/https://api.fxtwitter.com/${user}/status/${id}`);
+    } else if (id) {
+      push(`https://api.fxtwitter.com/i/status/${id}`);
+      push(`https://r.jina.ai/https://api.fxtwitter.com/i/status/${id}`);
+    }
     return out;
   }
   if (host === "instagram.com" || host === "instagramez.com" || host === "ddinstagram.com" || host === "kkinstagram.com") {
     const rest = path.replace(/\/+$/, "") || "/";
     const parts = rest.split("/").filter(Boolean);
     const isPost = parts[0] === "p" || parts[0] === "reel" || parts[0] === "reels" || parts[0] === "tv";
-    push(`https://www.ddinstagram.com${rest}/`);
-    push(`https://www.instagramez.com${rest}/`);
-    push(`https://r.jina.ai/https://www.ddinstagram.com${rest}/`);
     if (isPost) {
       const code = parts[1] || "";
       if (code) {
-        push(`https://www.instagram.com/${parts[0]}/${code}/embed/captioned/`);
-        push(`https://www.ddinstagram.com/${parts[0]}/${code}/`);
+        const embed = `https://www.instagram.com/${parts[0]}/${code}/embed/captioned/`;
+        push(`https://r.jina.ai/${embed}`);
+        push(embed);
       }
-    } else {
+    }
+    push(`https://www.ddinstagram.com${rest}/`);
+    push(`https://www.instagramez.com${rest}/`);
+    if (!isPost) {
       const user = parts[0] || "";
       if (user) {
-        push(`https://www.ddinstagram.com/${user}/`);
         push(`https://r.jina.ai/https://www.ddinstagram.com/${user}/`);
         push(`https://r.jina.ai/https://ink.bio/${user}`);
       }
