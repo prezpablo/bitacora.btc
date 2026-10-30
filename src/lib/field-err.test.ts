@@ -19,4 +19,10 @@ test("form alerts are tied to the field that failed", () => {
   assert.match(contact, /fieldErr\(errId, emailBad\)/);
   assert.match(compose, /id=\{errId\} role="alert"/);
   assert.match(compose, /fieldErr\(errId, nameBad\)/);
+  const proof = readFileSync(new URL("../components/map/carga-proof-step.tsx", import.meta.url), "utf8");
+  const step = proof.slice(proof.indexOf("export function CargaProofStep"), proof.indexOf("export function CargaPendingView"));
+  assert.match(step, /const errId = useId\(\)/);
+  assert.match(step, /fieldErr\(errId, Boolean\(err\)\)/);
+  assert.match(step, /id=\{errId\}/);
+  assert.match(step, /role="alert"/);
 });

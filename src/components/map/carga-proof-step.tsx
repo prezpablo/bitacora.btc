@@ -68,6 +68,7 @@ export function CargaProofStep({
   onCancel?: () => void;
 }) {
   const t = useT();
+  const errId = useId();
   const [proof, setProof] = useState("");
   const [copied, setCopied] = useState<"code" | "post" | "fail" | "">("");
   const [sheet, setSheet] = useState("");
@@ -208,7 +209,6 @@ export function CargaPendingView({
   onCancel: () => void;
 }) {
   const t = useT();
-  const errId = useId();
   if (generating && !token) {
     return (
       <div className="flex min-h-32 flex-col items-center justify-center gap-2" role="status" aria-live="polite" aria-busy="true">
