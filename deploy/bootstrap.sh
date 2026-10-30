@@ -53,7 +53,18 @@ fi
 apt-get update -y
 apt-get install -y ca-certificates curl git gnupg debian-keyring debian-archive-keyring apt-transport-https ufw unzip
 
+# 22.23.4 cierra CVE-2026-111497 (Brotli) en la línea 22. Si ya está, no se reinstala.
+need_node=0
 if ! command -v node >/dev/null 2>&1; then
+  need_node=1
+else
+  ver=$(node -v | sed 's/^v//')
+  low=$(printf '%s\n%s\n' "22.23.4" "$ver" | sort -V | head -n1)
+  if [ "$low" != "22.23.4" ]; then
+    need_node=1
+  fi
+fi
+if [ "$need_node" = 1 ]; then
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y nodejs
 fi
