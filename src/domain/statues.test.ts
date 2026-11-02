@@ -6,7 +6,7 @@ import { STATUES, statueGlow } from "./statues.ts";
 test("only the installed statues with a photo are pinned", () => {
   assert.deepEqual(
     STATUES.map((s) => s.id),
-    ["budapest", "el-zonte", "vienna"],
+    ["budapest", "el-zonte", "vienna", "buenos-aires"],
   );
   for (const s of STATUES) {
     assert.equal(existsSync(new URL(`../../public${s.img}`, import.meta.url)), true);

@@ -30,8 +30,8 @@ import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
 import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
 import { SiteShell } from "@/components/site-header";
 import { MapSearch, type SearchHit } from "./map-search";
-import { hoursToCsv, paysToCsv, socialsToCsv } from "@/domain/map-csv";
-import { CommunityCard, PlaceCard } from "./map-listing-card";
+import { hoursToCsv, paysToCsv, socialsToCsv, type CircularPin } from "@/domain/map-csv";
+import { CircularCard, CommunityCard, PlaceCard } from "./map-listing-card";
 import { CargaPendingView, holdCargaSpinner } from "./carga-proof-step";
 import { ListingPatchForm } from "./map-patch-form";
 import { MapDropPick, MapVotePanel, StarMeter } from "./map-panels";
@@ -54,6 +54,7 @@ import {
 const STORE = "bitacora-places-v1";
 const COMM = "bitacora-communities-v1";
 const PENDING_MAP = "bitacora-map-pending";
+const PENDING_MS = 36 * 60 * 60 * 1000;
 
 /** Carga local a la espera de la URL pública con el código CARGA-XXXX. */
 type PendingCarga = {
@@ -73,6 +74,10 @@ function readPendingMap(): PendingCarga | null {
     if (!raw) return null;
     const p = JSON.parse(raw) as PendingCarga;
     if (!p.id || !p.token || (p.kind !== "shop" && p.kind !== "community")) return null;
+    if (!p.created || Date.now() - p.created > PENDING_MS) {
+      writePendingMap(null);
+      return null;
+    }
     return p;
   } catch {
     return null;
@@ -187,6 +192,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const skipWorldRef = useRef(false);
   const lockWorldRef = useRef(false);
   const lastZoomRef = useRef(focus?.zoom && focus.zoom > 2 ? focus.zoom : 16);
+  const focusRef = useRef(focus);
+  focusRef.current = focus;
   const mapEl = useRef<HTMLDivElement>(null);
   const marks = useRef<import("leaflet").LayerGroup | null>(null);
   const hitMark = useRef<import("leaflet").Layer | null>(null);
@@ -199,8 +206,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [mapReady, setMapReady] = useState(false);
   const [store, setStore] = useState<Record<string, MerchantLocal>>({});
   const [comms, setComms] = useState<Community[]>([]);
+  const [circulars, setCirculars] = useState<CircularPin[]>([]);
   const [sel, setSel] = useState<MerchantPlace | null>(null);
   const [selComm, setSelComm] = useState<Community | null>(null);
+  const [selCirc, setSelCirc] = useState<CircularPin | null>(null);
+  const [statueId, setStatueId] = useState<string | null>(null);
+  const statueHold = useRef(false);
+  const statueIdRef = useRef<string | null>(null);
+  const statueMark = useRef<{ closePopup: () => void; openPopup: () => void } | null>(null);
+  const statueMarks = useRef(new Map<string, { closePopup: () => void; openPopup: () => void }>());
+  statueIdRef.current = statueId;
   const [draft, setDraft] = useState("");
   const [shopName, setShopName] = useState("");
   const [shopDesc, setShopDesc] = useState("");
@@ -213,7 +228,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [shopLogo, setShopLogo] = useState("");
   const [stars, setStars] = useState<1 | 2 | 3 | 4 | 5>(5);
   const [nick, setNick] = useState("colaborador");
-  const [filter, setFilter] = useState<"todas" | "comercios" | "comunidades">("todas");
+  const [filter, setFilter] = useState<"todas" | "comercios" | "comunidades" | "circulares">("todas");
   const [drop, setDrop] = useState<{ lat: number; lon: number } | null>(null);
   const [dropKind, setDropKind] = useState<"pick" | "comercio" | "comunidad">("pick");
   const [voteOpen, setVoteOpen] = useState(false);
@@ -235,11 +250,29 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const [pendingCarga, setPendingCarga] = useState<PendingCarga | null>(null);
   const [cargaBusy, setCargaBusy] = useState(false);
   const [cargaGenerating, setCargaGenerating] = useState(false);
+  const [cargaDialog, setCargaDialog] = useState(false);
   const [sync, setSync] = useState<"off" | "wait" | "on" | "fail">(firebaseConfigured() ? "wait" : "off");
 
   shopAddrRef.current = shopAddr;
   // Con pin o CARGA pendiente no se vuelve al globo (un zoomend falso perdía la validación).
-  lockWorldRef.current = Boolean(drop || pendingCarga || cargaGenerating);
+  lockWorldRef.current = Boolean(drop || pendingCarga || cargaGenerating || cargaDialog);
+
+  function holdCargaScreen() {
+    lockWorldRef.current = true;
+    try {
+      sessionStorage.setItem("bitacora-carga-lock", "1");
+    } catch {
+      /* modo privado */
+    }
+  }
+
+  function releaseCargaScreen() {
+    try {
+      sessionStorage.removeItem("bitacora-carga-lock");
+    } catch {
+      /* modo privado */
+    }
+  }
 
   function stayOnMap(lat: number, lon: number, z = 16) {
     const map = mapRef.current;
@@ -303,6 +336,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         };
       }
       setStore(store0);
+      setCirculars(next.circulars);
       if (pending?.kind === "community" && !comms0.some((c) => c.id === pending.id)) {
         setComms([
           ...comms0,
@@ -361,6 +395,12 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     }
     if (pending) {
       setPendingCarga(pending);
+      // El cartel tapa el mapa solo en esta visita. Al reabrir el celular, no.
+      try {
+        if (sessionStorage.getItem(PENDING_MAP)) setCargaDialog(true);
+      } catch {
+        /* modo privado */
+      }
       if (pending.kind === "community") {
         setSelComm({
           id: pending.id,
@@ -429,6 +469,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       return [...map.values()];
     });
     writeExtra(CSV_CACHE, text);
+    setCirculars(next.circulars);
     setSync("on");
   }, [csvQ.data]);
 
@@ -470,7 +511,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const countryStat = countryFromGlobe(globe.data, focus?.iso);
 
   const places = useMemo(() => {
-    if (filter === "comunidades" || !bbox) return [];
+    if (filter === "comunidades" || filter === "circulares" || !bbox) return [];
     const pad = 0.8;
     const extra: MerchantPlace[] = Object.entries(store)
       .filter(([id, s]) => !s.removed && s.lat != null && s.lon != null && (shopIsPublic(id, s.verifiedAt) || id === sel?.id || Boolean(s.verifyToken && !s.verifiedAt)))
@@ -551,7 +592,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   }, [btcComms.data, overlayComms]);
 
   const visibleComms = useMemo(() => {
-    if (filter === "comercios" || !bbox) return [];
+    if (filter === "comercios" || filter === "circulares" || !bbox) return [];
     const isoBox: Record<string, { s: number; n: number; w: number; e: number }> = {
       UY: { s: -35.15, n: -30.05, w: -58.6, e: -53.0 },
       AR: { s: -55.1, n: -21.7, w: -73.6, e: -53.5 },
@@ -572,6 +613,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     return rows;
   }, [allComms, bbox, filter, focus?.iso, selComm?.id, selComm?.slug]);
 
+  const visibleCirculars = useMemo(() => {
+    if (filter === "comercios" || filter === "comunidades" || !bbox) return [];
+    const pad = 0.8;
+    return circulars.filter(
+      (c) => c.lon >= bbox.west - pad && c.lon <= bbox.east + pad && c.lat >= bbox.south - pad && c.lat <= bbox.north + pad,
+    );
+  }, [circulars, bbox, filter]);
+
   const openedFocus = useRef("");
   useEffect(() => {
     if (!focus?.id || openedFocus.current === focus.id) return;
@@ -587,7 +636,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     openedFocus.current = focus.id;
     setSel(place);
     setSelComm(null);
-    if (!place.id.startsWith("local:") && !place.id.startsWith("cluster:")) {
+    if (!place.id.startsWith("cluster:")) {
       void getMerchant({ data: { id: place.id } }).then((full) => {
         if (full) setSel(full);
       });
@@ -617,7 +666,27 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         setZoom(map.getZoom());
       };
       map.on("moveend", pushBbox);
-      map.setView(focus ? [focus.lat, focus.lon] : [20, -40], focus?.zoom ?? 4);
+      let opened = false;
+      const placeFocus = () => {
+        if (!map) return;
+        const here = focusRef.current;
+        if (here && Number.isFinite(here.lat) && Number.isFinite(here.lon)) {
+          const z = here.zoom > 2 ? here.zoom : 6;
+          skipWorldRef.current = true;
+          map.setView([here.lat, here.lon], z, { animate: false });
+          lastZoomRef.current = z;
+          opened = true;
+          window.setTimeout(() => {
+            skipWorldRef.current = false;
+          }, 700);
+          return;
+        }
+        if (!opened) {
+          map.setView([20, -40], 4, { animate: false });
+          opened = true;
+        }
+      };
+      placeFocus();
       pushBbox();
       const addOtm = () => {
         if (!map || (map as { _bitacoraFb?: boolean })._bitacoraFb) return;
@@ -688,7 +757,15 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       box.addEventListener("wheel", wheelRoom, { passive: false });
       setMapReady(true);
       setZoom(map.getZoom());
-      const size = () => map?.invalidateSize({ animate: false });
+      let placed = 0;
+      const size = () => {
+        if (!map) return;
+        map.invalidateSize({ animate: false });
+        if (placed < 3) {
+          placed += 1;
+          placeFocus();
+        }
+      };
       requestAnimationFrame(size);
       window.setTimeout(size, 120);
       window.setTimeout(size, 600);
@@ -707,7 +784,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           if (!m || skipWorldRef.current) return;
           if (m.getZoom() > 2) return;
           const short = m.getContainer().clientHeight < 200;
-          if (lockWorldRef.current || short) {
+          if (lockWorldRef.current || short || (typeof sessionStorage !== "undefined" && sessionStorage.getItem("bitacora-carga-lock") === "1")) {
             m.setZoom(lastZoomRef.current || 16, { animate: false });
             return;
           }
@@ -731,7 +808,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       });
       requestAnimationFrame(() => map?.invalidateSize());
       pushBbox();
-      if (focus && Number.isFinite(focus.lat) && Number.isFinite(focus.lon)) {
+      const here = focusRef.current;
+      if (here && Number.isFinite(here.lat) && Number.isFinite(here.lon)) {
         setGeo("ok");
         return;
       }
@@ -783,6 +861,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     const L = leafletRef.current;
     if (!mapReady || !map || !group || !L) return;
     try {
+    statueHold.current = true;
+    statueMarks.current.clear();
     group.clearLayers();
       type MapPin = {
         id: string;
@@ -882,14 +962,16 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             return;
           }
           if (pin.kind === "community" && pin.comm) {
+            setSelCirc(null);
             setSelComm(withFoundingProfile({ ...pin.comm, lat: pin.lat0, lon: pin.lon0 }));
             setSel(null);
           } else if (pin.place) {
             const stub = { ...pin.place, lat: pin.lat0, lon: pin.lon0, logo: pin.logo };
+            setSelCirc(null);
             setSel(stub);
             setSelComm(null);
             setDraft(store[pin.id]?.description || "");
-            if (!pin.place.id.startsWith("cluster:") && !pin.place.id.startsWith("local:")) {
+            if (!pin.place.id.startsWith("cluster:")) {
               void getMerchant({ data: { id: pin.id } }).then((full) => {
                 if (!full) return;
                 setSel({ ...full, lat: pin.lat0, lon: pin.lon0, logo: pin.logo || full.logo });
@@ -939,14 +1021,103 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           <span style="opacity:.7">${escapeHtml(t(s.creditKey))}</span>
         </div>`;
         const sm = L.marker([s.lat, s.lon], { icon, zIndexOffset: 1000 });
-        sm.bindPopup(card, { maxWidth: 200 });
-        if (focus?.id === s.id) sm.openPopup();
+        sm.on("click", (ev) => {
+          L.DomEvent.stopPropagation(ev);
+          setDrop(null);
+          setDropKind("pick");
+          setVoteOpen(false);
+          setFormErr("");
+          setSel(null);
+          setSelComm(null);
+          setSelCirc(null);
+          setHit(null);
+          setStatueId(s.id);
+        });
+        sm.bindPopup(card, {
+          maxWidth: 200,
+          autoPan: false,
+          autoClose: false,
+          closeOnClick: false,
+          offset: [0, 0],
+          className: "statue-pop",
+        });
+        const centerOnIcon = () => {
+          const el = sm.getPopup()?.getElement();
+          if (!el) return;
+          const h = el.offsetHeight;
+          if (h < 8) return;
+          const popup = sm.getPopup();
+          if (!popup) return;
+          popup.options.offset = [0, Math.round(h / 2)];
+          popup.options.autoPan = false;
+          const update = (popup as { _updatePosition?: () => void })._updatePosition;
+          update?.call(popup);
+        };
+        sm.on("popupopen", () => {
+          centerOnIcon();
+          sm.getPopup()?.getElement()?.querySelector("img")?.addEventListener("load", centerOnIcon, { once: true });
+        });
+        sm.on("popupclose", () => {
+          if (statueHold.current) return;
+          setStatueId((cur) => (cur === s.id ? null : cur));
+        });
+        statueMarks.current.set(s.id, sm);
+        if (statueIdRef.current === s.id) {
+          statueMark.current = sm;
+          sm.openPopup();
+        }
         sm.addTo(group);
+      }
+      for (const c of visibleCirculars) {
+        const selected = selCirc?.id === c.id;
+        const size = Math.min(40, Math.max(28, coinPinSize(zoom, "community", selected) + 12));
+        const src = escapeHtml("/logos/economia-circular.png");
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a,0 1px 4px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="${src}" alt="" width="${size - 4}" height="${size - 4}" style="width:${size - 4}px;height:${size - 4}px;object-fit:contain;display:block" /></div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+        const cm = L.marker([c.lat, c.lon], { icon, zIndexOffset: 860 });
+        cm.on("click", (ev) => {
+          L.DomEvent.stopPropagation(ev);
+          setDrop(null);
+          setDropKind("pick");
+          setVoteOpen(false);
+          setFormErr("");
+          setSel(null);
+          setSelComm(null);
+          setSelCirc(c);
+        });
+        const tip = `<div style="min-width:160px"><strong>${escapeHtml(c.name)}</strong><br/><span>${escapeHtml(c.city)}</span><br/><span style="opacity:.7">${escapeHtml(c.steward)}</span></div>`;
+        cm.bindTooltip(tip, { direction: "top", sticky: true, opacity: 1 });
+        cm.addTo(group);
       }
     } catch {
       /* un pin malo no deja el mapa en blanco */
     }
-  }, [places, store, visibleComms, hit, mapReady, zoom, t, focus?.id]);
+    statueHold.current = false;
+  }, [places, store, visibleComms, visibleCirculars, selCirc?.id, hit, mapReady, zoom, t, focus?.id]);
+
+  useEffect(() => {
+    if (focus?.id && STATUES.some((s) => s.id === focus.id)) setStatueId(focus.id);
+  }, [focus?.id]);
+
+  useEffect(() => {
+    const marker = statueId ? statueMarks.current.get(statueId) : null;
+    if (!marker) {
+      statueMark.current?.closePopup();
+      return;
+    }
+    statueMark.current = marker;
+    marker.openPopup();
+  }, [statueId]);
+
+  useEffect(() => {
+    if (!(sel || selComm || selCirc || drop || hit)) return;
+    setStatueId(null);
+    statueMark.current?.closePopup();
+  }, [sel, selComm, selCirc, drop, hit]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1033,7 +1204,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   function persist(nextStore: Record<string, MerchantLocal>, nextComms: Community[]) {
     saveStore(nextStore);
     saveCommunities(nextComms);
-    const csv = dumpMapCsv(nextStore, nextComms, places);
+    const csv = dumpMapCsv(nextStore, nextComms, places, circulars);
     writeExtra(CSV_CACHE, csv);
     return saveMapCsv({ data: { csv, captchaId: ticket?.id, captcha: ticket?.answer, captchaNonce: ticket?.nonce } }).then(
       (r) => {
@@ -1097,6 +1268,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     else if (code === "instagram") setFormErr(t("pinNoIg"));
     else if (code === "links" || code === "need") setFormErr(t("verifyNeedLink"));
     else if (code === "proof") setFormErr(t("pinProofFail"));
+    else if (code === "medium") setFormErr(t("pinProofMedium"));
     else if (code === "missing" || code === "token") setFormErr(t("pinGone"));
     else if (code === "live") setFormErr(t("pinProofFail"));
     else setFormErr(t("pinNeed"));
@@ -1120,13 +1292,15 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setFormErr(t("pinNeed"));
       return;
     }
-    const pin = { lat: drop.lat, lon: drop.lon };
-    const links = linksFromPicked(picked, handles);
     const cap = ticketRef.current;
     if (!cap) {
       setFormErr(t("captchaNeed"));
       return;
     }
+    const pin = { lat: drop.lat, lon: drop.lon };
+    const links = linksFromPicked(picked, handles);
+    holdCargaScreen();
+    setCargaDialog(true);
     setCargaGenerating(true);
     setFormErr("");
     const started = Date.now();
@@ -1214,6 +1388,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     } catch {
       failCarga("save");
     } finally {
+      releaseCargaScreen();
       setCargaGenerating(false);
     }
   }
@@ -1234,6 +1409,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       return;
     }
     const links = linksFromPicked(picked, handles);
+    holdCargaScreen();
+    setCargaDialog(true);
     setCargaGenerating(true);
     setFormErr("");
     const started = Date.now();
@@ -1316,6 +1493,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     } catch {
       failCarga("save");
     } finally {
+      releaseCargaScreen();
       setCargaGenerating(false);
     }
   }
@@ -1416,6 +1594,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
     clearRoute();
     setSel(null);
     setSelComm(null);
+    setSelCirc(null);
     setVoteOpen(false);
     setPatchOpen(false);
     setFormErr("");
@@ -1441,6 +1620,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       saveCommunities(next);
     }
     keepPendingMap(null);
+    setCargaDialog(false);
     setSel(null);
     setSelComm(null);
     setFormErr("");
@@ -1484,7 +1664,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   const local = sel ? store[sel.id] : undefined;
   const removable = sel ? canRemove(local) : false;
-  const chips: ("todas" | "comercios" | "comunidades")[] = ["todas", "comercios", "comunidades"];
+  const chips: ("todas" | "comercios" | "comunidades" | "circulares")[] = ["todas", "comercios", "comunidades", "circulares"];
   const _hasPin = Boolean(sel || selComm || pendingCarga);
   const listedPlaces = places.filter(isListPlace).slice(0, 80);
 
@@ -1527,9 +1707,9 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).events.toLocaleString()}</span> {t("globeEvents")}
           </p>
         ) : null}
-        {sync !== "off" ? (
+        {sync === "wait" || sync === "fail" ? (
           <p className={cn("text-xs", sync === "fail" ? "text-primary" : "text-muted-foreground")}>
-            {sync === "on" ? t("mapCsvOn") : sync === "wait" ? t("mapSyncWait") : t("mapSyncFail")}
+            {sync === "wait" ? t("mapSyncWait") : t("mapSyncFail")}
           </p>
         ) : null}
         <div className="chip-row">
@@ -1543,7 +1723,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 filter === k ? "bg-primary text-primary-foreground" : "bg-elevated text-muted-foreground",
               )}
             >
-              {k === "todas" ? t("all") : k === "comercios" ? t("filterShops") : t("communities")}
+              {k === "todas" ? t("all") : k === "comercios" ? t("filterShops") : k === "circulares" ? t("filterCircular") : t("communities")}
             </button>
           ))}
         </div>
@@ -1618,7 +1798,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
         <aside
           className="rounded-lg bg-card p-4 shadow-[var(--shadow-border)]"
-          aria-hidden={Boolean(pendingCarga || cargaGenerating) || undefined}
+          aria-hidden={Boolean(pendingCarga || cargaGenerating || cargaDialog) || undefined}
         >
           {pendingCarga || cargaGenerating ? (
             <CargaPendingView
@@ -1704,6 +1884,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                 }
               />
             </div>
+          ) : selCirc ? (
+            <CircularCard pin={selCirc} onClose={cancelSel} />
           ) : selComm ? (
             <div className="space-y-3">
               <CommunityCard
@@ -1875,10 +2057,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <p className="text-sm text-muted-foreground">{t("pickSpot")}</p>
           )}
         </aside>
-        {typeof document !== "undefined" && (pendingCarga || cargaGenerating)
+        {typeof document !== "undefined" && (cargaGenerating || cargaDialog)
           ? createPortal(
               <div
-                className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto overscroll-contain bg-background/95 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+                className="fixed inset-0 z-[4000] flex items-start justify-center overflow-y-auto overscroll-contain bg-background/95 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="carga-proof-title"
@@ -1890,9 +2072,10 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   className="my-2 w-full max-w-md rounded-lg bg-card p-4 shadow-[var(--shadow-border)] outline-none sm:p-5"
                 >
                   <p id="carga-proof-title" className="text-center font-mono text-3xl font-bold tracking-widest text-primary">
-                    {pendingCarga?.token || t("pinGenerating")}
+                    {pendingCarga?.token || (cargaGenerating ? t("pinGenerating") : t("pinNeed"))}
                   </p>
                   <div className="mt-4">
+                    {pendingCarga?.token || cargaGenerating ? (
                     <CargaPendingView
                       generating={cargaGenerating && !pendingCarga?.token}
                       token={pendingCarga?.token}
@@ -1902,6 +2085,18 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                       onCheck={(proof) => void checkPending(proof)}
                       onCancel={abortPending}
                     />
+                    ) : (
+                      <div className="space-y-3">
+                        <p className="text-sm text-primary" role="alert">{formErr || t("pinSaveFail")}</p>
+                        <button
+                          type="button"
+                          className="h-10 w-full rounded-md bg-primary px-3 text-sm font-medium text-white"
+                          onClick={() => setCargaDialog(false)}
+                        >
+                          {t("pinCancel")}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>,
@@ -1945,7 +2140,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
                   setVoteOpen(false);
                   setDrop(null);
                   setDraft(store[p.id]?.description || "");
-                  if (!p.id.startsWith("cluster:") && !p.id.startsWith("local:")) {
+                  if (!p.id.startsWith("cluster:")) {
                     void getMerchant({ data: { id: p.id } }).then((full) => {
                       if (full) setSel(full);
                     });

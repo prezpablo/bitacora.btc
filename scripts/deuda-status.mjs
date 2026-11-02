@@ -360,9 +360,10 @@ function repoCheck(id) {
   }
   if (id === "L-LABIT") {
     const banner = read("src/components/dashboard/labitconf-banner.tsx");
+    const list = read("src/domain/featured-event.ts");
     const i18n = read("src/lib/i18n.ts");
-    const ok = /labitconf\.com/.test(banner) && !/labitKicker|Destacado|Patrocinado|Sponsored/.test(banner + i18n);
-    return { pass: ok, detail: ok ? "el banner enlaza LABITCONF y no lleva sello de destacado ni de patrocinado" : "el sello sigue" };
+    const ok = /bitcoinhistorico\.com/.test(list) && /#EFBC53/.test(list) && /pickFeatured/.test(banner) && !/labitKicker|Patrocinado|Sponsored/.test(banner + i18n);
+    return { pass: ok, detail: ok ? "el banner muestra el evento vigente, con su oro, y no lleva sello de patrocinado" : "el sello sigue o el banner no rota" };
   }
   if (id === "D-AEO-FAQ") {
     const seo = read("src/lib/seo.ts");

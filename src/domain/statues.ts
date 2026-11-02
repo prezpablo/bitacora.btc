@@ -4,15 +4,15 @@
  * cuadrada, como Budapest y El Zonte. Esa es la regla de cada monumento.
  */
 export type StatuePin = {
-  id: "budapest" | "el-zonte" | "vienna";
+  id: "budapest" | "el-zonte" | "vienna" | "buenos-aires";
   lat: number;
   lon: number;
   year: number;
   img: string;
-  nameKey: "statueBudapestName" | "statueZonteName" | "statueViennaName";
-  whereKey: "statueBudapestWhere" | "statueZonteWhere" | "statueViennaWhere";
-  aboutKey: "statueBudapestAbout" | "statueZonteAbout" | "statueViennaAbout";
-  creditKey: "statueBudapestCredit" | "statueZonteCredit" | "statueViennaCredit";
+  nameKey: "statueBudapestName" | "statueZonteName" | "statueViennaName" | "statueBairesName";
+  whereKey: "statueBudapestWhere" | "statueZonteWhere" | "statueViennaWhere" | "statueBairesWhere";
+  aboutKey: "statueBudapestAbout" | "statueZonteAbout" | "statueViennaAbout" | "statueBairesAbout";
+  creditKey: "statueBudapestCredit" | "statueZonteCredit" | "statueViennaCredit" | "statueBairesCredit";
 };
 
 /** Halo dorado. El anillo naranja de comercios y comunidades no lo usa. */
@@ -58,5 +58,16 @@ export const STATUES: StatuePin[] = [
     whereKey: "statueViennaWhere",
     aboutKey: "statueViennaAbout",
     creditKey: "statueViennaCredit",
+  },
+  {
+    id: "buenos-aires",
+    lat: -34.54663,
+    lon: -58.48981,
+    year: 2026,
+    img: "/statues/buenos-aires.jpg",
+    nameKey: "statueBairesName",
+    whereKey: "statueBairesWhere",
+    aboutKey: "statueBairesAbout",
+    creditKey: "statueBairesCredit",
   },
 ];

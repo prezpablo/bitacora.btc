@@ -98,6 +98,11 @@ export async function acceptMapListing(data: MapCargaInput): Promise<CargaResult
   }
   const existing = rows.find((r) => r.id === id);
   if (existing?.verifiedAt) return { ok: false, error: data.kind === "community" ? "slugTaken" : "need" };
+  // El primer clic a veces guarda y la pantalla se cierra antes de mostrar el código.
+  // El segundo clic, en la misma media hora, recibe ese código y no gasta otro captcha.
+  if (existing?.token && Date.now() - (existing.created || 0) < 30 * 60_000) {
+    return { ok: true, id: existing.id, token: existing.token };
+  }
   if (existing) return { ok: false, error: "pending" };
   if (!consumeCaptchaTicket(data.captchaId || "", data.captcha || "", data.hp || "", data.captchaNonce || "")) {
     return { ok: false, error: "captcha" };

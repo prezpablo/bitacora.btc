@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { communityIsPublic, communityTrust, listingTrust, normalizeProofUrl, shopIsPublic, overlayPending, cargaVerifyGate, withFoundingProfile } from "./verify.ts";
+import { communityIsPublic, communityTrust, listingTrust, normalizeProofUrl, proofOnDeclaredMedium, shopIsPublic, overlayPending, cargaVerifyGate, withFoundingProfile } from "./verify.ts";
 
 test("user shop is public only after scrape", () => {
   assert.equal(shopIsPublic("local:-34.4,-57.8", 0), false);
@@ -95,6 +95,19 @@ test("overlayPending is only unverified local: or user c:", () => {
   assert.equal(overlayPending("btcmap:abc", 0), false);
   assert.equal(overlayPending("node:99", 0), false);
   assert.equal(overlayPending("osm:1", 0), false);
+});
+
+test("proof must be on a declared network or the declared site", () => {
+  const declared = [
+    { key: "instagram", url: "https://instagram.com/bouriks" },
+    { key: "web", url: "https://bouriks.com.ar" },
+  ];
+  assert.equal(proofOnDeclaredMedium("https://www.instagram.com/p/AbC123/", declared), true);
+  assert.equal(proofOnDeclaredMedium("https://www.bouriks.com.ar/novedades", declared), true);
+  assert.equal(proofOnDeclaredMedium("https://x.com/bouriks/status/1", declared), false);
+  assert.equal(proofOnDeclaredMedium("https://otro.com/post", declared), false);
+  assert.equal(proofOnDeclaredMedium("https://instagram.com/p/AbC123/", [{ key: "web", url: "https://bouriks.com.ar" }]), false);
+  assert.equal(proofOnDeclaredMedium("https://instagram.com/p/AbC123/", []), false);
 });
 
 test("cargaVerifyGate requires matching token and never accepts catalog", () => {

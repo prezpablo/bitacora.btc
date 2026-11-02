@@ -138,6 +138,11 @@ body {
   width: 100%;
   height: auto;
   min-height: 0;
+  touch-action: none;
+}
+.globe-fit .bit-globe canvas {
+  touch-action: none;
+  cursor: grab;
 }
 .map-fit,
 .globe-fit {
@@ -353,6 +358,14 @@ main#contenido h2.font-display {
 
 .velar-news-in {
   animation: velar-news-in 280ms var(--ease-out);
+}
+
+.leaflet-popup.statue-pop {
+  margin-bottom: 0;
+}
+
+.leaflet-popup.statue-pop .leaflet-popup-tip-container {
+  display: none;
 }
 
 @keyframes bitacora-hit-pulse {

@@ -196,7 +196,7 @@ export function CommunityPinsBoard() {
     try {
       const res = await verifyCommunityPin({ data: { id: pending.id, proof: proofUrl || undefined } });
       if (!res.ok) {
-        setErr(res.error === "instagram" ? t("pinNoIg") : res.error === "need" ? t("verifyNeedLink") : t("pinProofFail"));
+        setErr(res.error === "instagram" ? t("pinNoIg") : res.error === "medium" ? t("pinProofMedium") : res.error === "need" ? t("verifyNeedLink") : t("pinProofFail"));
         return;
       }
       keepPending(null);

@@ -27,8 +27,8 @@ Habitación COMUNIDAD: anuncios 7d, eventos, banner LABITCONF, feed. Destino, no
 Habitación MERCADO: precio, velas, disclaimer educativo. Destino, no cola.
 Habitación PIE: roadmap + datos + soberanía + contacto. Solo desde el footer. Roadmap NO está entre Aprender y Comunidad.
 Aprender = Qué es Bitácora · Historia de Bitcoin · Bitcoin hoy. H1 = bienvenida Consciencia Bitcoin (marca, no se traduce).
-Globo: cifras en recuadro centrado con borde semitransparente ARRIBA del planeta (no overlay). Botones Suma comercio o comunidad + Entrar al mapa. Zoom rueda SOLO con foco.
-Mapa: Suma comercio o comunidad + Volver al globo. Volver no aborta CARGA pendiente.
+Globo: cifras en recuadro centrado con borde semitransparente ARRIBA del planeta (no overlay). Botones Sumate al mapa + Entrar al mapa. Zoom rueda SOLO con foco.
+Mapa: Sumate al mapa + Volver al globo. Volver no aborta CARGA pendiente.
 Dirección de comercio/comunidad OPCIONAL. Pedir código = nombre + captcha + privacidad.
 Ficha Consciencia Bitcoin: texto educación y psicología financiera + iconos/enlaces YouTube, X, TikTok, Instagram, Telegram, Web.
 Red #red vive DENTRO de #mercado.
@@ -110,10 +110,10 @@ D) HABITACIÓN LLEGAR (Mapa + Aprender)
 - L3 H1 bienvenida (es Te damos la bienvenida / pt Boas-vindas / en Welcome). «Consciencia Bitcoin» intacta
 - L4 Historia de Bitcoin al bajar. Bitcoin hoy = pulso
 - L5 Globo: recuadro de cifras centrado (ciudades/comercios/comunidades/eventos) + línea LATINOAMÉRICA. El planeta NO queda tapado por el recuadro. Copy «Ya no estás solo»
-- L6 Suma comercio o comunidad (izq/centro) + Entrar al mapa (der)
-- L7 Entrar al mapa: Leaflet + búsqueda. Suma comercio o comunidad + Volver al globo
+- L6 Sumate al mapa (izq/centro) + Entrar al mapa (der)
+- L7 Entrar al mapa: Leaflet + búsqueda. Sumate al mapa + Volver al globo
 - L8 Volver al globo deshabilitado si hay CARGA pendiente
-- L9 Header Sumate (Telegram) NO debe sacar del mapa ni abrir carga; es comunidad Telegram. Carga = Suma comercio o comunidad / pin en el mapa
+- L9 Header Sumate (Telegram) NO debe sacar del mapa ni abrir carga; es comunidad Telegram. Carga = Sumate al mapa / pin en el mapa
 - L10 Rueda SIN foco en globo/mapa: no zoomea. Con foco, zoomea. +/− del mapa vivos
 - L11 Filtros todas / comercios / comunidades
 - L12 Ficha comercio: Ir · Opinar · Actualizar · Cancelar en una fila

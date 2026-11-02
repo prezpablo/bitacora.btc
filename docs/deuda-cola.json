@@ -738,6 +738,13 @@
       "open": false,
       "kind": "repo",
       "done": "26 oct: vite 8.2.4, rango ~8.2.4 para no saltar a 8.3. Solo el servidor de desarrollo. Falta el ZIP."
+    },
+    {
+      "id": "D-ALIADAS",
+      "pri": "P3",
+      "open": true,
+      "kind": "manual",
+      "done": "Sección en Comunidad, no un quinto destino. Logos de las comunidades que ayudan a verificar los datos, con el enlace a sus redes. Los sube Bitácora. No hay formulario público ni KYC."
     }
   ],
   "guards": [

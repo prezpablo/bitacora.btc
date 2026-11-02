@@ -35,8 +35,13 @@ function copyPlain(text: string) {
     ok = false;
   }
   area.remove();
-  if (box instanceof HTMLElement) box.scrollTop = y;
-  if (window.scrollY !== win) window.scrollTo(0, win);
+  const putBack = () => {
+    if (box instanceof HTMLElement) box.scrollTop = y;
+    if (window.scrollY !== win) window.scrollTo(0, win);
+  };
+  putBack();
+  window.setTimeout(putBack, 50);
+  window.setTimeout(putBack, 300);
   return ok;
 }
 

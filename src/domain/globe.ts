@@ -8,13 +8,13 @@ export type GlobeDot = {
   kind?: "shop" | "community";
 };
 
-/** Consciencia Bitcoin — inland of Colonia so the ₿ sits on UY, not the river. */
+/** Consciencia Bitcoin — frente al AFE, del lado del puerto, en tierra. */
 export const FOUNDING_UY = {
   id: "c:cc-btc",
   slug: "cc-btc",
   name: "Consciencia Bitcoin",
-  lat: -34.451,
-  lon: -57.812,
+  lat: -34.47345,
+  lon: -57.84536,
   logo: "/logos/conciencia-bitcoin.png",
 };
 

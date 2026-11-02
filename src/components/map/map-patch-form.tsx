@@ -93,6 +93,7 @@ export function ListingPatchForm({
     else if (code === "notours") setErr(t("patchNotOurs"));
     else if (code === "links" || code === "need") setErr(t("verifyNeedLink"));
     else if (code === "instagram") setErr(t("pinNoIg"));
+    else if (code === "medium") setErr(t("pinProofMedium"));
     else if (code === "proof") setErr(t("pinProofFail"));
     else setErr(t("patchFail"));
   }

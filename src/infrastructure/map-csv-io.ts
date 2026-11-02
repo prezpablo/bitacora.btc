@@ -16,7 +16,7 @@ const FOUNDING: MapCsvRow = {
   name: FOUNDING_UY.name,
   lat: FOUNDING_UY.lat,
   lon: FOUNDING_UY.lon,
-  address: "Colonia del Sacramento, Uruguay",
+  address: "Frente al AFE, Paseo Eduardo Víctor Haedo, Colonia del Sacramento, Uruguay",
   description: FOUNDING_DESCRIPTION,
   notes: "",
   score: 0,
@@ -33,7 +33,7 @@ const FOUNDING: MapCsvRow = {
 function rowFromSql(r: Record<string, unknown>): MapCsvRow {
   return {
     id: String(r.id || ""),
-    tipo: r.tipo === "community" ? "community" : "shop",
+    tipo: r.tipo === "community" ? "community" : r.tipo === "circular" ? "circular" : "shop",
     name: String(r.name || ""),
     lat: Number(r.lat) || 0,
     lon: Number(r.lon) || 0,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
+import type { CircularPin } from "@/domain/map-csv";
 import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust, refineShopIcon, withFoundingProfile } from "@/domain";
 import { pickListingLogo } from "@/domain/community-dedupe";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,46 @@ import { PayRow } from "./pay-row";
 import { SocialRow } from "./social-row";
 import { VerifiedStar } from "./verified-star";
 import { CargaProofStep } from "./carga-proof-step";
+
+export function CircularCard({ pin, onClose }: { pin: CircularPin; onClose: () => void }) {
+  const t = useT();
+  const [imgOk, setImgOk] = useState(true);
+  useEffect(() => {
+    setImgOk(true);
+  }, [pin.id, pin.logo]);
+  const showImg = Boolean(imgSrc(pin.logo || "")) && imgOk;
+  return (
+    <div className="space-y-3">
+      <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("circularKind")}</p>
+      <div className="flex items-center gap-3">
+        <img src="/logos/economia-circular.png" alt="" width={56} height={56} className="size-14 rounded-full bg-white object-contain shadow-[var(--shadow-border)]" />
+        <div>
+          <h3 className="text-lg font-medium">{pin.name}</h3>
+          <p className="text-sm text-muted-foreground">{pin.city}</p>
+        </div>
+      </div>
+      {pin.description ? <p className="text-sm text-pretty">{pin.description}</p> : null}
+      <div className="flex items-center gap-3">
+        {showImg ? (
+          <img
+            src={imgSrc(pin.logo)}
+            alt=""
+            width={40}
+            height={40}
+            referrerPolicy="no-referrer"
+            className="size-10 rounded-md bg-white object-contain"
+            onError={() => setImgOk(false)}
+          />
+        ) : null}
+        <p className="text-sm">{t("circularBy", { name: pin.steward || pin.name })}</p>
+      </div>
+      <SocialRow links={pin.links} />
+      <Button type="button" variant="outline" className="w-full" onClick={onClose}>
+        {t("pinCancel")}
+      </Button>
+    </div>
+  );
+}
 
 export function CommunityCard({
   community: raw,
@@ -76,6 +117,7 @@ export function CommunityCard({
               .then((res) => {
                 if (res.ok) onVerified();
                 else if (res.error === "instagram") setProofErr(t("pinNoIg"));
+                else if (res.error === "medium") setProofErr(t("pinProofMedium"));
                 else if (res.error === "links" || res.error === "need") setProofErr(t("verifyNeedLink"));
                 else setProofErr(t("pinProofFail"));
               })
@@ -106,6 +148,11 @@ export function PlaceCard({
   const overlay = place.id.startsWith("local:");
   const trust = listingTrust(local?.links, g?.avg ?? 0, g?.count ?? 0, (local?.verifiedAt ?? 0) > 0, overlay);
   const logo = pickListingLogo(local?.logo, place.logo);
+  const address = local?.address || place.address;
+  const hours = local?.hours || place.hours;
+  const links = local?.links?.length ? local.links : place.links;
+  const pays = local?.pays?.length ? local.pays : place.pays;
+  const description = local?.description || place.description;
   const [proofErr, setProofErr] = useState("");
   const [proofBusy, setProofBusy] = useState(false);
   const needsCarga = Boolean(local?.verifyToken && !(local?.verifiedAt ?? 0) && onVerified);
@@ -143,17 +190,18 @@ export function PlaceCard({
           </p>
         </div>
       ) : null}
-      {local?.description ? <p className="text-sm text-pretty text-foreground">{local.description}</p> : null}
+      {description ? <p className="text-sm text-pretty text-foreground">{description}</p> : null}
       {local?.notes ? (
         <p className="text-sm text-pretty text-muted-foreground">
           <span className="font-medium text-foreground">{t("notesPrefix")} </span>
           {local.notes}
         </p>
       ) : null}
-      {local?.address ? <p className="text-sm text-muted-foreground">{local.address}</p> : null}
-      {local?.hours ? <HoursView hours={local.hours} /> : null}
-      {local?.pays?.length ? <PayRow methods={local.pays} /> : null}
-      {local?.links?.length ? <SocialRow links={local.links} /> : null}
+      {address ? <p className="text-sm text-muted-foreground">{address}</p> : null}
+      {place.phone ? <p className="text-sm text-muted-foreground">{place.phone}</p> : null}
+      {hours ? <HoursView hours={hours} /> : place.hoursText ? <p className="text-sm text-muted-foreground">{place.hoursText}</p> : null}
+      {pays?.length ? <PayRow methods={pays} /> : null}
+      {links?.length ? <SocialRow links={links} /> : null}
       {needsCarga ? (
         <CargaProofStep
           token={local!.verifyToken!}
@@ -167,6 +215,7 @@ export function PlaceCard({
               .then((res) => {
                 if (res.ok) onVerified?.();
                 else if (res.error === "instagram") setProofErr(t("pinNoIg"));
+                else if (res.error === "medium") setProofErr(t("pinProofMedium"));
                 else if (res.error === "links" || res.error === "need") setProofErr(t("verifyNeedLink"));
                 else setProofErr(t("pinProofFail"));
               })

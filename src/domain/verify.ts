@@ -1,5 +1,5 @@
 import { averageStars } from "./merchant-grade.ts";
-import { keyFromUrl } from "./socials.ts";
+import { keyFromUrl, type SocialKey } from "./socials.ts";
 import type { Community, CommunityLink } from "./entities";
 import { FOUNDING_DESCRIPTION, FOUNDING_LINKS, FOUNDING_UY } from "./globe.ts";
 
@@ -64,6 +64,46 @@ export function hasScrapeLink(links: { key?: string; url: string }[] | undefined
 }
 
 export type ProofErr = "need" | "links" | "instagram";
+
+function siteHost(raw: string) {
+  try {
+    return new URL(raw).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function sameSite(a: string, b: string) {
+  if (!a || !b) return false;
+  return a === b || a.endsWith(`.${b}`) || b.endsWith(`.${a}`);
+}
+
+/**
+ * El post tiene que salir de un medio que el comercio o la comunidad declaró.
+ * Red: misma red (Instagram, X, Telegram…). Web: el mismo sitio, con o sin www.
+ */
+export function proofOnDeclaredMedium(proof: string, declared: { key?: string; url: string }[]): boolean {
+  const host = siteHost(proof);
+  if (!host) return false;
+  let key: SocialKey = "web";
+  try {
+    key = keyFromUrl(new URL(proof).toString());
+  } catch {
+    return false;
+  }
+  for (const row of declared) {
+    const url = (row.url || "").trim();
+    if (!url) continue;
+    const declaredKey = (row.key || keyFromUrl(url)) as SocialKey;
+    if (declaredKey !== "web") {
+      if (key === declaredKey) return true;
+      continue;
+    }
+    if (key !== "web") continue;
+    if (sameSite(host, siteHost(url))) return true;
+  }
+  return false;
+}
 
 /** Vacío = todavía no hay prueba (paso 1). Instagram solo si es post/reel. */
 export function normalizeProofUrl(raw: string): { url: string } | { error: ProofErr } {

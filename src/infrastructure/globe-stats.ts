@@ -320,6 +320,7 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   const overlay: GlobeDot[] = [];
   try {
     for (const r of parseMapCsv(csv)) {
+      if (r.tipo === "circular") continue;
       if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
       const isComm = r.tipo === "community";
       const iso = locateOrNearest(r.lon, r.lat, idx);

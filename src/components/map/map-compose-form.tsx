@@ -111,6 +111,7 @@ export function MapComposeForm({
   if (kind === "comercio") {
     return (
       <div className="space-y-2">
+        <p className="text-sm text-pretty text-muted-foreground">{t("joinWho")}</p>
         <p className="text-sm text-pretty text-muted-foreground">{t("composeHow")}</p>
         <p className="text-xs text-pretty text-muted-foreground">{t("shopKeeper")}</p>
         <p className="text-xs text-muted-foreground">{t("reqHint")}</p>

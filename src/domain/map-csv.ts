@@ -25,7 +25,7 @@ export const MAP_CSV_HEADERS = [
   "verifiedAt",
 ] as const;
 
-export type MapTipo = "shop" | "community";
+export type MapTipo = "shop" | "community" | "circular";
 
 export type MapCsvRow = {
   id: string;
@@ -303,7 +303,14 @@ export function parseMapCsv(text: string): MapCsvRow[] {
     const id = get("id");
     if (!id) continue;
     const tipoRaw = get("tipo");
-    const tipo = tipoRaw === "community" || tipoRaw === "comunidad" ? "community" : tipoRaw === "shop" || tipoRaw === "comercio" ? "shop" : null;
+    const tipo =
+      tipoRaw === "community" || tipoRaw === "comunidad"
+        ? "community"
+        : tipoRaw === "circular" || tipoRaw === "economia"
+          ? "circular"
+          : tipoRaw === "shop" || tipoRaw === "comercio"
+            ? "shop"
+            : null;
     if (!tipo) continue;
     const lat = plainNum(get("lat"));
     const lon = plainNum(get("lon"));
@@ -418,28 +425,83 @@ export function rowToCommunity(row: MapCsvRow): Community {
   };
 }
 
+export type CircularPin = {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  city: string;
+  description: string;
+  steward: string;
+  logo: string;
+  links: SocialLink[];
+  createdAt: number;
+  verifiedAt: number;
+};
+
+export function rowToCircular(row: MapCsvRow): CircularPin {
+  return {
+    id: row.id,
+    name: row.name,
+    lat: row.lat,
+    lon: row.lon,
+    city: row.address,
+    description: row.description,
+    steward: row.notes,
+    logo: row.logo,
+    links: socialsFromCsv(row.socials),
+    createdAt: row.created,
+    verifiedAt: row.verifiedAt || 0,
+  };
+}
+
+export function circularToRow(c: CircularPin): MapCsvRow {
+  return {
+    id: c.id,
+    tipo: "circular",
+    name: c.name,
+    lat: c.lat,
+    lon: c.lon,
+    address: c.city,
+    description: c.description,
+    notes: c.steward,
+    score: 0,
+    votes: 0,
+    logo: logoUrl(c.logo || ""),
+    socials: socialsToCsv(c.links),
+    hours: "",
+    pays: "",
+    created: c.createdAt,
+    token: "",
+    verifiedAt: c.verifiedAt || 0,
+  };
+}
+
 export function hydrateMapCsv(text: string) {
   const rows = parseMapCsv(text);
   const store: Record<string, MerchantLocal> = {};
   const comms: Community[] = [];
+  const circulars: CircularPin[] = [];
   for (const r of rows) {
     if (r.tipo === "community") comms.push(rowToCommunity(r));
+    else if (r.tipo === "circular") circulars.push(rowToCircular(r));
     else store[r.id] = rowToLocal(r);
   }
-  return { store, comms };
+  return { store, comms, circulars };
 }
 
 export function dumpMapCsv(
   store: Record<string, MerchantLocal>,
   comms: Community[],
   places: MerchantPlace[] = [],
+  circulars: CircularPin[] = [],
 ) {
   const byId = new Map(places.map((p) => [p.id, p]));
   const shops = Object.entries(store)
     .filter(([, s]) => !s.removed)
     .map(([id, s]) => shopToRow(id, byId.get(id) || {}, s));
   const communities = comms.map(communityToRow);
-  return stringifyMapCsv([...shops, ...communities]);
+  return stringifyMapCsv([...shops, ...communities, ...circulars.map(circularToRow)]);
 }
 
 /** Incoming wins, but empty text does not erase a field that already had data. */

@@ -50,9 +50,10 @@ function MapFallback() {
 }
 
 function mapHasPendingCarga() {
-  // Si hay un CARGA a medio validar, no arrancar en el globo: se pierde el paso de la prueba.
+  // Solo esta pestaña. localStorage no debe abrir el mapa en el código al volver otro día.
   try {
-    const raw = sessionStorage.getItem("bitacora-map-pending") || localStorage.getItem("bitacora-map-pending");
+    if (sessionStorage.getItem("bitacora-carga-lock") === "1") return true;
+    const raw = sessionStorage.getItem("bitacora-map-pending");
     if (!raw) return false;
     const p = JSON.parse(raw) as { id?: string; token?: string };
     return Boolean(p.id && p.token);

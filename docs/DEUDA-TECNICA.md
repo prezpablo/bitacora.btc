@@ -99,6 +99,14 @@ Cotejo del 26 oct contra el árbol instalado. No se reabre Next ni React Server 
 
 **Siguiente:** **D-NODO**, cuando exista el nodo en Colonia. No se arma el túnel antes. **S-VOTE-WHO**, **S-REBIND**, **S-CSP-NONCE**, **D-TR-CACHE**, **D-LIQ-ZOOM**, **D-EXIF** y **D-CSV-LOCK** entran con el próximo ZIP.
 
+## Cola 2 nov 2026 — comunidades aliadas
+
+No es un quinto destino. Vive dentro de **Comunidad**, junto a anuncios, eventos, experiencias y el feed. Una fase, cuando toque. No se mezcla con la carga pública de un comercio (código CARGA).
+
+| Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|
+| **D-ALIADAS** | P3 | Pendiente. Una sección con el logo de cada comunidad que ayuda a verificar los datos, y al lado los enlaces a sus redes. Los logos los sube Bitácora. Textos en es, pt y en. | No se abre un formulario público. No hay KYC. No se crea una sala nueva en la barra. No se enlaza un logo de un dominio ajeno: el archivo queda en el sitio. |
+
 ---
 
 ## Checklist legal — 13 oct 22:22 -03, cotejo del .org

@@ -2,7 +2,8 @@ import { mkdirSync, readFileSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Community, MerchantPlace, ShopPin } from "@/domain";
 import { placeAsPin } from "@/domain";
-import { logoUrl, parseMapCsv } from "@/domain/map-csv";
+import { hoursFromCsv, logoUrl, parseMapCsv, paysFromCsv, socialsFromCsv } from "@/domain/map-csv";
+import { factsFromOsmTags, type ShopFacts } from "@/domain/shop-facts";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 import { loadMapCsvText } from "./map-csv-io";
 import { catalogAllShops, catalogCommunities, catalogShopById, catalogShopsInBox, searchCatalogShops } from "./catalog";
@@ -252,6 +253,43 @@ export async function fetchMerchants(bbox: {
   return [...map.values()];
 }
 
+const tagCache = new Map<string, Record<string, string>>();
+
+async function osmTags(id: string): Promise<Record<string, string>> {
+  if (!/^(node|way|relation):\d+$/.test(id)) return {};
+  const hit = tagCache.get(id);
+  if (hit) return hit;
+  try {
+    const res = await fetch(`https://api.btcmap.org/v2/elements/${encodeURIComponent(id)}`, {
+      headers: { Accept: "application/json", "User-Agent": "bitacora.btc/1.0" },
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!res.ok) {
+      tagCache.set(id, {});
+      return {};
+    }
+    const el = (await res.json()) as { osm_json?: { tags?: Record<string, string> } };
+    const tags = el.osm_json?.tags || {};
+    tagCache.set(id, tags);
+    return tags;
+  } catch {
+    return {};
+  }
+}
+
+function withFacts(place: MerchantPlace, facts: ShopFacts): MerchantPlace {
+  const hours = place.hours || facts.hours;
+  return {
+    ...place,
+    address: place.address || facts.address,
+    phone: place.phone || facts.phone,
+    hours,
+    hoursText: hours ? undefined : place.hoursText || facts.hoursText,
+    links: place.links?.length ? place.links : facts.links,
+    pays: place.pays?.length ? place.pays : facts.pays,
+  };
+}
+
 export async function fetchMerchant(id: string): Promise<MerchantPlace | null> {
   if (!id || id.startsWith("cluster:")) return null;
   let place = catalogShopById(id);
@@ -259,25 +297,39 @@ export async function fetchMerchant(id: string): Promise<MerchantPlace | null> {
     const csv = await loadMapCsvText();
     for (const r of parseMapCsv(csv)) {
       if (r.id !== id || r.tipo === "community") continue;
-      place = {
-        id: r.id,
-        lat: r.lat,
-        lon: r.lon,
-        name: r.name || place?.name || r.id,
-        category: place?.category && place.category !== "cluster" ? place.category : "propuesta",
-        createdAt: r.created || place?.createdAt || Date.now(),
-        logo: r.logo || place?.logo,
-        description: r.description || place?.description,
-      };
+      place = withFacts(
+        {
+          id: r.id,
+          lat: r.lat,
+          lon: r.lon,
+          name: r.name || place?.name || r.id,
+          category: place?.category && place.category !== "cluster" ? place.category : "propuesta",
+          createdAt: r.created || place?.createdAt || Date.now(),
+          logo: r.logo || place?.logo,
+          description: r.description || place?.description,
+        },
+        {
+          address: r.address || undefined,
+          hours: r.hours ? hoursFromCsv(r.hours) : undefined,
+          links: socialsFromCsv(r.socials),
+          pays: paysFromCsv(r.pays),
+        },
+      );
       break;
     }
   } catch {
     /* csv optional */
   }
-  if (place) return place;
-  const snap = readSnap().find((p) => p.id === id);
-  if (snap) return snap;
-  return FALLBACK.find((p) => p.id === id) ?? null;
+  if (!place) {
+    const snap = readSnap().find((p) => p.id === id);
+    place = snap || FALLBACK.find((p) => p.id === id) || null;
+  }
+  if (!place) return null;
+  const thin = !place.address || !place.hours || !place.links?.length;
+  if (thin && /^(node|way|relation):/.test(place.id)) {
+    place = withFacts(place, factsFromOsmTags(await osmTags(place.id)));
+  }
+  return place;
 }
 
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {

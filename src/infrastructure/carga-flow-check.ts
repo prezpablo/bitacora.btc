@@ -116,8 +116,8 @@ const again = await acceptMapListing({
   captcha: againCap.code,
   captchaNonce: againCap.nonce,
 });
-if (again.error !== "pending") throw new Error(`esperaba pendiente, llegó ${JSON.stringify(again)}`);
-if (used(againCap.id) !== 0) throw new Error("el duplicado gastó el captcha");
+if (!again.ok || again.token !== shop.token) throw new Error(`el reintento no devolvió el mismo código: ${JSON.stringify(again)}`);
+if (used(againCap.id) !== 0) throw new Error("el reintento gastó el captcha");
 
 console.log("SHOP", shop.token);
 console.log("COMM", comm.token);

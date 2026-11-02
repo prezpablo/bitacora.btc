@@ -33,6 +33,22 @@ type Feat = {
   cities: number;
 };
 
+function facesCamera(lat: number, lon: number, pov: { lat?: number; lng?: number; altitude?: number }) {
+  const phi = (deg: number) => ((90 - deg) * Math.PI) / 180;
+  const vec = (la: number, lo: number) => {
+    const p = phi(la);
+    const t = phi(lo);
+    const s = Math.sin(p);
+    return { x: s * Math.cos(t), y: Math.cos(p), z: s * Math.sin(t) };
+  };
+  const a = vec(lat, lon);
+  const c = vec(Number(pov.lat) || 0, Number(pov.lng) || 0);
+  const dot = a.x * c.x + a.y * c.y + a.z * c.z;
+  const alt = Number(pov.altitude);
+  const limb = 1 / (1 + (Number.isFinite(alt) ? alt : 1.5));
+  return dot > limb + 0.04;
+}
+
 function featCenter(g: Feat["geometry"]) {
   let ring: number[][] = [];
   if (g.type === "Polygon") ring = ((g.coordinates as number[][][]) || [])[0] || [];
@@ -68,10 +84,18 @@ function GlobeCanvas({
   const reduceMotion = usePrefersReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
   const globeRef = useRef<{
-    controls: () => { autoRotate: boolean; autoRotateSpeed: number; enableZoom: boolean };
+    controls: () => {
+      autoRotate: boolean;
+      autoRotateSpeed: number;
+      enableZoom: boolean;
+      enableRotate: boolean;
+      addEventListener: (type: string, cb: () => void) => void;
+    };
     pointOfView: (pov?: { lat?: number; lng?: number; altitude?: number }, ms?: number) => { lat: number; lng: number; altitude: number };
+    getScreenCoords?: (lat: number, lng: number, altitude?: number) => { x: number; y: number };
   } | null>(null);
   const entered = useRef(false);
+  const drag = useRef({ x: 0, y: 0, moved: false });
   const [Globe, setGlobe] = useState<ComponentType<Record<string, unknown>> | null>(null);
   const [loadErr, setLoadErr] = useState("");
   const [joining, setJoining] = useState(false);
@@ -127,6 +151,7 @@ function GlobeCanvas({
   useEffect(() => {
     const g = globeRef.current;
     if (!g) return;
+    if (document.activeElement === wrap.current) return;
     try {
       const c = g.controls();
       c.autoRotate = !reduceMotion;
@@ -278,6 +303,36 @@ function GlobeCanvas({
 
   const enterRef = useRef(enter);
   enterRef.current = enter;
+
+  function pinUnder(clientX: number, clientY: number) {
+    const g = globeRef.current;
+    const root = wrap.current;
+    if (!g || !root) return null;
+    const pov = g.pointOfView?.() || { lat: -15, lng: -58, altitude: 2 };
+    const buttons = root.querySelectorAll<HTMLButtonElement>("button[data-pin-lat]");
+    let best: HTMLButtonElement | null = null;
+    let bestD = Infinity;
+    buttons.forEach((el) => {
+      if (el.style.display === "none") return;
+      const faceLat = Number(el.dataset.faceLat);
+      const faceLon = Number(el.dataset.faceLon);
+      if (!Number.isFinite(faceLat) || !Number.isFinite(faceLon) || !facesCamera(faceLat, faceLon, pov)) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) return;
+      const dist = Math.hypot(clientX - (rect.left + rect.width / 2), clientY - (rect.top + rect.height / 2));
+      const rad = Math.max(rect.width, rect.height) / 2 + 8;
+      if (dist <= rad && dist < bestD) {
+        best = el;
+        bestD = dist;
+      }
+    });
+    if (!best) return null;
+    const lat = Number(best.dataset.pinLat);
+    const lon = Number(best.dataset.pinLon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    const kind = best.dataset.pinKind === "shop" || best.dataset.pinKind === "community" ? best.dataset.pinKind : undefined;
+    return { lat, lon, id: best.dataset.pinId || undefined, kind };
+  }
   const htmlElement = useCallback(
     (d: { lat: number; lon: number; lat0?: number; lon0?: number; id?: string; name?: string; logo?: string; kind?: "shop" | "community"; face?: "btc" | "logo"; halo?: boolean; px?: number }) => {
       const el = document.createElement("button");
@@ -286,14 +341,22 @@ function GlobeCanvas({
       el.type = "button";
       el.tabIndex = -1;
       el.title = d.name || "";
+      const pinLat = Number(d.lat0 ?? d.lat);
+      const pinLon = Number(d.lon0 ?? d.lon);
+      if (Number.isFinite(pinLat)) el.dataset.pinLat = String(pinLat);
+      if (Number.isFinite(pinLon)) el.dataset.pinLon = String(pinLon);
+      el.dataset.faceLat = String(d.lat);
+      el.dataset.faceLon = String(d.lon);
+      if (d.id) el.dataset.pinId = d.id;
+      if (d.kind) el.dataset.pinKind = d.kind;
       const face = d.halo ? document.createElement("span") : null;
       if (d.halo && face) {
         const glow = statueGlow(sizePx);
         const box = sizePx + glow.pad * 2;
-        el.style.cssText = `width:${box}px;height:${box}px;padding:0;border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;overflow:visible;cursor:pointer;pointer-events:auto`;
+        el.style.cssText = `width:${box}px;height:${box}px;padding:0;border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;overflow:visible;pointer-events:none`;
         face.style.cssText = `display:block;width:${sizePx}px;height:${sizePx}px;border-radius:50%;overflow:hidden;background:#f7931a;box-shadow:${glow.shadow}`;
       } else {
-        el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden;cursor:pointer;pointer-events:auto`;
+        el.style.cssText = `width:${sizePx}px;height:${sizePx}px;padding:0;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 ${ring}px #f7931a;overflow:hidden;pointer-events:none`;
       }
       const host = face ?? el;
       const logo = d.face === "logo" ? imgSrc(d.logo || "") : "";
@@ -314,10 +377,6 @@ function GlobeCanvas({
         host.innerHTML = BITCOIN_MARK_SVG;
       }
       if (face) el.appendChild(face);
-      el.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        enterRef.current(d.lat0 ?? d.lat, d.lon0 ?? d.lon, 13, undefined, d);
-      });
       return el;
     },
     [],
@@ -374,16 +433,39 @@ function GlobeCanvas({
         role="application"
         aria-label={t("globeKeys")}
         title={t("zoomNeedFocus")}
-        onPointerDown={() => wrap.current?.focus({ preventScroll: true })}
-        onFocus={() => {
-          const g = globeRef.current;
-          if (g) g.controls().enableZoom = true;
-        }}
-        onBlur={() => {
+        onPointerDown={(e) => {
+          drag.current = { x: e.clientX, y: e.clientY, moved: false };
+          wrap.current?.focus({ preventScroll: true });
           const g = globeRef.current;
           if (!g) return;
-          g.controls().enableZoom = false;
-          g.controls().autoRotate = !reduceMotion;
+          const c = g.controls();
+          c.enableRotate = true;
+          c.enableZoom = true;
+        }}
+        onPointerMove={(e) => {
+          if (Math.hypot(e.clientX - drag.current.x, e.clientY - drag.current.y) > 6) drag.current.moved = true;
+        }}
+        onPointerUp={(e) => {
+          if (drag.current.moved) return;
+          const pin = pinUnder(e.clientX, e.clientY);
+          if (!pin) return;
+          enterRef.current(pin.lat, pin.lon, 14, undefined, pin);
+        }}
+        onFocus={() => {
+          const g = globeRef.current;
+          if (!g) return;
+          const c = g.controls();
+          c.enableRotate = true;
+          c.enableZoom = true;
+        }}
+        onBlur={(e) => {
+          const next = e.relatedTarget;
+          if (next instanceof Node && wrap.current?.contains(next)) return;
+          const g = globeRef.current;
+          if (!g) return;
+          const c = g.controls();
+          c.enableZoom = false;
+          c.autoRotate = !reduceMotion;
         }}
         onKeyDown={(e) => {
           const g = globeRef.current;
@@ -447,7 +529,6 @@ function GlobeCanvas({
             alpha: false,
             powerPreference: "default",
           }}
-          pointOfView={{ lat: -15, lng: -58, altitude: 2.05 }}
           polygonsData={features}
           polygonGeoJsonGeometry="geometry"
           polygonCapCurvatureResolution={4}
@@ -476,7 +557,14 @@ function GlobeCanvas({
             setAlt((prev) => (Math.abs(prev - a) < 0.12 ? prev : a));
           }}
           onPolygonHover={(d: Feat | null) => setHover(d)}
-          onPolygonClick={(d: Feat) => {
+          onPolygonClick={(d: Feat, _ev: unknown, coords?: { lat?: number; lng?: number }) => {
+            if (entered.current) return;
+            const lat = Number(coords?.lat);
+            const lon = Number(coords?.lng);
+            if (Number.isFinite(lat) && Number.isFinite(lon)) {
+              enter(lat, lon, 6, d.iso);
+              return;
+            }
             const cap = capitalOf(d.iso);
             if (cap) {
               enter(cap.lat, cap.lon, 11, d.iso);
@@ -492,7 +580,16 @@ function GlobeCanvas({
             const c = g.controls();
             c.autoRotate = !reduceMotion;
             c.autoRotateSpeed = reduceMotion ? 0 : 0.4;
+            c.enableRotate = true;
             c.enableZoom = document.activeElement === wrap.current;
+            const canvas = wrap.current?.querySelector("canvas");
+            if (canvas) canvas.style.touchAction = "none";
+            c.addEventListener("start", () => {
+              c.autoRotate = false;
+              c.enableRotate = true;
+              c.enableZoom = true;
+            });
+            g.pointOfView({ lat: -15, lng: -58, altitude: 2.05 });
           }}
         />
       ) : (

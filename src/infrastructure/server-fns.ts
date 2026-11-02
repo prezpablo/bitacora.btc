@@ -31,10 +31,10 @@ import { makePinToken, pinAlive, PIN_TTL_MS, type CommunityPin } from "@/domain/
 import { cleanExperience, experienceOnBoard, experiencePublic, type Experience } from "@/domain/experience";
 import { applyListingPatch, proposeListingPatch } from "@/application/map-listings";
 import { makeContactTicket, PATCH_TTL_MS, patchAlive } from "@/domain/listing-patch";
-import { parseMapCsv, socialsFromCsv, socialsToCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
+import { parseMapCsv, socialsFromCsv, stringifyMapCsv, stringifyMapCsvPublic } from "@/domain/map-csv";
 import { mergeLiveFees } from "@/domain/fees";
 import { localeOf, translateFeed, translateNews } from "./translate";
-import { normalizeProofUrl, cargaVerifyGate } from "@/domain/verify";
+import { normalizeProofUrl, cargaVerifyGate, proofOnDeclaredMedium } from "@/domain/verify";
 import { rewriteDataLogo } from "./logo-exif";
 import { addRepasoCount, readRepasoCount } from "./repaso-count";
 
@@ -365,7 +365,10 @@ export const verifyCommunityPin = createServerFn({ method: "POST" })
       pin.proof = proof;
     }
     if (!pin.proof) return { ok: false, error: "need" };
-    const hit = await scrapeShowsToken(pin.proof, pin.token, pin.links);
+    if (!proofOnDeclaredMedium(pin.proof, (pin.links || []).map((url) => ({ url })))) {
+      return { ok: false, error: "medium" };
+    }
+    const hit = await scrapeShowsToken(pin.proof, pin.token);
     if (!hit) {
       const ig = /instagram\.com/i.test(pin.proof);
       return { ok: false, error: ig ? "instagram" : "proof" };
@@ -501,7 +504,7 @@ export const verifyMapListing = createServerFn({ method: "POST" })
     const row = rows.find((r) => r.id === data.id);
     const gate = cargaVerifyGate(row, data.token);
     if (gate !== "ok" || !row) return { ok: false, error: gate };
-    const extra = socialsFromCsv(row.socials).map((l) => l.url).filter(Boolean);
+    const extra = socialsFromCsv(row.socials);
     let proof = "";
     if ((data.proof || "").trim()) {
       const n = normalizeProofUrl(data.proof || "");
@@ -510,16 +513,9 @@ export const verifyMapListing = createServerFn({ method: "POST" })
       if (!proof) return { ok: false, error: "proof" };
     }
     if (!proof) return { ok: false, error: "need" };
-    const urls = [proof, ...extra.filter((u) => u !== proof)];
-    const hit = await scrapeShowsToken(urls[0]!, row.token, urls.slice(1));
+    if (!proofOnDeclaredMedium(proof, extra)) return { ok: false, error: "medium" };
+    const hit = await scrapeShowsToken(proof, row.token);
     if (!hit) return { ok: false, error: "proof" };
-    if (proof) {
-      const links = socialsFromCsv(row.socials);
-      if (!links.some((l) => l.url === proof)) {
-        links.push({ key: "web", label: "web", url: proof });
-        row.socials = socialsToCsv(links);
-      }
-    }
     row.verifiedAt = Date.now();
     await saveMapCsvText(stringifyMapCsv(rows));
     return { ok: true };
@@ -631,10 +627,10 @@ export const verifyListingPatch = createServerFn({ method: "POST" })
       patch.proof = proof;
     }
     if (!patch.proof) return { ok: false, error: "links" };
-    const extra = socialsFromCsv(parseMapCsv(await loadMapCsvText()).find((r) => r.id === patch.listingId)?.socials || "")
-      .map((l) => l.url)
-      .filter(Boolean);
-    const hit = await scrapeShowsToken(patch.proof, patch.token, extra);
+    const listing = parseMapCsv(await loadMapCsvText()).find((r) => r.id === patch.listingId);
+    const declared = socialsFromCsv(patch.fields.socials !== undefined ? patch.fields.socials : listing?.socials || "");
+    if (!proofOnDeclaredMedium(patch.proof, declared)) return { ok: false, error: "medium" };
+    const hit = await scrapeShowsToken(patch.proof, patch.token);
     if (!hit) return { ok: false, error: "proof" };
     patch.verified = true;
     patch.verifiedAt = Date.now();

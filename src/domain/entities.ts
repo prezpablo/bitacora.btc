@@ -182,6 +182,12 @@ export type MerchantPlace = {
   createdAt: number;
   description?: string;
   logo?: string;
+  address?: string;
+  phone?: string;
+  hours?: WeekHours;
+  hoursText?: string;
+  links?: SocialLink[];
+  pays?: PayKey[];
   /** Supercluster: pines agrupados (D-PIN-02). Ausente en ficha suelta. */
   clusterCount?: number;
 };
