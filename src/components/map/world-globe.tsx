@@ -64,6 +64,49 @@ function featCenter(g: Feat["geometry"]) {
   return { lon: n ? x / n : 0, lat: n ? y / n : 0 };
 }
 
+function geoBox(g: Feat["geometry"]) {
+  let minLon = 180;
+  let maxLon = -180;
+  let minLat = 90;
+  let maxLat = -90;
+  let n = 0;
+  const walk = (c: unknown) => {
+    if (!Array.isArray(c)) return;
+    if (typeof c[0] === "number" && typeof c[1] === "number") {
+      const lon = c[0];
+      const lat = c[1];
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) return;
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      n += 1;
+      return;
+    }
+    for (const part of c) walk(part);
+  };
+  walk(g.coordinates);
+  if (!n) return null;
+  return { minLon, maxLon, minLat, maxLat };
+}
+
+function inGeoBox(
+  lat: number,
+  lon: number,
+  box: { minLon: number; maxLon: number; minLat: number; maxLat: number },
+  pad: number,
+) {
+  return lat >= box.minLat - pad && lat <= box.maxLat + pad && lon >= box.minLon - pad && lon <= box.maxLon + pad;
+}
+
+function zoomForBox(box: { minLon: number; maxLon: number; minLat: number; maxLat: number }) {
+  const span = Math.max(box.maxLat - box.minLat, box.maxLon - box.minLon);
+  if (span < 6) return 7;
+  if (span < 14) return 5;
+  if (span < 30) return 4;
+  return 3;
+}
+
 function isoOf(props: Record<string, unknown>) {
   const a2 = String(props.ISO_A2 || "");
   if (a2 && a2 !== "-99") return a2;
@@ -93,6 +136,7 @@ function GlobeCanvas({
     };
     pointOfView: (pov?: { lat?: number; lng?: number; altitude?: number }, ms?: number) => { lat: number; lng: number; altitude: number };
     getScreenCoords?: (lat: number, lng: number, altitude?: number) => { x: number; y: number };
+    toGlobeCoords?: (x: number, y: number) => { lat: number; lng: number } | null;
   } | null>(null);
   const entered = useRef(false);
   const drag = useRef({ x: 0, y: 0, moved: false });
@@ -218,6 +262,38 @@ function GlobeCanvas({
     if (entered.current) return;
     entered.current = true;
     onEnter({ lat, lon, zoom, iso, id: pin?.id, kind: pin?.kind, join });
+  }
+
+  function sphereAt(clientX: number, clientY: number) {
+    const g = globeRef.current;
+    const canvas = wrap.current?.querySelector("canvas");
+    const rect = canvas?.getBoundingClientRect();
+    if (!g?.toGlobeCoords || !rect || rect.width < 2) return null;
+    const hit = g.toGlobeCoords(clientX - rect.left, clientY - rect.top);
+    if (!hit || !Number.isFinite(hit.lat) || !Number.isFinite(hit.lng)) return null;
+    return { lat: hit.lat, lon: hit.lng };
+  }
+
+  function enterCountry(d: Feat, coords?: { lat?: number; lng?: number }) {
+    const box = geoBox(d.geometry);
+    const lat = Number(coords?.lat);
+    const lon = Number(coords?.lng);
+    const zoom = box ? zoomForBox(box) : 6;
+    if (box && Number.isFinite(lat) && Number.isFinite(lon) && inGeoBox(lat, lon, box, 1.2)) {
+      enter(lat, lon, zoom, d.iso);
+      return;
+    }
+    const cap = capitalOf(d.iso);
+    if (cap && (!box || inGeoBox(cap.lat, cap.lon, box, 4))) {
+      enter(cap.lat, cap.lon, zoom, d.iso);
+      return;
+    }
+    if (box) {
+      enter((box.minLat + box.maxLat) / 2, (box.minLon + box.maxLon) / 2, zoom, d.iso);
+      return;
+    }
+    const c = featCenter(d.geometry);
+    enter(c.lat, c.lon, zoom, d.iso);
   }
 
   function askJoin() {
@@ -449,7 +525,11 @@ function GlobeCanvas({
           if (drag.current.moved) return;
           const pin = pinUnder(e.clientX, e.clientY);
           if (!pin) return;
-          enterRef.current(pin.lat, pin.lon, 14, undefined, pin);
+          const box = hover ? geoBox(hover.geometry) : null;
+          if (box && !inGeoBox(pin.lat, pin.lon, box, 2)) return;
+          const hit = sphereAt(e.clientX, e.clientY);
+          if (hit && Math.hypot(pin.lat - hit.lat, pin.lon - hit.lon) > 6) return;
+          enterRef.current(pin.lat, pin.lon, 14, hover?.iso, pin);
         }}
         onFocus={() => {
           const g = globeRef.current;
@@ -497,17 +577,8 @@ function GlobeCanvas({
             go({ altitude: Math.min(4, pov.altitude + z) });
           } else if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            if (hover) {
-              const cap = capitalOf(hover.iso);
-              if (cap) enter(cap.lat, cap.lon, 11, hover.iso);
-              else {
-                const row = stats.data?.countries.find((c) => c.iso === hover.iso);
-                const c = row && row.lat ? row : featCenter(hover.geometry);
-                enter(c.lat, c.lon, 6, hover.iso);
-              }
-            } else {
-              onSkip();
-            }
+            if (hover) enterCountry(hover);
+            else onSkip();
           } else if (e.key === "Escape") {
             e.preventDefault();
             onSkip();
@@ -559,20 +630,7 @@ function GlobeCanvas({
           onPolygonHover={(d: Feat | null) => setHover(d)}
           onPolygonClick={(d: Feat, _ev: unknown, coords?: { lat?: number; lng?: number }) => {
             if (entered.current) return;
-            const lat = Number(coords?.lat);
-            const lon = Number(coords?.lng);
-            if (Number.isFinite(lat) && Number.isFinite(lon)) {
-              enter(lat, lon, 6, d.iso);
-              return;
-            }
-            const cap = capitalOf(d.iso);
-            if (cap) {
-              enter(cap.lat, cap.lon, 11, d.iso);
-              return;
-            }
-            const row = stats.data?.countries.find((c) => c.iso === d.iso);
-            const c = row && row.lat ? row : featCenter(d.geometry);
-            enter(c.lat, c.lon, 6, d.iso);
+            enterCountry(d, coords);
           }}
           onGlobeReady={() => {
             const g = globeRef.current;
