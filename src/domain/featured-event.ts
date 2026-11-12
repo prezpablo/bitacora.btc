@@ -1,7 +1,7 @@
 /** Un solo banner en Comunidad. Cuando cierra la fecha, entra el siguiente.
  *  Solo Bitcoin. No entra un encuentro de cripto, banca, stablecoins ni inteligencia artificial.
- *  Los colores y la imagen son del evento, no de Bitácora.
- *  Siguiente, cuando tenga su pieza: Circular Economies (El Zonte, 19–20 nov) y Plan ₿ Forum (San Salvador, 29–30 ene 2027). */
+ *  Los colores son del evento, no de Bitácora.
+ *  Desde el 11 de noviembre el banner es El Zonte, partido en dos: cumbre y festival. */
 
 export type FeaturedEvent = {
   id: string;
@@ -10,9 +10,11 @@ export type FeaturedEvent = {
   agenda?: string;
   tickets?: string;
   image: string;
-  altKey: "labitAlt" | "histAlt";
+  altKey: "labitAlt" | "histAlt" | "beachAlt";
   accent: string;
   ink: string;
+  /** Dos mitades y el botón de tickets al medio. El clic de la pieza va a `site`. */
+  split?: boolean;
 };
 
 export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
@@ -29,13 +31,24 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   },
   {
     id: "bitcoin-historico-2026",
-    end: "2026-11-12",
+    end: "2026-11-10",
     site: "https://bitcoinhistorico.com/",
     tickets: "https://bitcoinhistorico.com/#tickets",
     image: "/eventos/bitcoin-historico.jpg",
     altKey: "histAlt",
     accent: "#EFBC53",
     ink: "#120C08",
+  },
+  {
+    id: "bitcoin-beach-2026",
+    end: "2026-11-22",
+    site: "https://www.bitcoinbeach.com/",
+    tickets: "https://www.bitcoinbeach.com/",
+    image: "",
+    altKey: "beachAlt",
+    accent: "#FE6A00",
+    ink: "#101820",
+    split: true,
   },
 ];
 
