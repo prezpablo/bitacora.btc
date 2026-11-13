@@ -4,8 +4,9 @@ import type { Community, MerchantLocal, MerchantPlace } from "@/domain";
 import type { CircularPin } from "@/domain/map-csv";
 import { GRADE_HEX, gradeOf, communityTrust, imgSrc, listingTrust, refineShopIcon, withFoundingProfile } from "@/domain";
 import { pickListingLogo } from "@/domain/community-dedupe";
+import { circularByline, circularCity, circularMail, circularText, type CircLang } from "@/domain/circular-copy";
 import { Button } from "@/components/ui/button";
-import { useT } from "@/lib/i18n";
+import { useAppLang, useT } from "@/lib/i18n";
 import { verifyMapListing } from "@/infrastructure/server-fns";
 import { HoursView } from "./hours-editor";
 import { StarMeter } from "./map-panels";
@@ -16,11 +17,15 @@ import { CargaProofStep } from "./carga-proof-step";
 
 export function CircularCard({ pin, onClose }: { pin: CircularPin; onClose: () => void }) {
   const t = useT();
+  const lang = useAppLang() as CircLang;
   const [imgOk, setImgOk] = useState(true);
   useEffect(() => {
     setImgOk(true);
   }, [pin.id, pin.logo]);
   const showImg = Boolean(imgSrc(pin.logo || "")) && imgOk;
+  const body = circularText(pin.id, lang);
+  const city = circularCity(pin.id, lang) || pin.city;
+  const email = pin.description.match(/Email:\s*(\S+)/)?.[1] || "";
   return (
     <div className="space-y-3">
       <p className="text-xs tracking-wide text-muted-foreground uppercase">{t("circularKind")}</p>
@@ -28,10 +33,18 @@ export function CircularCard({ pin, onClose }: { pin: CircularPin; onClose: () =
         <img src="/logos/economia-circular.png" alt="" width={56} height={56} className="size-14 rounded-full bg-white object-contain shadow-[var(--shadow-border)]" />
         <div>
           <h3 className="text-lg font-medium">{pin.name}</h3>
-          <p className="text-sm text-muted-foreground">{pin.city}</p>
+          <p className="text-sm text-muted-foreground">{city}</p>
         </div>
       </div>
-      {pin.description ? <p className="text-sm text-pretty">{pin.description}</p> : null}
+      {body ? <p className="text-sm text-pretty">{body}</p> : null}
+      {email ? (
+        <p className="text-sm">
+          {circularMail(lang)}:{" "}
+          <a className="underline" href={`mailto:${email}`}>
+            {email}
+          </a>
+        </p>
+      ) : null}
       <div className="flex items-center gap-3">
         {showImg ? (
           <img
@@ -44,7 +57,7 @@ export function CircularCard({ pin, onClose }: { pin: CircularPin; onClose: () =
             onError={() => setImgOk(false)}
           />
         ) : null}
-        <p className="text-sm">{t("circularBy", { name: pin.steward || pin.name })}</p>
+        <p className="text-sm">{circularByline(lang, pin.steward || pin.name)}</p>
       </div>
       <SocialRow links={pin.links} />
       <Button type="button" variant="outline" className="w-full" onClick={onClose}>

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { CIRCULAR_COPY, circularText } from "./circular-copy.ts";
 
 const FOOTER = ["bc1qyuynamp7tystcvqfnjsp25dxl56deu4vgxhl2j", "bc1qsxfx6clgz3ke6uwcyafd58u56rdwtauvv0ettq"];
 
@@ -62,4 +63,21 @@ test("the map csv has the 27 circular economies and the globe does not draw them
   assert.doesNotMatch(canvas, /circularPins/);
   const seed = readFileSync(new URL("../infrastructure/map-csv-io.ts", import.meta.url), "utf8");
   assert.match(seed, /tipo = 'circular'/);
+  const card = readFileSync(new URL("../components/map/map-listing-card.tsx", import.meta.url), "utf8");
+  assert.match(card, /circularText\(pin\.id, lang\)/);
+  assert.match(card, /useAppLang/);
+  for (const cols of rows) {
+    const id = get(cols, "id");
+    const copy = CIRCULAR_COPY[id];
+    assert.ok(copy, id);
+    for (const lang of ["es", "pt", "en"] as const) {
+      assert.ok(copy.text[lang].length > 20, `${id} ${lang}`);
+      assert.ok(copy.city[lang].length > 2, `${id} city ${lang}`);
+      assert.equal(copy.text[lang].includes("Email:"), false);
+    }
+    assert.notEqual(copy.text.es, copy.text.en);
+    assert.notEqual(copy.text.es, copy.text.pt);
+    assert.equal(circularText(id, "pt"), copy.text.pt);
+  }
+  assert.equal(Object.keys(CIRCULAR_COPY).length, 27);
 });
