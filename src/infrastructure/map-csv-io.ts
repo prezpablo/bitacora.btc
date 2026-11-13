@@ -95,14 +95,22 @@ async function seedFromCsv() {
   const text = await readFirstFile(SNAP);
   const rows = mergeMapRows(parseMapCsv(text), [FOUNDING]);
   sqlTx(() => {
+    const db = openSqlite();
     const have = new Set(
-      openSqlite()
+      db
         .prepare("SELECT id FROM map_rows")
         .all()
         .map((r) => String(r.id || "")),
     );
     for (const r of rows) {
       if (!have.has(r.id)) upsertMap(r);
+    }
+    // La capa circular sale del CSV. Una muestra que ya no está en el archivo no vuelve desde SQLite.
+    const keep = new Set(rows.filter((r) => r.tipo === "circular").map((r) => r.id));
+    const drop = db.prepare("DELETE FROM map_rows WHERE id = ?");
+    for (const row of db.prepare("SELECT id FROM map_rows WHERE tipo = 'circular'").all()) {
+      const id = String(row.id || "");
+      if (id && !keep.has(id)) drop.run(id);
     }
     upsertMap(FOUNDING);
   });

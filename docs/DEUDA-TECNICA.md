@@ -5,17 +5,17 @@
 **Repo:** `prezpablo/bitacora.btc` `main`  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
+## Cierre 13 nov 2026 — D-CIRC
+
+Hecho en el repo. Las 27 fichas de Bitcoin Confederation (corte 11 nov 2026) están en `public/data/map.csv`: ciudad, pin y el contacto que cada una publica. Se ven en el mapa, filtro Economía circular. El globo las salta. No es un feed. No se copiaron las direcciones de donación del pie. Bitcoin Ikorodu queda en el pin publicado, que cae en Shagamu. Al arrancar, una fila circular que ya no está en el CSV se borra de SQLite, así no vuelven las muestras. Falta el ZIP.
+
 ## Cierre 13 nov 2026 — L-TAKEDOWN
 
 Pablo fijó el plazo: **5 días hábiles**. La regla 12 lo dice para denunciar una ficha y retirar lo ilícito o engañoso. La regla 13, el mismo plazo si quien publicó pide el retiro. En es, pt y en. No cambia el plazo de acceso, rectificación o supresión, que ya era de 5 días hábiles. Falta el ZIP para el .org.
 
 ## Cola 11 nov 2026 — D-CIRC
 
-Anotado. No se carga en este corte. El mapa ya tiene la capa de economía circular y sigue apagada. En el globo no van: solo se ven en el mapa.
-
-| Id | Pri | Hecho cuando | No se hace |
-|---|---|---|---|
-| **D-CIRC** | P3 | Cuando las 27 fichas de [bitcoinconfederation.org](https://bitcoinconfederation.org/explore/?type=place&sort=latest) (`type=place`, corte 11 nov 2026) estén en el mapa y en el CSV público: ciudad, pin y el contacto que cada una publica (correo, web, red). | No se ven en el globo: solo en el mapa. No se prende la capa antes. No es un feed: la Confederación dejó de operar y el sitio es archivo. No se copian las tres direcciones de donación del pie. El pin de Bitcoin Ikorodu cae en Shagamu, no en Ikorodu. No se inventa un contacto que la ficha no trae. |
+Cerrada el 13 nov. Ver el cierre de arriba. No se ven en el globo.
 
 ## Acuerdo 11 set (tarde) — congelado
 

@@ -756,9 +756,9 @@
     {
       "id": "D-CIRC",
       "pri": "P3",
-      "open": true,
-      "kind": "manual",
-      "done": "11 nov 2026. Cargar en el mapa y en el CSV público las 27 economías circulares de bitcoinconfederation.org (type=place) con ciudad, pin y el contacto que cada ficha publica. Solo en el mapa: no se dibujan en el globo. La capa del mapa sigue apagada hasta ese corte. No es un feed vivo: la Confederación dejó de operar y el sitio es archivo. No copiar las tres direcciones de donación del pie. El pin de Bitcoin Ikorodu cae en Shagamu."
+      "open": false,
+      "kind": "repo",
+      "done": "13 nov 2026. 27 economías circulares de bitcoinconfederation.org en public/data/map.csv (ciudad, pin y el contacto de cada ficha). Solo en el mapa. El globo las salta. No se copian las donaciones del pie. Ikorodu queda en el pin de Shagamu. Las muestras Ciudad Vieja y Punta del Este no vuelven desde SQLite. Falta el ZIP."
     }
   ],
   "guards": [
