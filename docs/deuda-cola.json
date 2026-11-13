@@ -14,9 +14,9 @@
     {
       "id": "D-FOSS",
       "pri": "P1",
-      "open": true,
+      "open": false,
       "kind": "live",
-      "done": "GET github.com/prezpablo/bitacora.btc 200 anónimo + archivo LICENSE"
+      "done": "3 nov 2026. GitHub 200 anónimo, LICENSE AGPL y el pie de bitacorabtc.org enlaza el commit."
     },
     {
       "id": "L-MANIF",
@@ -469,9 +469,9 @@
     {
       "id": "L-TAKEDOWN",
       "pri": "P2",
-      "open": true,
+      "open": false,
       "kind": "repo",
-      "done": "términos con plazo para denunciar contenido y retirarlo"
+      "done": "13 nov 2026. Pablo fijó 5 días hábiles para denunciar contenido ilícito o engañoso y retirarlo, y el mismo plazo para el retiro que pide quien publicó. Reglas 12 y 13 en es, pt y en. Falta el ZIP."
     },
     {
       "id": "L-PSAV",
@@ -742,9 +742,23 @@
     {
       "id": "D-ALIADAS",
       "pri": "P3",
+      "open": false,
+      "kind": "repo",
+      "done": "3 nov 2026. Chip Aliadas dentro de Comunidad. Logo local y redes https. Sin formulario y sin sala nueva. La primera es Consciencia Bitcoin."
+    },
+    {
+      "id": "D-HASH",
+      "pri": "P3",
       "open": true,
       "kind": "manual",
-      "done": "Sección en Comunidad, no un quinto destino. Logos de las comunidades que ayudan a verificar los datos, con el enlace a sus redes. Los sube Bitácora. No hay formulario público ni KYC."
+      "done": "3 nov 2026. Chip Máquinas dentro de Minar. Carrusel de 4 fichas en es/pt/en: qué es minar, qué hace un minero, cómo es la máquina, equipos de ahora (ASIC, agua cerca de 9 J/TH, aire 11 a 13). Negro, blanco y naranja. El botón Hablar con un minero sigue apagado hasta un canal https."
+    },
+    {
+      "id": "D-CIRC",
+      "pri": "P3",
+      "open": true,
+      "kind": "manual",
+      "done": "11 nov 2026. Cargar en el mapa y en el CSV público las 27 economías circulares de bitcoinconfederation.org (type=place) con ciudad, pin y el contacto que cada ficha publica. Solo en el mapa: no se dibujan en el globo. La capa del mapa sigue apagada hasta ese corte. No es un feed vivo: la Confederación dejó de operar y el sitio es archivo. No copiar las tres direcciones de donación del pie. El pin de Bitcoin Ikorodu cae en Shagamu."
     }
   ],
   "guards": [

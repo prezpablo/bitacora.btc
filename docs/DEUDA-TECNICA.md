@@ -5,6 +5,18 @@
 **Repo:** `prezpablo/bitacora.btc` `main`  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
+## Cierre 13 nov 2026 — L-TAKEDOWN
+
+Pablo fijó el plazo: **5 días hábiles**. La regla 12 lo dice para denunciar una ficha y retirar lo ilícito o engañoso. La regla 13, el mismo plazo si quien publicó pide el retiro. En es, pt y en. No cambia el plazo de acceso, rectificación o supresión, que ya era de 5 días hábiles. Falta el ZIP para el .org.
+
+## Cola 11 nov 2026 — D-CIRC
+
+Anotado. No se carga en este corte. El mapa ya tiene la capa de economía circular y sigue apagada. En el globo no van: solo se ven en el mapa.
+
+| Id | Pri | Hecho cuando | No se hace |
+|---|---|---|---|
+| **D-CIRC** | P3 | Cuando las 27 fichas de [bitcoinconfederation.org](https://bitcoinconfederation.org/explore/?type=place&sort=latest) (`type=place`, corte 11 nov 2026) estén en el mapa y en el CSV público: ciudad, pin y el contacto que cada una publica (correo, web, red). | No se ven en el globo: solo en el mapa. No se prende la capa antes. No es un feed: la Confederación dejó de operar y el sitio es archivo. No se copian las tres direcciones de donación del pie. El pin de Bitcoin Ikorodu cae en Shagamu, no en Ikorodu. No se inventa un contacto que la ficha no trae. |
+
 ## Acuerdo 11 set (tarde) — congelado
 
 Caja gris recalibrada. **P0 de infra retirados. No reabrir.** Superficie oponible hoy: sitio + CSV + snapshots + `/healthz` + `/legal`. FLOSS oponible **solo** cuando el repo liste 200 anónimo.
@@ -99,13 +111,23 @@ Cotejo del 26 oct contra el árbol instalado. No se reabre Next ni React Server 
 
 **Siguiente:** **D-NODO**, cuando exista el nodo en Colonia. No se arma el túnel antes. **S-VOTE-WHO**, **S-REBIND**, **S-CSP-NONCE**, **D-TR-CACHE**, **D-LIQ-ZOOM**, **D-EXIF** y **D-CSV-LOCK** entran con el próximo ZIP.
 
+## Propuesta 3 nov 2026 — D-HASH
+
+Conversación con mineros y con el CEO de Hashrate. El chip **Máquinas** está en Minar, después de Cuidado. Es un carrusel de cuatro fichas, en es, pt y en: qué es minar, qué hace un minero, cómo es la máquina y los equipos de ahora. Solo negro, blanco y naranja. Se frena si el puntero o el teclado están encima, y queda quieto si el sistema pide menos movimiento. El botón **Hablar con un minero** no se muestra: falta el canal https.
+
+Quedan abiertas: **L-TAKEDOWN**, **D-DEPS**, **D-SQL-ONE**, **D-TILE-LATAM**, **D-NODO**, **D-HASH**.
+
+## Cierre 3 nov 2026 — D-FOSS
+
+**D-FOSS** cerrada. GitHub responde 200 sin login, `LICENSE` es AGPL y el pie de bitacorabtc.org enlaza el commit. El vigilante sigue exigiendo el hash en el HTML: un 200 de GitHub solo no la reabre ni la da por hecha. No se tocó la carga de códigos.
+
 ## Cola 2 nov 2026 — comunidades aliadas
 
 No es un quinto destino. Vive dentro de **Comunidad**, junto a anuncios, eventos, experiencias y el feed. Una fase, cuando toque. No se mezcla con la carga pública de un comercio (código CARGA).
 
 | Id | Pri | Hecho cuando | No se hace |
 |---|---|---|---|
-| **D-ALIADAS** | P3 | Pendiente. Una sección con el logo de cada comunidad que ayuda a verificar los datos, y al lado los enlaces a sus redes. Los logos los sube Bitácora. Textos en es, pt y en. | No se abre un formulario público. No hay KYC. No se crea una sala nueva en la barra. No se enlaza un logo de un dominio ajeno: el archivo queda en el sitio. |
+| **D-ALIADAS** | P3 | Hecho el 3 nov 2026. Chip dentro de Comunidad. Logo en el sitio y redes en https. La primera ficha es Consciencia Bitcoin. | No hay formulario. No hay sala nueva. Un logo de otro dominio no se muestra. |
 
 ---
 

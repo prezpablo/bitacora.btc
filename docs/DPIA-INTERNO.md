@@ -36,7 +36,7 @@ El sitio es un directorio público de comercios y comunidades, más anuncios, ex
 3. La ciudad por IP sale del navegador hacia GeoJS cuando el usuario lo habilita.
 4. Contacto sale hacia FormSubmit (Estados Unidos) y de ahí a Gmail. La casilla lo dice antes de enviar.
 5. La regla 1 ya dice que leer el sitio no es aceptar. La aceptación queda en la casilla, al publicar o al escribir por Contacto.
-6. El 14 oct se decidió no publicar un segundo plazo de denuncia. Los 5 días hábiles quedan para acceso, rectificación o supresión. Una disputa de ficha usa el formulario y no promete fecha.
+6. El 13 nov 2026 Pablo fijó el plazo: 5 días hábiles para revisar un aviso y retirar lo ilícito o engañoso, y el mismo plazo si quien publicó pide el retiro. El acceso, la rectificación y la supresión siguen en 5 días hábiles (arts. 14 y 15).
 
 ## Qué no hace esta nota
 

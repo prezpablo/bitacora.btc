@@ -7,7 +7,7 @@ import { legalFilled } from "./legal-config.ts";
 
 const ANCHORS = ["aviso", "privacidad", "cookies", "accesibilidad", "terminos"];
 
-test("terms has fourteen rules and does not invent a dispute deadline", () => {
+test("terms has fourteen rules and a 5 business-day takedown", () => {
   const dispute = /5 días hábiles|5 business days|5 dias úteis/;
   for (const lang of ["es", "en", "pt"] as const) {
     const ids = LEGAL_EU[lang].blocks.map((b) => b.id).filter(Boolean);
@@ -19,6 +19,8 @@ test("terms has fourteen rules and does not invent a dispute deadline", () => {
     for (let n = 1; n <= 14; n++) assert.match(titles[n - 1] || "", new RegExp(`^${n}\\.`));
     const joined = (terms?.clauses || []).map((c) => c.body).join("\n");
     assert.match(joined, dispute);
+    assert.match(joined, /retiramos ese contenido en 5 días hábiles|take that content down within 5 business days|retiramos esse conteúdo em 5 dias úteis/);
+    assert.doesNotMatch(joined, /plazo propio de disputa|no separate dispute deadline|prazo próprio de disputa/);
     assert.doesNotMatch(joined, /\[PLAZO|sigue la ODbL|remains under the ODbL as a derived|ficha derivada/);
     assert.match(joined, /no se afirma aquí|is not stated here|não é afirmada aqui/);
   }
