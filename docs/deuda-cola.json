@@ -709,7 +709,7 @@
       "pri": "P3",
       "open": true,
       "kind": "manual",
-      "done": "Cuando exista el nodo: WireGuard de salida, solo lectura, sin billetera. No se arma el túnel antes."
+      "done": "13 nov 2026. El lector está en el repo y no corre solo: sin BITACORA_NODE_HOST sale y no arma el túnel. Si el host es una IP privada, solo pide getblockchaininfo, getmempoolinfo y estimatesmartfee. Sigue abierto hasta que el nodo de Colonia exista y el timer escriba data/node-status.json."
     },
     {
       "id": "S-GUIDE",

@@ -1,0 +1,10 @@
+[Unit]
+Description=Bitacora lectura del nodo cada 6 horas
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:20:00
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

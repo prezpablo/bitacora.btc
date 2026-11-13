@@ -5,6 +5,10 @@
 **Repo:** `prezpablo/bitacora.btc` `main`  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
+## Corte 13 nov 2026 — D-NODO
+
+El lector quedó en el repo. No hay nodo, así que **no se armó el túnel** y el timer no se prende. `deploy/bitacora-node-pull.sh` sale si `BITACORA_NODE_HOST` está vacío. Si algún día el host es una IP privada de WireGuard o Tailscale, solo pide `getblockchaininfo`, `getmempoolinfo` y `estimatesmartfee`. No pide la billetera, no acepta un nombre público y no usa Cloudflare. El frente no habla con el nodo.
+
 ## Cierre 13 nov 2026 — D-CIRC
 
 Hecho en el repo. Las 27 fichas de Bitcoin Confederation (corte 11 nov 2026) están en `public/data/map.csv`: ciudad, pin y el contacto que cada una publica. Se ven en el mapa, filtro Economía circular. El globo las salta. No es un feed. No se copiaron las direcciones de donación del pie. Bitcoin Ikorodu queda en el pin publicado, que cae en Shagamu. Al arrancar, una fila circular que ya no está en el CSV se borra de SQLite, así no vuelven las muestras. Falta el ZIP.

@@ -84,7 +84,7 @@ El PDF pide WireGuard/Tailscale y un worker que cachea al VPS. Sin el nodo en Co
 | H2.3 | Caché | El JSON del VPS alcanza. Redis no hace falta a este tráfico. |
 | H2.4 | Qué datos | Decidir: mempool propio, lightning, fees. Hoy el desk ya tiene mempool.space público. |
 
-Plantilla: `deploy/umbrel-pull.example.sh`. No corre hasta tener IP Tailscale.
+Plantilla: `deploy/bitacora-node-pull.sh`. Sale sin hacer nada hasta que `BITACORA_NODE_HOST` sea una IP privada. No se habilita el timer antes.
 
 ---
 

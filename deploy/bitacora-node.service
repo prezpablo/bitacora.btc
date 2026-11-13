@@ -1,0 +1,8 @@
+[Unit]
+Description=Bitacora lectura del nodo (solo si hay IP privada)
+After=network.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/bitacora.env
+ExecStart=/usr/local/bin/bitacora-node-pull.sh
