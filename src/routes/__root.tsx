@@ -100,7 +100,7 @@ function RootDoc() {
   const path = loaded?.path || pagePath(search.pathname);
   const explicitLang = loaded?.explicitLang ?? Boolean(langFromQuery(search.search) || langFromQuery(search.searchStr));
   const canonical = pageCanonical(ORIGIN, path, lang, explicitLang);
-  const ld = JSON.stringify(jsonLd(lang, ORIGIN, path, canonical));
+  const ld = JSON.stringify(jsonLd(lang, ORIGIN, path, canonical)).replace(/</g, "\\u003c");
   return (
     <html lang={lang} className="antialiased" suppressHydrationWarning>
       <head>

@@ -37,3 +37,17 @@ const HTML_ESC: Record<string, string> = {
 export function escapeHtml(raw: string) {
   return String(raw ?? "").replace(/[&<>"']/g, (ch) => HTML_ESC[ch] || ch);
 }
+
+/** Solo una ruta propia o un https de BTC Map entran al HTML de Leaflet. */
+export function leafletImg(raw: string) {
+  const src = escapeHtml(raw).replace(/"/g, "");
+  if (src.startsWith("/") && !src.startsWith("//")) return src;
+  if (!src.startsWith("https://")) return "";
+  try {
+    const host = new URL(src).hostname;
+    if (/(^|\.)btcmap\.org$/i.test(host)) return src;
+  } catch {
+    return "";
+  }
+  return "";
+}

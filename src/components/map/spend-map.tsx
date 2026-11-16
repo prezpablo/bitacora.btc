@@ -24,7 +24,7 @@ import { applyFix } from "./leaflet-fix";
 import { useMapGuide } from "./use-map-guide";
 import { useAppLang, useT } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
-import { cn, escapeHtml } from "@/lib/utils";
+import { cn, escapeHtml, leafletImg } from "@/lib/utils";
 import { extrasAllowed, readExtra, writeExtra } from "@/lib/storage-consent";
 import { CommunityFeedPanel } from "@/components/dashboard/community-feed";
 import { BitcoinMark, BITCOIN_MARK_SVG } from "@/components/dashboard/brand-mark";
@@ -153,7 +153,7 @@ function isListPlace(p: { id: string; name?: string; category?: string }) {
 }
 
 function coinFaceHtml(logo: string, size: number) {
-  const src = escapeHtml(imgSrc(logo)).replace(/"/g, "");
+  const src = leafletImg(imgSrc(logo));
   if (src) {
     return `<img src="${src}" alt="" width="${size}" height="${size}" referrerpolicy="no-referrer" decoding="async" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;display:block;background:#f7931a" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" /><span style="display:none;width:${size}px;height:${size}px">${BITCOIN_MARK_SVG}</span>`;
   }
@@ -937,7 +937,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         const check = pin.verified
           ? `<span style="position:absolute;right:-3px;bottom:-3px;width:${badge}px;height:${badge}px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${VERIFIED_STAR_HTML}</span>`
           : pin.kind === "city" && (pin.count || 0) > 1
-            ? `<span style="position:absolute;right:-4px;bottom:-4px;min-width:${badge}px;height:${badge}px;padding:0 3px;border-radius:${Math.ceil(badge / 2)}px;background:#f7931a;color:#fff;font:700 ${Math.max(8, badge - 4)}px/${badge}px Ubuntu,sans-serif">${pin.count}</span>`
+            ? `<span style="position:absolute;right:-4px;bottom:-4px;min-width:${badge}px;height:${badge}px;padding:0 3px;border-radius:${Math.ceil(badge / 2)}px;background:#f7931a;color:#fff;font:700 ${Math.max(8, badge - 4)}px/${badge}px Ubuntu,sans-serif">${Math.max(0, Math.floor(Number(pin.count) || 0))}</span>`
             : "";
         const ring = size < 14 ? 1 : 1.5;
         const icon = L.divIcon({
@@ -979,7 +979,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             }
           }
         });
-        const logo = escapeHtml(imgSrc(pin.logo || "")).replace(/"/g, "");
+        const logo = leafletImg(imgSrc(pin.logo || ""));
         const kind = refineShopIcon(pin.place?.category || "", pin.name);
         const clusterN = pin.count || 1;
         const title =
@@ -1012,7 +1012,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           iconSize: [box, box],
           iconAnchor: [box / 2, box / 2],
         });
-        const photo = escapeHtml(s.img);
+        const photo = leafletImg(s.img);
         const card = `<div style="max-width:180px">
           <img src="${photo}" alt="" width="160" height="160" style="width:100%;height:auto;border-radius:8px;background:#f7931a;display:block" />
           <strong>${escapeHtml(t(s.nameKey))}</strong><br/>
@@ -1071,7 +1071,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       for (const c of visibleCirculars) {
         const selected = selCirc?.id === c.id;
         const size = Math.min(40, Math.max(28, coinPinSize(zoom, "community", selected) + 12));
-        const src = escapeHtml("/logos/economia-circular.png");
+        const src = leafletImg("/logos/economia-circular.png");
         const icon = L.divIcon({
           className: "",
           html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #f7931a,0 1px 4px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="${src}" alt="" width="${size - 4}" height="${size - 4}" style="width:${size - 4}px;height:${size - 4}px;object-fit:contain;display:block" /></div>`,
