@@ -58,11 +58,24 @@ test("the map csv has the 27 circular economies and the globe does not draw them
     assert.doesNotMatch(blob, /x\.combitcoin/);
   }
   const globe = readFileSync(new URL("../infrastructure/globe-stats.ts", import.meta.url), "utf8");
-  assert.match(globe, /if \(r\.tipo === "circular"\) continue;/);
+  assert.match(globe, /if \(r\.tipo === "circular"\)/);
+  assert.match(globe, /circularIso\.push/);
+  assert.match(globe, /tallyCircular\(circularIso\)/);
+  assert.doesNotMatch(globe, /circularPins/);
   const canvas = readFileSync(new URL("../components/map/world-globe.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(canvas, /circularPins/);
   const seed = readFileSync(new URL("../infrastructure/map-csv-io.ts", import.meta.url), "utf8");
   assert.match(seed, /tipo = 'circular'/);
+  assert.match(seed, /public\/overlay\/circular\.csv/);
+  const overlay = readFileSync(new URL("../../public/overlay/circular.csv", import.meta.url), "utf8");
+  const overlayIds = overlay
+    .replace(/^\uFEFF/, "")
+    .split(/\r?\n/)
+    .slice(1)
+    .filter((l) => l.trim())
+    .map((line) => splitCsvLine(line)[0]!.replace(/^'+/, "").replace(/^"|"$/g, ""));
+  assert.equal(overlayIds.length, 27);
+  for (const id of ids) assert.ok(overlayIds.includes(id), id);
   const card = readFileSync(new URL("../components/map/map-listing-card.tsx", import.meta.url), "utf8");
   assert.match(card, /circularText\(pin\.id, lang\)/);
   assert.match(card, /useAppLang/);

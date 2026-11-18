@@ -138,17 +138,101 @@ body {
   width: 100%;
   height: auto;
   min-height: 0;
-  touch-action: none;
+  touch-action: pan-y;
 }
 .globe-fit .bit-globe canvas {
-  touch-action: none;
+  touch-action: pan-y;
   cursor: grab;
+}
+.globe-fit .bit-globe.is-armed,
+.globe-fit .bit-globe.is-armed canvas {
+  touch-action: none;
+}
+.map-fit .leaflet-container {
+  touch-action: pan-y;
+}
+.map-fit .leaflet-container.is-armed {
+  touch-action: none;
+}
+.bit-stage {
+  touch-action: pan-y;
+}
+.bit-stage.is-armed {
+  touch-action: none;
+}
+.scroll-free:focus-visible {
+  outline: 2px solid #f7931a;
+  outline-offset: -2px;
 }
 .map-fit,
 .globe-fit {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+.globe-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  column-gap: 0.15rem;
+  list-style: none;
+}
+.globe-stats > li {
+  min-width: 0;
+  text-align: center;
+}
+.globe-stat-n {
+  display: block;
+  color: #171717;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(0.78rem, 4.1vw, 1.45rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.globe-stats.is-latam .globe-stat-n {
+  color: #9a5600;
+  font-weight: 700;
+  font-size: clamp(0.68rem, 3.35vw, 1.05rem);
+  letter-spacing: -0.03em;
+}
+.globe-stat-l {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 2.2em;
+  margin-top: 0.15rem;
+  color: #3f3f3f;
+  font-weight: 500;
+  font-size: clamp(0.56rem, 2.55vw, 0.75rem);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+.globe-stat-cap {
+  margin: 0.35rem 0 0;
+  color: #9a5600;
+  font-size: clamp(0.58rem, 2.7vw, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+@media (width >= 40rem) {
+  .globe-stats {
+    column-gap: 0.75rem;
+  }
+  .globe-stat-n,
+  .globe-stats.is-latam .globe-stat-n,
+  .globe-stat-l {
+    letter-spacing: 0;
+  }
+  .globe-stat-l {
+    min-height: 2.35em;
+  }
 }
 .map-fit {
   height: clamp(220px, calc(100dvh - 18.75rem), 640px);

@@ -460,43 +460,56 @@ function GlobeCanvas({
 
   return (
     <div className="globe-fit overflow-hidden rounded-lg bg-white shadow-[var(--shadow-border)]">
-      <header className="shrink-0 px-2 py-2 sm:px-4 sm:py-3">
-        <div className="mx-auto max-w-3xl rounded-lg bg-white/75 px-3 py-2 text-center shadow-[0_0_0_1px_rgba(29,29,27,0.12)] backdrop-blur-[2px] sm:px-5 sm:py-2.5">
+      <header className="shrink-0 px-1 py-1.5 sm:px-4 sm:py-3">
+        <div className="mx-auto w-full max-w-3xl rounded-lg bg-white/75 px-1 py-1.5 text-center shadow-[0_0_0_1px_rgba(29,29,27,0.12)] backdrop-blur-[2px] sm:px-5 sm:py-2.5">
         <p className="font-display text-sm text-neutral-900 sm:text-2xl">{t("globeKicker")}</p>
         <p className="hidden text-[11px] text-neutral-600 sm:mt-0.5 sm:block sm:text-sm">{t("globeTitle")}</p>
         {world ? (
           <>
-          <ul className="mt-1.5 grid grid-cols-2 justify-items-center gap-x-2 gap-y-1 sm:mt-2 sm:grid-cols-4 sm:gap-x-6" aria-label={t("globeTitle")}>
-            <li className="text-[11px] text-neutral-600 sm:text-sm">
-              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.cities.toLocaleString()}</span>
-              <span className="ml-1 font-medium">{t("globeCitiesShort")}</span>
-            </li>
-            <li className="text-[11px] text-neutral-600 sm:text-sm">
-              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.shops.toLocaleString()}</span>
-              <span className="ml-1 font-medium">{t("globeShops")}</span>
-            </li>
-            <li className="text-[11px] text-neutral-600 sm:text-sm">
-              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.comms.toLocaleString()}</span>
-              <span className="ml-1 font-medium">{t("globeComms")}</span>
-            </li>
-            <li className="text-[11px] text-neutral-600 sm:text-sm">
-              <span className="text-base font-bold text-neutral-900 sm:text-2xl">{world.events.toLocaleString()}</span>
-              <span className="ml-1 font-medium">{t("globeEvents")}</span>
-            </li>
+          <ul className="globe-stats mt-2" aria-label={t("globeTitle")}>
+            {(
+              [
+                [world.cities, t("globeCitiesShort"), ""],
+                [world.shops, t("globeShops"), ""],
+                [world.comms, t("globeComms"), ""],
+                [world.events, t("globeEvents"), ""],
+                [world.circular ?? 0, t("globeCircularA"), t("globeCircularB")],
+              ] as const
+            ).map(([n, a, b]) => (
+              <li key={a}>
+                <span className="globe-stat-n">{n.toLocaleString()}</span>
+                <span className="globe-stat-l">
+                  {a}
+                  {b ? (
+                    <>
+                      <br />
+                      {b}
+                    </>
+                  ) : null}
+                </span>
+              </li>
+            ))}
           </ul>
           {latam ? (
-            <p className="mt-1 flex flex-wrap items-baseline justify-center gap-x-1.5 text-[10px] text-neutral-600 sm:text-xs">
-              <span className="font-semibold tracking-wide text-primary uppercase">{t("globeLatamName")}</span>
-              <span>
-                <span className="font-bold text-neutral-900">{latam.cities.toLocaleString()}</span> {t("globeCitiesShort")}
-                {" · "}
-                <span className="font-bold text-neutral-900">{latam.shops.toLocaleString()}</span> {t("globeShops")}
-                {" · "}
-                <span className="font-bold text-neutral-900">{latam.comms.toLocaleString()}</span> {t("globeComms")}
-                {" · "}
-                <span className="font-bold text-neutral-900">{latam.events.toLocaleString()}</span> {t("globeEvents")}
-              </span>
-            </p>
+            <>
+              <p className="globe-stat-cap">{t("globeLatamName")}</p>
+              <ul className="globe-stats is-latam mt-1" aria-label={t("globeLatamName")}>
+                {(
+                  [
+                    [latam.cities, t("globeCitiesShort")],
+                    [latam.shops, t("globeShops")],
+                    [latam.comms, t("globeComms")],
+                    [latam.events, t("globeEvents")],
+                    [latam.circular ?? 0, `${t("globeCircularA")} ${t("globeCircularB")}`],
+                  ] as const
+                ).map(([n, label]) => (
+                  <li key={label}>
+                    <span className="globe-stat-n">{n.toLocaleString()}</span>
+                    <span className="sr-only">{label}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : null}
           </>
         ) : null}
@@ -509,14 +522,15 @@ function GlobeCanvas({
         role="application"
         aria-label={t("globeKeys")}
         title={t("zoomNeedFocus")}
+        onPointerDownCapture={() => {
+          if (wrap.current?.classList.contains("is-armed")) return;
+          const c = globeRef.current?.controls();
+          if (!c) return;
+          c.enableRotate = false;
+          c.enableZoom = false;
+        }}
         onPointerDown={(e) => {
           drag.current = { x: e.clientX, y: e.clientY, moved: false };
-          wrap.current?.focus({ preventScroll: true });
-          const g = globeRef.current;
-          if (!g) return;
-          const c = g.controls();
-          c.enableRotate = true;
-          c.enableZoom = true;
         }}
         onPointerMove={(e) => {
           if (Math.hypot(e.clientX - drag.current.x, e.clientY - drag.current.y) > 6) drag.current.moved = true;
@@ -531,20 +545,41 @@ function GlobeCanvas({
           if (hit && Math.hypot(pin.lat - hit.lat, pin.lon - hit.lon) > 6) return;
           enterRef.current(pin.lat, pin.lon, 14, hover?.iso, pin);
         }}
-        onFocus={() => {
-          const g = globeRef.current;
-          if (!g) return;
-          const c = g.controls();
+        onClick={() => {
+          const el = wrap.current;
+          if (!el) return;
+          el.classList.add("is-armed");
+          el.focus({ preventScroll: true });
+          const c = globeRef.current?.controls();
+          if (!c) return;
+          c.autoRotate = false;
+          c.enableRotate = true;
+          c.enableZoom = true;
+        }}
+        onWheel={(e) => {
+          if (wrap.current?.classList.contains("is-armed")) return;
+          const scroller = wrap.current?.closest(".scroll-free");
+          if (!(scroller instanceof HTMLElement) || scroller.scrollHeight <= scroller.clientHeight + 4) return;
+          scroller.scrollTop += e.deltaY;
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onFocus={(e) => {
+          if (!e.currentTarget.matches(":focus-visible")) return;
+          e.currentTarget.classList.add("is-armed");
+          const c = globeRef.current?.controls();
+          if (!c) return;
           c.enableRotate = true;
           c.enableZoom = true;
         }}
         onBlur={(e) => {
           const next = e.relatedTarget;
           if (next instanceof Node && wrap.current?.contains(next)) return;
-          const g = globeRef.current;
-          if (!g) return;
-          const c = g.controls();
+          wrap.current?.classList.remove("is-armed");
+          const c = globeRef.current?.controls();
+          if (!c) return;
           c.enableZoom = false;
+          c.enableRotate = false;
           c.autoRotate = !reduceMotion;
         }}
         onKeyDown={(e) => {
@@ -581,7 +616,15 @@ function GlobeCanvas({
             else onSkip();
           } else if (e.key === "Escape") {
             e.preventDefault();
-            onSkip();
+            e.currentTarget.classList.remove("is-armed");
+            const c = globeRef.current?.controls();
+            if (c) {
+              c.enableZoom = false;
+              c.enableRotate = false;
+              c.autoRotate = !reduceMotion;
+            }
+            const room = e.currentTarget.closest(".scroll-free");
+            if (room instanceof HTMLElement) room.focus({ preventScroll: true });
           }
         }}
         className="bit-globe relative z-0 overflow-hidden bg-white outline-none focus-visible:shadow-[var(--shadow-border-hover)]"
@@ -638,14 +681,17 @@ function GlobeCanvas({
             const c = g.controls();
             c.autoRotate = !reduceMotion;
             c.autoRotateSpeed = reduceMotion ? 0 : 0.4;
-            c.enableRotate = true;
-            c.enableZoom = document.activeElement === wrap.current;
+            c.enableRotate = false;
+            c.enableZoom = false;
             const canvas = wrap.current?.querySelector("canvas");
-            if (canvas) canvas.style.touchAction = "none";
+            if (canvas) canvas.style.touchAction = "";
             c.addEventListener("start", () => {
+              if (!wrap.current?.classList.contains("is-armed")) {
+                c.enableRotate = false;
+                c.enableZoom = false;
+                return;
+              }
               c.autoRotate = false;
-              c.enableRotate = true;
-              c.enableZoom = true;
             });
             g.pointOfView({ lat: -15, lng: -58, altitude: 2.05 });
           }}

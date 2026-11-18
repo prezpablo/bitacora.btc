@@ -631,6 +631,14 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       setSel(null);
       return;
     }
+    const circ = circulars.find((c) => c.id === focus.id);
+    if (circ) {
+      openedFocus.current = focus.id;
+      setSelCirc(circ);
+      setSel(null);
+      setSelComm(null);
+      return;
+    }
     const place = places.find((p) => p.id === focus.id);
     if (!place) return;
     openedFocus.current = focus.id;
@@ -641,7 +649,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         if (full) setSel(full);
       });
     }
-  }, [focus?.id, allComms, places]);
+  }, [focus?.id, allComms, places, circulars]);
 
   useEffect(() => {
     if (!mapEl.current || mapRef.current) return;
@@ -741,10 +749,33 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
       const box = map.getContainer();
       box.tabIndex = 0;
       box.title = t("zoomNeedFocus");
-      const wheelOn = () => map?.scrollWheelZoom.enable();
-      const wheelOff = () => map?.scrollWheelZoom.disable();
-      box.addEventListener("focus", wheelOn);
-      box.addEventListener("blur", wheelOff);
+      map.dragging.disable();
+      const arm = () => {
+        box.classList.add("is-armed");
+        map?.dragging.enable();
+        map?.scrollWheelZoom.enable();
+      };
+      const disarm = () => {
+        box.classList.remove("is-armed");
+        map?.dragging.disable();
+        map?.scrollWheelZoom.disable();
+      };
+      box.addEventListener("pointerdown", () => {
+        if (!box.classList.contains("is-armed")) map?.dragging.disable();
+      }, true);
+      box.addEventListener("click", () => arm());
+      box.addEventListener("focus", () => {
+        if (box.matches(":focus-visible")) arm();
+      });
+      box.addEventListener("blur", () => disarm());
+      box.addEventListener("keydown", (ev) => {
+        if (ev.key !== "Escape") return;
+        ev.preventDefault();
+        disarm();
+        const room = box.closest(".scroll-free");
+        if (room instanceof HTMLElement) room.focus({ preventScroll: true });
+        else box.blur();
+      });
       // Sin foco, la rueda mueve la habitación. Si no, el borde de abajo queda tapado.
       const wheelRoom = (ev: WheelEvent) => {
         if (!map || map.scrollWheelZoom.enabled()) return;
@@ -1078,7 +1109,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
           iconSize: [size, size],
           iconAnchor: [size / 2, size / 2],
         });
-        const cm = L.marker([c.lat, c.lon], { icon, zIndexOffset: 860 });
+        const cm = L.marker([c.lat, c.lon], { icon, zIndexOffset: 940 });
         cm.on("click", (ev) => {
           L.DomEvent.stopPropagation(ev);
           setDrop(null);
@@ -1698,6 +1729,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <span className="font-semibold text-foreground">{globe.data.world.shops.toLocaleString()}</span> {t("globeShops")} ·{" "}
             <span className="font-semibold text-foreground">{globe.data.world.comms.toLocaleString()}</span> {t("globeComms")} ·{" "}
             <span className="font-semibold text-foreground">{globe.data.world.events.toLocaleString()}</span> {t("globeEvents")}
+            {" · "}
+            <span className="font-semibold text-foreground">{(globe.data.world.circular ?? 0).toLocaleString()}</span> {t("globeCircular")}
             <br />
             <span className="font-semibold text-primary">{t("globeLatamName")}</span>
             {": "}
@@ -1705,6 +1738,8 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
             <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).shops.toLocaleString()}</span> {t("globeShops")} ·{" "}
             <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).comms.toLocaleString()}</span> {t("globeComms")} ·{" "}
             <span className="font-semibold text-foreground">{(globe.data.latam ?? globe.data.world).events.toLocaleString()}</span> {t("globeEvents")}
+            {" · "}
+            <span className="font-semibold text-foreground">{((globe.data.latam ?? globe.data.world).circular ?? 0).toLocaleString()}</span> {t("globeCircular")}
           </p>
         ) : null}
         {sync === "wait" || sync === "fail" ? (

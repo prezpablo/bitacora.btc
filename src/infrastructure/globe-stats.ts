@@ -1,5 +1,5 @@
 import type { GlobeCountryStat, GlobeDot, GlobeStats } from "@/domain/globe";
-import { FOUNDING_UY, LATAM_ISO, tallyCountries, tallyEvents } from "@/domain/globe";
+import { FOUNDING_UY, LATAM_ISO, tallyCircular, tallyCountries, tallyEvents } from "@/domain/globe";
 import { isoFromCountryName } from "@/domain";
 import { fetchAllMerchants, fetchBtcCommunities } from "./btc-map";
 import { fetchNetworkEvents } from "./events";
@@ -69,7 +69,7 @@ type CountryIdx = { iso: string; lat: number; lon: number; minX: number; minY: n
 
 let geoCache: { at: number; ver: number; idx: CountryIdx[] } | null = null;
 let statsCache: { at: number; ver: number; data: GlobeStats } | null = null;
-const STATS_VER = 26;
+const STATS_VER = 27;
 
 export function clearGlobeStatsCache() {
   statsCache = null;
@@ -318,9 +318,13 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
     });
   }
   const overlay: GlobeDot[] = [];
+  const circularIso: string[] = [];
   try {
     for (const r of parseMapCsv(csv)) {
-      if (r.tipo === "circular") continue;
+      if (r.tipo === "circular") {
+        if (Number.isFinite(r.lat) && Number.isFinite(r.lon)) circularIso.push(locateOrNearest(r.lon, r.lat, idx));
+        continue;
+      }
       if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
       const isComm = r.tipo === "community";
       const iso = locateOrNearest(r.lon, r.lat, idx);
@@ -384,6 +388,9 @@ export async function fetchGlobeStats(): Promise<GlobeStats> {
   const latam = tallyCountries(countries, LATAM_ISO);
   world.events = evN.world;
   latam.events = evN.latam;
+  const circN = tallyCircular(circularIso);
+  world.circular = circN.world;
+  latam.circular = circN.latam;
   const data: GlobeStats = {
     world,
     latam,

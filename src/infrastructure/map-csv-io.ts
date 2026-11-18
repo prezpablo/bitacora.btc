@@ -9,6 +9,8 @@ import { oneAtATime } from "./one-at-a-time";
 import { readFirstFile } from "./data-files";
 
 const SNAP = "public/data/map.csv";
+// El deploy no pisa public/data (ahí viven votos y fichas del VPS). Esta lista sí viaja en el ZIP.
+const CIRCULAR_SNAP = "public/overlay/circular.csv";
 
 const FOUNDING: MapCsvRow = {
   id: FOUNDING_UY.id,
@@ -91,9 +93,16 @@ function upsertMap(row: MapCsvRow) {
     );
 }
 
+async function circularBundle(): Promise<MapCsvRow[]> {
+  const text = await readFirstFile(CIRCULAR_SNAP);
+  if (!text.includes("id,tipo")) return [];
+  return parseMapCsv(text).filter((r) => r.tipo === "circular" && r.id.startsWith("circ:"));
+}
+
 async function seedFromCsv() {
   const text = await readFirstFile(SNAP);
-  const rows = mergeMapRows(parseMapCsv(text), [FOUNDING]);
+  const bundled = await circularBundle();
+  const rows = mergeMapRows(parseMapCsv(text), [FOUNDING, ...bundled]);
   sqlTx(() => {
     const db = openSqlite();
     const have = new Set(
@@ -105,12 +114,15 @@ async function seedFromCsv() {
     for (const r of rows) {
       if (!have.has(r.id)) upsertMap(r);
     }
-    // La capa circular sale del CSV. Una muestra que ya no está en el archivo no vuelve desde SQLite.
-    const keep = new Set(rows.filter((r) => r.tipo === "circular").map((r) => r.id));
-    const drop = db.prepare("DELETE FROM map_rows WHERE id = ?");
-    for (const row of db.prepare("SELECT id FROM map_rows WHERE tipo = 'circular'").all()) {
-      const id = String(row.id || "");
-      if (id && !keep.has(id)) drop.run(id);
+    // La lista del ZIP manda: entra aunque el CSV del VPS sea el viejo, sin borrar votos.
+    for (const r of bundled) upsertMap(r);
+    const keep = new Set(bundled.map((r) => r.id));
+    if (keep.size) {
+      const drop = db.prepare("DELETE FROM map_rows WHERE id = ?");
+      for (const row of db.prepare("SELECT id FROM map_rows WHERE tipo = 'circular'").all()) {
+        const id = String(row.id || "");
+        if (id && !keep.has(id)) drop.run(id);
+      }
     }
     upsertMap(FOUNDING);
   });

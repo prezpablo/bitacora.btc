@@ -108,7 +108,7 @@ export const getGlobeStats = createServerFn({ method: "POST" }).handler(async ()
   try {
     return await fetchGlobeStats();
   } catch {
-    return { world: { shops: 0, comms: 0, events: 0, cities: 0 }, latam: { shops: 0, comms: 0, events: 0, cities: 0 }, countries: [], points: [], overlay: [], asOf: Date.now() };
+    return { world: { shops: 0, comms: 0, events: 0, cities: 0, circular: 0 }, latam: { shops: 0, comms: 0, events: 0, cities: 0, circular: 0 }, countries: [], points: [], overlay: [], asOf: Date.now() };
   }
 });
 

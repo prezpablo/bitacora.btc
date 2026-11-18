@@ -30,7 +30,7 @@ export const FOUNDING_LINKS: { key: string; label: string; url: string }[] = [
   { key: "web", label: "Web", url: "https://lnk.bio/latamcriptomom" },
 ];
 
-export type GlobeTally = { shops: number; comms: number; events: number; cities: number };
+export type GlobeTally = { shops: number; comms: number; events: number; cities: number; circular: number };
 
 export type GlobeCountryStat = {
   iso: string;
@@ -51,7 +51,7 @@ export type GlobeStats = {
   asOf: number;
 };
 
-export const EMPTY_TALLY: GlobeTally = { shops: 0, comms: 0, events: 0, cities: 0 };
+export const EMPTY_TALLY: GlobeTally = { shops: 0, comms: 0, events: 0, cities: 0, circular: 0 };
 
 /** ISO 3166-1 alpha-2 del recorte Bitácora (Latam + Caribe hispano/lusófono). */
 export const LATAM_ISO = new Set([
@@ -82,7 +82,7 @@ export const LATAM_ISO = new Set([
 ]);
 
 export function tallyCountries(rows: GlobeCountryStat[], iso?: Set<string>): GlobeTally {
-  const out: GlobeTally = { shops: 0, comms: 0, events: 0, cities: 0 };
+  const out: GlobeTally = { shops: 0, comms: 0, events: 0, cities: 0, circular: 0 };
   for (const c of rows) {
     if (iso && !iso.has(c.iso)) continue;
     out.shops += c.shops;
@@ -101,6 +101,17 @@ export function tallyEvents(rows: { countryCode?: string }[]): { world: number; 
     world += 1;
     const iso = (e.countryCode || "").toUpperCase();
     if (LATAM_ISO.has(iso)) latam += 1;
+  }
+  return { world, latam };
+}
+
+/** Fichas circulares. El globo no las dibuja; solo las cuenta. Latam = ISO en LATAM_ISO. */
+export function tallyCircular(isos: string[]): { world: number; latam: number } {
+  let world = 0;
+  let latam = 0;
+  for (const iso of isos) {
+    world += 1;
+    if (LATAM_ISO.has(iso.toUpperCase())) latam += 1;
   }
   return { world, latam };
 }
