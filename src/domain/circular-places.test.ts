@@ -27,16 +27,16 @@ function splitCsvLine(line: string): string[] {
   return out;
 }
 
-test("the map csv has the 27 circular economies and the globe does not draw them", () => {
+test("the map csv has the 28 circular economies and the globe does not draw them", () => {
   const csv = readFileSync(new URL("../../public/data/map.csv", import.meta.url), "utf8");
   const lines = csv.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
   const head = splitCsvLine(lines[0]!).map((h) => h.trim().toLowerCase());
   const idx = (name: string) => head.indexOf(name);
   const rows = lines.slice(1).map((line) => splitCsvLine(line)).filter((cols) => (cols[idx("tipo")] || "").replace(/^'+/, "") === "circular");
-  assert.equal(rows.length, 27);
+  assert.equal(rows.length, 28);
   const get = (cols: string[], name: string) => (cols[idx(name)] || "").replace(/^'+/, "");
   const ids = new Set(rows.map((cols) => get(cols, "id")));
-  assert.equal(ids.size, 27);
+  assert.equal(ids.size, 28);
   assert.ok(ids.has("circ:bitcoin-beach-el-salvador"));
   assert.ok(ids.has("circ:puntabitcoin"));
   assert.ok(ids.has("circ:bitcoin-makueni"));
@@ -51,7 +51,9 @@ test("the map csv has the 27 circular economies and the globe does not draw them
   for (const cols of rows) {
     assert.ok(get(cols, "name") && get(cols, "address"));
     assert.ok(Number.isFinite(Number(get(cols, "lat"))) && Number.isFinite(Number(get(cols, "lon"))));
-    assert.match(get(cols, "description"), /Email: /);
+    const hasMail = /Email: /.test(get(cols, "description"));
+    const hasLink = /(?:web|instagram|x):https?:/.test(get(cols, "socials"));
+    assert.ok(hasMail || hasLink, get(cols, "id"));
     assert.equal(get(cols, "verifiedAt"), "");
     const blob = `${get(cols, "description")} ${get(cols, "socials")} ${get(cols, "notes")}`;
     for (const addr of FOOTER) assert.equal(blob.includes(addr), false, get(cols, "id"));
@@ -74,7 +76,7 @@ test("the map csv has the 27 circular economies and the globe does not draw them
     .slice(1)
     .filter((l) => l.trim())
     .map((line) => splitCsvLine(line)[0]!.replace(/^'+/, "").replace(/^"|"$/g, ""));
-  assert.equal(overlayIds.length, 27);
+  assert.equal(overlayIds.length, 28);
   for (const id of ids) assert.ok(overlayIds.includes(id), id);
   const card = readFileSync(new URL("../components/map/map-listing-card.tsx", import.meta.url), "utf8");
   assert.match(card, /circularText\(pin\.id, lang\)/);
@@ -92,5 +94,15 @@ test("the map csv has the 27 circular economies and the globe does not draw them
     assert.notEqual(copy.text.es, copy.text.pt);
     assert.equal(circularText(id, "pt"), copy.text.pt);
   }
-  assert.equal(Object.keys(CIRCULAR_COPY).length, 27);
+  assert.equal(Object.keys(CIRCULAR_COPY).length, 28);
+  const satoshi = rows.find((cols) => get(cols, "id") === "circ:satoshilemu");
+  assert.ok(satoshi);
+  assert.match(get(satoshi, "address"), /Pichilemu/);
+  assert.ok(Number(get(satoshi, "lat")) < -34 && Number(get(satoshi, "lat")) > -35);
+  assert.match(get(satoshi, "socials"), /instagram:https:\/\/www\.instagram\.com\/satoshilemu/);
+  assert.match(get(satoshi, "socials"), /discord:https:\/\/discord\.gg\/mUWmatFZAm/);
+  assert.match(get(satoshi, "socials"), /web:https:\/\/satoshilemu\.org/);
+  assert.match(circularText("circ:satoshilemu", "es"), /cuatro pilares: educación, comercio, comunidad y espiritualidad/);
+  assert.match(circularText("circ:satoshilemu", "pt"), /quatro pilares/);
+  assert.match(circularText("circ:satoshilemu", "en"), /four pillars/);
 });

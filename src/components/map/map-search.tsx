@@ -1,6 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { Building2, MapPin, Search, Users } from "lucide-react";
+import { Building2, MapPin, Orbit, Search, Users } from "lucide-react";
 import type { Community, MerchantPlace } from "@/domain";
+import type { CircularPin } from "@/domain/map-csv";
+import { matchesQuery } from "@/domain/map-search";
 import { searchMap } from "@/infrastructure/server-fns";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -8,6 +10,7 @@ import { cn } from "@/lib/utils";
 export type SearchHit =
   | { kind: "community"; id: string; label: string; hint: string; lat: number; lon: number; community: Community }
   | { kind: "place"; id: string; label: string; hint: string; lat: number; lon: number; place: MerchantPlace }
+  | { kind: "circular"; id: string; label: string; hint: string; lat: number; lon: number; circular: CircularPin }
   | { kind: "city"; id: string; label: string; hint: string; lat: number; lon: number };
 
 const CITY_SEED: SearchHit[] = [
@@ -23,17 +26,10 @@ const CITY_SEED: SearchHit[] = [
   { kind: "city", id: "city:asun", label: "Asunción", hint: "Paraguay", lat: -25.2637, lon: -57.5759 },
 ];
 
-function norm(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-
 function Highlight({ text, needle }: { text: string; needle: string }) {
   const n = needle.trim();
   if (!n) return <>{text}</>;
-  const i = norm(text).indexOf(norm(n));
+  const i = foldIndex(text, n);
   if (i < 0) return <>{text}</>;
   return (
     <>
@@ -44,13 +40,29 @@ function Highlight({ text, needle }: { text: string; needle: string }) {
   );
 }
 
+function foldIndex(text: string, needle: string) {
+  const folded = text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const n = needle
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const i = folded.indexOf(n);
+  if (i < 0) return -1;
+  return text.length === folded.length ? i : text.toLowerCase().indexOf(needle.toLowerCase());
+}
+
 export function MapSearch({
   communities,
   places,
+  circulars,
   onPick,
 }: {
   communities: Community[];
   places: MerchantPlace[];
+  circulars: CircularPin[];
   onPick: (hit: SearchHit) => void;
 }) {
   const [q, setQ] = useState(() => {
@@ -62,20 +74,24 @@ export function MapSearch({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [remote, setRemote] = useState<{ places: MerchantPlace[]; cities: { label: string; lat: number; lon: number }[] }>({
+  const [remote, setRemote] = useState<{
+    places: MerchantPlace[];
+    communities: Community[];
+    cities: { label: string; lat: number; lon: number }[];
+  }>({
     places: [],
+    communities: [],
     cities: [],
   });
   const box = useRef<HTMLDivElement>(null);
   const listId = useId();
   const needle = q.trim();
-  const nrm = norm(needle);
   const t = useT();
 
   const localHits = useMemo(() => {
-    if (nrm.length < 1) return [] as SearchHit[];
+    if (needle.length < 1) return [] as SearchHit[];
     const comms = communities
-      .filter((c) => norm(c.name).includes(nrm) || c.slug.includes(nrm))
+      .filter((c) => matchesQuery(needle, c.name, c.slug, c.description || ""))
       .slice(0, 5)
       .map(
         (c): SearchHit => ({
@@ -89,7 +105,8 @@ export function MapSearch({
         }),
       );
     const shops = places
-      .filter((p) => norm(p.name).includes(nrm) || norm(p.category).includes(nrm))
+      .filter((p) => matchesQuery(needle, p.name, p.category, p.address || "", p.description || ""))
+      .filter((p) => !p.id.startsWith("cluster:"))
       .slice(0, 6)
       .map(
         (p): SearchHit => ({
@@ -102,13 +119,27 @@ export function MapSearch({
           place: p,
         }),
       );
-    const cities = CITY_SEED.filter((c) => norm(c.label).includes(nrm) || norm(c.hint).includes(nrm));
-    return [...comms, ...shops, ...cities];
-  }, [nrm, communities, places]);
+    const circs = circulars
+      .filter((c) => matchesQuery(needle, c.name, c.city, c.steward))
+      .slice(0, 5)
+      .map(
+        (c): SearchHit => ({
+          kind: "circular",
+          id: c.id,
+          label: c.name,
+          hint: c.city,
+          lat: c.lat,
+          lon: c.lon,
+          circular: c,
+        }),
+      );
+    const cities = CITY_SEED.filter((c) => matchesQuery(needle, c.label, c.hint));
+    return [...comms, ...shops, ...circs, ...cities];
+  }, [needle, communities, places, circulars]);
 
   useEffect(() => {
     if (needle.length < 1) {
-      setRemote({ places: [], cities: [] });
+      setRemote({ places: [], communities: [], cities: [] });
       setLoading(false);
       return;
     }
@@ -120,7 +151,7 @@ export function MapSearch({
           setLoading(false);
         })
         .catch(() => {
-          setRemote({ places: [], cities: [] });
+          setRemote({ places: [], communities: [], cities: [] });
           setLoading(false);
         });
     }, 200);
@@ -129,8 +160,22 @@ export function MapSearch({
 
   const hits = useMemo(() => {
     const seen = new Set(localHits.map((h) => h.id));
+    const extraComms: SearchHit[] = (remote.communities || [])
+      .filter((c) => !seen.has(c.id))
+      .map((c) => {
+        seen.add(c.id);
+        return {
+          kind: "community" as const,
+          id: c.id,
+          label: c.name,
+          hint: `@${c.slug}`,
+          lat: c.lat,
+          lon: c.lon,
+          community: c,
+        };
+      });
     const extraPlaces: SearchHit[] = remote.places
-      .filter((p) => !seen.has(p.id))
+      .filter((p) => !seen.has(p.id) && !p.id.startsWith("cluster:"))
       .map((p) => {
         seen.add(p.id);
         return {
@@ -153,13 +198,16 @@ export function MapSearch({
         lat: c.lat,
         lon: c.lon,
       }));
-    return [...localHits, ...extraPlaces, ...extraCities].slice(0, 14);
+    const take = (kind: SearchHit["kind"], extra: SearchHit[], n: number) =>
+      [...localHits.filter((h) => h.kind === kind), ...extra].slice(0, n);
+    return [...take("community", extraComms, 5), ...take("place", extraPlaces, 6), ...take("circular", [], 5), ...take("city", extraCities, 5)];
   }, [localHits, remote]);
 
   const groups = useMemo(() => {
     const g: { title: string; items: SearchHit[] }[] = [
       { title: t("grpComm"), items: hits.filter((h) => h.kind === "community") },
       { title: t("grpShop"), items: hits.filter((h) => h.kind === "place") },
+      { title: t("grpCircular"), items: hits.filter((h) => h.kind === "circular") },
       { title: t("grpCity"), items: hits.filter((h) => h.kind === "city") },
     ];
     return g.filter((x) => x.items.length);
@@ -215,7 +263,7 @@ export function MapSearch({
   return (
     <div ref={box} className="relative w-full">
       <label className="sr-only" htmlFor="mapa-buscar">
-        Autocompletar comercio, comunidad o ciudad
+        {t("searchAria")}
       </label>
       <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       <input
@@ -253,7 +301,7 @@ export function MapSearch({
                 <ul>
                   {group.items.map((hit) => {
                     const i = running++;
-                    const Icon = hit.kind === "community" ? Users : hit.kind === "city" ? MapPin : Building2;
+                    const Icon = hit.kind === "community" ? Users : hit.kind === "city" ? MapPin : hit.kind === "circular" ? Orbit : Building2;
                     return (
                       <li key={hit.id} role="option" id={`${listId}-${hit.id}`} aria-selected={i === active}>
                         <button

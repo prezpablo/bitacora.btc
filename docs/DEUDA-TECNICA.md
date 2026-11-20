@@ -11,7 +11,7 @@ El lector quedó en el repo. No hay nodo, así que **no se armó el túnel** y e
 
 ## Cierre 13 nov 2026 — D-CIRC
 
-Hecho en el repo. Las 27 fichas de Bitcoin Confederation (corte 11 nov 2026) están en `public/data/map.csv`: ciudad, pin y el contacto que cada una publica. Se ven en el mapa, filtro Economía circular. El globo las salta. No es un feed. No se copiaron las direcciones de donación del pie. Bitcoin Ikorodu queda en el pin publicado, que cae en Shagamu. Al arrancar, una fila circular que ya no está en el CSV se borra de SQLite, así no vuelven las muestras. Falta el ZIP.
+Hecho en el repo. Las 27 fichas de Bitcoin Confederation (corte 11 nov 2026) más Satoshilemu (Pichilemu, 19 nov 2026, a pedido de la comunidad; no está en ese directorio) están en `public/data/map.csv`: ciudad, pin y el contacto que cada una publica. Se ven en el mapa, filtro Economía circular. El globo las salta. No es un feed. No se copiaron las direcciones de donación del pie. Bitcoin Ikorodu queda en el pin publicado, que cae en Shagamu. Al arrancar, una fila circular que ya no está en el CSV se borra de SQLite, así no vuelven las muestras. Falta el ZIP.
 
 ## Cierre 13 nov 2026 — L-TAKEDOWN
 

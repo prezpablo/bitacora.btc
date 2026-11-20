@@ -1215,20 +1215,28 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
 
   function flyTo(hit: SearchHit) {
     setHit(hit);
-    mapRef.current?.setView([hit.lat, hit.lon], hit.kind === "city" ? 13 : 16, { animate: !prefersReducedMotion() });
+    const zoom = hit.kind === "city" ? 13 : hit.kind === "circular" ? 14 : 16;
+    mapRef.current?.setView([hit.lat, hit.lon], zoom, { animate: !prefersReducedMotion() });
     setDrop(null);
     setDropKind("pick");
     setVoteOpen(false);
     if (hit.kind === "community") {
       setSelComm(withFoundingProfile(hit.community));
       setSel(null);
+      setSelCirc(null);
     } else if (hit.kind === "place") {
       setSel(hit.place);
       setSelComm(null);
+      setSelCirc(null);
       setDraft(store[hit.place.id]?.description || "");
+    } else if (hit.kind === "circular") {
+      setSelCirc(hit.circular);
+      setSel(null);
+      setSelComm(null);
     } else {
       setSel(null);
       setSelComm(null);
+      setSelCirc(null);
     }
   }
 
@@ -1697,6 +1705,20 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
   const removable = sel ? canRemove(local) : false;
   const chips: ("todas" | "comercios" | "comunidades" | "circulares")[] = ["todas", "comercios", "comunidades", "circulares"];
   const _hasPin = Boolean(sel || selComm || pendingCarga);
+  const searchPlaces = useMemo((): MerchantPlace[] => {
+    return Object.entries(store)
+      .filter(([, s]) => !s.removed && s.lat != null && s.lon != null && Boolean((s.name || "").trim()))
+      .map(([id, s]) => ({
+        id,
+        lat: s.lat!,
+        lon: s.lon!,
+        name: s.name || id,
+        category: s.category || "",
+        createdAt: s.listedAt,
+        description: s.description,
+        address: s.address,
+      }));
+  }, [store]);
   const listedPlaces = places.filter(isListPlace).slice(0, 80);
 
   const body = (
@@ -1768,7 +1790,7 @@ export function SpendMap({ focus, onWorld, embedded = false }: { focus?: GlobeFo
         <div className="map-fit isolate overflow-hidden rounded-lg bg-card shadow-[var(--shadow-border)]">
           <div className="relative min-h-0 flex-1">
           <div className="absolute top-3 right-3 left-3 z-[1500] max-w-lg">
-            <MapSearch communities={allComms} places={places} onPick={flyTo} />
+            <MapSearch communities={allComms} places={searchPlaces} circulars={circulars} onPick={flyTo} />
           </div>
           <div
             ref={mapEl}

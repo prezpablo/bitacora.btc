@@ -6,7 +6,7 @@ import { hoursFromCsv, logoUrl, parseMapCsv, paysFromCsv, socialsFromCsv } from 
 import { factsFromOsmTags, type ShopFacts } from "@/domain/shop-facts";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 import { loadMapCsvText } from "./map-csv-io";
-import { catalogAllShops, catalogCommunities, catalogShopById, catalogShopsInBox, searchCatalogShops } from "./catalog";
+import { catalogAllShops, catalogCommunities, catalogShopById, catalogShopsInBox, searchCatalogCommunities, searchCatalogShops } from "./catalog";
 import { clusteredCatalogShops } from "./shop-cluster";
 
 type RawEl = {
@@ -333,11 +333,17 @@ export async function fetchMerchant(id: string): Promise<MerchantPlace | null> {
 }
 
 export async function searchMerchants(q: string): Promise<MerchantPlace[]> {
-  const needle = q.trim().toLowerCase();
+  const needle = q.trim();
   if (needle.length < 2) return [];
   const hits = searchCatalogShops(needle, 8);
   if (hits.length) return hits;
-  return FALLBACK.filter((p) => p.name.toLowerCase().includes(needle));
+  return FALLBACK.filter((p) => p.name.toLowerCase().includes(needle.toLowerCase()));
+}
+
+export async function searchCommunities(q: string): Promise<Community[]> {
+  const needle = q.trim();
+  if (needle.length < 2) return [];
+  return searchCatalogCommunities(needle, 6);
 }
 
 export async function searchCities(q: string): Promise<{ label: string; lat: number; lon: number }[]> {

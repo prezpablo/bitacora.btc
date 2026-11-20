@@ -6,7 +6,7 @@ import { fetchLiveMarket, fetchTick } from "./compose";
 import { fetchClarity, fetchEtfFlows, fetchFearGreed, fetchLiquidity, fetchOnchain, fetchOnchainLive, fetchPulse } from "./extra-feeds";
 import { upcomingEventHtml, type EventHtmlRow } from "@/domain/event-html";
 import { withLastKnown, readLast } from "./last-known.server";
-import { fetchBtcCommunities, fetchMerchant, fetchMerchants, searchCities, searchMerchants } from "./btc-map";
+import { fetchBtcCommunities, fetchMerchant, fetchMerchants, searchCities, searchCommunities, searchMerchants } from "./btc-map";
 import { clearGlobeStatsCache, fetchGlobeStats } from "./globe-stats";
 import { fetchCommunityFeed } from "./community-feed";
 import { fetchNetworkEvents } from "./events";
@@ -149,10 +149,10 @@ export const getMerchant = createServerFn({ method: "POST" })
 
 export const searchMap = createServerFn({ method: "POST" })
   .validator((input: { q: string }) => input)
-  .handler(async ({ data }): Promise<{ places: MerchantPlace[]; cities: { label: string; lat: number; lon: number }[] }> => {
+  .handler(async ({ data }): Promise<{ places: MerchantPlace[]; communities: Community[]; cities: { label: string; lat: number; lon: number }[] }> => {
     const q = data.q.trim();
-    const [places, cities] = await Promise.all([searchMerchants(q), searchCities(q)]);
-    return { places, cities };
+    const [places, communities, cities] = await Promise.all([searchMerchants(q), searchCommunities(q), searchCities(q)]);
+    return { places, communities, cities };
   });
 
 export const getCommunityFeed = createServerFn({ method: "POST" })

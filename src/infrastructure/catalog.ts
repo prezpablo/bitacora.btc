@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Community, MerchantPlace, ShopPin } from "@/domain";
+import { likeNeedle, sqlFold } from "@/domain/map-search";
 import type { SocialLink } from "@/domain/socials";
 import { metaGet, metaSet, openSqlite, sqlTx } from "./sqlite.ts";
 
@@ -273,17 +274,42 @@ export function catalogCommunities(): Community[] {
 }
 
 export function searchCatalogShops(needle: string, limit = 8): MerchantPlace[] {
+  const q = likeNeedle(needle);
+  if (!q) return [];
   ensureCatalog();
-  const q = `%${needle.toLowerCase()}%`;
+  const name = sqlFold("name");
+  const cat = sqlFold("category");
+  const desc = sqlFold("description");
   try {
     return openSqlite()
       .prepare(
         `SELECT id, name, lat, lon, category, logo, description, created FROM catalog
-         WHERE tipo = 'shop' AND (lower(name) LIKE ? OR lower(category) LIKE ?) LIMIT ?`,
+         WHERE tipo = 'shop' AND (${name} LIKE ? OR ${cat} LIKE ? OR ${desc} LIKE ?) LIMIT ?`,
       )
-      .all(q, q, limit)
+      .all(q, q, q, limit)
       .map(asShop)
       .filter((p) => p.id);
+  } catch {
+    return [];
+  }
+}
+
+export function searchCatalogCommunities(needle: string, limit = 6): Community[] {
+  const q = likeNeedle(needle);
+  if (!q) return [];
+  ensureCatalog();
+  const name = sqlFold("name");
+  const cat = sqlFold("category");
+  const desc = sqlFold("description");
+  try {
+    return openSqlite()
+      .prepare(
+        `SELECT id, name, lat, lon, category, logo, description, socials, created FROM catalog
+         WHERE tipo = 'community' AND (${name} LIKE ? OR ${cat} LIKE ? OR ${desc} LIKE ?) LIMIT ?`,
+      )
+      .all(q, q, q, limit)
+      .map(asComm)
+      .filter((c) => c.id);
   } catch {
     return [];
   }

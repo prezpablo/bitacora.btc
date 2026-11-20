@@ -220,6 +220,14 @@ export const CIRCULAR_COPY: Record<string, CircCopy> = {
       en: "In Punta del Este they connect Bitcoin with local shops, education and projects. It is part of Bemlocal.",
     },
   },
+  "circ:satoshilemu": {
+    city: { es: "Pichilemu, Chile", pt: "Pichilemu, Chile", en: "Pichilemu, Chile" },
+    text: {
+      es: "Satoshilemu es una iniciativa comunitaria de adopción de Bitcoin en Pichilemu, Chile, que busca construir una economía circular basada en cuatro pilares: educación, comercio, comunidad y espiritualidad. Integra la soberanía individual, la libertad económica, la conexión con la naturaleza y el desarrollo de la conciencia como fundamentos de una comunidad más libre, consciente y colaborativa.",
+      pt: "Satoshilemu é uma iniciativa comunitária de adoção de Bitcoin em Pichilemu, Chile, que busca construir uma economia circular baseada em quatro pilares: educação, comércio, comunidade e espiritualidade. Integra a soberania individual, a liberdade econômica, a conexão com a natureza e o desenvolvimento da consciência como fundamentos de uma comunidade mais livre, consciente e colaborativa.",
+      en: "Satoshilemu is a community initiative for Bitcoin adoption in Pichilemu, Chile. It aims to build a circular economy on four pillars: education, commerce, community and spirituality. It brings together individual sovereignty, economic freedom, a connection with nature and the growth of awareness as the basis of a freer, more aware and more collaborative community.",
+    },
+  },
 };
 
 export function circularText(id: string, lang: CircLang): string {
