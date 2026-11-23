@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { COMMUNITY_HUB, FOOTER_COMMUNITY, FOOTER_LEGAL, FOOTER_PROJECT, LEARN_HUB, LEGAL_NAV, MARKET_HUB, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, hubChipOn, sectorOf, spyOf } from "./nav.ts";
+import { COMMUNITY_HUB, FOOTER_COMMUNITY, FOOTER_LEGAL, FOOTER_PROJECT, LEARN_HUB, LEGAL_NAV, MARKET_HUB, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, hubChipOn, internalHash, sectorOf, spyOf } from "./nav.ts";
 
 test("D-NAV-01 primary bar is four destinations", () => {
   assert.deepEqual(
@@ -119,4 +119,13 @@ test("Aprender chip: un solo foco, y la sala sigue siendo llegar", () => {
   for (const hash of ["", "aprender", "conciencia", "historia", "minado", "pulso", "mapa", "comunidad", "mercado", "repaso"]) {
     assert.ok(lit(hash).length <= 1, hash);
   }
+});
+
+test("an external # link is not an internal anchor", () => {
+  const here = { origin: "https://bitacorabtc.org", pathname: "/" };
+  assert.equal(internalHash("#comunidad", here), "comunidad");
+  assert.equal(internalHash("https://bitacorabtc.org/#aprender", here), "aprender");
+  assert.equal(internalHash("https://sovereign-conference.com/#program", here), "");
+  assert.equal(internalHash("https://sovereign-conference.com/es/#program", here), "");
+  assert.equal(internalHash("https://www.satlantis.io/embed/events/1002890/tickets", here), "");
 });

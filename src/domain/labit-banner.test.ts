@@ -27,8 +27,14 @@ test("the banner rotates to the next event and hides when that instant passes", 
   assert.equal(pickFeatured("2026-10-30T12:00:00Z")?.id, "labitconf-2026");
   assert.equal(pickFeatured("2026-11-02T12:00:00Z")?.id, "bitcoin-historico-2026");
   assert.equal(pickFeatured("2026-11-11T00:00:00Z")?.id, "bitcoin-beach-2026");
-  assert.equal(pickFeatured("2026-11-22T23:00:00Z")?.id, "bitcoin-beach-2026");
-  assert.equal(pickFeatured("2026-11-23T00:00:00Z")?.id, "la-crypta-cowork-2026-11-24");
+  assert.equal(pickFeatured("2026-11-21T23:00:00Z")?.id, "bitcoin-beach-2026");
+  assert.equal(pickFeatured("2026-11-22T00:00:00Z")?.id, "sovereign-2026");
+  assert.equal(pickFeatured("2026-11-23T15:00:00-03:00")?.id, "sovereign-2026");
+  const sov = pickFeatured("2026-11-23T12:00:00Z");
+  assert.equal(sov?.id, "sovereign-2026");
+  assert.match(sov?.links?.tickets || "", /satlantis\.io\/embed\/events\/1002890\/tickets/);
+  assert.match(sov?.links?.agenda || "", /sovereign-conference\.com\/es\/#program/);
+  assert.equal(pickFeatured("2026-11-24T15:00:00-03:00")?.id, "la-crypta-cowork-2026-11-24");
   assert.equal(pickFeatured("2026-11-24T14:59:00Z")?.id, "la-crypta-cowork-2026-11-24");
   assert.equal(pickFeatured("2026-11-25T02:59:00Z")?.id, "la-crypta-cowork-2026-11-24");
   assert.equal(pickFeatured("2026-11-25T03:00:00Z"), null);
@@ -50,7 +56,7 @@ test("an end without an explicit offset is ignored", () => {
 });
 
 test("La Crypta keeps the event page and tickets, and skips a missing agenda", () => {
-  const event = pickFeatured("2026-11-23T15:00:00Z");
+  const event = pickFeatured("2026-11-24T15:00:00Z");
   assert.ok(event);
   const links = featuredLinks(event);
   assert.deepEqual(
@@ -151,7 +157,13 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.doesNotMatch(banner, /event\.note|event\.where|featuredSource[^L]/);
   assert.ok(contrast("#ffffff", "#9a5600") >= 4.5);
   assert.ok(contrast("#5c6370", "#ffffff") >= 4.5);
-  assert.doesNotMatch(banner, /labitKicker|Patrocinado|Sponsored|patrocinado|alianza|lacrypta\.ar|https?:\/\//);
+  assert.doesNotMatch(banner, /labitKicker|Patrocinado|Sponsored|patrocinado|alianza|lacrypta\.ar|https?:\/\/|youtube|Ver en vivo/);
+  const special = readFileSync(new URL("../components/dashboard/labitconf-banner.tsx", import.meta.url), "utf8");
+  const data = readFileSync(new URL("../content/featured-events.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(special + data + i18n, /youtube|cryptaCta|Ver en vivo|Watch live|Ver ao vivo/);
+  assert.match(data, /sovereign-2026/);
+  assert.match(special, /SovereignBanner/);
+  assert.match(special, /BeachSplit/);
   assert.match(i18n, /Diseño: Bitácora BTC, con la identidad visual de \{identity\}/);
   assert.match(i18n, /Design: Bitácora BTC, using the visual identity of \{identity\}/);
   assert.match(i18n, /Design: Bitácora BTC, com a identidade visual de \{identity\}/);

@@ -11,6 +11,7 @@ import {
   type EventLang,
   type FeaturedLinkKind,
 } from "@/domain/featured-event";
+import { BeachSplit, SovereignBanner } from "./labitconf-banner";
 import { useAppLang, useT, type CopyKey } from "@/lib/i18n";
 
 const LINK_FULL: Record<FeaturedLinkKind, CopyKey> = {
@@ -36,6 +37,9 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
   const lang = useAppLang();
   const event = pickFeatured(now ?? new Date());
   if (!event) return null;
+
+  if (event.id === "bitcoin-beach-2026") return <BeachSplit />;
+  if (event.id === "sovereign-2026") return <SovereignBanner />;
 
   const title = featuredText(event.title, lang);
   const titleLang = foreignLang(event.lang, lang);

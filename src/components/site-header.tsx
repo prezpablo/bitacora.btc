@@ -7,7 +7,7 @@ import { SkipLink } from "@/components/skip-link";
 import { COPY, useAppLang, useT, type CopyKey } from "@/lib/i18n";
 import { LANGS, legalHref, useLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
-import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, spyOf, type NavItem } from "@/domain/nav";
+import { LEGAL_NAV, PRIMARY_NAV, TELEGRAM_COMMUNITY, UTILITY_NAV, internalHash, spyOf, type NavItem } from "@/domain/nav";
 import { LEGAL } from "@/domain/legal-config";
 import { BUILD_REV } from "@/build-rev";
 import { scrollDeskTo } from "@/lib/desk-scroll";
@@ -110,19 +110,13 @@ export function SiteHeader() {
     };
 
     const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = (e.target as HTMLElement | null)?.closest?.("a[href]");
-      if (!a) return;
-      const href = a.getAttribute("href") || "";
-      let id = "";
-      if (href.startsWith("#")) id = href.slice(1);
-      else {
-        try {
-          const u = new URL(href, window.location.origin);
-          if (u.pathname === (pathname || "/") && u.hash) id = u.hash.slice(1);
-        } catch {
-          return;
-        }
-      }
+      if (!a || a.getAttribute("target") === "_blank") return;
+      const id = internalHash(a.getAttribute("href") || "", {
+        origin: window.location.origin,
+        pathname: pathname || "/",
+      });
       if (!id || id === "contenido") return;
       e.preventDefault();
       go(id);

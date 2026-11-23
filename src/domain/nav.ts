@@ -98,3 +98,17 @@ export function hubChipOn(hash: string, itemHash: string, fallbackHash: string, 
   const root = id === "" || id === fallbackHash || (parentHash !== undefined && id === parentHash);
   return id === itemHash || (root && itemHash === fallbackHash);
 }
+
+/** Ancla de esta página. Un enlace a otro sitio, aunque termine en #, no se queda acá. */
+export function internalHash(href: string, here: { origin: string; pathname: string }): string {
+  if (!href || href.startsWith("mailto:") || href.startsWith("tel:")) return "";
+  if (href.startsWith("#")) return href.slice(1);
+  try {
+    const u = new URL(href, here.origin);
+    if (u.origin !== here.origin) return "";
+    if (u.pathname === (here.pathname || "/") && u.hash) return u.hash.slice(1);
+  } catch {
+    return "";
+  }
+  return "";
+}

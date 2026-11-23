@@ -5,6 +5,22 @@
 **Repo:** `prezpablo/bitacora.btc` `main`  
 **Legal:** [`DEUDA-LEGAL.md`](DEUDA-LEGAL.md) · **Híbrido:** [`DEUDA-PLAN-HIBRIDO.md`](DEUDA-PLAN-HIBRIDO.md) · **Tests:** [`TEST-EXTERNO.md`](TEST-EXTERNO.md) · smoke corto [`SMOKE-DIARIO.md`](SMOKE-DIARIO.md) · largo [`TEST-COMPLETO.md`](TEST-COMPLETO.md) · **ZIP VPS:** [`COMANDOS-ZIP.md`](COMANDOS-ZIP.md)
 
+## Corte 23 nov 2026 — auditoría de arquitectura (sobre `e4b84d1`)
+
+Lectura, sin rearmar la página. Lo que el informe acertó entra acá. Lo que no, no se reabre.
+
+**No es deuda.** El dominio y la aplicación no importan React, TanStack, Leaflet ni `node:sqlite`. Las cuatro salas siguen en `domain/nav.ts`. El pin y la prueba pública siguen siendo la puerta. `en` y `pt` en `src/lib/i18n.ts` ya son `Record<keyof typeof es, string>`: un texto nuevo de la UI sin las tres lenguas no compila. El informe dijo que no había ese tipo. Mentira para la UI. El copy largo del dominio (`legal-eu` y vecinos) sigue pareado por tests, no por ese `Record`. `sqlFold` arma un `replace`/`lower` sin importar SQLite: es el mismo pliegue que `foldLatin`. No se mueve de capa. Las dos puertas del catálogo no son dos escritores: `GET /map-shops` es la lectura y `getMerchants` es el respaldo si ese GET falla. Firebase, Better Auth y partir `spend-map` / `price-chart` / `i18n` por tamaño siguen fuera. No `npm audit fix --force`. No se toca `/legal` en estas fases.
+
+**Sí es deuda**, de la más útil a la más peligrosa. Una por ZIP. Cada una se revierte volviendo esos archivos.
+
+| Orden | Id | Hecho cuando | No se hace |
+|---|---|---|---|
+| 1 | **D-ARQ-CICLO** | Hecho en el repo (23 nov 2026). `maybeWeeklyCatalogSync` vive en `btc-map.ts` y se dispara al leer comercios. `catalog.ts` ya no importa `btc-map`. `ensureCatalog` solo siembra si hay menos de 50 filas. Falta el ZIP. | No cambia la lectura del mapa ni se prende el sync si `BITACORA_CATALOG_SYNC` no es `1`. |
+| 2 | **D-ARQ-JOIN** | `join-map` recibe get/set/remove. El header y el mapa pasan `sessionStorage`. La clave sigue `bitacora-join`. | No se cambia el texto de Sumate. Si el puerto no se cablea, Sumate deja de abrir el alta: se prueba ese clic antes del ZIP. |
+| 3 | **D-ARQ-LANG** | `domain/lang.ts` exporta `AppLang`. `locale.ts` lo reexporta. Los cinco `import type` del dominio cambian de línea. | No se edita una cadena de `legal-eu`, del quiz ni de `i18n.ts`. |
+| 4 | **D-ARQ-UI** | La UI formatea la calle desde `domain/street-addr`. El GPS entra por el puerto de `locate-user`. Firebase entra por una función, no por el módulo de I/O. | No se reescribe `spend-map`. No se toca la CARGA, los pines ni las teselas. `leaflet-router` puede quedar. |
+| 5 | **D-ARQ-CARGA** | La decisión de aceptar ficha o anuncio pasa a `application/` con puertos. `server-fns` parsea y llama. `verify.ts` no se reescribe. El HMAC no guarda la IP. | Última, porque es la puerta de escritura. Un voto de más de una estrella no mueve la fila. |
+
 ## Corte 13 nov 2026 — D-NODO
 
 El lector quedó en el repo. No hay nodo, así que **no se armó el túnel** y el timer no se prende. `deploy/bitacora-node-pull.sh` sale si `BITACORA_NODE_HOST` está vacío. Si algún día el host es una IP privada de WireGuard o Tailscale, solo pide `getblockchaininfo`, `getmempoolinfo` y `estimatesmartfee`. No pide la billetera, no acepta un nombre público y no usa Cloudflare. El frente no habla con el nodo.

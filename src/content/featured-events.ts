@@ -128,7 +128,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   {
     id: "bitcoin-beach-2026",
     lang: "en",
-    endsAt: "2026-11-23T00:00:00Z",
+    endsAt: "2026-11-22T00:00:00Z",
     title: {
       es: "Bitcoin Beach",
       en: "Bitcoin Beach",
@@ -150,6 +150,31 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     image: { src: "/eventos/beach-summit.jpg", width: 931, height: 518 },
     links: {
       event: "https://www.bitcoinbeach.com/",
+    },
+  },
+  {
+    id: "sovereign-2026",
+    lang: "en",
+    endsAt: "2026-11-24T00:00:00Z",
+    title: {
+      es: "Sovereign Conference",
+      en: "Sovereign Conference",
+      pt: "Sovereign Conference",
+    },
+    place: { es: "Asunción", en: "Asunción", pt: "Assunção" },
+    alt: {
+      es: "Sovereign Conference, 22 de noviembre de 2026, Espacio Mburucuyá, Asunción",
+      en: "Sovereign Conference, November 22, 2026, Espacio Mburucuyá, Asunción",
+      pt: "Sovereign Conference, 22 de novembro de 2026, Espacio Mburucuyá, Assunção",
+    },
+    credit: { kind: "organizer", artist: "Sovereign Conference", source: "https://sovereign-conference.com/es/" },
+    accent: "#f7931a",
+    ink: "#0b0b0b",
+    image: { src: "/favicon.svg", width: 32, height: 32 },
+    links: {
+      event: "https://sovereign-conference.com/es/",
+      agenda: "https://sovereign-conference.com/es/#program",
+      tickets: "https://www.satlantis.io/embed/events/1002890/tickets",
     },
   },
   {

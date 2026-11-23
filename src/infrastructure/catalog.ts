@@ -127,9 +127,6 @@ export function replaceCatalog(shops: MerchantPlace[], comms: Community[], wipe 
   });
 }
 
-const WEEK_MS = 7 * 86_400_000;
-const LOCK_MS = 2 * 3_600_000;
-
 /** Insert only ids Bitácora does not have. Never touches map_rows (user overlay). */
 export function mergeNewCatalog(shops: MerchantPlace[], comms: Community[]) {
   let addedShops = 0;
@@ -176,26 +173,9 @@ export function mergeNewCatalog(shops: MerchantPlace[], comms: Community[]) {
   return { addedShops, addedComms };
 }
 
-/** La copia local es la fuente. El volcado a BTC Map solo corre si BITACORA_CATALOG_SYNC=1. */
-export function maybeWeeklyCatalogSync() {
-  if (process.env.BITACORA_CATALOG_SYNC !== "1") return;
-  const at = Number(metaGet("catalog_at") || 0);
-  if (at && Date.now() - at < WEEK_MS) return;
-  const lock = Number(metaGet("catalog_sync_lock") || 0);
-  if (lock && Date.now() - lock < LOCK_MS) return;
-  metaSet("catalog_sync_lock", String(Date.now()));
-  void import("./btc-map")
-    .then((m) => m.syncCatalogFromBtcMap())
-    .catch((err) => {
-      console.error("[catalog] weekly sync", err);
-    });
-}
-
+/** Si hay menos de 50 filas, siembra el JSON. El sync semanal no vive acá: lo dispara btc-map. */
 export function ensureCatalog() {
-  if (catalogCount() >= 50) {
-    maybeWeeklyCatalogSync();
-    return;
-  }
+  if (catalogCount() >= 50) return;
   const shops = readSeed<MerchantPlace>("btcmap-shops.json");
   const comms = readSeed<Community>("btcmap-comms.json");
   if (!shops.length && !comms.length) return;
