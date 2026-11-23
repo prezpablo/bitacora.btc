@@ -201,19 +201,27 @@ test("footer links Telegram Consciencia Bitcoin once", () => {
   assert.match(copy, /Junte-se à Consciencia Bitcoin/);
 });
 
-test("Comunidad features LABITCONF 26 banner above anuncios", () => {
+test("Comunidad features the current event above anuncios", () => {
   const desk = read("src/components/dashboard/desk.tsx");
-  const banner = desk.indexOf("<LabitconfBanner");
+  const banner = desk.indexOf("<FeaturedEventBanner");
   const ads = desk.indexOf('id="anuncios"');
   assert.ok(banner > 0 && ads > banner, "banner must sit above anuncios");
-  const src = read("src/components/dashboard/labitconf-banner.tsx");
-  assert.match(src, /https:\/\/www\.labitconf\.com\//);
-  assert.match(src, /labitconf-hodl\.jpg/);
-  assert.match(src, /#ABF760/);
+  const src = read("src/components/dashboard/featured-event-banner.tsx");
+  assert.match(src, /pickFeatured/);
+  assert.match(src, /loading="lazy"/);
+  assert.doesNotMatch(src, /lacrypta\.ar|Patrocinado|Sponsored/);
+  const data = read("src/content/featured-events.ts");
+  assert.match(data, /eventos\.lacrypta\.ar\/o\/la-crypta\/events\/cowork-2026-11-24/);
+  assert.match(data, /2026-11-25T00:00:00-03:00/);
   const copy = read("src/lib/i18n.ts");
-  assert.match(copy, /Comprar ticket/);
-  assert.match(copy, /Get tickets/);
-  assert.match(copy, /Comprar ingresso/);
+  assert.match(copy, /Evento destacado/);
+  assert.match(copy, /Página del evento \{title\}/);
+  assert.match(copy, /Entradas para \{title\}/);
+  assert.match(copy, /Agenda de la comunidad: \{title\}/);
+  assert.match(copy, /Event page for \{title\}/);
+  assert.match(copy, /Página do evento \{title\}/);
+  assert.match(data, /Arte: La Crypta|artist: "La Crypta"/);
+  assert.doesNotMatch(src, /Patrocinado|Sponsored|en alianza/);
 });
 
 test("D-BANNER storage compacts after first visit", () => {

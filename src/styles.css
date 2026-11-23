@@ -329,41 +329,6 @@ body {
     transform: rotateY(360deg);
   }
 }
-/* Centro del banner de El Zonte: superficie blanca de Bitácora, ₿ en naranja de marca. */
-.beach-btc {
-  position: absolute;
-  color: #f7931a;
-  font-weight: 700;
-  line-height: 1;
-  opacity: 0.45;
-}
-@keyframes beach-btc-float {
-  0% {
-    transform: translateY(28px);
-    opacity: 0;
-  }
-  16% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(-340px);
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .beach-btc {
-    animation-name: beach-btc-float;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
-  .beach-more {
-    transition: transform 180ms ease;
-  }
-  a:hover .beach-more,
-  a:focus-visible .beach-more {
-    transform: scale(1.08);
-  }
-}
 .mine-step {
   box-shadow: 0 0 0 1px #e6e6e6;
 }

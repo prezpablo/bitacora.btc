@@ -8,7 +8,7 @@ import { formatMarketClock } from "@/domain/market-clock";
 import { COMMUNITY_HUB, MARKET_HUB, sectorOf } from "@/domain/nav";
 import { EventHtmlList } from "./event-html-list";
 import { HubIndex } from "./hub-index";
-import { LabitconfBanner } from "./labitconf-banner";
+import { FeaturedEventBanner } from "./featured-event-banner";
 import { buildModelMarket } from "@/application";
 import { getDeskExtras, getEtfFlows, getMarket, getOnchainLive, getPulse, getTick } from "@/infrastructure/server-fns";
 import { cn, formatPct, formatUsd } from "@/lib/utils";
@@ -300,7 +300,7 @@ export function Desk({ eventHtml = [] }: { eventHtml?: EventHtmlRow[] }) {
           fallbackHash="anuncios"
           parentHash="comunidad"
         />
-        <LabitconfBanner />
+        <FeaturedEventBanner />
         <section id="anuncios" className="scroll-mt-[4.5rem]">
         <Suspense fallback={<Soft />}>
           <LazyMount fallback={<Soft />} minHeight="12rem">
