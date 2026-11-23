@@ -223,7 +223,10 @@ test("Comunidad features the current event above anuncios", () => {
   assert.match(data, /kind: "bitacora"/);
   assert.match(data, /identity: "La Crypta"/);
   assert.match(data, /lang: "es"/);
-  assert.doesNotMatch(data, /artist: "La Crypta"/);
+  assert.match(copy, /Diseño: Bitácora BTC, con la identidad visual de \{identity\}/);
+  assert.match(copy, /Design: Bitácora BTC, using the visual identity of \{identity\}/);
+  assert.match(copy, /Design: Bitácora BTC, com a identidade visual de \{identity\}/);
+  assert.doesNotMatch(data + copy, /Arte: La Crypta/);
   assert.doesNotMatch(src, /Patrocinado|Sponsored|en alianza/);
 });
 

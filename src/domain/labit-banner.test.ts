@@ -69,8 +69,16 @@ test("La Crypta keeps the event page and tickets, and skips a missing agenda", (
   assert.match(event.alt.es, /Villanueva 1367/);
   assert.equal(event.lang, "es");
   assert.equal(event.credit.kind, "bitacora");
-  if (event.credit.kind === "bitacora") assert.equal(event.credit.identity, "La Crypta");
+  if (event.credit.kind !== "bitacora") return;
+  assert.equal(event.credit.identity, "La Crypta");
   assert.equal(event.credit.source, links[0]?.href);
+  const esCredit = `Diseño: Bitácora BTC, con la identidad visual de ${event.credit.identity}. Fuente: ${event.credit.source}`;
+  const enCredit = `Design: Bitácora BTC, using the visual identity of ${event.credit.identity}. Source: ${event.credit.source}`;
+  const ptCredit = `Design: Bitácora BTC, com a identidade visual de ${event.credit.identity}. Fonte: ${event.credit.source}`;
+  assert.equal(esCredit, "Diseño: Bitácora BTC, con la identidad visual de La Crypta. Fuente: https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24");
+  assert.equal(enCredit, "Design: Bitácora BTC, using the visual identity of La Crypta. Source: https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24");
+  assert.equal(ptCredit, "Design: Bitácora BTC, com a identidade visual de La Crypta. Fonte: https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24");
+  assert.doesNotMatch(`${esCredit}\n${enCredit}\n${ptCredit}`, /Arte: La Crypta/);
   assert.equal(foreignLang(event.lang, "en"), "es");
   assert.equal(foreignLang(event.lang, "pt"), "es");
   assert.equal(foreignLang(event.lang, "es"), undefined);
