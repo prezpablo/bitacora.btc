@@ -9,9 +9,19 @@
  *
  * `links` es opcional. Solo https, sin parámetros de seguimiento (utm, fbclid, gclid).
  * La imagen vive en este repo (`/eventos/…`). No se carga nada del sitio del organizador.
- * `credit` nombra al autor y la ficha oficial. No es un patrocinio.
+ * `lang` es el idioma del nombre del evento (`es`, `en` o `pt`). Si la página está
+ * en otro idioma, ese nombre se marca con `lang` (WCAG 3.1.2).
+ * `credit` no es un patrocinio ni un aval. Dos casos:
+ * - `{ kind: "organizer", artist, source }`: el afiche lo hizo el organizador.
+ *   Se lee «Arte: {artist}».
+ * - `{ kind: "bitacora", identity, source }`: el diseño es de Bitácora BTC y usa
+ *   la identidad visual de `identity`. No atribuye la pieza al organizador.
+ *   Se lee «Diseño: Bitácora BTC, con la identidad visual de {identity}».
+ * `source` es la ficha oficial, https, sin seguimiento. Se muestra como texto.
  * Imagen nueva: 1200×630, AVIF + WebP + PNG de respaldo. `src` es el respaldo.
  */
+
+export type EventLang = "es" | "en" | "pt";
 
 export type LangText = {
   readonly es: string;
@@ -33,11 +43,19 @@ export type FeaturedLinks = {
   readonly agenda?: string;
 };
 
-export type FeaturedCredit = {
-  readonly artist: string;
-  /** Ficha oficial, https, sin parámetros de seguimiento. Se muestra como texto. */
-  readonly source: string;
-};
+export type FeaturedCredit =
+  | {
+      readonly kind: "organizer";
+      /** Quién hizo el afiche oficial. */
+      readonly artist: string;
+      readonly source: string;
+    }
+  | {
+      readonly kind: "bitacora";
+      /** De quién es la identidad visual. No es el autor de la pieza. */
+      readonly identity: string;
+      readonly source: string;
+    };
 
 export type FeaturedEvent = {
   readonly id: string;
@@ -46,6 +64,7 @@ export type FeaturedEvent = {
   readonly title: LangText;
   readonly where?: LangText;
   readonly note?: LangText;
+  readonly lang: EventLang;
   readonly alt: LangText;
   readonly credit: FeaturedCredit;
   readonly accent: string;
@@ -59,6 +78,7 @@ const BA = "Villanueva 1367, CABA, Argentina";
 export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   {
     id: "labitconf-2026",
+    lang: "es",
     endsAt: "2026-11-01T00:00:00Z",
     title: {
       es: "LABITCONF 26 HODL",
@@ -70,7 +90,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
       en: "LABITCONF 26 HODL — October 30–31, Costa Salguero, Buenos Aires",
       pt: "LABITCONF 26 HODL — 30 e 31 de outubro, Costa Salguero, Buenos Aires",
     },
-    credit: { artist: "LABITCONF", source: "https://www.labitconf.com/" },
+    credit: { kind: "organizer", artist: "LABITCONF", source: "https://www.labitconf.com/" },
     accent: "#ABF760",
     ink: "#171616",
     image: { src: "/labitconf-hodl.jpg", width: 1600, height: 592 },
@@ -82,6 +102,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   },
   {
     id: "bitcoin-historico-2026",
+    lang: "es",
     endsAt: "2026-11-11T00:00:00Z",
     title: {
       es: "Bitcoin Histórico",
@@ -93,7 +114,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
       en: "Bitcoin Histórico — November 11–12, San Salvador",
       pt: "Bitcoin Histórico — 11 e 12 de novembro, San Salvador",
     },
-    credit: { artist: "Bitcoin Histórico", source: "https://bitcoinhistorico.com/" },
+    credit: { kind: "organizer", artist: "Bitcoin Histórico", source: "https://bitcoinhistorico.com/" },
     accent: "#EFBC53",
     ink: "#120C08",
     image: { src: "/eventos/bitcoin-historico.jpg", width: 1024, height: 576 },
@@ -104,6 +125,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   },
   {
     id: "bitcoin-beach-2026",
+    lang: "en",
     endsAt: "2026-11-23T00:00:00Z",
     title: {
       es: "Bitcoin Beach",
@@ -120,7 +142,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
       en: "Global Bitcoin Circular, November 19–20, and Bitcoin Beach Festival, November 21–22, in El Zonte",
       pt: "Global Bitcoin Circular, 19 e 20 de novembro, e Festival Bitcoin Beach, 21 e 22, em El Zonte",
     },
-    credit: { artist: "Bitcoin Beach", source: "https://www.bitcoinbeach.com/" },
+    credit: { kind: "organizer", artist: "Bitcoin Beach", source: "https://www.bitcoinbeach.com/" },
     accent: "#FE6A00",
     ink: "#101820",
     image: { src: "/eventos/beach-summit.jpg", width: 931, height: 518 },
@@ -130,6 +152,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   },
   {
     id: "la-crypta-cowork-2026-11-24",
+    lang: "es",
     startsAt: "2026-11-24T11:59:00-03:00",
     // No se publicó hora de cierre. Se oculta al empezar el 25 en Buenos Aires.
     endsAt: "2026-11-25T00:00:00-03:00",
@@ -150,7 +173,8 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
       pt: "Cartaz de Coworking en La Crypta. Terça 24 de novembro de 2026, 11:59, Villanueva 1367, Buenos Aires. Bitcoin, comunidade, a partir de 2.100 sats.",
     },
     credit: {
-      artist: "La Crypta",
+      kind: "bitacora",
+      identity: "La Crypta",
       source: "https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24",
     },
     accent: "#C4E828",

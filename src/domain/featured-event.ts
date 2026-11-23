@@ -1,10 +1,11 @@
 import {
   FEATURED_EVENTS,
+  type EventLang,
   type FeaturedEvent,
   type LangText,
 } from "../content/featured-events.ts";
 
-export type { FeaturedCredit, FeaturedEvent, FeaturedImage, FeaturedLinks, LangText } from "../content/featured-events.ts";
+export type { EventLang, FeaturedCredit, FeaturedEvent, FeaturedImage, FeaturedLinks, LangText } from "../content/featured-events.ts";
 export { FEATURED_EVENTS } from "../content/featured-events.ts";
 
 export type AppLang = "es" | "en" | "pt";
@@ -84,6 +85,11 @@ export function featuredText(text: LangText | undefined, lang: AppLang): string 
   if (!text) return "";
   const value = text[lang]?.trim() || text.es.trim();
   return value;
+}
+
+/** Idioma a marcar cuando el texto no está en el idioma de la página. */
+export function foreignLang(textLang: EventLang, uiLang: AppLang): EventLang | undefined {
+  return textLang === uiLang ? undefined : textLang;
 }
 
 const WEEKDAY: Record<AppLang, readonly string[]> = {

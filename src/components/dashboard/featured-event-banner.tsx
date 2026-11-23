@@ -2,9 +2,12 @@ import {
   featuredHref,
   featuredLinks,
   featuredText,
+  foreignLang,
   formatFeaturedWhen,
   pickFeatured,
   siteAsset,
+  type AppLang,
+  type EventLang,
   type FeaturedLinkKind,
 } from "@/domain/featured-event";
 import { useAppLang, useT, type CopyKey } from "@/lib/i18n";
@@ -17,6 +20,30 @@ const LINK_LABEL: Record<FeaturedLinkKind, CopyKey> = {
 
 const ON_INK = "#f4f4f1";
 
+function Slot({
+  template,
+  token,
+  value,
+  valueLang,
+  uiLang,
+}: {
+  template: string;
+  token: string;
+  value: string;
+  valueLang: EventLang;
+  uiLang: AppLang;
+}) {
+  const [before, after] = template.split(`{${token}}`);
+  const mark = foreignLang(valueLang, uiLang);
+  return (
+    <>
+      {before}
+      {mark ? <span lang={mark}>{value}</span> : value}
+      {after ?? ""}
+    </>
+  );
+}
+
 /** El evento que todavía no cerró. Si no hay ninguno, no ocupa lugar. */
 export function FeaturedEventBanner({ now }: { now?: Date }) {
   const t = useT();
@@ -25,6 +52,7 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
   if (!event) return null;
 
   const title = featuredText(event.title, lang);
+  const titleLang = foreignLang(event.lang, lang);
   const where = featuredText(event.where, lang);
   const note = featuredText(event.note, lang);
   const when = event.startsAt ? formatFeaturedWhen(event.startsAt, lang) : "";
@@ -64,7 +92,7 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
           <p id={kickerId} className="text-xs font-medium tracking-wide uppercase">
             {t("featuredKicker")}
           </p>
-          <p id={titleId} className="font-display text-base font-medium" style={{ color: "#ffffff" }}>
+          <p id={titleId} lang={titleLang} className="font-display text-base font-medium" style={{ color: "#ffffff" }}>
             {title}
           </p>
           {when && event.startsAt ? (
@@ -75,8 +103,24 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
           {where ? <p>{where}</p> : null}
           {note ? <p>{note}</p> : null}
           <p>
-            {t("featuredCredit", { artist: event.credit.artist })}
-            {source ? ` ${t("featuredSource", { source })}` : null}
+            {event.credit.kind === "bitacora" ? (
+              <Slot
+                template={t("featuredCreditDesign")}
+                token="identity"
+                value={event.credit.identity}
+                valueLang={event.lang}
+                uiLang={lang}
+              />
+            ) : (
+              <Slot
+                template={t("featuredCreditArt")}
+                token="artist"
+                value={event.credit.artist}
+                valueLang={event.lang}
+                uiLang={lang}
+              />
+            )}
+            {source ? <> {t("featuredSource", { source })}</> : null}
           </p>
         </figcaption>
       </figure>
@@ -92,7 +136,7 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
               className="inline-flex min-h-11 max-w-full items-center rounded-md px-3 py-2 text-left text-sm font-medium text-pretty no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               style={{ background: event.accent, color: event.ink }}
             >
-              {t(LINK_LABEL[link.kind], { title })}
+              <Slot template={t(LINK_LABEL[link.kind])} token="title" value={title} valueLang={event.lang} uiLang={lang} />
             </a>
           ))}
           <p id={externalId} className="basis-full text-xs text-pretty" style={{ color: ON_INK }}>

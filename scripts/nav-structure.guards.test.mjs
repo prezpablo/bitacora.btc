@@ -220,7 +220,10 @@ test("Comunidad features the current event above anuncios", () => {
   assert.match(copy, /Agenda de la comunidad: \{title\}/);
   assert.match(copy, /Event page for \{title\}/);
   assert.match(copy, /Página do evento \{title\}/);
-  assert.match(data, /Arte: La Crypta|artist: "La Crypta"/);
+  assert.match(data, /kind: "bitacora"/);
+  assert.match(data, /identity: "La Crypta"/);
+  assert.match(data, /lang: "es"/);
+  assert.doesNotMatch(data, /artist: "La Crypta"/);
   assert.doesNotMatch(src, /Patrocinado|Sponsored|en alianza/);
 });
 

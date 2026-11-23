@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { FEATURED_EVENTS, featuredHref, featuredLinks, featuredText, formatFeaturedWhen, pickFeatured, siteAsset } from "./featured-event.ts";
+import { FEATURED_EVENTS, featuredHref, featuredLinks, featuredText, foreignLang, formatFeaturedWhen, pickFeatured, siteAsset } from "./featured-event.ts";
 import type { FeaturedEvent } from "./featured-event.ts";
 
 function contrast(ink: string, accent: string) {
@@ -21,7 +21,7 @@ function contrast(ink: string, accent: string) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-const credit = { artist: "x", source: "https://example.com/art" };
+const credit = { kind: "organizer" as const, artist: "x", source: "https://example.com/art" };
 
 test("the banner rotates to the next event and hides when that instant passes", () => {
   assert.equal(pickFeatured("2026-10-30T12:00:00Z")?.id, "labitconf-2026");
@@ -38,6 +38,7 @@ test("an end without an explicit offset is ignored", () => {
   const loose = {
     id: "loose",
     endsAt: "2026-11-24T23:59:59",
+    lang: "es",
     title: { es: "x", en: "x", pt: "x" },
     alt: { es: "x", en: "x", pt: "x" },
     accent: "#000000",
@@ -66,8 +67,13 @@ test("La Crypta keeps the event page and tickets, and skips a missing agenda", (
   assert.match(event.alt.es, /Coworking en La Crypta/);
   assert.match(event.alt.es, /24 de noviembre de 2026/);
   assert.match(event.alt.es, /Villanueva 1367/);
-  assert.equal(event.credit.artist, "La Crypta");
+  assert.equal(event.lang, "es");
+  assert.equal(event.credit.kind, "bitacora");
+  if (event.credit.kind === "bitacora") assert.equal(event.credit.identity, "La Crypta");
   assert.equal(event.credit.source, links[0]?.href);
+  assert.equal(foreignLang(event.lang, "en"), "es");
+  assert.equal(foreignLang(event.lang, "pt"), "es");
+  assert.equal(foreignLang(event.lang, "es"), undefined);
   assert.ok(contrast(event.ink, event.accent) >= 4.5);
 });
 
@@ -75,6 +81,7 @@ test("duplicate and non-https links are dropped", () => {
   const event = {
     id: "links",
     endsAt: "2026-12-01T00:00:00Z",
+    lang: "es",
     title: { es: "x", en: "x", pt: "x" },
     alt: { es: "x", en: "x", pt: "x" },
     accent: "#000000",
@@ -117,7 +124,13 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.match(banner, /rel="noopener noreferrer"/);
   assert.match(banner, /aria-describedby/);
   assert.match(banner, /featuredKicker/);
+  assert.match(banner, /foreignLang/);
+  assert.match(banner, /featuredCreditDesign/);
+  assert.match(banner, /lang=\{titleLang\}/);
   assert.doesNotMatch(banner, /labitKicker|Patrocinado|Sponsored|patrocinado|alianza|lacrypta\.ar|https?:\/\//);
+  assert.match(i18n, /Diseño: Bitácora BTC, con la identidad visual de \{identity\}/);
+  assert.match(i18n, /Design: Bitácora BTC, using the visual identity of \{identity\}/);
+  assert.match(i18n, /Design: Bitácora BTC, com a identidade visual de \{identity\}/);
   assert.match(i18n, /Evento destacado/);
   assert.match(i18n, /Página del evento \{title\}/);
   assert.match(i18n, /Entradas para \{title\}/);
