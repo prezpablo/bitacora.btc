@@ -1,53 +1,7 @@
-import { pickFeatured, utcDay } from "@/domain/featured-event";
 import { useAppLang, useT } from "@/lib/i18n";
 
-/** El evento vigente. El Zonte va partido. Asunción usa la pieza negra del evento. */
-export function LabitconfBanner() {
-  const t = useT();
-  const event = pickFeatured(utcDay());
-  if (!event) return null;
-  if (event.split) return <BeachSplit />;
-  if (event.id === "sovereign-2026") return <SovereignBanner />;
-  if (event.id === "crypta-2026-11-24") return <CryptaBanner />;
-  const tickets = event.tickets || event.site;
-  const pill = "absolute inline-flex min-h-8 items-center rounded-full px-3 py-1 text-[11px] font-black tracking-[0.08em] uppercase no-underline sm:px-4 sm:text-xs";
-  return (
-    <div className="group relative overflow-hidden rounded-lg border-2" style={{ borderColor: event.accent, background: event.ink }}>
-      <a href={event.site} target="_blank" rel="noopener noreferrer" className="block">
-        <img
-          src={event.image}
-          alt={t(event.altKey)}
-          width={1600}
-          height={592}
-          className="aspect-[8/3] w-full object-cover object-center transition-transform duration-300 group-hover:scale-[1.02]"
-          decoding="async"
-        />
-      </a>
-      {event.agenda ? (
-        <a
-          href={event.agenda}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${pill} bottom-2 left-2 sm:bottom-3 sm:left-3`}
-          style={{ background: event.accent, color: event.ink }}
-        >
-          {t("labitAgenda")}
-        </a>
-      ) : null}
-      <a
-        href={tickets}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`${pill} right-2 bottom-2 sm:right-3 sm:bottom-3`}
-        style={{ background: event.accent, color: event.ink }}
-      >
-        {t("labitCta")}
-      </a>
-    </div>
-  );
-}
-
-function BeachSplit() {
+/** El Zonte, partido. Solo cuando ese evento es el vigente. */
+export function BeachSplit() {
   const t = useT();
   const site = "https://www.bitcoinbeach.com/";
   const floats = [
@@ -111,7 +65,8 @@ function BeachSplit() {
   );
 }
 
-function SovereignBanner() {
+/** Sovereign Conference, Asunción. Solo cuando ese evento es el vigente. */
+export function SovereignBanner() {
   const t = useT();
   const lang = useAppLang();
   const site = lang === "en" ? "https://sovereign-conference.com/" : "https://sovereign-conference.com/es/";
@@ -161,38 +116,3 @@ function SovereignBanner() {
     </section>
   );
 }
-
-function CryptaBanner() {
-  const t = useT();
-  const site = "https://lacrypta.ar/";
-  const live = "https://www.youtube.com/@LaCryptaOk/live";
-  return (
-    <section className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#0b0b0b]" aria-label={t("cryptaAlt")}>
-      <div className="h-1 bg-[#ff4b1f]" />
-      <div className="flex items-end gap-3 px-4 py-4 sm:gap-6 sm:px-6 sm:py-5">
-        <div className="min-w-0 flex-1">
-          <p className="font-mono text-[10px] tracking-[0.16em] text-[#ff4b1f] uppercase sm:text-xs">{t("cryptaMeta")}</p>
-          <a href={site} target="_blank" rel="noopener noreferrer" className="mt-2 block no-underline">
-            <span className="sov-word block text-[#f4efe4]">la</span>
-            <span className="sov-word block text-[#ff4b1f]">crypta</span>
-          </a>
-          <p className="mt-3 text-xs text-[#a8a29a] sm:text-sm">{t("cryptaLead")}</p>
-          <div className="mt-4">
-            <a
-              href={live}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-10 items-center bg-[#ff4b1f] px-4 text-sm font-semibold text-[#0b0b0b] no-underline hover:bg-[#ff6a42]"
-            >
-              {t("cryptaCta")}
-            </a>
-          </div>
-        </div>
-        <p className="mb-1 hidden font-mono text-4xl leading-none text-[#ff4b1f] sm:block" aria-hidden="true">
-          ₿
-        </p>
-      </div>
-    </section>
-  );
-}
-

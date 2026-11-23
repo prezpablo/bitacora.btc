@@ -359,8 +359,8 @@ function repoCheck(id) {
     return { pass: ok, detail: ok ? "20.446 art. 693 y Circular 2507 citadas; no se inventa una exclusión por ser persona física" : "sigue solo la 20.345 o se inventó una exclusión" };
   }
   if (id === "L-LABIT") {
-    const banner = read("src/components/dashboard/labitconf-banner.tsx");
-    const list = read("src/domain/featured-event.ts");
+    const banner = read("src/components/dashboard/featured-event-banner.tsx");
+    const list = read("src/content/featured-events.ts");
     const i18n = read("src/lib/i18n.ts");
     const ok = /bitcoinhistorico\.com/.test(list) && /#EFBC53/.test(list) && /pickFeatured/.test(banner) && !/labitKicker|Patrocinado|Sponsored/.test(banner + i18n);
     return { pass: ok, detail: ok ? "el banner muestra el evento vigente, con su oro, y no lleva sello de patrocinado" : "el sello sigue o el banner no rota" };
