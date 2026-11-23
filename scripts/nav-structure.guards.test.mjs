@@ -207,9 +207,12 @@ test("Comunidad features LABITCONF 26 banner above anuncios", () => {
   const ads = desk.indexOf('id="anuncios"');
   assert.ok(banner > 0 && ads > banner, "banner must sit above anuncios");
   const src = read("src/components/dashboard/labitconf-banner.tsx");
-  assert.match(src, /https:\/\/www\.labitconf\.com\//);
-  assert.match(src, /labitconf-hodl\.jpg/);
-  assert.match(src, /#ABF760/);
+  const data = read("src/domain/featured-event.ts");
+  assert.match(data, /https:\/\/www\.labitconf\.com\//);
+  assert.match(data, /labitconf-hodl\.jpg/);
+  assert.match(data, /#ABF760/);
+  assert.match(src, /pickFeatured/);
+  assert.match(data, /lacrypta-cowork-2026-11-24/);
   const copy = read("src/lib/i18n.ts");
   assert.match(copy, /Comprar ticket/);
   assert.match(copy, /Get tickets/);
