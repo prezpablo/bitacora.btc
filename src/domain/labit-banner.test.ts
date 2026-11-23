@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { FEATURED_EVENTS, featuredHref, featuredLinks, featuredText, foreignLang, formatFeaturedWhen, pickFeatured, siteAsset } from "./featured-event.ts";
+import { FEATURED_EVENTS, featuredHref, featuredLinks, featuredLinkSplit, featuredText, foreignLang, formatFeaturedCompact, formatFeaturedWhen, pickFeatured, siteAsset } from "./featured-event.ts";
 import type { FeaturedEvent } from "./featured-event.ts";
 
 function contrast(ink: string, accent: string) {
@@ -64,6 +64,13 @@ test("La Crypta keeps the event page and tickets, and skips a missing agenda", (
   assert.match(formatFeaturedWhen(event.startsAt || "", "es"), /noviembre/i);
   assert.equal(featuredText(event.where, "en"), "Villanueva 1367, CABA, Argentina");
   assert.equal(formatFeaturedWhen(event.startsAt || "", "es"), "martes 24 de noviembre de 2026, 11:59");
+  assert.equal(formatFeaturedCompact(event.startsAt || "", "es"), "Mar 24 nov · 11:59");
+  assert.equal(formatFeaturedCompact(event.startsAt || "", "en"), "Tue 24 Nov · 11:59");
+  assert.equal(formatFeaturedCompact(event.startsAt || "", "pt"), "Ter 24 nov · 11:59");
+  assert.equal(featuredText(event.place, "es"), "CABA");
+  assert.deepEqual(featuredLinkSplit("Página del evento {title}", "Página del evento"), { lead: " ", tail: "" });
+  assert.deepEqual(featuredLinkSplit("Entradas para {title}", "Entradas"), { lead: " para ", tail: "" });
+  assert.equal(featuredLinkSplit("Otra cosa {title}", "Entradas"), null);
   assert.match(event.alt.es, /Coworking en La Crypta/);
   assert.match(event.alt.es, /24 de noviembre de 2026/);
   assert.match(event.alt.es, /Villanueva 1367/);
@@ -72,12 +79,12 @@ test("La Crypta keeps the event page and tickets, and skips a missing agenda", (
   if (event.credit.kind !== "bitacora") return;
   assert.equal(event.credit.identity, "La Crypta");
   assert.equal(event.credit.source, links[0]?.href);
-  const esCredit = `Diseño: Bitácora BTC, con la identidad visual de ${event.credit.identity}. Fuente: ${event.credit.source}`;
-  const enCredit = `Design: Bitácora BTC, using the visual identity of ${event.credit.identity}. Source: ${event.credit.source}`;
-  const ptCredit = `Design: Bitácora BTC, com a identidade visual de ${event.credit.identity}. Fonte: ${event.credit.source}`;
-  assert.equal(esCredit, "Diseño: Bitácora BTC, con la identidad visual de La Crypta. Fuente: https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24");
-  assert.equal(enCredit, "Design: Bitácora BTC, using the visual identity of La Crypta. Source: https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24");
-  assert.equal(ptCredit, "Design: Bitácora BTC, com a identidade visual de La Crypta. Fonte: https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24");
+  const esCredit = `Diseño: Bitácora BTC, con la identidad visual de ${event.credit.identity}.`;
+  const enCredit = `Design: Bitácora BTC, using the visual identity of ${event.credit.identity}.`;
+  const ptCredit = `Design: Bitácora BTC, com a identidade visual de ${event.credit.identity}.`;
+  assert.equal(esCredit, "Diseño: Bitácora BTC, con la identidad visual de La Crypta.");
+  assert.equal(enCredit, "Design: Bitácora BTC, using the visual identity of La Crypta.");
+  assert.equal(ptCredit, "Design: Bitácora BTC, com a identidade visual de La Crypta.");
   assert.doesNotMatch(`${esCredit}\n${enCredit}\n${ptCredit}`, /Arte: La Crypta/);
   assert.equal(foreignLang(event.lang, "en"), "es");
   assert.equal(foreignLang(event.lang, "pt"), "es");
@@ -135,6 +142,15 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.match(banner, /foreignLang/);
   assert.match(banner, /featuredCreditDesign/);
   assert.match(banner, /lang=\{titleLang\}/);
+  assert.match(banner, /sr-only/);
+  assert.match(banner, /featuredPageShort/);
+  assert.match(banner, /featuredSourceLink/);
+  assert.match(banner, /formatFeaturedCompact/);
+  assert.match(banner, /bg-primary/);
+  assert.match(banner, /text-muted-foreground/);
+  assert.doesNotMatch(banner, /event\.note|event\.where|featuredSource[^L]/);
+  assert.ok(contrast("#ffffff", "#9a5600") >= 4.5);
+  assert.ok(contrast("#5c6370", "#ffffff") >= 4.5);
   assert.doesNotMatch(banner, /labitKicker|Patrocinado|Sponsored|patrocinado|alianza|lacrypta\.ar|https?:\/\//);
   assert.match(i18n, /Diseño: Bitácora BTC, con la identidad visual de \{identity\}/);
   assert.match(i18n, /Design: Bitácora BTC, using the visual identity of \{identity\}/);

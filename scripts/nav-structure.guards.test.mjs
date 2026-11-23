@@ -216,6 +216,8 @@ test("Comunidad features the current event above anuncios", () => {
   const copy = read("src/lib/i18n.ts");
   assert.match(copy, /Evento destacado/);
   assert.match(copy, /Página del evento \{title\}/);
+  assert.match(copy, /featuredPageShort: "Página del evento"/);
+  assert.match(copy, /featuredTicketsShort: "Entradas"/);
   assert.match(copy, /Entradas para \{title\}/);
   assert.match(copy, /Agenda de la comunidad: \{title\}/);
   assert.match(copy, /Event page for \{title\}/);

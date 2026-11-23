@@ -118,3 +118,39 @@ export function formatFeaturedWhen(iso: string, lang: AppLang): string {
   if (lang === "en") return `${weekday} ${day} ${monthName} ${year}, ${hm}`;
   return `${weekday} ${day} de ${monthName} de ${year}, ${hm}`;
 }
+
+const WEEKDAY_SHORT: Record<AppLang, readonly string[]> = {
+  es: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  pt: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+};
+
+const MONTH_SHORT: Record<AppLang, readonly string[]> = {
+  es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  pt: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+};
+
+/** Una línea corta. La hora es la escrita en el ISO, no la del servidor. */
+export function formatFeaturedCompact(iso: string, lang: AppLang): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(iso);
+  if (!match || !OFFSET.test(iso)) return "";
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return "";
+  const year = Number(match[1]);
+  const weekday = WEEKDAY_SHORT[lang][new Date(Date.UTC(year, month - 1, day)).getUTCDay()] ?? "";
+  const monthName = MONTH_SHORT[lang][month - 1] ?? "";
+  return `${weekday} ${day} ${monthName} · ${match[4]}:${match[5]}`;
+}
+
+/**
+ * El nombre accesible es la plantilla completa. Lo visible es el prefijo.
+ * Lo que sigue, incluido `{title}`, queda para lectores de pantalla y tiene que
+ * empezar por el texto visible (WCAG 2.5.3).
+ */
+export function featuredLinkSplit(full: string, visible: string): { lead: string; tail: string } | null {
+  const [before = "", after = ""] = full.split("{title}");
+  if (!before.startsWith(visible)) return null;
+  return { lead: before.slice(visible.length), tail: after };
+}

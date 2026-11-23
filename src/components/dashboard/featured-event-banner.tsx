@@ -1,9 +1,10 @@
 import {
   featuredHref,
   featuredLinks,
+  featuredLinkSplit,
   featuredText,
   foreignLang,
-  formatFeaturedWhen,
+  formatFeaturedCompact,
   pickFeatured,
   siteAsset,
   type AppLang,
@@ -12,36 +13,21 @@ import {
 } from "@/domain/featured-event";
 import { useAppLang, useT, type CopyKey } from "@/lib/i18n";
 
-const LINK_LABEL: Record<FeaturedLinkKind, CopyKey> = {
+const LINK_FULL: Record<FeaturedLinkKind, CopyKey> = {
   event: "featuredPage",
   tickets: "featuredTickets",
   agenda: "featuredAgenda",
 };
 
-const ON_INK = "#f4f4f1";
+const LINK_SHORT: Record<FeaturedLinkKind, CopyKey> = {
+  event: "featuredPageShort",
+  tickets: "featuredTicketsShort",
+  agenda: "featuredAgendaShort",
+};
 
-function Slot({
-  template,
-  token,
-  value,
-  valueLang,
-  uiLang,
-}: {
-  template: string;
-  token: string;
-  value: string;
-  valueLang: EventLang;
-  uiLang: AppLang;
-}) {
-  const [before, after] = template.split(`{${token}}`);
-  const mark = foreignLang(valueLang, uiLang);
-  return (
-    <>
-      {before}
-      {mark ? <span lang={mark}>{value}</span> : value}
-      {after ?? ""}
-    </>
-  );
+function Marked({ text, textLang, uiLang }: { text: string; textLang: EventLang; uiLang: AppLang }) {
+  const mark = foreignLang(textLang, uiLang);
+  return mark ? <span lang={mark}>{text}</span> : text;
 }
 
 /** El evento que todavía no cerró. Si no hay ninguno, no ocupa lugar. */
@@ -53,9 +39,8 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
 
   const title = featuredText(event.title, lang);
   const titleLang = foreignLang(event.lang, lang);
-  const where = featuredText(event.where, lang);
-  const note = featuredText(event.note, lang);
-  const when = event.startsAt ? formatFeaturedWhen(event.startsAt, lang) : "";
+  const place = featuredText(event.place, lang);
+  const when = event.startsAt ? formatFeaturedCompact(event.startsAt, lang) : "";
   const links = featuredLinks(event);
   const src = siteAsset(event.image.src);
   const avif = siteAsset(event.image.avif);
@@ -64,14 +49,14 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
   const titleId = `featured-${event.id}-title`;
   const kickerId = `featured-${event.id}-kicker`;
   const externalId = `featured-${event.id}-external`;
+  const creditName = event.credit.kind === "bitacora" ? event.credit.identity : event.credit.artist;
+  const creditTemplate = event.credit.kind === "bitacora" ? t("featuredCreditDesign") : t("featuredCreditArt");
+  const creditToken = event.credit.kind === "bitacora" ? "identity" : "artist";
+  const [creditBefore, creditAfter] = creditTemplate.split(`{${creditToken}}`);
 
   return (
-    <section
-      aria-labelledby={`${kickerId} ${titleId}`}
-      className="overflow-hidden rounded-lg border-2"
-      style={{ borderColor: event.accent, background: event.ink }}
-    >
-      <figure>
+    <section aria-labelledby={`${kickerId} ${titleId}`} className="space-y-4">
+      <figure className="space-y-4">
         {src ? (
           <picture>
             {avif ? <source srcSet={avif} type="image/avif" /> : null}
@@ -81,65 +66,77 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
               alt={featuredText(event.alt, lang)}
               width={event.image.width}
               height={event.image.height}
-              className="h-auto w-full"
+              className="h-auto w-full rounded-lg shadow-[var(--shadow-border)]"
               loading="lazy"
               decoding="async"
               fetchPriority="low"
             />
           </picture>
         ) : null}
-        <figcaption className="space-y-1 px-3 pt-3 text-sm text-pretty" style={{ color: ON_INK }}>
-          <p id={kickerId} className="text-xs font-medium tracking-wide uppercase">
+        <figcaption className="space-y-2">
+          <p id={kickerId} className="text-xs font-medium tracking-wide text-primary uppercase">
             {t("featuredKicker")}
           </p>
-          <p id={titleId} lang={titleLang} className="font-display text-base font-medium" style={{ color: "#ffffff" }}>
+          <p id={titleId} lang={titleLang} className="sr-only">
             {title}
           </p>
           {when && event.startsAt ? (
-            <p>
+            <p className="text-sm text-foreground">
               <time dateTime={event.startsAt}>{when}</time>
+              {place ? ` · ${place}` : null}
             </p>
           ) : null}
-          {where ? <p>{where}</p> : null}
-          {note ? <p>{note}</p> : null}
-          <p>
-            {event.credit.kind === "bitacora" ? (
-              <Slot
-                template={t("featuredCreditDesign")}
-                token="identity"
-                value={event.credit.identity}
-                valueLang={event.lang}
-                uiLang={lang}
-              />
-            ) : (
-              <Slot
-                template={t("featuredCreditArt")}
-                token="artist"
-                value={event.credit.artist}
-                valueLang={event.lang}
-                uiLang={lang}
-              />
-            )}
-            {source ? <> {t("featuredSource", { source })}</> : null}
+          <p className="text-xs text-pretty text-muted-foreground">
+            {creditBefore}
+            <Marked text={creditName} textLang={event.lang} uiLang={lang} />
+            {creditAfter ?? ""}
+            {source ? (
+              <>
+                {" "}
+                <a
+                  href={source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-describedby={externalId}
+                  className="underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                >
+                  {t("featuredSourceLink")}
+                  <span className="sr-only">
+                    {" "}
+                    <Marked text={title} textLang={event.lang} uiLang={lang} />
+                  </span>
+                </a>
+              </>
+            ) : null}
           </p>
         </figcaption>
       </figure>
       {links.length ? (
-        <div className="flex flex-wrap gap-2 px-3 py-3">
-          {links.map((link) => (
-            <a
-              key={link.kind}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-describedby={externalId}
-              className="inline-flex min-h-11 max-w-full items-center rounded-md px-3 py-2 text-left text-sm font-medium text-pretty no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ background: event.accent, color: event.ink }}
-            >
-              <Slot template={t(LINK_LABEL[link.kind])} token="title" value={title} valueLang={event.lang} uiLang={lang} />
-            </a>
-          ))}
-          <p id={externalId} className="basis-full text-xs text-pretty" style={{ color: ON_INK }}>
+        <div className="flex flex-row flex-wrap gap-2 sm:flex-nowrap">
+          {links.map((link) => {
+            const visible = t(LINK_SHORT[link.kind]);
+            const parts = featuredLinkSplit(t(LINK_FULL[link.kind]), visible);
+            return (
+              <a
+                key={link.kind}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-describedby={externalId}
+                className="inline-flex min-h-11 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+              >
+                {visible}
+                {parts ? (
+                  <span className="sr-only">
+                    {parts.lead}
+                    <Marked text={title} textLang={event.lang} uiLang={lang} />
+                    {parts.tail}
+                  </span>
+                ) : null}
+              </a>
+            );
+          })}
+          <p id={externalId} className="sr-only">
             {t("featuredExternal")}
           </p>
         </div>

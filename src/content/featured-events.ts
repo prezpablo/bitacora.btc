@@ -63,6 +63,8 @@ export type FeaturedEvent = {
   readonly startsAt?: string;
   readonly title: LangText;
   readonly where?: LangText;
+  /** Lugar corto para la línea bajo el afiche. La dirección larga queda en `where` y en el alt. */
+  readonly place?: LangText;
   readonly note?: LangText;
   readonly lang: EventLang;
   readonly alt: LangText;
@@ -162,6 +164,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
       pt: "Coworking en La Crypta",
     },
     where: { es: BA, en: BA, pt: BA },
+    place: { es: "CABA", en: "CABA", pt: "CABA" },
     note: {
       es: "Desde 2.100 sats por Lightning. Cupo: 20 personas.",
       en: "From 2,100 sats over Lightning. Capacity: 20.",
