@@ -90,7 +90,7 @@ test("community logos show on the globe and /logos is not sandboxed", () => {
   assert.match(map, /function isListPlace/);
   assert.doesNotMatch(map, /columns-2/);
   assert.match(map, /pickListingLogo\(local\?\.logo, place\.logo\)/);
-  const cat = read("src/infrastructure/catalog.ts");
+  const cat = read("src/infrastructure/btc-map.ts");
   assert.match(cat, /BITACORA_CATALOG_SYNC !== "1"/);
   assert.match(read("package.json"), /register-ts-alias\.mjs scripts\/sync-catalog\.ts/);
   assert.match(read("scripts/mirror-community-logos.ts"), /tipo = 'community'/);

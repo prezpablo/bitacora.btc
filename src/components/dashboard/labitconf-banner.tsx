@@ -1,12 +1,14 @@
 import { pickFeatured, utcDay } from "@/domain/featured-event";
-import { useT } from "@/lib/i18n";
+import { useAppLang, useT } from "@/lib/i18n";
 
-/** El evento vigente. El Zonte va partido: cumbre | saber más | festival. */
+/** El evento vigente. El Zonte va partido. Asunción usa la pieza negra del evento. */
 export function LabitconfBanner() {
   const t = useT();
   const event = pickFeatured(utcDay());
   if (!event) return null;
   if (event.split) return <BeachSplit />;
+  if (event.id === "sovereign-2026") return <SovereignBanner />;
+  if (event.id === "crypta-2026-11-24") return <CryptaBanner />;
   const tickets = event.tickets || event.site;
   const pill = "absolute inline-flex min-h-8 items-center rounded-full px-3 py-1 text-[11px] font-black tracking-[0.08em] uppercase no-underline sm:px-4 sm:text-xs";
   return (
@@ -106,6 +108,91 @@ function BeachSplit() {
         />
       </a>
     </div>
+  );
+}
+
+function SovereignBanner() {
+  const t = useT();
+  const lang = useAppLang();
+  const site = lang === "en" ? "https://sovereign-conference.com/" : "https://sovereign-conference.com/es/";
+  const program = `${site}#program`;
+  const tickets = "https://www.satlantis.io/embed/events/1002890/tickets";
+  return (
+    <section className="overflow-hidden rounded-lg border border-[#2c2c2c] bg-[#0b0b0b]" aria-label={t("sovAlt")}>
+      <div className="h-1 bg-[#f7931a]" />
+      <div className="flex items-end gap-3 px-4 py-4 sm:gap-6 sm:px-6 sm:py-5">
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[10px] tracking-[0.16em] text-[#f7931a] uppercase sm:text-xs">{t("sovMeta")}</p>
+          <a href={site} target="_blank" rel="noopener noreferrer" className="mt-2 block no-underline">
+            <span className="sov-word block text-[#f4efe4]">Sovereign</span>
+            <span className="sov-word block text-[#f7931a]">Conference</span>
+          </a>
+          <p className="mt-3 text-xs text-[#a8a29a] sm:text-sm">{t("sovThemes")}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a
+              href={tickets}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center bg-[#f7931a] px-4 text-sm font-semibold text-[#0b0b0b] no-underline hover:bg-[#ffa640]"
+            >
+              {t("sovCta")}
+            </a>
+            <a
+              href={program}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center border border-[#f4efe4] px-4 text-sm font-semibold text-[#f4efe4] no-underline hover:bg-[#141414]"
+            >
+              {t("labitAgenda")}
+            </a>
+          </div>
+        </div>
+        <svg viewBox="0 0 64 80" className="mb-1 hidden h-16 w-14 shrink-0 sm:block" aria-hidden="true">
+          <rect x="8" y="6" width="40" height="62" fill="none" stroke="#f7931a" strokeWidth="1.6" />
+          <rect x="14" y="14" width="28" height="8" fill="none" stroke="#f7931a" strokeWidth="1.4" />
+          <rect x="14" y="28" width="28" height="8" fill="none" stroke="#f7931a" strokeWidth="1.4" />
+          <rect x="14" y="42" width="28" height="8" fill="none" stroke="#f7931a" strokeWidth="1.4" />
+          <circle cx="36" cy="18" r="1.3" fill="#f7931a" />
+          <circle cx="36" cy="32" r="1.3" fill="#f7931a" />
+          <circle cx="36" cy="46" r="1.3" fill="#f7931a" />
+          <path d="M48 16h8M52 12v8M48 34h8M48 54h8" fill="none" stroke="#f7931a" strokeWidth="1.4" />
+        </svg>
+      </div>
+    </section>
+  );
+}
+
+function CryptaBanner() {
+  const t = useT();
+  const site = "https://lacrypta.ar/";
+  const live = "https://www.youtube.com/@LaCryptaOk/live";
+  return (
+    <section className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#0b0b0b]" aria-label={t("cryptaAlt")}>
+      <div className="h-1 bg-[#ff4b1f]" />
+      <div className="flex items-end gap-3 px-4 py-4 sm:gap-6 sm:px-6 sm:py-5">
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[10px] tracking-[0.16em] text-[#ff4b1f] uppercase sm:text-xs">{t("cryptaMeta")}</p>
+          <a href={site} target="_blank" rel="noopener noreferrer" className="mt-2 block no-underline">
+            <span className="sov-word block text-[#f4efe4]">la</span>
+            <span className="sov-word block text-[#ff4b1f]">crypta</span>
+          </a>
+          <p className="mt-3 text-xs text-[#a8a29a] sm:text-sm">{t("cryptaLead")}</p>
+          <div className="mt-4">
+            <a
+              href={live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center bg-[#ff4b1f] px-4 text-sm font-semibold text-[#0b0b0b] no-underline hover:bg-[#ff6a42]"
+            >
+              {t("cryptaCta")}
+            </a>
+          </div>
+        </div>
+        <p className="mb-1 hidden font-mono text-4xl leading-none text-[#ff4b1f] sm:block" aria-hidden="true">
+          ₿
+        </p>
+      </div>
+    </section>
   );
 }
 

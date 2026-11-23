@@ -1,7 +1,8 @@
 /** Un solo banner en Comunidad. Cuando cierra la fecha, entra el siguiente.
  *  Solo Bitcoin. No entra un encuentro de cripto, banca, stablecoins ni inteligencia artificial.
  *  Los colores son del evento, no de Bitácora.
- *  Desde el 11 de noviembre el banner es El Zonte, partido en dos: cumbre y festival. */
+ *  El Zonte cierra el 21. Desde el 22 el banner es Sovereign Conference, Asunción.
+ *  El 24 es la llamada semanal de La Crypta. */
 
 export type FeaturedEvent = {
   id: string;
@@ -10,7 +11,7 @@ export type FeaturedEvent = {
   agenda?: string;
   tickets?: string;
   image: string;
-  altKey: "labitAlt" | "histAlt" | "beachAlt";
+  altKey: "labitAlt" | "histAlt" | "beachAlt" | "sovAlt" | "cryptaAlt";
   accent: string;
   ink: string;
   /** Dos mitades y el botón de tickets al medio. El clic de la pieza va a `site`. */
@@ -41,7 +42,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
   },
   {
     id: "bitcoin-beach-2026",
-    end: "2026-11-22",
+    end: "2026-11-21",
     site: "https://www.bitcoinbeach.com/",
     tickets: "https://www.bitcoinbeach.com/",
     image: "",
@@ -49,6 +50,27 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     accent: "#FE6A00",
     ink: "#101820",
     split: true,
+  },
+  {
+    id: "sovereign-2026",
+    end: "2026-11-23",
+    site: "https://sovereign-conference.com/",
+    agenda: "https://sovereign-conference.com/es/#program",
+    tickets: "https://www.satlantis.io/embed/events/1002890/tickets",
+    image: "",
+    altKey: "sovAlt",
+    accent: "#f7931a",
+    ink: "#0b0b0b",
+  },
+  {
+    id: "crypta-2026-11-24",
+    end: "2026-11-24",
+    site: "https://lacrypta.ar/",
+    tickets: "https://www.youtube.com/@LaCryptaOk/live",
+    image: "",
+    altKey: "cryptaAlt",
+    accent: "#ff4b1f",
+    ink: "#0b0b0b",
   },
 ];
 

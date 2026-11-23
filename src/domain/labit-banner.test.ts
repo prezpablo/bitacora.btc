@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { pickFeatured } from "./featured-event.ts";
 
-test("from 11 nov the banner is El Zonte, split, through the 22nd", () => {
+test("from 11 nov the banner is El Zonte, then Asunción on the 22nd", () => {
   const beach = pickFeatured("2026-11-11");
   assert.equal(beach?.id, "bitcoin-beach-2026");
   assert.equal(beach?.split, true);
@@ -11,8 +11,20 @@ test("from 11 nov the banner is El Zonte, split, through the 22nd", () => {
   assert.match(beach?.site || "", /bitcoinbeach\.com/);
   assert.equal(pickFeatured("2026-11-02")?.id, "bitcoin-historico-2026");
   assert.equal(pickFeatured("2026-10-30")?.id, "labitconf-2026");
-  assert.equal(pickFeatured("2026-11-22")?.id, "bitcoin-beach-2026");
-  assert.equal(pickFeatured("2026-11-23"), null);
+  assert.equal(pickFeatured("2026-11-21")?.id, "bitcoin-beach-2026");
+  const sov = pickFeatured("2026-11-22");
+  assert.equal(sov?.id, "sovereign-2026");
+  assert.equal(sov?.accent, "#f7931a");
+  assert.equal(sov?.ink, "#0b0b0b");
+  assert.match(sov?.tickets || "", /satlantis\.io\/embed\/events\/1002890\/tickets/);
+  assert.match(sov?.agenda || "", /sovereign-conference\.com\/es\/#program/);
+  assert.equal(pickFeatured("2026-11-23")?.id, "sovereign-2026");
+  const crypta = pickFeatured("2026-11-24");
+  assert.equal(crypta?.id, "crypta-2026-11-24");
+  assert.equal(crypta?.accent, "#ff4b1f");
+  assert.match(crypta?.tickets || "", /youtube\.com\/@LaCryptaOk\/live/);
+  assert.match(crypta?.site || "", /lacrypta\.ar/);
+  assert.equal(pickFeatured("2026-11-25"), null);
 });
 
 test("the banner is a link, not a sponsored or featured seal", () => {

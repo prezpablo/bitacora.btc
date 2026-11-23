@@ -6,8 +6,9 @@ import { hoursFromCsv, logoUrl, parseMapCsv, paysFromCsv, socialsFromCsv } from 
 import { factsFromOsmTags, type ShopFacts } from "@/domain/shop-facts";
 import { keyFromUrl, type SocialKey, type SocialLink } from "@/domain/socials";
 import { loadMapCsvText } from "./map-csv-io";
-import { catalogAllShops, catalogCommunities, catalogShopById, catalogShopsInBox, searchCatalogCommunities, searchCatalogShops } from "./catalog";
+import { catalogAllShops, catalogCommunities, catalogShopById, catalogShopsInBox, mergeNewCatalog, searchCatalogCommunities, searchCatalogShops } from "./catalog";
 import { clusteredCatalogShops } from "./shop-cluster";
+import { metaGet, metaSet } from "./sqlite.ts";
 
 type RawEl = {
   id: string;
@@ -205,6 +206,22 @@ async function _overpassBbox(b: { west: number; south: number; east: number; nor
   return out;
 }
 
+const WEEK_MS = 7 * 86_400_000;
+const LOCK_MS = 2 * 3_600_000;
+
+/** La copia local es la fuente. El volcado a BTC Map solo corre si BITACORA_CATALOG_SYNC=1. */
+export function maybeWeeklyCatalogSync() {
+  if (process.env.BITACORA_CATALOG_SYNC !== "1") return;
+  const at = Number(metaGet("catalog_at") || 0);
+  if (at && Date.now() - at < WEEK_MS) return;
+  const lock = Number(metaGet("catalog_sync_lock") || 0);
+  if (lock && Date.now() - lock < LOCK_MS) return;
+  metaSet("catalog_sync_lock", String(Date.now()));
+  void syncCatalogFromBtcMap().catch((err) => {
+    console.error("[catalog] weekly sync", err);
+  });
+}
+
 export async function fetchMerchants(bbox: {
   west: number;
   south: number;
@@ -212,6 +229,7 @@ export async function fetchMerchants(bbox: {
   north: number;
   zoom?: number;
 }): Promise<ShopPin[]> {
+  maybeWeeklyCatalogSync();
   // D-PIN-03 payload: id,lat,lon,icon
   const map = new Map<string, ShopPin>();
   const zoom = Number.isFinite(bbox.zoom) ? Number(bbox.zoom) : 4;
@@ -562,7 +580,6 @@ export async function fetchRemoteCommunities(): Promise<Community[]> {
 
 /** Weekly: pull BTC Map and insert only ids Bitácora does not already have. */
 export async function syncCatalogFromBtcMap() {
-  const { mergeNewCatalog } = await import("./catalog");
   const shops = await refreshDump(readSnap());
   const comms = await fetchRemoteCommunities();
   const added = mergeNewCatalog(shops, comms);
