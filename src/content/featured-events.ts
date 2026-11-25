@@ -219,4 +219,122 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
       tickets: "https://eventos.lacrypta.ar/o/la-crypta/events/cowork-2026-11-24#reservar",
     },
   },
+  {
+    id: "bitdevs-bh-2026-11-25",
+    lang: "pt",
+    startsAt: "2026-11-25T19:00:00-03:00",
+    endsAt: "2026-11-25T21:00:00-03:00",
+    title: {
+      es: "31º BitDevs BH",
+      en: "31º BitDevs BH",
+      pt: "31º BitDevs BH",
+    },
+    where: {
+      es: "Sala 1030, Escola de Engenharia da UFMG, Rua Reitor Pires Albuquerque, 100, Belo Horizonte, Brasil",
+      en: "Room 1030, Escola de Engenharia da UFMG, Rua Reitor Pires Albuquerque, 100, Belo Horizonte, Brazil",
+      pt: "Sala 1030, Escola de Engenharia da UFMG, Rua Reitor Pires Albuquerque, 100, Belo Horizonte, Brasil",
+    },
+    place: { es: "Belo Horizonte", en: "Belo Horizonte", pt: "Belo Horizonte" },
+    alt: {
+      es: "Afiche de 31º BitDevs BH, seminario socrático. Miércoles 25 de noviembre de 2026, 19:00 a 21:00, Sala 1030 de la Escola de Engenharia da UFMG, Belo Horizonte.",
+      en: "Poster for 31º BitDevs BH, a Socratic seminar. Wednesday 25 November 2026, 19:00–21:00, Room 1030 at Escola de Engenharia da UFMG, Belo Horizonte.",
+      pt: "Cartaz do 31º BitDevs BH, seminário socrático. Quarta 25 de novembro de 2026, 19:00 às 21:00, Sala 1030 da Escola de Engenharia da UFMG, Belo Horizonte.",
+    },
+    credit: {
+      kind: "bitacora",
+      identity: "Belo Horizonte BitDevs",
+      source: "https://www.meetup.com/pt-br/belo-horizonte-bitdevs/events/317255330/",
+    },
+    accent: "#ff9900",
+    ink: "#333333",
+    image: {
+      src: "/eventos/bitdevs-bh-2026-11-25.png",
+      avif: "/eventos/bitdevs-bh-2026-11-25.avif",
+      webp: "/eventos/bitdevs-bh-2026-11-25.webp",
+      width: 1200,
+      height: 630,
+    },
+    links: {
+      event: "https://www.meetup.com/pt-br/belo-horizonte-bitdevs/events/317255330/",
+    },
+  },
+  {
+    id: "bitdevs-sp-2026-11-26",
+    lang: "pt",
+    // La ficha publica el día y la casa (Vinteum), no la hora. Se oculta al empezar el 27 en São Paulo.
+    endsAt: "2026-11-27T00:00:00-03:00",
+    title: {
+      es: "Seminário Socrático 050",
+      en: "Seminário Socrático 050",
+      pt: "Seminário Socrático 050",
+    },
+    where: {
+      es: "Vinteum, São Paulo, Brasil",
+      en: "Vinteum, São Paulo, Brazil",
+      pt: "Vinteum, São Paulo, Brasil",
+    },
+    place: { es: "São Paulo", en: "São Paulo", pt: "São Paulo" },
+    alt: {
+      es: "Afiche de Seminário Socrático 050 de São Paulo BitDevs. Jueves 26 de noviembre de 2026, en Vinteum, São Paulo.",
+      en: "Poster for Seminário Socrático 050 by São Paulo BitDevs. Thursday 26 November 2026, at Vinteum, São Paulo.",
+      pt: "Cartaz do Seminário Socrático 050 de São Paulo BitDevs. Quinta 26 de novembro de 2026, na Vinteum, em São Paulo.",
+    },
+    credit: {
+      kind: "bitacora",
+      identity: "São Paulo BitDevs",
+      source: "https://saopaulobitdevs.org/2026-11-26-socratic-seminar-050",
+    },
+    accent: "#ff9900",
+    ink: "#333333",
+    image: {
+      src: "/eventos/bitdevs-sp-2026-11-26.png",
+      avif: "/eventos/bitdevs-sp-2026-11-26.avif",
+      webp: "/eventos/bitdevs-sp-2026-11-26.webp",
+      width: 1200,
+      height: 630,
+    },
+    links: {
+      event: "https://saopaulobitdevs.org/2026-11-26-socratic-seminar-050",
+    },
+  },
+  {
+    id: "bitdevs-ba-2026-11-28",
+    lang: "es",
+    startsAt: "2026-11-28T15:45:00-03:00",
+    endsAt: "2026-11-28T18:30:00-03:00",
+    title: {
+      es: "BitdevsBA Seminario Socratico #16",
+      en: "BitdevsBA Seminario Socratico #16",
+      pt: "BitdevsBA Seminario Socratico #16",
+    },
+    where: {
+      es: "Cafe.te, Thames 937, Buenos Aires, Argentina",
+      en: "Cafe.te, Thames 937, Buenos Aires, Argentina",
+      pt: "Cafe.te, Thames 937, Buenos Aires, Argentina",
+    },
+    place: { es: "Buenos Aires", en: "Buenos Aires", pt: "Buenos Aires" },
+    alt: {
+      es: "Afiche de BitdevsBA Seminario Socratico #16. Sábado 28 de noviembre de 2026, 15:45 a 18:30, Cafe.te, Thames 937, Buenos Aires.",
+      en: "Poster for BitdevsBA Seminario Socratico #16. Saturday 28 November 2026, 15:45–18:30, Cafe.te, Thames 937, Buenos Aires.",
+      pt: "Cartaz do BitdevsBA Seminario Socratico #16. Sábado 28 de novembro de 2026, 15:45 às 18:30, Cafe.te, Thames 937, Buenos Aires.",
+    },
+    credit: {
+      kind: "bitacora",
+      identity: "BitDevsBA",
+      source: "https://bitdevsba.org/socratic-seminar-16/",
+    },
+    accent: "#ff9900",
+    ink: "#333333",
+    image: {
+      src: "/eventos/bitdevs-ba-2026-11-28.png",
+      avif: "/eventos/bitdevs-ba-2026-11-28.avif",
+      webp: "/eventos/bitdevs-ba-2026-11-28.webp",
+      width: 1200,
+      height: 630,
+    },
+    links: {
+      event: "https://bitdevsba.org/socratic-seminar-16/",
+      tickets: "https://app.evento.so/e/evt_nHFKpYNeAxpVQq1f",
+    },
+  },
 ];
