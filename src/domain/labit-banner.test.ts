@@ -197,6 +197,9 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.match(banner, /formatFeaturedCompact/);
   assert.match(banner, /bg-primary/);
   assert.match(banner, /text-muted-foreground/);
+  assert.match(banner, /border-2/);
+  assert.match(banner, /border-foreground/);
+  assert.ok(contrast("#1d1d1b", "#ffffff") >= 3);
   assert.doesNotMatch(banner, /event\.note|event\.where|featuredSource[^L]/);
   assert.ok(contrast("#ffffff", "#9a5600") >= 4.5);
   assert.ok(contrast("#5c6370", "#ffffff") >= 4.5);

@@ -70,7 +70,7 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
               alt={featuredText(event.alt, lang)}
               width={event.image.width}
               height={event.image.height}
-              className="h-auto w-full rounded-lg shadow-[var(--shadow-border)]"
+              className="h-auto w-full rounded-lg border-2 border-foreground shadow-[0_1px_2px_rgba(29,29,27,0.06),0_8px_18px_rgba(29,29,27,0.08)]"
               loading="lazy"
               decoding="async"
               fetchPriority="low"
