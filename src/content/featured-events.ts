@@ -243,7 +243,7 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     credit: {
       kind: "bitacora",
       identity: "Belo Horizonte BitDevs",
-      source: "https://www.meetup.com/pt-br/belo-horizonte-bitdevs/events/317255330/",
+      source: "https://bhbitdevs.org/",
     },
     accent: "#ff9900",
     ink: "#333333",
