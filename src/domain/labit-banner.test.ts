@@ -37,7 +37,50 @@ test("the banner rotates to the next event and hides when that instant passes", 
   assert.equal(pickFeatured("2026-11-24T15:00:00-03:00")?.id, "la-crypta-cowork-2026-11-24");
   assert.equal(pickFeatured("2026-11-24T14:59:00Z")?.id, "la-crypta-cowork-2026-11-24");
   assert.equal(pickFeatured("2026-11-25T02:59:00Z")?.id, "la-crypta-cowork-2026-11-24");
-  assert.equal(pickFeatured("2026-11-25T03:00:00Z"), null);
+  assert.equal(pickFeatured("2026-11-25T03:00:00Z")?.id, "bitdevs-bh-2026-11-25");
+  assert.equal(pickFeatured("2026-11-25T20:59:00-03:00")?.id, "bitdevs-bh-2026-11-25");
+  assert.equal(pickFeatured("2026-11-25T21:00:00-03:00")?.id, "bitdevs-sp-2026-11-26");
+  assert.equal(pickFeatured("2026-11-26T15:00:00-03:00")?.id, "bitdevs-sp-2026-11-26");
+  assert.equal(pickFeatured("2026-11-26T23:59:00-03:00")?.id, "bitdevs-sp-2026-11-26");
+  assert.equal(pickFeatured("2026-11-27T00:00:00-03:00")?.id, "bitdevs-ba-2026-11-28");
+  assert.equal(pickFeatured("2026-11-28T16:00:00-03:00")?.id, "bitdevs-ba-2026-11-28");
+  assert.equal(pickFeatured("2026-11-28T18:29:00-03:00")?.id, "bitdevs-ba-2026-11-28");
+  assert.equal(pickFeatured("2026-11-28T18:30:00-03:00"), null);
+});
+
+test("the next three BitDevs meetups chain without a gap and keep one clean link each", () => {
+  const bh = pickFeatured("2026-11-25T19:30:00-03:00");
+  const sp = pickFeatured("2026-11-26T12:00:00-03:00");
+  const between = pickFeatured("2026-11-27T12:00:00-03:00");
+  const ba = pickFeatured("2026-11-28T16:00:00-03:00");
+  assert.equal(bh?.id, "bitdevs-bh-2026-11-25");
+  assert.equal(sp?.id, "bitdevs-sp-2026-11-26");
+  assert.equal(between?.id, "bitdevs-ba-2026-11-28");
+  assert.equal(ba?.id, "bitdevs-ba-2026-11-28");
+  assert.ok(bh && sp && ba);
+  if (!bh || !sp || !ba) return;
+  assert.deepEqual(featuredLinks(bh).map((link) => link.kind), ["event"]);
+  assert.equal(featuredLinks(bh)[0]?.href, "https://www.meetup.com/pt-br/belo-horizonte-bitdevs/events/317255330/");
+  assert.deepEqual(featuredLinks(sp).map((link) => link.kind), ["event"]);
+  assert.equal(featuredLinks(sp)[0]?.href, "https://saopaulobitdevs.org/2026-11-26-socratic-seminar-050");
+  assert.equal(sp.startsAt, undefined);
+  assert.deepEqual(featuredLinks(ba).map((link) => link.kind), ["event", "tickets"]);
+  assert.equal(featuredLinks(ba)[1]?.href, "https://app.evento.so/e/evt_nHFKpYNeAxpVQq1f");
+  for (const event of [bh, sp, ba]) {
+    assert.equal(event.credit.kind, "bitacora");
+    assert.equal(event.image.width, 1200);
+    assert.equal(event.image.height, 300);
+    assert.ok(event.image.avif && event.image.webp);
+    for (const link of featuredLinks(event)) {
+      assert.equal(link.href.endsWith("#"), false);
+      assert.equal(link.href.includes("utm_"), false);
+    }
+  }
+  assert.equal(formatFeaturedCompact(bh.startsAt || "", "pt"), "Qua 25 nov · 19:00");
+  assert.equal(formatFeaturedCompact(ba.startsAt || "", "es"), "Sáb 28 nov · 15:45");
+  assert.equal(featuredText(bh.place, "es"), "Belo Horizonte");
+  assert.equal(featuredText(sp.where, "pt"), "Vinteum, São Paulo, Brasil");
+  assert.equal(featuredText(ba.where, "es"), "Cafe.te, Thames 937, Buenos Aires, Argentina");
 });
 
 test("an end without an explicit offset is ignored", () => {
@@ -154,6 +197,10 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.match(banner, /formatFeaturedCompact/);
   assert.match(banner, /bg-primary/);
   assert.match(banner, /text-muted-foreground/);
+  assert.match(banner, /rounded-\[12px\]/);
+  assert.match(banner, /max-h-32/);
+  assert.match(banner, /sm:max-h-\[200px\]/);
+  assert.doesNotMatch(banner, /border-2 border-foreground/);
   assert.doesNotMatch(banner, /event\.note|event\.where|featuredSource[^L]/);
   assert.ok(contrast("#ffffff", "#9a5600") >= 4.5);
   assert.ok(contrast("#5c6370", "#ffffff") >= 4.5);
