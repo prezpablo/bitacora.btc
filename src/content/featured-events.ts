@@ -248,11 +248,11 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     accent: "#ff9900",
     ink: "#333333",
     image: {
-      src: "/eventos/bitdevs-bh-2026-11-25.png",
-      avif: "/eventos/bitdevs-bh-2026-11-25.avif",
-      webp: "/eventos/bitdevs-bh-2026-11-25.webp",
+      src: "/eventos/bitdevs-bh-2026-11-25-wide.png",
+      avif: "/eventos/bitdevs-bh-2026-11-25-wide.avif",
+      webp: "/eventos/bitdevs-bh-2026-11-25-wide.webp",
       width: 1200,
-      height: 630,
+      height: 300,
     },
     links: {
       event: "https://www.meetup.com/pt-br/belo-horizonte-bitdevs/events/317255330/",
@@ -287,11 +287,11 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     accent: "#ff9900",
     ink: "#333333",
     image: {
-      src: "/eventos/bitdevs-sp-2026-11-26.png",
-      avif: "/eventos/bitdevs-sp-2026-11-26.avif",
-      webp: "/eventos/bitdevs-sp-2026-11-26.webp",
+      src: "/eventos/bitdevs-sp-2026-11-26-wide.png",
+      avif: "/eventos/bitdevs-sp-2026-11-26-wide.avif",
+      webp: "/eventos/bitdevs-sp-2026-11-26-wide.webp",
       width: 1200,
-      height: 630,
+      height: 300,
     },
     links: {
       event: "https://saopaulobitdevs.org/2026-11-26-socratic-seminar-050",
@@ -326,11 +326,11 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     accent: "#ff9900",
     ink: "#333333",
     image: {
-      src: "/eventos/bitdevs-ba-2026-11-28.png",
-      avif: "/eventos/bitdevs-ba-2026-11-28.avif",
-      webp: "/eventos/bitdevs-ba-2026-11-28.webp",
+      src: "/eventos/bitdevs-ba-2026-11-28-wide.png",
+      avif: "/eventos/bitdevs-ba-2026-11-28-wide.avif",
+      webp: "/eventos/bitdevs-ba-2026-11-28-wide.webp",
       width: 1200,
-      height: 630,
+      height: 300,
     },
     links: {
       event: "https://bitdevsba.org/socratic-seminar-16/",

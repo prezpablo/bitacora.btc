@@ -69,7 +69,7 @@ test("the next three BitDevs meetups chain without a gap and keep one clean link
   for (const event of [bh, sp, ba]) {
     assert.equal(event.credit.kind, "bitacora");
     assert.equal(event.image.width, 1200);
-    assert.equal(event.image.height, 630);
+    assert.equal(event.image.height, 300);
     assert.ok(event.image.avif && event.image.webp);
     for (const link of featuredLinks(event)) {
       assert.equal(link.href.endsWith("#"), false);
@@ -197,9 +197,10 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.match(banner, /formatFeaturedCompact/);
   assert.match(banner, /bg-primary/);
   assert.match(banner, /text-muted-foreground/);
-  assert.match(banner, /border-2/);
-  assert.match(banner, /border-foreground/);
-  assert.ok(contrast("#1d1d1b", "#ffffff") >= 3);
+  assert.match(banner, /rounded-\[12px\]/);
+  assert.match(banner, /max-h-32/);
+  assert.match(banner, /sm:max-h-\[200px\]/);
+  assert.doesNotMatch(banner, /border-2 border-foreground/);
   assert.doesNotMatch(banner, /event\.note|event\.where|featuredSource[^L]/);
   assert.ok(contrast("#ffffff", "#9a5600") >= 4.5);
   assert.ok(contrast("#5c6370", "#ffffff") >= 4.5);

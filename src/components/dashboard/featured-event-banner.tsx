@@ -59,10 +59,10 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
   const [creditBefore, creditAfter] = creditTemplate.split(`{${creditToken}}`);
 
   return (
-    <section aria-labelledby={`${kickerId} ${titleId}`} className="space-y-4">
-      <figure className="space-y-4">
+    <section aria-labelledby={`${kickerId} ${titleId}`}>
+      <figure className="flex flex-col overflow-hidden rounded-[12px] border border-[#e6d5c3] bg-[#fbf6ef] shadow-[0_10px_28px_rgba(90,55,20,0.10)] sm:flex-row sm:items-center">
         {src ? (
-          <picture>
+          <picture className="flex justify-center bg-white sm:max-w-[68%] sm:shrink-0">
             {avif ? <source srcSet={avif} type="image/avif" /> : null}
             {webp ? <source srcSet={webp} type="image/webp" /> : null}
             <img
@@ -70,14 +70,14 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
               alt={featuredText(event.alt, lang)}
               width={event.image.width}
               height={event.image.height}
-              className="h-auto w-full rounded-lg border-2 border-foreground shadow-[0_1px_2px_rgba(29,29,27,0.06),0_8px_18px_rgba(29,29,27,0.08)]"
+              className="block h-auto max-h-32 w-full object-contain object-left sm:max-h-[200px] sm:w-auto sm:max-w-[46rem]"
               loading="lazy"
               decoding="async"
               fetchPriority="low"
             />
           </picture>
         ) : null}
-        <figcaption className="space-y-2">
+        <figcaption className="flex min-w-0 flex-1 flex-col justify-center gap-2 px-3 py-3 sm:px-4">
           <p id={kickerId} className="text-xs font-medium tracking-wide text-primary uppercase">
             {t("featuredKicker")}
           </p>
@@ -113,38 +113,38 @@ export function FeaturedEventBanner({ now }: { now?: Date }) {
               </>
             ) : null}
           </p>
+          {links.length ? (
+            <div className="flex flex-row flex-wrap gap-2">
+              {links.map((link) => {
+                const visible = t(LINK_SHORT[link.kind]);
+                const parts = featuredLinkSplit(t(LINK_FULL[link.kind]), visible);
+                return (
+                  <a
+                    key={link.kind}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-describedby={externalId}
+                    className="inline-flex min-h-11 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  >
+                    {visible}
+                    {parts ? (
+                      <span className="sr-only">
+                        {parts.lead}
+                        <Marked text={title} textLang={event.lang} uiLang={lang} />
+                        {parts.tail}
+                      </span>
+                    ) : null}
+                  </a>
+                );
+              })}
+              <p id={externalId} className="sr-only">
+                {t("featuredExternal")}
+              </p>
+            </div>
+          ) : null}
         </figcaption>
       </figure>
-      {links.length ? (
-        <div className="flex flex-row flex-wrap gap-2 sm:flex-nowrap">
-          {links.map((link) => {
-            const visible = t(LINK_SHORT[link.kind]);
-            const parts = featuredLinkSplit(t(LINK_FULL[link.kind]), visible);
-            return (
-              <a
-                key={link.kind}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-describedby={externalId}
-                className="inline-flex min-h-11 items-center rounded-md bg-primary px-3 text-sm font-medium text-white no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-              >
-                {visible}
-                {parts ? (
-                  <span className="sr-only">
-                    {parts.lead}
-                    <Marked text={title} textLang={event.lang} uiLang={lang} />
-                    {parts.tail}
-                  </span>
-                ) : null}
-              </a>
-            );
-          })}
-          <p id={externalId} className="sr-only">
-            {t("featuredExternal")}
-          </p>
-        </div>
-      ) : null}
     </section>
   );
 }
