@@ -6,12 +6,15 @@ import {
   foreignLang,
   formatFeaturedCompact,
   pickFeatured,
+  pickSpecialFeatured,
   siteAsset,
   type AppLang,
   type EventLang,
+  type FeaturedEvent,
   type FeaturedLinkKind,
 } from "@/domain/featured-event";
 import { BeachSplit, SovereignBanner } from "./labitconf-banner";
+import { SpecialEventBanner } from "./special-event-banner";
 import { useAppLang, useT, type CopyKey } from "@/lib/i18n";
 
 const LINK_FULL: Record<FeaturedLinkKind, CopyKey> = {
@@ -31,12 +34,25 @@ function Marked({ text, textLang, uiLang }: { text: string; textLang: EventLang;
   return mark ? <span lang={mark}>{text}</span> : text;
 }
 
-/** El evento que todavía no cerró. Si no hay ninguno, no ocupa lugar. */
+/** El especial vigente, arriba, y el destacado común que todavía no cerró. */
 export function FeaturedEventBanner({ now }: { now?: Date }) {
+  const clock = now ?? new Date();
+  const specials = pickSpecialFeatured(clock);
+  const event = pickFeatured(clock);
+  if (!specials.length && !event) return null;
+  return (
+    <div className="space-y-3">
+      {specials.map((item) => (
+        <SpecialEventBanner key={item.id} event={item} />
+      ))}
+      {event ? <FeaturedEventCard event={event} /> : null}
+    </div>
+  );
+}
+
+function FeaturedEventCard({ event }: { event: FeaturedEvent }) {
   const t = useT();
   const lang = useAppLang();
-  const event = pickFeatured(now ?? new Date());
-  if (!event) return null;
 
   if (event.id === "bitcoin-beach-2026") return <BeachSplit />;
   if (event.id === "sovereign-2026") return <SovereignBanner />;

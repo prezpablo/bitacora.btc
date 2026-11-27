@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { FEATURED_EVENTS, featuredHref, featuredLinks, featuredLinkSplit, featuredText, foreignLang, formatFeaturedCompact, formatFeaturedWhen, pickFeatured, siteAsset } from "./featured-event.ts";
+import { FEATURED_EVENTS, featuredActions, featuredHref, featuredLinks, featuredLinkSplit, featuredSourceLabel, featuredText, foreignLang, formatFeaturedCompact, formatFeaturedWhen, pickFeatured, pickSpecialFeatured, siteAsset } from "./featured-event.ts";
 import type { FeaturedEvent } from "./featured-event.ts";
 
 function contrast(ink: string, accent: string) {
@@ -220,4 +220,86 @@ test("the banner is a link row, not a sponsored seal, and does not hardcode the 
   assert.match(i18n, /Agenda de la comunidad: \{title\}/);
   assert.match(i18n, /Se abre el sitio del evento en otra pestaña/);
   assert.doesNotMatch(i18n, /labitKicker|Destacado · LABITCONF|Featured · LABITCONF|Destaque · LABITCONF|Patrocinado|en alianza/);
+});
+
+test("Crypto Talks stays a special banner above BitdevsBA and hides at 22:00 Montevideo", () => {
+  const during = "2026-11-28T16:00:00-03:00";
+  assert.equal(pickFeatured(during)?.id, "bitdevs-ba-2026-11-28");
+  const live = pickSpecialFeatured(during);
+  assert.deepEqual(
+    live.map((event) => event.id),
+    ["crypto-talks-2026-11-28"],
+  );
+  assert.equal(pickFeatured("2026-11-28T18:30:00-03:00"), null);
+  assert.equal(pickSpecialFeatured("2026-11-28T18:30:00-03:00")[0]?.id, "crypto-talks-2026-11-28");
+  assert.equal(pickSpecialFeatured("2026-11-28T21:59:00-03:00")[0]?.id, "crypto-talks-2026-11-28");
+  assert.deepEqual(pickSpecialFeatured("2026-11-28T22:00:00-03:00"), []);
+  assert.deepEqual(pickSpecialFeatured("2026-11-29T01:00:00Z"), []);
+
+  const talk = live[0];
+  assert.ok(talk);
+  if (!talk) return;
+  assert.equal(talk.variant, "special");
+  assert.equal(Date.parse(talk.startsAt || ""), Date.parse("2026-11-28T21:00:00Z"));
+  assert.equal(Date.parse(talk.endsAt), Date.parse("2026-11-29T01:00:00Z"));
+  assert.equal(formatFeaturedCompact(talk.startsAt || "", "es"), "Sáb 28 nov · 18:00");
+  assert.equal(formatFeaturedCompact(talk.startsAt || "", "en"), "Sat 28 Nov · 18:00");
+  assert.equal(formatFeaturedCompact(talk.startsAt || "", "pt"), "Sáb 28 nov · 18:00");
+  assert.equal(talk.links?.agenda, undefined);
+  assert.equal(featuredLinks(talk).map((link) => link.kind).join(), "event");
+  assert.deepEqual(
+    featuredActions(talk).map((link) => link.href),
+    ["https://luma.com/u6dg4pio", "https://luma.com/u6dg4pio"],
+  );
+  assert.equal(featuredSourceLabel(talk.credit.source), "luma.com/u6dg4pio");
+  assert.equal(talk.credit.kind, "image");
+  if (talk.credit.kind !== "image") return;
+  assert.equal(talk.credit.artist, "Crypto Talks / Descubriendo Bitcoin");
+  assert.equal(featuredText(talk.cta?.tickets?.short, "es"), "Inscribirse (gratis)");
+  assert.equal(featuredText(talk.cta?.tickets?.short, "en"), "Register (free)");
+  assert.equal(featuredText(talk.cta?.tickets?.short, "pt"), "Inscrever-se (grátis)");
+  assert.deepEqual(featuredLinkSplit(featuredText(talk.cta?.tickets?.full, "es"), "Inscribirse (gratis)"), {
+    lead: " a ",
+    tail: "",
+  });
+  assert.deepEqual(featuredLinkSplit(featuredText(talk.cta?.tickets?.full, "en"), "Register (free)"), {
+    lead: " for ",
+    tail: "",
+  });
+  assert.deepEqual(featuredLinkSplit(featuredText(talk.cta?.tickets?.full, "pt"), "Inscrever-se (grátis)"), {
+    lead: " em ",
+    tail: "",
+  });
+  assert.match(featuredText(talk.note, "es"), /desde cero/);
+  assert.match(featuredText(talk.note, "en"), /from scratch/);
+  assert.match(featuredText(talk.note, "pt"), /a partir do zero/);
+  assert.match(featuredText(talk.where, "es"), /Sala Tempus/);
+  assert.match(featuredText(talk.hosts, "en"), /Roderich's Crypto House/);
+  assert.match(featuredText(talk.program, "pt"), /Iván Kaleja/);
+  assert.equal(talk.image.width, 640);
+  assert.equal(talk.image.height, 640);
+  assert.ok(contrast("#ffffff", "#2d61e6") >= 4.5);
+  assert.ok(contrast("#ffffff", "#1f4ed5") >= 4.5);
+  assert.ok(contrast("#f4f2f1", "#1a1a1d") >= 4.5);
+  assert.ok(contrast("#dd8f5b", "#1a1a1d") >= 4.5);
+  // #3671f5 (el extremo claro pedido) queda en 4.34:1 con blanco. El botón arranca en #2d61e6.
+  assert.ok(contrast("#ffffff", "#3671f5") < 4.5);
+
+  const view = readFileSync(new URL("../components/dashboard/special-event-banner.tsx", import.meta.url), "utf8");
+  const shell = readFileSync(new URL("../components/dashboard/featured-event-banner.tsx", import.meta.url), "utf8");
+  assert.match(shell, /pickSpecialFeatured/);
+  assert.match(shell, /SpecialEventBanner/);
+  assert.match(view, /featuredActions/);
+  assert.match(view, /loading="lazy"/);
+  assert.match(view, /image\/avif/);
+  assert.match(view, /image\/webp/);
+  assert.match(view, /rel="noopener noreferrer"/);
+  assert.match(view, /target="_blank"/);
+  assert.match(view, /aria-describedby/);
+  assert.match(view, /featuredSpecialKicker/);
+  assert.match(view, /featuredCreditImage/);
+  assert.match(view, /width=\{event\.image\.width\}/);
+  assert.match(view, /height=\{event\.image\.height\}/);
+  assert.match(view, /#2d61e6,#1f4ed5/);
+  assert.doesNotMatch(view, /#3671f5|Plus Jakarta|fontsource|https?:\/\/|utm_|Agenda<\/a>/);
 });
