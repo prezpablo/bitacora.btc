@@ -5,7 +5,7 @@ import {
   type LangText,
 } from "../content/featured-events.ts";
 
-export type { EventLang, FeaturedCredit, FeaturedEvent, FeaturedImage, FeaturedLinks, LangText } from "../content/featured-events.ts";
+export type { EventLang, FeaturedCredit, FeaturedCtaLabel, FeaturedEvent, FeaturedImage, FeaturedLinks, LangText } from "../content/featured-events.ts";
 export { FEATURED_EVENTS } from "../content/featured-events.ts";
 
 export type AppLang = "es" | "en" | "pt";
@@ -28,22 +28,47 @@ export function featuredEndMs(iso: string): number | null {
   return Number.isFinite(ms) ? ms : null;
 }
 
-/** El que cierra antes, mientras `now` sea anterior a `endsAt`. En el instante de cierre, ya no. */
+function featuredNowMs(now: Date | number | string): number | null {
+  const ms = typeof now === "number" ? now : now instanceof Date ? now.getTime() : Date.parse(now);
+  return Number.isFinite(ms) ? ms : null;
+}
+
+/** El que cierra antes, mientras `now` sea anterior a `endsAt`. En el instante de cierre, ya no.
+ *  `variant: "special"` no entra: se muestra aparte, arriba. */
 export function pickFeatured(
   now: Date | number | string = new Date(),
   events: readonly FeaturedEvent[] = FEATURED_EVENTS,
 ): FeaturedEvent | null {
-  const ms = typeof now === "number" ? now : now instanceof Date ? now.getTime() : Date.parse(now);
-  if (!Number.isFinite(ms)) return null;
+  const ms = featuredNowMs(now);
+  if (ms == null) return null;
   let next: FeaturedEvent | null = null;
   let nextEnd = Infinity;
   for (const event of events) {
+    if (event.variant === "special") continue;
     const end = featuredEndMs(event.endsAt);
     if (end == null || ms >= end || end >= nextEnd) continue;
     next = event;
     nextEnd = end;
   }
   return next;
+}
+
+/** Especiales que todavía no cerraron, el que cierra antes primero. */
+export function pickSpecialFeatured(
+  now: Date | number | string = new Date(),
+  events: readonly FeaturedEvent[] = FEATURED_EVENTS,
+): FeaturedEvent[] {
+  const ms = featuredNowMs(now);
+  if (ms == null) return [];
+  const open: FeaturedEvent[] = [];
+  for (const event of events) {
+    if (event.variant !== "special") continue;
+    const end = featuredEndMs(event.endsAt);
+    if (end == null || ms >= end) continue;
+    open.push(event);
+  }
+  open.sort((a, b) => (featuredEndMs(a.endsAt) ?? 0) - (featuredEndMs(b.endsAt) ?? 0));
+  return open;
 }
 
 const LINK_ORDER: readonly FeaturedLinkKind[] = ["event", "tickets", "agenda"];
@@ -79,6 +104,25 @@ export function featuredLinks(event: FeaturedEvent): FeaturedLink[] {
     out.push({ kind, href });
   }
   return out;
+}
+
+/** Igual que `featuredLinks`, pero conserva dos botones que apuntan a la misma ficha. */
+export function featuredActions(event: FeaturedEvent): FeaturedLink[] {
+  const out: FeaturedLink[] = [];
+  for (const kind of LINK_ORDER) {
+    const href = featuredHref(event.links?.[kind]);
+    if (!href) continue;
+    out.push({ kind, href });
+  }
+  return out;
+}
+
+/** Host y ruta, sin esquema. Para el crédito visible. Vacío si la ficha no es https limpio. */
+export function featuredSourceLabel(raw: string | undefined): string {
+  const href = featuredHref(raw);
+  if (!href) return "";
+  const url = new URL(href);
+  return `${url.host}${url.pathname.replace(/\/$/, "")}`;
 }
 
 export function featuredText(text: LangText | undefined, lang: AppLang): string {

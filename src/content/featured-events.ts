@@ -11,14 +11,20 @@
  * La imagen vive en este repo (`/eventos/…`). No se carga nada del sitio del organizador.
  * `lang` es el idioma del nombre del evento (`es`, `en` o `pt`). Si la página está
  * en otro idioma, ese nombre se marca con `lang` (WCAG 3.1.2).
- * `credit` no es un patrocinio ni un aval. Dos casos:
+ * `credit` no es un patrocinio ni un aval. Tres casos:
  * - `{ kind: "organizer", artist, source }`: el afiche lo hizo el organizador.
  *   Se lee «Arte: {artist}».
  * - `{ kind: "bitacora", identity, source }`: el diseño es de Bitácora BTC y usa
  *   la identidad visual de `identity`. No atribuye la pieza al organizador.
  *   Se lee «Diseño: Bitácora BTC, con la identidad visual de {identity}».
  * `source` es la ficha oficial, https, sin seguimiento. Se muestra como texto.
+ * - `{ kind: "image", artist, source }`: la foto es del organizador. Se lee
+ *   «Imagen: {artist} (host y ruta de source)». No es un aval.
  * Imagen nueva: 1200×630, AVIF + WebP + PNG de respaldo. `src` es el respaldo.
+ * Una tapa cuadrada puede ir a 640 px si el archivo original es cuadrado.
+ *
+ * `variant: "special"` no entra en la rotación. Se muestra arriba, aparte,
+ * mientras no haya pasado `endsAt`. El destacado común sigue su turno.
  */
 
 export type EventLang = "es" | "en" | "pt";
@@ -55,7 +61,18 @@ export type FeaturedCredit =
       /** De quién es la identidad visual. No es el autor de la pieza. */
       readonly identity: string;
       readonly source: string;
+    }
+  | {
+      readonly kind: "image";
+      /** De quién es la foto oficial. */
+      readonly artist: string;
+      readonly source: string;
     };
+
+export type FeaturedCtaLabel = {
+  readonly short: LangText;
+  readonly full: LangText;
+};
 
 export type FeaturedEvent = {
   readonly id: string;
@@ -73,6 +90,16 @@ export type FeaturedEvent = {
   readonly ink: string;
   readonly image: FeaturedImage;
   readonly links?: FeaturedLinks;
+  /** `special` se pinta arriba y no ocupa el turno del destacado común. */
+  readonly variant?: "special";
+  readonly hosts?: LangText;
+  /** Texto corto de agenda. No es un enlace. */
+  readonly program?: LangText;
+  readonly cta?: {
+    readonly event?: FeaturedCtaLabel;
+    readonly tickets?: FeaturedCtaLabel;
+    readonly agenda?: FeaturedCtaLabel;
+  };
 };
 
 const BA = "Villanueva 1367, CABA, Argentina";
@@ -335,6 +362,78 @@ export const FEATURED_EVENTS: readonly FeaturedEvent[] = [
     links: {
       event: "https://bitdevsba.org/socratic-seminar-16/",
       tickets: "https://app.evento.so/e/evt_nHFKpYNeAxpVQq1f",
+    },
+  },
+  {
+    id: "crypto-talks-2026-11-28",
+    lang: "es",
+    variant: "special",
+    // 18:00–22:00 America/Montevideo (UTC−3 todo el año).
+    // Mismos instantes que 2026-11-28T21:00:00Z y 2026-11-29T01:00:00Z.
+    startsAt: "2026-11-28T18:00:00-03:00",
+    endsAt: "2026-11-28T22:00:00-03:00",
+    title: {
+      es: "Crypto Talks: Descubriendo Bitcoin",
+      en: "Crypto Talks: Descubriendo Bitcoin",
+      pt: "Crypto Talks: Descubriendo Bitcoin",
+    },
+    where: {
+      es: "World Trade Center Montevideo, Torre 4, Sala Tempus (lobby inferior), Dr. Luis Bonavita 1266, Buceo, Montevideo",
+      en: "World Trade Center Montevideo, Tower 4, Sala Tempus (lower lobby), Dr. Luis Bonavita 1266, Buceo, Montevideo",
+      pt: "World Trade Center Montevideo, Torre 4, Sala Tempus (saguão inferior), Dr. Luis Bonavita 1266, Buceo, Montevideo",
+    },
+    place: { es: "Montevideo", en: "Montevideo", pt: "Montevideo" },
+    note: {
+      es: "Última Crypto Talks del año. Encuentro gratuito para acercarse a Bitcoin desde cero. Entrada libre, con inscripción y cupos limitados.",
+      en: "Last Crypto Talks of the year. A free gathering to approach Bitcoin from scratch. Free entry, registration required, limited places.",
+      pt: "Última Crypto Talks do ano. Encontro gratuito para se aproximar do Bitcoin a partir do zero. Entrada livre, com inscrição e vagas limitadas.",
+    },
+    hosts: {
+      es: "Organizan Descubriendo Bitcoin y Roderich's Crypto House. Participan Plugin, Fundación Bitcoin Iberoamérica (FBI) y Bitcoin for Humanity. Acompañan Geyser, Paystand y Bitcoin Beach.",
+      en: "Organized by Descubriendo Bitcoin and Roderich's Crypto House. Taking part: Plugin, Fundación Bitcoin Iberoamérica (FBI), and Bitcoin for Humanity. Joined by Geyser, Paystand, and Bitcoin Beach.",
+      pt: "Organizam Descubriendo Bitcoin e Roderich's Crypto House. Participam Plugin, Fundación Bitcoin Iberoamérica (FBI) e Bitcoin for Humanity. Acompanham Geyser, Paystand e Bitcoin Beach.",
+    },
+    program: {
+      es: "Agenda: apertura Maximiliano Pérez (Plugin); Luis Canessa — FBI y LABIF; Sergio Strangis — Bitcoin para periodistas; Iván Kaleja (Bitcoin for Humanity) — economías circulares; cierre con drinks y merch.",
+      en: "Agenda: opening Maximiliano Pérez (Plugin); Luis Canessa — FBI and LABIF; Sergio Strangis — Bitcoin for journalists; Iván Kaleja (Bitcoin for Humanity) — circular economies; close with drinks and merch.",
+      pt: "Agenda: abertura Maximiliano Pérez (Plugin); Luis Canessa — FBI e LABIF; Sergio Strangis — Bitcoin para jornalistas; Iván Kaleja (Bitcoin for Humanity) — economias circulares; encerramento com drinks e merch.",
+    },
+    alt: {
+      es: "Afiche de Crypto Talks: Descubriendo Bitcoin. Monedas color cobre sobre fondo oscuro, pastilla azul con sábado 28 de noviembre de 18 a 22 h, y los logos de Descubriendo Bitcoin, Roderich's y Plugin.",
+      en: "Poster for Crypto Talks: Descubriendo Bitcoin. Copper-colored coins on a dark background, a blue pill reading Saturday 28 November from 18:00 to 22:00, and the logos of Descubriendo Bitcoin, Roderich's, and Plugin.",
+      pt: "Cartaz de Crypto Talks: Descubriendo Bitcoin. Moedas cor de cobre sobre fundo escuro, pílula azul com sábado 28 de novembro das 18 às 22 h, e os logos de Descubriendo Bitcoin, Roderich's e Plugin.",
+    },
+    credit: {
+      kind: "image",
+      artist: "Crypto Talks / Descubriendo Bitcoin",
+      source: "https://luma.com/u6dg4pio",
+    },
+    accent: "#2d61e6",
+    ink: "#ffffff",
+    image: {
+      src: "/eventos/crypto-talks-2026-11-28.png",
+      avif: "/eventos/crypto-talks-2026-11-28.avif",
+      webp: "/eventos/crypto-talks-2026-11-28.webp",
+      width: 640,
+      height: 640,
+    },
+    links: {
+      event: "https://luma.com/u6dg4pio",
+      tickets: "https://luma.com/u6dg4pio",
+    },
+    cta: {
+      tickets: {
+        short: {
+          es: "Inscribirse (gratis)",
+          en: "Register (free)",
+          pt: "Inscrever-se (grátis)",
+        },
+        full: {
+          es: "Inscribirse (gratis) a {title}",
+          en: "Register (free) for {title}",
+          pt: "Inscrever-se (grátis) em {title}",
+        },
+      },
     },
   },
 ];
